@@ -5,10 +5,9 @@ SCRIPT_NAME="${SCRIPT##*/}"
 SCRIPT_PATH="${SCRIPT%$SCRIPT_NAME}"
 case "$SCRIPT_PATH" in
     /*)  SCRIPT_RPATH="$SCRIPT_PATH" ;;
-    ./*) SCRIPT_RPATH="${CUR_PATH}/${SCRIPT_PATH#./}" ;;
-    *)   SCRIPT_RPATH="${CUR_PATH}/${SCRIPT_PATH}" ;;
+    ./*) SCRIPT_RPATH="${PWD}/${SCRIPT_PATH#./}" ;;
+    *)   SCRIPT_RPATH="${PWD}/${SCRIPT_PATH}" ;;
 esac
-CUR_PATH=`pwd`
 
 usage()
 {
