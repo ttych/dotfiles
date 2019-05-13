@@ -2,13 +2,13 @@
 
 ;;; mode::emacs
 
-(use-package ido
-  :config
-  (setq ido-create-new-buffer 'always)
-  (setq ido-enable-flex-matching t)
-  (setq ido-everywhere t)
-  (ido-mode t)
-  )
+;; (use-package ido
+;;   :config
+;;   (setq ido-create-new-buffer 'always)
+;;   (setq ido-enable-flex-matching t)
+;;   (setq ido-everywhere t)
+;;   (ido-mode t)
+;;   )
 
 (use-package try
   :ensure t)
@@ -62,6 +62,13 @@
          ("M-g j" . ace-jump-mode)
          ("M-g J" . ace-jump-mode-pop-mark)
          )
+  )
+
+(use-package ace-window
+  :ensure t
+  :bind ([remap other-window] . ace-window)
+  :config
+  (ace-window-display-mode t)
   )
 
 (use-package iy-go-to-char
@@ -148,9 +155,8 @@
   )
 
 
+
 ;;; mode::language
-
-
 
 (use-package paredit
   :ensure t
@@ -202,6 +208,18 @@
 
 (use-package puppet-mode
   :ensure t)
+
+
+
+;;; org
+
+(use-package ox-md)
+
+(use-package org-bullets
+  :ensure t
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+  )
 
 
 

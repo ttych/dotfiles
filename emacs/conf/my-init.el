@@ -65,16 +65,6 @@
 ;(setq tab-always-indent 'complete)
 
 
-;;; mini buffer
-(icomplete-mode 1)
-(global-set-key (kbd "C-x C-b") 'ibuffer)
-(autoload 'ibuffer "ibuffer" "List buffers." t)
-
-
-
-;;; Packages :: built-in
-
-
 ;;; Packages :: additional
 
 (use-package emamux
@@ -449,11 +439,6 @@ Start `ielm' if it's not already running."
 ;;         `((".*" . ,temporary-file-directory)))
 ;;   (setq undo-tree-auto-save-history t))
 
-(use-package ace-window
-  :ensure t
-  :config
-  (global-set-key (kbd "C-c o") 'ace-window)
-  (global-set-key [remap other-window] 'ace-window))
 
 ;; ;; temporarily highlight changes from yanking, etc
 (use-package volatile-highlights

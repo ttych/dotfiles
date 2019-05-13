@@ -45,6 +45,7 @@
  '(global-auto-revert-non-file-buffers t)
  '(global-display-line-numbers-mode t)
  '(history-length 1000)
+ '(icomplete-mode t)
  '(indent-tabs-mode t)
  '(indicate-empty-lines t)
  '(large-file-warning-threshold 100000000)

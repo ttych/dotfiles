@@ -4,26 +4,32 @@
 
 ;;; Code:
 
-;;; Search
+;; buffers
+;; (defalias 'list-buffers 'ibuffer)
+(global-set-key (kbd "C-x B") 'ibuffer)
+;; (global-set-key (kbd "C-x B") 'ibuffer-other-window)
+
+
+;; Comment
+(global-set-key (kbd "C-c #") 'comment-region)
+(global-set-key (kbd "C-c @") 'uncomment-region)
+
+
+;; Search
 (global-set-key (kbd "M-s O") 'multi-occur)
 (global-set-key (kbd "M-s d") 'find-dired)
 (global-set-key (kbd "M-s g") 'rgrep)
 (global-set-key (kbd "M-s r") 'query-replace-regexp)
 
 
-;;; Modes
+;; Modes
 (global-set-key (kbd "C-c m f") 'auto-fill-mode)
 (global-set-key (kbd "C-c m w") 'whitespace-mode)
 (global-set-key (kbd "C-c m s") 'auto-save-mode)
 (global-set-key (kbd "C-c m l") 'display-line-numbers-mode)
 
 
-;;; Comment
-(global-set-key (kbd "C-c #") 'comment-region)
-(global-set-key (kbd "C-c @") 'uncomment-region)
-
-
-;;; Align
+;; Align
 (global-set-key (kbd "C-x \\") 'align-regexp)
 
 ; C-c C-r    =>  recentf
