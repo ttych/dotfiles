@@ -56,7 +56,8 @@ conf_install()
     fi
 
     if [ -x "${conf_install__app}/install.sh" ]; then
-        ( cd "${conf_install__app}" && ./install.sh )
+        ( cd "${conf_install__app}" &&
+              INSTALL_DIR="$DOTFILES_INSTALL_DIR" ./install.sh )
     fi
 }
 
