@@ -41,7 +41,7 @@ conf_install()
         fi
     done
 
-    if [ -r "${conf_install__app}/install_list" ]; then
+    if [ -r "${conf_install__app}/install.list" ]; then
         while read a b; do
             [ -z "$a" ] && continue
             [ -z "$b" ] && continue
@@ -52,7 +52,7 @@ conf_install()
             esac
             rm -f "${DOTFILES_INSTALL_DIR}/$b" && \
                 ln -s "${DOTFILES_SOURCE_DIR}/${conf_install__app%/}$a" "${DOTFILES_INSTALL_DIR}/$b"
-        done  < "${conf_install__app}/install_list"
+        done  < "${conf_install__app}/install.list"
     fi
 
     if [ -x "${conf_install__app}/install.sh" ]; then
