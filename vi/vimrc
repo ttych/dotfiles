@@ -1,0 +1,4 @@
+set bg=dark
+
+" git commit message: spell checking and auto wrapping to 72 columns
+autocmd Filetype gitcommit setlocal spell textwidth=72
