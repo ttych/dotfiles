@@ -1,0 +1,528 @@
+#**********************************************************************
+#
+#    .twmrc	by	enigmatyc	@	open-coder.org
+#
+#**********************************************************************
+
+#IconDirectory	"/home/enigmatyc/images/bitmaps"
+
+NoGrabServer
+
+RandomPlacement
+
+#NoDefaults
+NoVersion
+
+NoRaiseOnMove
+NoRaiseOnResize
+
+#NoMenuShadows
+NoTitleHighlight
+NoHighlight
+NoTitleFocus
+NoSaveUnders
+SqueezeTitle
+ConstrainedMoveTime 0
+DecorateTransients
+#TitleButtonBorderWidth 0
+#ButtonIndent 0
+#LeftTitleButton "iconify.bm" = f.iconify
+#RightTitleButton "resize.bm" = f.resize
+OpaqueMove
+#ClientBorderWidth
+BorderWidth	1
+
+#IconRegion	"1024x250+0+600" NORTH WEST 1024 25
+IconRegion	"600x200-200+0" NORTH EAST 75 25
+#IconRegion	"200x100-0+200" WEST NORTH 25 50
+TitleFont	"-*-helvetica-bold-o-normal--*-140-*-*-*-*-iso8859-1"
+MenuFont	"-*-helvetica-bold-r-normal--*-140-*-*-*-*-iso8859-1"
+IconFont	"-*-helvetica-bold-r-normal--*-140-*-*-*-*-iso8859-1"
+ResizeFont	"-*-helvetica-bold-r-normal--*-120-*-*-*-*-iso8859-1"
+IconManagerFont	"-*-helvetica-bold-r-normal--*-120-*-*-*-*-iso8859-1"
+
+ShowIconManager
+SortIconManager
+IconManagerGeometry	"=100x100-200+0"
+
+# nice colors:  background of wheat, foreground of #d36
+
+Cursors
+{
+#	Button "left_ptr"
+#	Menu "left_ptr"
+#	Title "left_ptr"
+	Frame "left_ptr"
+#	Icon "left_ptr"
+	Frame     "left_ptr"
+        Title     "left_ptr"
+	Icon      "left_ptr"
+        IconMgr   "left_ptr"
+        Move      "fleur"
+        Resize    "fleur"
+        Menu      "hand1"
+        Button    "hand2"
+        Wait      "clock"
+        Select    "dot"
+        Destroy   "pirate"
+}
+
+Color
+{
+    BorderColor "black"
+    TitleBackground "CadetBlue"
+    TitleForeground "#fffff0"
+    MenuBackground "#fffff0"
+    MenuForeground "black"
+    MenuTitleBackground "CadetBlue"
+    MenuTitleForeground "#fffff0"
+    IconBackground "#fffff0"
+    IconForeground "black"
+    IconBorderColor "black"
+}
+
+Monochrome
+{
+	IconManagerHighlight	"white"
+}
+
+# define key bindings
+
+
+MoveDelta 3
+
+Function "move-or-raise" { f.move f.deltastop f.raise }
+Function "move-or-lower" { f.move f.deltastop f.lower }
+Function "move-or-raiselower" { f.move f.deltastop f.raiselower }
+Function "move-or-iconify" { f.move f.deltastop f.iconify }
+Function "focus-move" { f.raise f.deltastop f.move }
+Function "window-client" { f.delete f.deltastop f.destroy }
+Function "next-window" { }
+Function "previous-window" { }
+
+DefaultFunction f.nop
+
+
+
+
+
+#ForceIcons
+
+#Icons
+#{
+#	"Xmh"		"mail-up.bm"	# from IconDirectory
+#	"XTerm"		"xterm.bm"	# from IconDirectory
+#	"XTerm"  "/home/chris/.x/xterm.icon"
+#	"Buddy List" "/home/chris/.x/aim.icon"
+#	"XTerm"   "/usr/X11R6/include/X11/bitmaps/Term"
+#	"x11amp"  "/usr/include/X11/bitmaps/xfm_au.xbm"
+#}
+
+#UnknownIcon	"icon"
+
+NoTitle
+{
+  "clock"
+  "oclock"
+  "xclock"
+  "xbiff"
+  "xeyes"
+  "xload"
+  "dclock"
+  "gkrellm"
+	"xmms"
+}
+
+
+IconManagerDontShow {
+	"clock"
+	"oclock"
+	"xclock"
+	"xbiff"
+	"xeyes"
+	"xload"
+	"dclock"
+	"gkrellm"
+}
+
+menu "Applications"
+{
+	"Applications"		f.title
+	#""		f.nop
+#	"Files"		f.menu "files"
+	"Terms"		f.menu "terms"
+	"Editors"	f.menu "editors"
+	"Internet"       f.menu "internet"
+	"Hosts"		f.menu "hosts"
+#	"Mathematica"	f.menu "mathematica"
+	"Graphics"      f.menu "graphics"
+	"Viewers"	f.menu "viewers"
+	"Music"         f.menu "music"
+	"Games"		f.menu "games"
+	"Utilities"     f.menu "utilities"
+	"System"	f.menu "system"
+	"W-Manager"	f.menu "WManager"
+}
+
+menu "hosts"
+{
+	"vnc - win"	f.exec "vncviewer 192.168.0.200 &"
+	"ssh - cube"	f.exec "aterm -e ssh -p 42 cube &"
+	"ssh - smiley"	f.exec "aterm -e ssh smiley &"
+	"ssh - nium"	f.exec "aterm -e ssh nium &"
+}
+
+menu "files"
+{
+"Files"		f.title
+"Midc"		f.exec "xterm -sl 255 -bg black -fg white -e midc -b &"
+}
+
+menu "terms"
+{
+	"Terms"		f.title
+	"xterm"		f.exec "xterm &"
+	"aterm"		f.exec "aterm &"
+	"rxvt"		f.exec "rxvt &"
+	"eterm"		f.exec "Eterm &"
+	"konsole"	f.exec "konsole &"
+	"gnome-T"	f.exec "gnome-terminal &"
+}
+
+menu "mathematica"
+{
+"Mathematica" 	f.title
+"Mathematica" 	f.exec "mathematica &"
+}
+
+menu "editors"
+{
+	"Editors"	f.title
+	"emacs"		f.exec "emacs &"
+	"gvim"		f.exec "gvim &"
+	"Xemacs"	f.exec "xemacs &"
+	"nedit"		f.exec "nedit &"
+	"OpenOffice.Org"	f.exec "openoffice.org &"
+	"OOO-swriter"	f.exec "openoffice.org-1.1.5-swriter &"
+	"Joe"		f.exec "xterm -bg black -fg white -e joe &"
+}
+
+menu "system"
+{
+"System" 	f.title
+"Xosview"	f.exec "xosview &"
+"Top"		f.exec "xterm -bg black -fg white -e top &"
+"Gkrellm"	f.exec "gkrellm &"
+}
+
+menu "viewers"
+{
+"Viewers"	f.title
+"Ghostview"	f.exec "gv &"
+"Xdvi"		f.exec "xdvi -rv -fg black -bg white -geometry 800x700 &"
+"Acrobat"	f.exec "acroread4 -geometry 800x700 &"
+"Xpdf"		f.exec "xpdf &"
+}
+
+menu "internet"
+{
+"Internet"    f.title
+"firefox"	f.exec "firefox &"
+"Mozilla"	f.exec "mozilla &"
+"Opera"		f.exec "opera &"
+"Netscape"      f.exec "netscape -geometry 800x700 &"
+#"IRC II"     f.exec "xterm -bg midnightblue -name irc@twm.org -fg white -e irk2 &"
+#"Portscan"   f.exec "/home/prg/java/portscan/portscan &"
+#"ICQ"        f.exec "/usr/local/ICQJava/ICQ &"
+"Lynx"       f.exec "xterm -bg black -fg white -e lynx &"
+#Lynx, the bug-free internetbrowser :)
+#""           f.nop
+#"PPP"        f.menu "ppp"
+}
+
+menu "ppp"
+{
+"PPP"       f.title
+"Linkup"    f.exec "pppd &"
+"Hang up"   f.exec "ppp-off &"
+}
+
+menu "graphics"
+{
+"Graphics"      f.title
+"XV"            f.exec "xv -bg black -fg white -hi black -lo grey30 &"
+"Gimp"          f.exec "gimp &"
+"ElectricEyes"	f.exec "ElectricEyes &"
+#"xRes"          f.exec "/home/prg/xRes &"
+#"Xpaint"        f.exec "xpaint"
+}
+
+menu "music"
+{
+"Music"	        f.title
+"Xmms"		f.exec "xmms &"
+"VideoLan"	f.exec "vlc &"
+"Xine"		f.exec "xine &"
+"CdPlayer"	f.exec "xterm -bg black -fg white -e cd-console &"
+"Mp3Blaster"	f.exec "xterm -bg black -fg white -e mp3blaster &"
+#"RealPlayer"	f.exec "/usr/home/keppler/RealPlayer8/realplay &"
+#"Xmovie"	f.exec "xmovie &"
+"X11amp"        f.exec "x11amp &"
+"Audacious"	f.exec "audacious &"
+"Workman"       f.exec "workman &"
+#"TkMix"         f.exec "tkmix &"
+}
+
+menu "games"
+{
+"Games"		f.title
+"gTetrinet"	f.exec "getetrinet &"
+"Xboard"	f.exec "xboard -rv &"
+}
+
+menu "utilities"
+{
+"Utilities"      f.title
+"Xman"		f.exec "xman -rv &"
+"Xclock" 	f.exec "xclock -rv -analog &"
+"Xcalc"		f.exec "xcalc -rv &"
+"Xclipboard"	f.exec "xclipboard &"
+# The Realistic Macintosh emulator
+#"vMac"           f.exec "/home/prg/vMacX/execmac &"
+# The Impressive Macintosh emulator
+#"Executor"       f.exec "executor-demo &"
+#bochs a pc emulator for unix/beos .. able to run win95 but a bit slow :(
+#"Bochs"          f.exec "/tmp/bochs-980227/bochs"
+}
+
+menu "window"
+{
+"X Windows"      f.title
+"Kill Window"    f.destroy
+"Delete Window"  f.delete
+""               f.nop
+"Maximize"       f.fullzoom
+"Minimize"       f.iconify
+#"Resize"         f.resize
+"Move"           f.move
+#"Raise"          f.raise
+#"Lower"          f.lower
+""               f.nop
+"Focus"          f.focus
+"Unfocus"        f.unfocus
+"Show Iconmgr"   f.showiconmgr
+"Hide Iconmgr"   f.hideiconmgr
+""               f.nop
+"Screensaver"    f.menu "screensaver" 
+"Redraw"         f.refresh
+"Restart"        f.restart
+"Quit"           f.menu "quit"
+}
+
+menu "quit"
+{
+"Really Quit?"     f.title
+"No"               f.nop
+"Yes"              f.quit
+}
+
+menu "screensaver"
+{
+"ZZzz..."        f.title
+"Laser"          f.exec "xlock -nolock -mode laser &"
+"Qix"            f.exec "xlock -nolock -mode qix &"
+"Star trek"      f.exec "xlock -nolock -mode star &"
+"Galaxy"         f.exec "xlock -nolock -mode galaxy -wireframe&"
+"Pyrotechnical"  f.exec "xlock -nolock -mode pyro -wireframe &"
+"Swarm"          f.exec "xlock -nolock -mode swarm &"
+"OS"		f.exec "xlock -nolock -mode flag &"
+}
+
+
+
+
+
+menu "Middle"
+{
+"Toys"		f.title
+"Jove"		!"xjove &"
+"Mail"		!"xmh &"
+"Manual"	!"xman &"
+"Troff Viewer"	!"xditview &"
+"Calculator"	!"xcalc &"
+"Mille Bornes"	!"xmille `path -n .mille` &"
+"Notepad"	!"xclipboard &"
+"Eyes"		!"xeyes &"
+"Lens"		!"xmag &"
+"expo jove"	!"expo xjove&"
+"expo mail"	!"expo xmh &"
+}
+
+
+
+
+
+
+menu "WManager"
+{
+	"W-Manager"			f.title
+	"Window ops"		f.menu "Window Ops"
+	"Windows"		f.menu "TwmWindows"
+	""			f.nop
+	"Refresh"		f.refresh
+	"Unfocus"		f.unfocus
+	"Show Icon Box"		f.showiconmgr
+	"Hide Icon Box"		f.hideiconmgr
+	"Version"		f.version
+	""			f.nop
+	"Screensaver"		f.menu "screensaver"
+	""			f.nop
+	"Restart"		f.restart
+	"Logout"		f.quit
+}
+
+menu "Window Ops"
+{
+	"Window Ops"		f.title
+	"Lower"			f.lower
+	"Raise"			f.raise
+	"Resize"		f.resize
+	"Move"			f.move
+	"Deiconify"		f.deiconify
+	"Iconify"		f.iconify
+	"Identify"		f.identify
+	"Focus"			f.focus
+	"Kill"			f.destroy
+}
+
+
+
+menu "Title Menu"
+{
+	"Lower"			f.lower
+	"Raise"			f.raise
+	"Resize"		f.resize
+	"Move"			f.move
+	"Iconify"		f.iconify
+	"Identify"		f.identify
+	"Focus"			f.focus
+	"Kill"			f.destroy
+	"Dismiss"		f.delete
+}
+
+menu "Quick"
+{
+	"Quick"			f.title
+	"xTerm"			f.exec "xterm &"
+	""			f.nop
+	"Xkill"			f.exec "xkill &"
+}
+
+Button1 =	: root		: f.menu "Applications"
+#Button2 =	: root		: f.menu "Middle"
+#Button2 =	: root		: f.nop
+Button3 =	: root		: f.menu "WManager"
+Button1 = m2	: root		: f.menu "Applications"
+#Button2 = m2	: root		: f.menu "Middle"
+#Button2 = m2	: root		: f.nop
+Button3 = m2	: root		: f.menu "WManager"
+Button1 = m3	: root		: f.menu "Applications"
+#Button2 = m3	: root		: f.menu "Middle"
+#Button2 = m3	: root		: f.nop
+Button3 = m3	: root		: f.menu "WManager"
+
+
+Button1	=	: title 	: f.function "move-or-raiselower"
+#Button2 =	: title		: f.menu "Title Menu"
+#Button3 =	: title		: f.resize
+#Button2 =	: title		: f.nop
+Button3 =	: title		: f.menu "Title Menu"
+Button1	= m2	: title 	: f.function "move-or-raiselower"
+#Button2 = m2	: title		: f.menu "Title Menu"
+#Button3 = m2	: title		: f.resize
+#Button2 = m2	: title		: f.nop
+Button3 = m2	: title		: f.menu "Title Menu"
+Button1	= m3	: title 	: f.function "move-or-raiselower"
+#Button2 = m3	: title		: f.menu "Title Menu"
+#Button3 = m3	: title		: f.resize
+#Button2 = m3	: title		: f.nop
+Button3 = m3	: title		: f.menu "Title Menu"
+
+
+Button3 = c m	: title		: f.destroy
+Button3 = c m | m2	: title		: f.destroy
+Button3 = c m | m3	: title		: f.destroy
+
+Button1 = m	: window|icon	: f.function "move-or-raiselower"
+#Button2 = m	: window|icon	: f.function "move-or-raiselower"
+Button3 = m	: window|icon	: f.resize
+Button1 = m | m2	: window|icon	: f.function "move-or-raiselower"
+#Button2 = m | m2	: window|icon	: f.function "move-or-raiselower"
+Button3 = m | m2	: window|icon	: f.resize
+Button1 = m | m3	: window|icon	: f.function "move-or-raiselower"
+#Button2 = m | m3	: window|icon	: f.function "move-or-raiselower"
+Button3 = m | m3	: window|icon	: f.resize
+
+
+Button1 =	: icon		: f.function "move-or-iconify"
+Button3 =	: icon		: f.menu "Title Menu"
+Button1 = m2	: icon		: f.function "move-or-iconify"
+Button3 = m2	: icon		: f.menu "Title Menu"
+Button1 = m3	: icon		: f.function "move-or-iconify"
+Button3 = m3	: icon		: f.menu "Title Menu"
+
+Button1 = 		: iconmgr	: f.iconify
+#Button2 = 		: iconmgr	: f.destroy
+Button3 = 		: iconmgr	: f.menu "Title Menu"
+Button1 =	m2	: iconmgr	: f.iconify
+#Button2 =	m2	: iconmgr	: f.destroy
+Button3 =	m2	: iconmgr	: f.menu "Title Menu"
+Button1 =	m3	: iconmgr	: f.iconify
+#Button2 =	m3	: iconmgr	: f.destroy
+Button3 =	m3	: iconmgr	: f.menu "Title Menu"
+
+Button1 = c		: all	: f.iconify
+#Button2 = c		: all	: f.destroy
+Button3 = c		: all	: f.menu "Title Menu"
+Button1 = c |	m2	: all	: f.iconify
+#Button2 = c |	m2	: all	: f.destroy
+Button3 = c | 	m2	: all	: f.menu "Title Menu"
+Button1 = c | 	m3	: all	: f.iconify
+#Button2 = c | 	m3	: all	: f.destroy
+Button3 = c |	m3	: all	: f.menu "Title Menu"
+
+Button1 = c		: root		: f.menu "Quick"
+Button3 = c		: root		: f.menu "Quick"
+Button1 = c | m2	: root		: f.menu "Quick"
+Button3 = c | m2	: root		: f.menu "Quick"
+Button1 = c | m3	: root		: f.menu "Quick"
+Button3 = c | m3	: root		: f.menu "Quick"
+
+"Left"	= m		: all	: f.horizoom
+"Right"	= m		: all	: f.horizoom
+"Up"	= m		: all	: f.zoom
+"Down"	= m		: all	: f.fullzoom
+
+"Left"	= m|m2		: all	: f.horizoom
+"Right"	= m|m2		: all	: f.horizoom
+"Up"	= m|m2		: all	: f.zoom
+"Down"	= m|m2		: all	: f.fullzoom
+
+"Left"	= m|m3		: all	: f.horizoom
+"Right"	= m|m3		: all	: f.horizoom
+"Up"	= m|m3		: all	: f.zoom
+"Down"	= m|m3		: all	: f.fullzoom
+
+"F11"    =		: all	: f.iconify
+"F11"    = m2		: all	: f.iconify
+"F11"    = m3		: all	: f.iconify
+
+"Tab"	= m	: all		: f.raiselower
+"Tab"   = m|m2  : all           : f.raiselower
+"Tab"   = m|m3  : all           : f.raiselower
+
+"Tab"	= s m	    : all	: f.raise
+"Tab"   = s m | m2  : all       : f.raise
+"Tab"   = s m | m3  : all       : f.raise
+
+
