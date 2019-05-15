@@ -29,14 +29,14 @@
 (use-package multiple-cursors
   :ensure t
   :bind (
-         ("M-# e" . mc/edit-lines)
-         ("M-# n" . mc/mark-next-like-this)
-         ("M-# p" . mc/mark-previous-like-this)
-         ("M-# w" . mc/mark-next-like-this-word)
-         ("M-# W" . mc/mark-previous-like-this-word)
-         ("M-# s" . mc/mark-next-like-this-word)
-         ("M-# S" . mc/mark-previous-like-this-word)
-         ("M-# a" . mc/mark-all-like-this)
+         ("M-_ e" . mc/edit-lines)
+         ("M-_ n" . mc/mark-next-like-this)
+         ("M-_ p" . mc/mark-previous-like-this)
+         ("M-_ w" . mc/mark-next-like-this-word)
+         ("M-_ W" . mc/mark-previous-like-this-word)
+         ("M-_ s" . mc/mark-next-like-this-word)
+         ("M-_ S" . mc/mark-previous-like-this-word)
+         ("M-_ a" . mc/mark-all-like-this)
          ("C-c c e" . mc/edit-lines)
          ("C-c c n" . mc/mark-next-like-this)
          ("C-c c p" . mc/mark-previous-like-this)
@@ -50,8 +50,11 @@
 
 (use-package expand-region
   :ensure t
-  :bind (("M-+" . er/expand-region)
-		 ("C-c +" . er/expand-region))
+  :bind (
+         ("M-+" . er/expand-region)
+         ("C-c +" . er/expand-region)
+         ("M-* +" . er/expand-region)
+         )
   )
 
 (use-package ace-jump-mode
@@ -59,6 +62,8 @@
   :bind (
          ("C-c j" . ace-jump-mode)
          ("C-c J" . ace-jump-mode-pop-mark)
+         ("M-* j" . ace-jump-mode)
+         ("M-* J" . ace-jump-mode-pop-mark)
          ("M-g j" . ace-jump-mode)
          ("M-g J" . ace-jump-mode-pop-mark)
          )
@@ -78,16 +83,18 @@
          ("M-g F" . iy-go-to-or-up-to-continue)
          ("M-g b" . iy-go-to-char-backward)
          ("M-g B" . iy-go-to-or-up-to-continue-backward)
-         ("C-c f" . iy-go-to-char)
-         ("C-c F" . iy-go-to-or-up-to-continue)
-         ("C-c b" . iy-go-to-char-backward)
-         ("C-c B" . iy-go-to-or-up-to-continue-backward)
          ("C-c v f" . iy-go-to-char)
          ("C-c v F" . iy-go-to-char-backward)
          ("C-c v ." . iy-go-to-or-up-to-continue)
          ("C-c v ," . iy-go-to-or-up-to-continue-backward)
          ("C-c v t" . iy-go-up-to-char)
          ("C-c v T" . iy-go-up-to-char-backward)
+         ("M-* v f" . iy-go-to-char)
+         ("M-* v F" . iy-go-to-char-backward)
+         ("M-* v ." . iy-go-to-or-up-to-continue)
+         ("M-* v ," . iy-go-to-or-up-to-continue-backward)
+         ("M-* v t" . iy-go-up-to-char)
+         ("M-* v T" . iy-go-up-to-char-backward)
          )
   :config
   ;; multiple-cursors
@@ -101,6 +108,9 @@
          ("C-c y n" . yas-new-snippet)
          ("C-c y i" . yas-insert-snippet)
          ("C-c y v" . yas-visit-snippet-file)
+         ("M-* y n" . yas-new-snippet)
+         ("M-* y i" . yas-insert-snippet)
+         ("M-* y v" . yas-visit-snippet-file)
          )
   :config
   (yas-global-mode 1)
@@ -149,6 +159,15 @@
          ("C-c t d" . multi-term-dedicated-close)
          ("C-c t T" . multi-term-dedicated-toggle)
          ("C-c t s" . multi-term-dedicated-select)
+         ("M-* t c" . multi-term)
+         ("M-* t t" . multi-term)
+         ("M-* t n" . multi-term-next)
+         ("M-* t p" . multi-term-prev)
+         ("M-* t o" . multi-term-dedicated-open)
+         ("M-* t d" . multi-term-dedicated-close)
+         ("M-* t T" . multi-term-dedicated-toggle)
+         ("M-* t s" . multi-term-dedicated-select)
+
          )
   :config
   (setq multi-term-program (getenv "ESHELL"))
