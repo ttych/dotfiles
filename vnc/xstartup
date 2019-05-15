@@ -1,0 +1,25 @@
+#!/bin/sh
+
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$HOME/tools/shell:/$HOME/tools/local/$(uname -s)/bin:/$HOME/tools/local/$(uname -s)_$(uname -m)/bin
+
+xrdb $HOME/.Xresources
+#xsetroot -solid black
+xsetroot -solid SteelBlue4
+#xhost +
+
+setxkbmap -option "compose:ralt"
+
+#mywm &
+#ctwm &
+
+xterm &
+exec ctwm
+
+
+
+#xclock -d -geometry 144x48-0-144 -utime &
+#exec xclock -geometry 96x96-144+0
+#xclock -geometry 144x24-0+144 -strftime "%a %d/%m/%y"
+#exec xclock -geometry 144x24-0+144 -strftime "        %H:%M:%S" -padding 2
+#/usr/dt/bin/dtwm &
+#/usr/bin/gnome-session
