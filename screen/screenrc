@@ -1,0 +1,100 @@
+##
+## .screenrc for screen
+##
+## Made by enigmatyc
+## Login   <enigmatyc@open-coder.org>
+##
+## Started on  Tue May 15 00:07:15 2007 enigmatyc
+##
+##
+
+# ENV
+#unsetenv DISPLAY
+#setenv LC_CTYPE fr_FR.UTF-8
+
+# No startup message
+startup_message off
+
+# Set path to homedir
+chdir
+
+# Log new screen windows in utmp.
+deflogin on
+
+# autodetach on closing term
+autodetach on
+
+# restore screen
+altscreen on
+
+# bell
+vbell on
+vbell_msg "bell on %t (%n)"
+#vbell off
+
+# If a window goes unresponsive, don't block the whole session waiting for it.
+nonblock on
+
+# Scrollback
+defscrollback 4000
+
+# escape control
+#defescape ^Vv
+#escape ^Vv
+#escape ^zz
+
+# idle action : lock
+#idle 1800 lockscreen
+
+# Run everything in UTF-8.
+#defutf8 on
+
+termcapinfo xterm*|Eterm|mlterm 'hs:ts=\E]0;:fs=\007:ds=\E]0;screen\007'
+
+defhstatus "screen  (t) | $USER@H"
+
+# Hardstatus
+#hardstatus on
+#hardstatus alwayslastline
+#hardstatus string "%{b kB}[%{s gB}%c%{b kB}] %{b kR}%H %{b kB}[%{s yB}%l%{b kB}] %{b kB}[%{rs Y}%-Lw%{BY}%50>%n%{R}%f%{B} %t%{YB}%+Lw%<"
+#hardstatus string "[xen %n%?: %t%?] %h"
+#hardstatus string '%{= kG}[%= %{= kw}%?%-Lw%?%{r}(%{W}%n*%f%t%?(%u)%?%{r})%{w}%?%+Lw%?%?%= %{g}][%{R}%{+B} %1` %{g}%{-B}][%{B} %D %d/%m %{W}%c %{g}]'
+hardstatus string "%r%c %t | %w% ? (%h)% ?" 
+
+# ===============================================================
+# At the very end... show the current version and say hello :-)
+# ===============================================================
+# Briefly show the version number of this starting
+# screen session - but only for *one* second:
+#msgwait 1
+#version
+# change back to showing messages
+# for duration of two seconds:
+#msgwait 2
+#msgminwait 3
+#msgwait 30
+#caption always "%-Lw%{= BW}%50>%n%f* %t%{-}%+Lw%<"
+caption always "%{-b bc}%c|%D|%M %d|%H%{+u wb} %L=%-Lw%45>%{+b by}%n%f* %t%{-}%+Lw%-0<"
+#caption always "%{wK}%-Lw%{= BW}%50>%n%f* %t%{-}%+Lw%< %=%c %d/%m/%y"
+#caption always "%?%F%{= gk}%:%{= wk}%? %n %?%F%{= wk}%? %C%A %{= wk} %t%= "
+
+# Make screen messages stand out a little more - black on bright green.
+sorendition "+b kG"
+
+# Variants on Sven's custom messages.
+activity "%c activity -> %n%f %t"
+# activity "Activity in %t(%n)"
+
+# Just in case it isn't clear...
+#shell zsh
+
+# Keep dead windows around until I tell them to exit.
+#zombie cr
+# And show the command for the windows when they're resurrected.
+#verbose on
+
+# This lets me use specific commands from screen escape sequences.
+multiuser on
+aclchg :window: +x select
+
+#source ${HOME}/.screenrc-${HOST}
