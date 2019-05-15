@@ -1,0 +1,1136 @@
+##
+## .ctwmrc
+##
+## Made by ttych
+## Login   <thomas.tych @ gmail.com>
+##
+
+
+#----------------------
+# Behaviour
+#----------------------
+RestartPreviousState
+
+
+#NoTitle
+ClearShadowContrast                     42
+
+NoGrabServer
+
+DecorateTransients
+
+OpaqueMove
+OpaqueResize
+DontPaintRootWindow
+NoShowOccupyAll
+RandomPlacement 			"on"
+IconifyByUnmapping
+DontMoveOff
+MoveOffResistance			42
+UsePPosition                           "non-zero"
+DefaultFunction                        f.nop
+
+
+WarpRingOnScreen
+WarpUnmapped
+
+
+#NoCaseSensitive
+#NoDefaults
+#AutoRelativeResize
+#InterpolateMenuColors
+#WarpCursor
+#WarpRingOnScreen
+#Zoom 					8
+#DefaultFunction 			f.nop
+#NoBackingStore
+#NoSaveUnders
+
+#libart_lgpl2-2.3.12
+
+#----------------------
+# Fonts
+#----------------------
+#TitleFont	"*new century schoolbook-medium-r-*--14-*-iso8859-*"
+#MenuFont	"*times-medium-i-*--12-*-iso8859-*"
+#IconFont	"*times-medium-i-*--12-*-iso8859-*"
+#ResizeFont	"*new century schoolbook-medium-i-*--24-*-iso8859-*"
+#IconManagerFont		"*times-medium-i-*--12-*-iso8859-*"
+
+#TitleFont	"-adobe-courier-medium-r-*-*-10-*-*-*-*-*-*-*"
+#MenuFont 	"-adobe-helvetica-medium-r-normal--*-120-*-*-*"
+#MenuFont	"-adobe-courier-medium-r-*-*-10-*-*-*-*-*-*-*"
+#MenuFont	"-adobe-courier-medium-r-*-*-10-*-*-*-*-*-*-*"
+#IconFont	"-adobe-courier-medium-r-*-*-10-*-*-*-*-*-*-*"
+#ResizeFont	"-adobe-courier-medium-r-*-*-10-*-*-*-*-*-*-*"
+#IconManagerFont
+
+MenuFont "-misc-fixed-medium-*-*-*-8-*-100-100-*-*-*-1"
+TitleFont "-misc-fixed-medium-*-*-*-8-*-100-100-*-*-*-1"
+
+IconFont "-misc-fixed-medium-*-*-*-8-*-100-100-*-*-*-1"
+ResizeFont "-misc-fixed-medium-*-*-*-8-*-100-100-*-*-*-1"
+WorkSpaceFont "-misc-fixed-medium-*-*-*-8-*-100-100-*-*-*-1"
+
+
+#----------------------
+# Titles
+#----------------------
+#UseThreeDTitles
+#ButtonIndent 				1
+#SqueezeTitle
+#FramePadding 				1
+#TitleShadowDepth 			0
+#TitleButtonBorderWidth 			1
+
+UseThreeDTitles
+NoDefaults				# not use default buttons
+
+#NoTitleHighlight
+#{					# optional winlist
+#}
+
+#SunkFocusWindowTitle			# sink instead of raise?
+NoTitleFocus				# keyboard input at pointer
+#UseSunkTitlePixmap			# sink instead of raise?
+
+#SqueezeTitle				# shrinks titlebar
+#{					# optional winlist
+#}
+
+#DontSqueezeTitle			# Don't squeeze title for these wins.
+#{					# If used w/o list, no titles squeeze
+#}
+
+TitleButtonShadowDepth    1
+TitleShadowDepth          1
+#TitleButtonBorderWidth   1
+TitlePadding              0		# frame around TBobjects?
+ButtonIndent              0		# indentated TBbuttons?
+FramePadding		  0		# frame around TB?
+TitleJustification        "left"	# right/left/center
+
+RightTitleButton           "xpm:kill.xpm"      = f.delete
+RightTitleButton           "xpm:resize.xpm"    = f.resize
+RightTitleButton           "xpm:verexp.xpm"    = f.zoom
+RightTitleButton           "xpm:horexp.xpm"    = f.hzoom
+LeftTitleButton            "xpm:minimize.xpm"  = f.iconify
+
+
+#----------------------
+# Pixmaps
+#----------------------
+PixmapDirectory				"~/.xpm"
+Pixmaps
+{
+    TitleHighLight "xpm:black.xpm"
+}
+
+#---------------------
+# Window Format
+#---------------------
+NoTitle
+{
+	"WorkSpaceManager"
+	"TWM Icon Manager"
+	"zlock"
+	"wmxmms"
+	"dclock"
+	"xlogo"
+	"xclock"
+	"xload"
+	"MPlayer"
+}
+
+NoBorder
+{
+	"WorkSpaceManager"
+	"TWM Icon Manager"
+	"dclock"
+	"wmxmms"
+	"xclock"
+	"xlogo"
+	"xload"
+}
+
+NoHighLight
+{
+	"TWM Icon Manager"
+	"WorkSpaceManager"
+	"xclock"
+}
+
+
+#----------------------
+# Borders
+#----------------------
+UseThreeDBorders
+ThreeDBorderWidth 			2
+BorderShadowDepth 			1
+BorderWidth 				0
+BorderResizeCursors
+ClientBorderWidth
+
+
+#--------------------
+# Icon Manager
+#--------------------
+#SortIconManager
+ShowIconManager
+UseThreeDIconManagers
+
+IconManagerFont "-misc-fixed-medium-*-*-*-8-*-100-100-*-*-*-1"
+IconManagerGeometry "126x42-0+0" 1
+
+IconManagerDontShow
+{
+	"WorkSpaceManager"
+ 	"gkrellm"
+	"dclock"
+#	"licq"
+	"xconsole"
+	"xeyes"
+	"Occupy Window"
+	"xload"
+	"asclock"
+	"xclock"
+	"xlogo"
+}
+
+
+#---------------------
+# Workspace Manager
+#---------------------
+ShowWorkSpaceManager
+WorkSpaceManagerGeometry "126x84+0+0" 3
+ReallyMoveInWorkspaceManager
+#AlwaysShowWindowWhenMovingFromWorkspaceManager
+DontToggleWorkSpaceManagerState
+ReverseCurrentWorkspace
+StartInMapState
+
+MapWindowDefaultWorkSpace { "black" "grey40" "white" }
+MapWindowCurrentWorkSpace { "black" "grey80" "white" }
+
+UseThreeDWMap
+DontWarpCursorInWMap			# no move to indicated win
+NoShowOccupyAll				# don't show'em in WSM
+
+WMgrButtonShadowDepth 	  1
+WMgrHorizButtonIndent     0		# /dist. between buttons
+WMgrVertButtonIndent      0		# \when in button mode
+
+WorkSpaces # name  [{ bg-button [fg-button] [bg-root] [fg-root] [pixmap-root]}]
+{
+	"#1"
+	"#2"
+	"#3"
+	"#4"
+	"#5"
+	"#6"
+#	"#7" {	"#000000" "#BEBABE" "#1e294f" "white"}
+#	"#8" {	"#000000" "#BEBABE" "#1e294f" "white"}
+#	"#9" {	"#000000" "#BEBABE" "#1e294f" "white"}
+}
+
+
+
+
+#---------------
+# Cursors
+#---------------
+Cursors
+{
+	Frame		"top_left_arrow"
+	Title		"top_left_arrow"
+	Icon		"top_left_arrow"
+	IconMgr		"top_left_arrow"
+	Move		"fleur"
+	Resize		"fleur"
+	Menu		"sb_left_arrow"
+	Button		"hand2"
+	Wait		"watch"
+	Select		"dot"
+	Destroy		"pirate"
+}
+
+#--------------------------------------#
+# Colors
+#--------------------------------------#
+#BeNiceToColorMap			# less col in shadows
+
+Color
+{
+  BorderColor           "gray50"	# optional windowlist
+#    {
+#      "emacs"          "#009900"
+#      "Netscape"       "cyan4"
+#    }
+
+  DefaultBackground     "grey70"
+  DefaultForeground     "Black"
+  TitleBackground       "gray80"
+#    { 					# optional windowlist
+#      "Netscape"       "DarkBlue"
+#      "emacs"          "DarkSlateGray"
+#      "xfig"           "#80CCF8"
+#    }
+
+  TitleForeground       "black"
+#    { 					# optional windowlist
+#      "Netscape"       "Yellow"
+#      "emacs"          "Wheat"
+#      "xfig"           "black"
+#    }
+
+  BorderTileBackground  "gray80"	# optional windowlist
+#    {
+#      "Netscape"       "#B0B0B0"
+#      "emacs"          "DarkSlateGray"
+#    }
+
+  MenuBackground        "gray70"
+  MenuForeground        "black"
+  MenuTitleBackground   "gray65"
+  MenuTitleForeground   "gray20"
+  MenuShadowColor 	"gray15"		# default is black
+
+  IconBackground        "Black"
+#    {						# optional winlist
+#	"Netscape"	"Blue"
+#    }
+  IconForeground        "White"
+#    {						# optional winlist
+#	"Netscape"	"Yellow"
+#    }
+  IconBorderColor       "gray45"
+#    {						# optional winlist
+#	"Netscape"	"Blue"
+#    }
+
+  IconManagerBackground "gray80"
+    {						# optional winlist
+	"Netscape"	"DarkBlue"
+	"emacs"		"#000020"
+	"*pdf*"		"Red"
+	"*xmms*"	"gray50"
+	"*pine*"	"black"
+	"*lysator*"	"lemonchiffon"
+	"*vmware*"	"white"
+    }
+
+  IconManagerForeground "black"
+    {						# optional winlist
+	"Netscape"	"Yellow"
+	"emacs"		"lemonchiffon"
+	"*pdf*"		"White"
+	"*xmms*"	"black"
+	"*pine*"	"green"
+	"*lysator*"	"black"
+	"*wmware*"	"DarkSlateGray"
+    }
+
+#  IconManagerHighlight  "yellow"
+#    {						# optional winlist
+#	"Netscape"	"Blue"
+#    }
+
+  MapWindowBackground   "gray65"		# BGcol for WSMwins
+#     {						# optional winlist
+#     }
+
+  MapWindowForeground   "Black"			# FGcol for WSMwins
+#     {						# optional winlist
+#     }
+
+}
+
+SaveColor					# tell client about these
+{						# settings to "smooth"
+     BorderColor
+     TitleBackground
+     TitleForeground
+}
+
+
+#---------------------------------------------------------
+# MONOCHROME "COLOR"-SETTINGS
+#---------------------------------------------------------
+
+Monochrome
+{
+	BorderColor 		"black"
+	BorderTileForeground 	"black"
+	BorderTileBackground 	"white"
+	TitleForeground 	"black"
+	TitleBackground 	"white"
+	MenuTitleForeground 	"black"
+	MenuTitleBackground 	"white"
+	MapWindowForeground 	"white"
+	MapWindowBackground 	"white"
+}
+
+#Color
+#{
+#	BorderColor		"darkgrey"
+#	{
+ #	  "licq" 	"yellow"
+ #	  "psi" 	"yellow"
+ #	  "Terminal"	"red"
+#	}
+#	BorderTileBackground	"black" #
+#	TitleBackground		"black" # ici pour changer la couleur
+#	TitleForeground		"lightgray"
+#	IconManagerBackground	"lightblue"
+#	{
+ #	  "licq" 	"yellow"
+ #	  "gabber" 	"yellow"
+ #	  "psi" 	"yellow"
+ #	  "Terminal" 	"red"
+#	}
+#	IconManagerForeground	"black"
+#	MenuForeground		"white"
+#	MenuBackground		"darkgray"
+#	MenuShadowColor		"black"
+#	MenuTitleBackground	"black"
+#	MenuTitleForeground	"lightblue"
+#	DefaultBackground	"black"
+#	DefaultForeground	"lightblue"
+#}
+#SaveColor
+#{
+#	"black"
+#	"white"
+#	"grey"
+#	"red"
+#	"green"
+#	"blue"
+#}
+
+
+
+#-----------------
+# Special cases
+#-----------------
+Icons
+{
+	"emacs"			"emacs.xbm"
+	"zlock"			"zlock.xbm"
+	"xterm"			"xterm.xbm"
+}
+AlwaysOnTop
+{
+	"WorkSpaceManager"
+	"TWM Icon Manager"
+	"dclock"
+	"xclock"
+#	"wmxmms"
+#	"xmms"
+#	"gkrellm"
+#	"xlogo"
+#	"xlogo"
+#	"xeyes"
+#	"console"
+#	"xload"
+#	"asclock"
+#	"ascd"
+}
+
+Occupy
+{
+        "dclock"	{"all"}
+	"asclock"	{"all"}
+	"xclock"	{"all"}
+	"xload"		{"all"}
+	"Xlogo"		{"all"}
+	"xlogo"		{"all"}
+#	"gkrellm"	{"all"}
+#	"licq"		{"all"}
+#	"gabber"	{"all"}
+#	"psi"		{"all"}
+#	"Netscape"	{"4"}		# always move this app. to the same workspace 4
+}
+
+StartIconified
+{
+	"XQuit"
+	"Povray"
+	"Netscape Download"
+	"XMMS*"
+}
+
+
+#--------------------
+# Functions
+#--------------------
+
+function "move-or-iconify"	{ f.move f.deltastop f.iconify }
+function "raise-resize"		{ f.raise f.resize }
+function "lower-resize"		{ f.lower f.resize }
+function "raise-move"		{ f.raise f.move }
+function "lower-move"		{ f.lower f.move }
+function "raiselower-move"		{ f.raiselower f.move }
+function "raiselower-resize"		{ f.raiselower f.resize }
+
+Function "move-to-#1"		{ f.addtoworkspace "#1"	f.vanish }
+Function "move-to-#2"		{ f.addtoworkspace "#2"	f.vanish }
+Function "move-to-#3"		{ f.addtoworkspace "#3"	f.vanish }
+Function "move-to-#4"		{ f.addtoworkspace "#4"	f.vanish }
+Function "move-to-#5"		{ f.addtoworkspace "#5"	f.vanish }
+Function "move-to-#6"		{ f.addtoworkspace "#6"	f.vanish }
+Function "move-to-#7"		{ f.addtoworkspace "#7"	f.vanish }
+Function "move-to-#8"		{ f.addtoworkspace "#8"	f.vanish }
+Function "move-to-#9"		{ f.addtoworkspace "#9"	f.vanish }
+
+Function "move-with-#1"		{ f.addtoworkspace "#1"	f.vanish  f.gotoworkspace "#1" }
+Function "move-with-#2"		{ f.addtoworkspace "#2"	f.vanish  f.gotoworkspace "#2" }
+Function "move-with-#3"		{ f.addtoworkspace "#3"	f.vanish  f.gotoworkspace "#3" }
+Function "move-with-#4"		{ f.addtoworkspace "#4"	f.vanish  f.gotoworkspace "#4" }
+Function "move-with-#5"		{ f.addtoworkspace "#5"	f.vanish  f.gotoworkspace "#5" }
+Function "move-with-#6"		{ f.addtoworkspace "#6"	f.vanish  f.gotoworkspace "#6" }
+Function "move-with-#7"		{ f.addtoworkspace "#7"	f.vanish  f.gotoworkspace "#7" }
+Function "move-with-#8"		{ f.addtoworkspace "#8"	f.vanish  f.gotoworkspace "#8" }
+Function "move-with-#9"		{ f.addtoworkspace "#9"	f.vanish  f.gotoworkspace "#9" }
+
+Function "toggle_manager"   { f.toggleworkspacemgr }
+
+#-------------------
+# Desktop Shortcut
+#-------------------
+
+#IgnoreLockModifier
+IgnoreModifier { lock m2 }
+
+"F1"	= m		: window	: f.function "move-to-#1"
+"F2"	= m		: window	: f.function "move-to-#2"
+"F3"	= m		: window	: f.function "move-to-#3"
+"F4"	= m		: window	: f.function "move-to-#4"
+"F5"	= m		: window	: f.function "move-to-#5"
+"F6"	= m		: window	: f.function "move-to-#6"
+"F7"	= m		: window	: f.function "move-to-#7"
+"F8"	= m		: window	: f.function "move-to-#8"
+"F9"	= m		: window	: f.function "move-to-#9"
+
+"F1"	= m|m2		: window	: f.function "move-to-#1"
+"F2"	= m|m2		: window	: f.function "move-to-#2"
+"F3"	= m|m2		: window	: f.function "move-to-#3"
+"F4"	= m|m2		: window	: f.function "move-to-#4"
+"F5"	= m|m2		: window	: f.function "move-to-#5"
+"F6"	= m|m2		: window	: f.function "move-to-#6"
+"F7"	= m|m2		: window	: f.function "move-to-#7"
+"F8"	= m|m2		: window	: f.function "move-to-#8"
+"F9"	= m|m2		: window	: f.function "move-to-#9"
+
+"F1"	= m|m3		: window	: f.function "move-to-#1"
+"F2"	= m|m3		: window	: f.function "move-to-#2"
+"F3"	= m|m3		: window	: f.function "move-to-#3"
+"F4"	= m|m3		: window	: f.function "move-to-#4"
+"F5"	= m|m3		: window	: f.function "move-to-#5"
+"F6"	= m|m3		: window	: f.function "move-to-#6"
+"F7"	= m|m3		: window	: f.function "move-to-#7"
+"F8"	= m|m3		: window	: f.function "move-to-#8"
+"F9"	= m|m3		: window	: f.function "move-to-#9"
+
+"F1"	= s		: all	: f.gotoworkspace "#1"
+"F2"	= s		: all	: f.gotoworkspace "#2"
+"F3"	= s		: all	: f.gotoworkspace "#3"
+"F4"	= s		: all	: f.gotoworkspace "#4"
+"F5"	= s		: all	: f.gotoworkspace "#5"
+"F6"	= s		: all	: f.gotoworkspace "#6"
+"F7"	= s		: all	: f.gotoworkspace "#7"
+"F8"	= s		: all	: f.gotoworkspace "#8"
+"F9"	= s		: all	: f.gotoworkspace "#9"
+
+"F1"	= s|m2		: all	: f.gotoworkspace "#1"
+"F2"	= s|m2		: all	: f.gotoworkspace "#2"
+"F3"	= s|m2		: all	: f.gotoworkspace "#3"
+"F4"	= s|m2		: all	: f.gotoworkspace "#4"
+"F5"	= s|m2		: all	: f.gotoworkspace "#5"
+"F6"	= s|m2		: all	: f.gotoworkspace "#6"
+"F7"	= s|m2		: all	: f.gotoworkspace "#7"
+"F8"	= s|m2		: all	: f.gotoworkspace "#8"
+"F9"	= s|m2		: all	: f.gotoworkspace "#9"
+
+"F1"	= s|m3		: all	: f.gotoworkspace "#1"
+"F2"	= s|m3		: all	: f.gotoworkspace "#2"
+"F3"	= s|m3		: all	: f.gotoworkspace "#3"
+"F4"	= s|m3		: all	: f.gotoworkspace "#4"
+"F5"	= s|m3		: all	: f.gotoworkspace "#5"
+"F6"	= s|m3		: all	: f.gotoworkspace "#6"
+"F7"	= s|m3		: all	: f.gotoworkspace "#7"
+"F8"	= s|m3		: all	: f.gotoworkspace "#8"
+"F9"	= s|m3		: all	: f.gotoworkspace "#9"
+
+"F1"	= s|m		: window	: f.function "move-with-#1"
+"F2"	= s|m		: window	: f.function "move-with-#2"
+"F3"	= s|m		: window	: f.function "move-with-#3"
+"F4"	= s|m		: window	: f.function "move-with-#4"
+"F5"	= s|m		: window	: f.function "move-with-#5"
+"F6"	= s|m		: window	: f.function "move-with-#6"
+"F7"	= s|m		: window	: f.function "move-with-#7"
+"F8"	= s|m		: window	: f.function "move-with-#8"
+"F9"	= s|m		: window	: f.function "move-with-#9"
+
+"F1"	= s|m|m2	: window	: f.function "move-with-#1"
+"F2"	= s|m|m2	: window	: f.function "move-with-#2"
+"F3"	= s|m|m2	: window	: f.function "move-with-#3"
+"F4"	= s|m|m2	: window	: f.function "move-with-#4"
+"F5"	= s|m|m2	: window	: f.function "move-with-#5"
+"F6"	= s|m|m2	: window	: f.function "move-with-#6"
+"F7"	= s|m|m2	: window	: f.function "move-with-#7"
+"F8"	= s|m|m2	: window	: f.function "move-with-#8"
+"F9"	= s|m|m2	: window	: f.function "move-with-#9"
+
+"F1"	= s|m|m3	: window	: f.function "move-with-#1"
+"F2"	= s|m|m3	: window	: f.function "move-with-#2"
+"F3"	= s|m|m3	: window	: f.function "move-with-#3"
+"F4"	= s|m|m3	: window	: f.function "move-with-#4"
+"F5"	= s|m|m3	: window	: f.function "move-with-#5"
+"F6"	= s|m|m3	: window	: f.function "move-with-#6"
+"F7"	= s|m|m3	: window	: f.function "move-with-#7"
+"F8"	= s|m|m3	: window	: f.function "move-with-#8"
+"F9"	= s|m|m3	: window	: f.function "move-with-#9"
+
+
+#-------------------
+# Window Shortcut
+#-------------------
+
+"Tab"	= m	: all		: f.raiselower
+"Tab"   = m|m2  : all           : f.raiselower
+"Tab"   = m|m3  : all           : f.raiselower
+
+"Tab"	= s m	    : all	: f.raise
+"Tab"   = s m | m2  : all       : f.raise
+"Tab"   = s m | m3  : all       : f.raise
+
+"Tab"   = c         : all       : f.function "toggle_manager"
+"Tab"   = c    | m2 : all       : f.function "toggle_manager"
+"Tab"   = c    | m3 : all       : f.function "toggle_manager"
+
+#"Tab"	= m m2	: all		: f.warpring "next"
+#"Tab"	= s m	: all		: f.warpring "prev"
+#"Tab"	= s m m2: all		: f.warpring "prev"
+
+
+"Left"	= m		: all	: f.horizoom
+"Right"	= m		: all	: f.horizoom
+"Up"	= m		: all	: f.zoom
+"Down"	= m		: all	: f.fullzoom
+
+"Left"	= m|m2		: all	: f.horizoom
+"Right"	= m|m2		: all	: f.horizoom
+"Up"	= m|m2		: all	: f.zoom
+"Down"	= m|m2		: all	: f.fullzoom
+
+"Left"	= m|m3		: all	: f.horizoom
+"Right"	= m|m3		: all	: f.horizoom
+"Up"	= m|m3		: all	: f.zoom
+"Down"	= m|m3		: all	: f.fullzoom
+
+"Left"	= c|m 		: all		: f.prevworkspace
+"Right" = c|m 		: all		: f.nextworkspace
+
+"Left"	= c|m|m2 	: all		: f.prevworkspace
+"Right" = c|m|m2 	: all		: f.nextworkspace
+
+"Left"	= c|m|m3 	: all		: f.prevworkspace
+"Right" = c|m|m3 	: all		: f.nextworkspace
+
+
+#--------------------
+# Mouse Bindings
+#--------------------
+
+Button4 = m2	: root		: f.prevworkspace
+Button5 = m2  	: root		: f.nextworkspace
+Button4 =	: root          : f.prevworkspace
+Button5 =	: root          : f.nextworkspace
+
+Button2 = m	: window	: f.forcemove
+Button2 = m m2	: window	: f.forcemove
+
+
+Button2 =   	: title		: f.move
+Button2 = m2	: title		: f.move
+
+
+Button2 =   	: icon   	: f.iconify
+#Button2 = m2	: icon   	: f.iconify
+Button3 =   	: icon   	: f.menu "window_menu"
+#Button3 = m2	: icon   	: f.menu "window_menu"
+
+
+Button1 =	: root		: f.menu "Quick"
+Button1 = m2	: root		: f.menu "Quick"
+Button1	= c	: root		: f.menu "Display"
+Button1	= c|m2	: root		: f.menu "Display"
+Button3 =	: root		: f.menu "Global Menu"
+Button3 = m2	: root		: f.menu "Global Menu"
+Button3	= c	: root		: f.menu "Global Menu"
+Button3	= c|m2	: root		: f.menu "Global Menu"
+
+Button1 =   	: iconmgr	: f.iconify
+Button1 = m2	: iconmgr	: f.iconify
+Button3 =   	: iconmgr	: f.menu "window_menu"
+Button3 = m2	: iconmgr	: f.menu "window_menu"
+
+Button1 =   	: icon   	: f.function "move-or-iconify"
+Button1 = m2	: icon   	: f.function "move-or-iconify"
+
+Button1 =   	: title		: f.function "raise-move"
+Button1 = m2	: title		: f.function "raise-move"
+Button3 =   	: title		: f.menu "window_menu"
+Button3 = m2	: title		: f.menu "window_menu"
+
+Button1 =	: frame         : f.resize
+Button1 = m2  	: frame		: f.resize
+
+Button1 = m	: window	: f.function "raiselower-move"
+Button1 = m|m2	: window	: f.function "raiselower-move"
+Button3 = m	: window	: f.resize
+Button3 = m|m2	: window	: f.resize
+
+Button1 = c|m	: window	: f.iconify
+Button1 = c|m|m2: window	: f.iconify
+
+
+#---------------------
+# Menus
+#---------------------
+
+UseThreeDMenus
+
+menu "Quick"
+{
+    "Quick"         f.title
+	"tTerm"			f.exec "xterm -name tterm &"
+	"xTerm"			f.exec "xterm &"
+    ""              f.nop
+	"firefox"		f.exec "firefox &"
+	"chromium"      f.exec "chromium-browser &"
+	""              f.nop
+    "lang"			f.menu "lang"
+	""              f.nop
+	"lock"			f.exec "xlock &"
+	""              f.nop
+    "Xkill"         f.exec "xkill &"
+}
+
+menu "Global Menu"
+{
+	"Global Menu"          f.title
+        #""             f.nop
+        "Terms"         f.menu "terms"
+        "Editors"       f.menu "editors"
+        "Internet"      f.menu "internet"
+        "Chats"         f.menu "chats"
+	"eMail"		f.menu "email"
+#	"Hosts"         f.menu "hosts"
+#       "Mathematica"   f.menu "mathematica"
+	"Database"	f.menu "database"
+        "Graphics"      f.menu "graphics"
+        "Viewers"       f.menu "viewers"
+        "MultiMedia"	f.menu "multimedia"
+        "Games"         f.menu "games"
+        "Utilities"     f.menu "utilities"
+        "System"        f.menu "system"
+	"Others DTM"	f.menu "others dtm"
+        "W-Manager"     f.menu "WManager"
+}
+
+menu "database"
+{
+	"Database"	f.title
+	"MySQL"		f.menu "mysql"
+}
+
+menu "mysql"
+{
+	"MySQL"		f.title
+	"Workbench"	f.exec "mysql-workbench &"
+}
+
+menu "email"
+{
+	"eMail"		f.title
+	"Kmail"		f.exec "kmail &"
+	"Thunderbird"	f.exec "thunderbird &"
+}
+
+menu "terms"
+{
+	"Terms"         f.title
+	"xTerm"		f.exec "xterm &"
+	"tTerm"		f.exec "xterm -name tterm &"
+	"myxTerm"	f.exec "xterm -name myxterm &"
+	"xTerm T"	f.exec "xterm -name xtermt &"
+	"dosTerm"	f.exec "xterm -name xtermdos &"
+	"amsTerm"	f.exec "xterm -name xtermams &"
+	"emTerm"	f.exec "xterm -name xtermem &"
+	"xTermatrix"	f.exec "xterm -name xtermatrix &"
+	"admTerm"	f.exec "xterm -name xtermadm &"
+	"consTerm"	f.exec "xterm -name xtermcons &"
+	""		f.nop
+        "aterm"         f.exec "aterm &"
+	"aterm t"	f.exec "aterm -name tterm &"
+        "aterm yellow"	f.exec "aterm -tint yellow &"
+        "aterm red"	f.exec "aterm -tint red &"
+        "aterm blue"	f.exec "aterm -tint blue &"
+        "aterm green"	f.exec "aterm -tint green &"
+	""		f.nop
+        "rxvt"          f.exec "rxvt &"
+        "eterm"         f.exec "Eterm --buttonbar off --scrollbar off -L 10000 -f orange -T Eterm&"
+        ""              f.nop
+        "PowerShell"    f.exec "powershell &"
+        ""              f.nop
+        "Gnome-T"       f.exec "gnome-terminal --nolastlog --noutmp --nowtmp &"
+        "Konsole"       f.exec "konsole &"
+}
+
+menu "chats"
+{
+        "Chats"         f.title
+        "amsn"          f.exec "amsn &"
+        "xchat"         f.exec "xchat &"
+        "gaim"          f.exec "gaim &"
+        "irssi"         f.exec "aterm -e irssi &"
+        "centericq"     f.exec "aterm -e centericq &"
+	""		f.nop
+	"mumble"	f.exec "mumble &"
+}
+
+menu "files"
+{
+"Files"         f.title
+"Midc"          f.exec "xterm -sl 255 -bg black -fg white -e midc -b &"
+}
+
+
+
+menu "mathematica"
+{
+"Mathematica"   f.title
+"Mathematica"   f.exec "mathematica &"
+}
+
+menu "editors"
+{
+        "Editors"       f.title
+        "emacs"         f.exec "emacs &"
+        "gvim"          f.exec "gvim &"
+        "Xemacs"        f.exec "xemacs &"
+        "nedit"         f.exec "nedit &"
+        "OpenOffice.Org"        f.exec "openoffice.org &"
+        "OOO-swriter"   f.exec "openoffice.org-1.1.5-swriter &"
+        "Joe"           f.exec "xterm -bg black -fg white -e joe &"
+}
+
+menu "system"
+{
+"System"        f.title
+"Xosview"       f.exec "xosview &"
+"Xmbmon"	f.exec "xmbmon &"
+"xload"		f.exec "xload &"
+"Top"           f.exec "xterm -bg black -fg white -e top &"
+"Gkrellm"       f.exec "gkrellm &"
+    ""                          f.nop
+    "Lang"                      f.menu "lang"
+}
+
+menu "viewers"
+{
+"Viewers"       f.title
+"Ghostview"     f.exec "gv &"
+"Xdvi"          f.exec "xdvi -rv -fg black -bg white -geometry 800x700 &"
+"Acrobat"       f.exec "acroread4 -geometry 800x700 &"
+"Xpdf"          f.exec "xpdf &"
+}
+
+menu "internet"
+{
+"Internet"    f.title
+"Firefox"       f.exec "firefox &"
+"Chrome"	f.exec "chrome &"
+"Mozilla"       f.exec "mozilla &"
+"Opera"         f.exec "opera &"
+"Netscape"      f.exec "netscape -geometry 800x700 &"
+#"IRC II"     f.exec "xterm -bg midnightblue -name irc@twm.org -fg white -e irk2 &"
+#"Portscan"   f.exec "/home/prg/java/portscan/portscan &"
+#"ICQ"        f.exec "/usr/local/ICQJava/ICQ &"
+"Lynx"       f.exec "xterm -bg black -fg white -e lynx &"
+#Lynx, the bug-free internetbrowser :)
+#""           f.nop
+#"PPP"        f.menu "ppp"
+}
+
+menu "ppp"
+{
+"PPP"       f.title
+"Linkup"    f.exec "pppd &"
+"Hang up"   f.exec "ppp-off &"
+}
+
+menu "graphics"
+{
+"Graphics"      f.title
+"XV"            f.exec "xv -bg black -fg white -hi black -lo grey30 &"
+"Gimp"          f.exec "gimp &"
+"ElectricEyes"  f.exec "ElectricEyes &"
+#"xRes"          f.exec "/home/prg/xRes &"
+#"Xpaint"        f.exec "xpaint"
+}
+
+menu "multimedia"
+{
+"MultiMedia"         f.title
+"Xmms"          f.exec "xmms &"
+"Mp3Blaster"    f.exec "xterm -bg black -fg white -e mp3blaster &"
+#"RealPlayer"   f.exec "/usr/home/keppler/RealPlayer8/realplay &"
+#"Xmovie"       f.exec "xmovie &"
+"X11amp"        f.exec "x11amp &"
+"Audacious"     f.exec "audacious &"
+"Workman"       f.exec "workman &"
+#"TkMix"         f.exec "tkmix &"
+"VideoLan"      f.exec "vlc &"
+"Xine"          f.exec "xine &"
+""		f.nop
+"CdPlayer"      f.exec "xterm -bg black -fg white -e cd-console &"
+"Xcdplayer"	f.exec "xcdplayer &"
+"wmcdplay"	f.exec "wmcdplay &"
+""		f.nop
+"Grip"		f.exec "grip &"
+	""		f.nop
+	"FreeTV"	f.exec "freetv &"
+	""		f.nop
+	"aumix"		f.exec "aumix &"
+	"alsamixer"	f.exec "alsamixer &"
+}
+
+menu "vnc"
+{
+	"vncviewer"	f.exec "vncviewer &"
+	"vncconfig"	f.exec "vncconfig &"
+}
+
+menu "utilities"
+{
+"Utilities"      f.title
+"Xman"          f.exec "xman -rv &"
+"Xclock"        f.exec "xclock -rv -analog &"
+"Xcalc"         f.exec "xcalc -rv &"
+"Xclipboard"    f.exec "xclipboard &"
+"VNC"		f.menu "vnc"
+# The Realistic Macintosh emulator
+#"vMac"           f.exec "/home/prg/vMacX/execmac &"
+# The Impressive Macintosh emulator
+#"Executor"       f.exec "executor-demo &"
+#bochs a pc emulator for unix/beos .. able to run win95 but a bit slow :(
+#"Bochs"          f.exec "/tmp/bochs-980227/bochs"
+}
+
+
+menu "window"
+{
+"X Windows"      f.title
+"Kill Window"    f.destroy
+"Delete Window"  f.delete
+""               f.nop
+"Maximize"       f.fullzoom
+"Minimize"       f.iconify
+#"Resize"         f.resize
+"Move"           f.move
+#"Raise"          f.raise
+#"Lower"          f.lower
+""               f.nop
+"Focus"          f.focus
+"Unfocus"        f.unfocus
+"Show Iconmgr"   f.showiconmgr
+"Hide Iconmgr"   f.hideiconmgr
+""               f.nop
+"Screensaver"    f.menu "screensaver"
+"Redraw"         f.refresh
+"Restart"        f.restart
+"Quit"           f.menu "quit"
+}
+
+menu "quit"
+{
+"Really Quit?"     f.title
+"No"               f.nop
+"Yes"              f.quit
+}
+
+menu "screensaver"
+{
+"ZZzz..."        f.title
+"Laser"          f.exec "xlock -nolock -mode laser &"
+"Qix"            f.exec "xlock -nolock -mode qix &"
+"Star trek"      f.exec "xlock -nolock -mode star &"
+"Galaxy"         f.exec "xlock -nolock -mode galaxy -wireframe&"
+"Pyrotechnical"  f.exec "xlock -nolock -mode pyro -wireframe &"
+"Swarm"          f.exec "xlock -nolock -mode swarm &"
+"OS"            f.exec "xlock -nolock -mode flag &"
+}
+
+
+
+
+menu "Middle"
+{
+"Toys"          f.title
+"Jove"          f.exec "xjove &"
+"Mail"          f.exec "xmh &"
+"Manual"        f.exec "xman &"
+"Troff Viewer"  f.exec "xditview &"
+"Calculator"    f.exec "xcalc &"
+#"Mille Bornes"  f.exec "xmille `path -n .mille` &"
+"Notepad"       f.exec "xclipboard &"
+"Eyes"          f.exec "xeyes &"
+"Lens"          f.exec "xmag &"
+"expo jove"     f.exec "expo xjove&"
+"expo mail"     f.exec "expo xmh &"
+}
+
+menu "games"
+{
+"Games"         f.title
+"gTetrinet"     f.exec "gtetrinet &"
+"Xboard"        f.exec "xboard -rv &"
+}
+
+
+menu "others dtm"
+{
+	"Others DTM"		f.title
+	"KDE"			f.menu "KDE"
+	"Gnome"			f.menu "Gnome"
+}
+
+menu "KDE"
+{
+	"KDE"			f.title
+	"IM"			f.menu "KDE-IM"
+	"News"			f.menu "KDE-News"
+	"Music"			f.menu "KDE-Music"
+	"P2P"			f.menu "KDE-P2P"
+	"Office"		f.menu "KDE-office"
+}
+
+menu "KDE-IM"
+{
+	"Instant Messenger"	f.title
+	"Kopete"		f.exec "kopete &"
+}
+
+menu "KDE-News"
+{
+	"News"			f.title
+	"klibido"		f.exec "klibido &"
+}
+
+menu "KDE-Music"
+{
+	"Music"			f.title
+	"Amarok"		f.exec "amarok &"
+}
+
+menu "KDE-P2P"
+{
+	"Music"			f.title
+	"Ktorrent"		f.exec "ktorrent &"
+}
+
+menu "Gnome"
+{
+	"Gnome"			f.title
+}
+
+menu "WManager"
+{
+        "W-Manager"                     f.title
+        "Window ops"            f.menu "Window Ops"
+        "Windows"               f.menu "TwmWindows"
+        ""                      f.nop
+        "Refresh"               f.refresh
+        "Unfocus"               f.unfocus
+        "Show Icon Box"         f.showiconmgr
+        "Hide Icon Box"         f.hideiconmgr
+        "Version"               f.version
+        ""                      f.nop
+        "Screensaver"           f.menu "screensaver"
+        ""                      f.nop
+        "Restart"               f.restart
+        "Logout"                f.quit
+}
+
+
+menu "Window Ops"
+{
+        "Window Ops"            f.title
+        "Lower"                 f.lower
+        "Raise"                 f.raise
+        "Resize"                f.resize
+        "Move"                  f.move
+        "Deiconify"             f.deiconify
+        "Iconify"               f.iconify
+        "Identify"              f.identify
+        "Focus"                 f.focus
+        "Kill"                  f.destroy
+}
+
+menu "Display-last"
+{
+	"last"			f.title
+	"xterm"			f.exec	"export DISPLAY=last.area.unixenv.info:0.0; xterm -fg green -bg black &"
+	"dclock"		f.exec  "export DISPLAY=last.area.unixenv.info:0.0; dclock -slope 9 -thickness 0.1 -smallsize 0.5 &"
+}
+
+menu "Display"
+{
+	"Display"		f.title
+	"last"			f.menu "Display-last"
+
+}
+
+menu "lang"
+{
+    "us"                    f.exec "setxkbmap us"
+    "fr"                    f.exec "setxkbmap fr"
+}
+
+#---------------------
+# Menu :: Window
+#---------------------
+
+menu "window_menu"
+{
+    # "Window Menu"         f.title
+
+    "Identify"              f.identify
+
+    "Move To"               f.menu "window_move_to"
+    "Occupy"                f.occupy
+
+    "Refresh"               f.winrefresh
+    "Iconify"               f.iconify
+    "Resize"                f.resize
+    "Lower"                 f.lower
+    "Move"                  f.move
+    "Focus"                 f.focus
+    "Raise"                 f.raise
+    "Toggle AutoRaise"      f.AutoRaise
+
+    "Kill"                  f.destroy
+    "Dismiss"               f.delete
+}
+
+menu "window_move_to"
+{
+    "1"     f.function "move-to-#1"
+    "2"     f.function "move-to-#2"
+    "3"     f.function "move-to-#3"
+    "4"     f.function "move-to-#4"
+    "5"     f.function "move-to-#5"
+    "6"     f.function "move-to-#6"
+}
