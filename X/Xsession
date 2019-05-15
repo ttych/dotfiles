@@ -1,0 +1,8 @@
+# Bind the key labeled ‘Caps Lock’ to ‘Control’
+# (Such a broken user interface suggests that keyboard manufacturers
+# think that computers are typewriters from 1885.)
+#xmodmap -e "clear Lock"
+#xmodmap -e "add Control = Caps_Lock"
+
+# Some ill designed keyboards have a key labeled ALT and no Meta
+#xmodmap -e "keysym Alt_L = Meta_L Alt_L"

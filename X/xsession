@@ -1,0 +1,9 @@
+#!/bin/sh
+
+xrdb $HOME/.Xresources
+xsetroot -solid SteelBlue4
+
+xbindkeys
+xterm &
+
+exec ctwm

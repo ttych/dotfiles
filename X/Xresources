@@ -1,0 +1,302 @@
+! ---------- help
+! use xprop
+! then watch WM_CLASS(STRING) = ...
+
+
+
+! ---------- Xcursor
+Xcursor.theme:		whiteglass
+Xcursor.size:		16
+
+
+! ---------- Xft settings
+Xft.dpi:        96
+Xft.antialias:  true
+Xft.rgba:       rgb
+Xft.hinting:    true
+Xft.hintstyle:  hintslight
+
+
+! ---------- xm
+Xm*geometry:                            400x200+0-0
+Xm*foreground:                          white
+Xm*background:                          black
+
+
+! ---------- xpdf
+xpdf*enableFreetype:    yes
+xpdf*antialias:         yes
+xpdf*foreground:        black
+xpdf*background:        white
+xpdf*urlCommand:        firefox %s
+
+
+! ---------- xclock
+xclock*update:                          1
+xclock*showTitle:                               off
+xclock*analog:                          false
+xclock*digital:				true
+xclock*background:                              black
+xclock*foreground:                              lightblue
+xclock*hands:                                   lightblue
+xclock*hourColor:                               red
+xclock*minuteColor:                             lightblue
+xclock*secondColor:                             yellow
+xclock*BorderWidth:                             5
+xclock*majorColor:                              red
+xclock*minorColor:                              lightblue
+xclock*border:                          firebrick
+xclock*twentyfour:			true
+
+
+! ---------- rxvt
+rxvt*background:                black
+rxvt*foreground:                orange
+rxvt*colorBD:                   red
+rxvt*colorUL:                   orange
+rxvt*cursorColor:               darkblue
+rxvt*cursorColor2:              darkblue
+rxvt*jumpScroll:                true
+rxvt*scrollBar:                 false
+rxvt*visualBell:                false
+rxvt*loginShell:                true
+rxvt*scrollBar_right:           true
+rxvt*saveLines:                 10000
+rxvt*title:                     rxvT
+rxvt*font:                      6x13
+
+
+! ---------- aterm
+aterm*title:                    aTerm
+aterm*geometry:                 80x24
+aterm*background:               black
+aterm*foreground:               lightblue
+aterm*loginShell:               true
+aterm*saveLines:                20000
+aterm*transparent:              true
+aterm*shading:                  50
+aterm*visualBell:               false
+aterm*colorBD:                  red
+aterm*colorUL:                  orange
+aterm*cursorColor:              lightblue
+aterm*pointerColorBackground:   lightblue
+aterm*scrollBar:                off
+aterm*scrollColor:              lightblue
+aterm*scrollBar_right:          true
+aterm*transpscrollbar:          true
+aterm*font:                     7x14
+aterm*font1:                    6x10
+aterm*font2:                    6x13
+aterm*font3:                    8x13
+aterm*font4:                    9x15
+
+
+! ---------- terminal - global
+*loginShell:			true
+*saveLines:			20000
+*background:			black
+!*foreground:			rgb:d7/d7/d7
+*foreground:			white
+*cursorColor:			white
+*charClass:			33:48,35:48,37:48,43:48,45-47:48,64:48,95:48,126:48
+!! whether or not the last column bug in more should be worked around
+!*curses:			on
+*visualBell:			false
+*marginBell:			false
+*internalBorder:		1
+*scrollBorder:			1
+*jumpScroll:			true
+!! default max is 250msec between click
+*multiClickTime:		500
+*multiScroll:			true
+*titlebar:			true
+*TitleFont:			vtbold
+*.vt100.font:			*-fixed-*-*-*-10-*
+!*.vt100.encodingMode:		locale
+!*font:				6x10
+!*font:				*-fixed-*-*-*-10-*
+!*boldFont:			6x10
+!*selectToClipboard:             true
+
+
+
+! ---------- XTerm
+XTerm*termName:                 XTerm
+XTerm*metaSendsEscape:          true
+!XTerm*altSendsEscape:           false
+
+
+
+! ---------- xterm
+xterm*name:                     xterm
+xterm*scrollBar:                false
+xterm*cutNewline:               false
+xterm*colorMode:                true
+xterm*colorAttrMode:            true
+!xterm*logFile :                 $HOME/.log/test
+!xterm*selectToClipboard:        true
+!! bold mode
+!xterm*colorBDMode:			true
+!! bold mode color
+!xterm*colorBD:				red
+!! blink mode
+!xterm*colorBLMode:			true
+!! blink mode color
+!xterm*colorBL:				yellow
+!! underline mode
+!xterm*colorULMode:			true
+!! underline mode color
+!xterm*colorUL:				orange
+!! reverse mode
+!# xterm*colorRVMode:			false
+!! reverse mode color
+!# xterm*colorRV:				red
+!# xterm*useInsertMode:			true
+!# xterm*TitleFont:			vtbold
+!# xterm.ActiveIcon:			true
+!# xterm*AllowIconInput:			true
+!# xterm*DeiconifyWarp:			false
+!# xterm*TextUnderIcon:			true
+!# xterm*reverseVideo:			false
+!# xterm*reverseWrap:			false
+!# xterm*geometry:			80x24
+
+
+! ---------- xterm - xtermdos - dos
+xtermdos*boldMode: false
+!! If Alt+F sends \346 and you need ^[f
+!xtermdos*eightBitInput: false
+xtermdos*foreground: rgb:a8/a8/a8
+xtermdos*background: rgb:00/00/00
+xtermdos*color0: rgb:00/00/00
+xtermdos*color1: rgb:a8/00/00
+xtermdos*color2: rgb:00/a8/00
+xtermdos*color3: rgb:a8/54/00
+xtermdos*color4: rgb:00/00/a8
+xtermdos*color5: rgb:a8/00/a8
+xtermdos*color6: rgb:00/a8/a8
+xtermdos*color7: rgb:a8/a8/a8
+xtermdos*color8: rgb:54/54/54
+xtermdos*color9: rgb:fc/54/54
+xtermdos*color10: rgb:54/fc/54
+xtermdos*color11: rgb:fc/fc/54
+xtermdos*color12: rgb:54/54/fc
+xtermdos*color13: rgb:fc/54/fc
+xtermdos*color14: rgb:54/fc/fc
+xtermdos*color15: rgb:fc/fc/fc
+xtermdos*colorBDMode: true
+xtermdos*colorBD: rgb:fc/fc/fc
+
+! ---------- xterm - xtermcons - console
+xtermcons*foreground:           white
+xtermcons*background:           black
+xtermcons*name:                 xterm-console
+xtermcons*scrollBar:            false
+xtermcons*cutNewline:           false
+
+! ---------- xterm - xtermadm - admin
+xtermadm*foreground:            orangered
+xtermadm*background:            black
+xtermadm*name:                  xterm-admin
+xtermadm*scrollBar:             false
+xtermadm*cutNewline:            false
+xtermadm*cursorColor:           orangered
+
+! ---------- xterm - xtermlblue - usage
+xtermlblue*.foreground:         #93d2ff
+xtermlblue*background:          black
+xtermlblue*name:                xterm-lblue
+xtermlblue*scrollBar:           false
+xtermlblue*cutNewline:          false
+xtermlblue*.cursorColor:        #93d2ff
+
+! ---------- xterm - xtermlwhite - usage
+xtermlwhite*foreground:         rgb:d7/d7/af
+xtermlwhite*background:         black
+xtermlwhite*name:               xterm-lwhite
+xtermlwhite*scrollBar:          false
+xtermlwhite*cutNewline:         false
+xtermlwhite*cursorColor:        rgb:d7/d7/af
+
+! ---------- xterm - xtermem - emacs
+xtermem*foreground:             rgb:ff/f8/dc
+xtermem*background:             rgb:23/3b/5a
+xtermem*name:                   xterm-emacs
+xtermem*scrollBar:              false
+xtermem*cutNewline:             false
+xtermem*.cursorColor:           rgb:ff/f8/dc
+
+! ---------- xterm - xtermemadm - emacs admin
+xtermemadm*foreground:          orange
+xtermemadm*background:          RoyalBlue4
+xtermemadm*name:                xterm-emacs-admin
+xtermemadm*scrollBar:           false
+xtermemadm*cutNewline:          false
+xtermemadm*cursorColor:         orange
+
+! ---------- xterm - xtermatrix - matrix
+xtermatrix*foreground:          green
+xtermatrix*background:          black
+xtermatrix*name:                xterm-matrix
+xtermatrix*scrollBar:           false
+xtermatrix*cutNewline:          false
+xtermatrix*cursorColor:         green
+
+! ---------- xterm - xtermams - amstrad
+xtermams*foreground:            Yellow
+xtermams*background:            Dark Blue
+xtermams*name:                  xterm-amstrad
+xtermams*scrollBar:             false
+xtermams*cutNewline:            false
+xtermams*cursorColor:           Yellow
+
+
+! ---------- xterm - myxterm - my
+!myxterm*foreground:            PaleGreen1
+!myxterm*foreground:			Turquoise2
+!myxterm*foreground:			CornflowerBlue
+!myxterm*foreground:			DeepSkyBlue1
+!myxterm*foreground:			SteelBlue1
+!myxterm*foreground:            white
+!myxterm*background:            SkyBlue4
+!myxterm*background:            SlateGray
+!myxterm*background:            LightBlue4
+myxterm*foreground:             rgb:d7/d7/af
+myxterm*background:             black
+myxterm*name:                   myxTerm
+myxterm*scrollBar:              false
+myxterm*cutNewline:             false
+myxterm*cursorColor:            rgb:d7/d7/af
+
+
+
+
+
+! ---------- emacs - 01
+!emacsa*font: *-fixed-*-*-*-10-*
+!emacsa*Background: DarkSlateGray
+!emacsa*Foreground: Wheat
+!emacsa*pointerColor: Orchid
+!emacs*cursorColor: Orchid
+!emacs*font: fixed
+
+
+! ---------- emacs
+emacs*font: *-fixed-*-*-*-10-*
+emacs*foreground: rgb:ff/f8/dc
+emacs*background: rgb:23/3b/5a
+emacs*geometry: 80x50
+emacs*bitmapIcon: on
+!emacs*cursorColor: Green
+!emacs*pointerColor: Yellow
+!emacs*scrollBarWidth: 10
+!#if X_RESOLUTION > 4000
+!emacs.font:				9x15bold
+!#else
+!emacs.font:				7x13bold
+!#endif
+!emacs.ReverseVideo:			on
+
+
+
+
