@@ -1,0 +1,13 @@
+#+STARTUP: overview
+
+* utilsh
+  Framework to integrate shell utilities from several sources.
+** enhancements
+*** TODO add base installer to integrate default remote repositories
+**** TODO *install.sh* should add default source
+**** TODO *install.sh* should default default autoload
+*** TODO import base utilities
+**** TODO copy base utilities from original utilsh
+*** TODO change source/target flow
+**** TODO manage source/target to have full segregation
+**** TODO avoid build step when not needed ?
