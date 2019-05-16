@@ -1,0 +1,55 @@
+#!/bin/sh
+# -*- mode: shell -*-
+
+_want_auto_tmux()
+{
+    [ -r "$ESH_CONF_DIR/auto_tmux" ]
+}
+
+_has_tmux()
+{
+    which tmux >/dev/null 2>/dev/null
+}
+
+_inside_tmux()
+{
+    [ -n "$TMUX" ]
+}
+
+_not_inside_tmux()
+{
+    ! _inside_tmux
+}
+
+_ensure_tmux_is_running()
+{
+    _has_tmux || return 0
+
+    if _not_inside_tmux; then
+        _atmux
+    fi
+}
+
+_tmux_session_exists()
+{
+    [ -z "$1" ] && return 1
+    tmux list-sessions | sed -E 's/:.*$//' | grep -q "^$1$"
+}
+
+_atmux()
+{
+    _has_tmux || return 1
+
+    _atmux__session_name="$1"
+    [ -z "$_atmux__session_name" ] &&
+        _atmux__session_name="$(echo ${PWD##*/} | tr . _)"
+
+    if _not_inside_tmux; then
+        tmux new-session -As "$_atmux__session_name"
+    else
+        if ! _tmux_session_exists "$_atmux__session_name"; then
+            TMUX='' tmux new-session -Ads "$_atmux__session_name"
+        fi
+        tmux switch-client -t "$_atmux__session_name"
+    fi
+}

@@ -1,0 +1,419 @@
+#!/bin/sh
+# -*- mode: shell -*-
+
+ESH_DIR="${ESH_DIR:-$HOME/.esh}"
+export ESH_DIR
+
+ESH_CONF_DIR="$ESH_DIR/conf"
+
+ESH_SH_INIT="${ESH_SH_INIT:-$0}"
+ESH_SH_CUR="${ESH_SH_INIT#-}"
+ESH_SH_LOGIN=false
+[ X${ESH_SH_INIT%${ESH_SH_INIT#?}} = X- ] && ESH_SH_LOGIN=true
+ESH_SH_DEF=`getent passwd $USER | cut -d':' -f7`
+[ "$ESH_SH_CUR" = "su" ] && \
+    ESH_SH_CUR="$ESH_SH_DEF"
+ESH_SH_CUR_SHORT="${ESH_SH_CUR##*/}"
+export ESH_SH_INIT ESH_SH_CUR ESH_SH_LOGIN ESH_SH_DEF ESH_SH_CUR_SHORT
+
+SHELL="${SHELL:-$ESH_SH_CUR}"
+SHELL_SHORT="${SHELL_SHORT:-$ESH_SH_CUR_SHORT}"
+export SHELL SHELL_SHORT
+
+
+esh_reload()
+{
+    [ -r "$ESH_DIR/base" ] && . "$ESH_DIR/base"
+}
+
+esh_update()
+(
+    cd "$ESH_DIR" &&
+        git reset --quiet --hard HEAD &&
+        git pull --no-rebase --ff-only
+)
+
+
+### BOOLEAN
+TRUE()
+{
+    return 0
+}
+FALSE()
+{
+    return 1
+}
+
+
+### SECURITY
+umask 022
+
+
+### ENVIRONMENT
+ESH_OS=`uname -s`
+ESH_OS_ARCH=`uname -m`
+
+export ESH_OS ESH_OS_ARCH HOSTNAME
+
+
+### PATH
+PATH_BASE=/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin
+MANPATH_BASE=/usr/man:/usr/share/man:/usr/local/man:/usr/local/share/man
+LD_LIBRARY_PATH_BASE=/lib:/usr/lib:/usr/local/lib
+
+_path_clear()
+{
+    PATH="$PATH_BASE"
+    MANPATH="$MANPATH_BASE"
+    LD_LIBRARY_PATH="$LD_LIBRARY_PATH_BASE"
+    export PATH MANPATH LD_LIBRARY_PATH
+}
+_path_clear
+
+_path_splitter()
+{
+    for _path_splitter__var in PATH MANPATH LD_LIBRARY_PATH; do
+        eval _path_splitter__content=\"\$${_path_splitter__var}\"
+        eval _path_splitter__base=\"\$${_path_splitter__var}_BASE\"
+
+        _path_splitter__front="${_path_splitter__content%%$_path_splitter__base*}"
+        _path_splitter__front="${_path_splitter__front%:}"
+        _path_splitter__back="${_path_splitter__content##*$_path_splitter__base}"
+        _path_splitter__back="${_path_splitter__back#:}"
+
+        eval "${_path_splitter__var}_FRONT"="$_path_splitter__front"
+        eval "${_path_splitter__var}_BACK"="$_path_splitter__back"
+    done
+}
+
+_path_merger()
+{
+    for _path_merger__var in PATH MANPATH LD_LIBRARY_PATH; do
+        _path_merger__merge=
+        for _path_merger__part in FRONT BASE BACK; do
+            eval _path_merger__cur=\"\$${_path_merger__var}_${_path_merger__part}\"
+            [ -z "$_path_merger__cur" ] && continue
+            _path_merger__merge="${_path_merger__merge:+$_path_merger__merge:}${_path_merger__cur}"
+        done
+        eval $_path_merger__var="$_path_merger__merge"
+    done
+    export PATH MANPATH LD_LIBRARY_PATH
+}
+
+
+# adder
+_path_add_var()
+{
+    _path_add_var__var="${1}_${2}"
+    eval _path_add_var__cur_val="\"\$$_path_add_var__var\""
+    if [ -z "$_path_add_var__cur_val" ]; then
+        eval $_path_add_var__var="\"${4}\""
+    else
+        case "${3}" in
+            pre|front) eval $_path_add_var__var="\"${4}:\$$_path_add_var__var\"" ;;
+            post|back) eval $_path_add_var__var="\"\$$_path_add_var__var:${4}\"" ;;
+        esac
+    fi
+}
+
+_path_add()
+{
+    _path_add__loc1="$1" ; shift
+    _path_add__loc2="$1" ; shift
+    [ $# -eq 0 ] && return
+    case $_path_add__loc1 in
+        pre|front) _path_add__loc1=FRONT ;;
+        base) _path_add__loc1=BASE ;;
+        post|back) _path_add__loc1=BACK ;;
+    esac
+    _path_splitter
+    for _path_add__p; do
+        if [ -d "$_path_add__p" ]; then
+            if [ -d "$_path_add__p/bin" ]; then
+                _path_add_var PATH "$_path_add__loc1" "$_path_add__loc2" "$_path_add__p/bin"
+                [ -d "$_path_add__p/lib" ] &&
+                    _path_add_var LD_LIBRARY_PATH "$_path_add__loc1" "$_path_add__loc2" "$_path_add__p/lib"
+                [ -d "$_path_add__p/man" ] &&
+                    _path_add_var MANPATH "$_path_add__loc1" "$_path_add__loc2" "$_path_add__p/man"
+                [ -d "$_path_add__p/share/man" ] &&
+                    _path_add_var MANPATH "$_path_add__loc1" "$_path_add__loc2" "$_path_add__p/share/man"
+                [ -d "$_path_add__p/sbin" ] &&
+                    _path_add_var PATH "$_path_add__loc1" "$_path_add__loc2" "$_path_add__p/sbin"
+                _path_activate && [ -r "$_path_add__p/bin/$_path_activate" ] &&
+                    . "$_path_add__p/bin/$_path_activate"
+            else
+                _path_add_var PATH "$_path_add__loc1" "$_path_add__loc2" "$_path_add__p"
+                _path_activate && [ -r "$_path_add__p/$_path_activate" ] &&
+                    . "$_path_add__p/$_path_activate"
+            fi
+        fi
+    done
+    _path_merger
+}
+
+_path_purge_var()
+{
+    _path_purge_var__var="${1}_${2}"
+    eval _path_purge_var__val="\"\$$_path_purge_var__var\""
+
+    while [ -n "$_path_purge_var__val" ]; do
+        case "$_path_purge_var__val" in
+            "${3}"*:*)
+                _path_purge_var__val="${_path_purge_var__val#$3*:}"
+                ;;
+            "${3}"*)
+                _path_purge_var__val=
+                ;;
+            *:"${3}"*)
+                _path_purge_var__val="${_path_purge_var__val%:$3*}"
+                ;;
+            *:"${3}"*:*)
+                break # FIXME
+                ;;
+            *) break ;;
+        esac
+    done
+    eval $_path_purge_var__var="\"$_path_purge_var__val\""
+}
+
+_path_purge()
+{
+    [ $# -eq 0 ] && return
+    _path_splitter
+    for _path_purge__path; do
+        for _path_purge__loc1 in FRONT BACK; do
+            for _path_purge__loc2 in PATH LD_LIBRARY_PATH MANPATH; do
+                _path_purge_var "$_path_purge__loc2" "$_path_purge__loc1" "$_path_purge__path"
+            done
+        done
+    done
+    _path_merger
+}
+
+path_purge()
+{
+    _path_purge "$@"
+}
+
+
+path_add()
+{
+    path_add_pre "$@"
+}
+
+path_add_pre_pre()
+{
+    _path_add pre pre "$@"
+}
+
+path_add_pre()
+{
+    _path_add pre post "$@"
+}
+
+path_add_base_pre()
+{
+    _path_add base pre "$@"
+}
+
+path_add_base()
+{
+    _path_add base post "$@"
+}
+
+path_add_post_pre()
+{
+    _path_add post pre "$@"
+}
+
+path_add_post()
+{
+    _path_add post post "$@"
+}
+
+_path_addin()
+{
+    path_addin__loc="$1" ; shift
+    for path_addin__p
+    do
+        [ -d "$path_addin__p" ] || continue
+        if [ -r "$path_addin__p/_path_load" ]; then
+            while read path_addin__dist path_addin__mode; do
+                path_add_${path_addin__loc}_${path_addin__mode:+_$path_addin__mode} "${path_addin__p}/${path_addin__dist}"
+            done < "$path_addin__p/to_load"
+        elif (echo "$path_addin__p"/* >/dev/null) 2>/dev/null; then
+            for path_addin__dist in "$path_addin__p"/*; do
+                case "${path_addin__dist##*/}" in
+                    _*) continue ;;
+                esac
+                [ -d "$path_addin__dist" ] && \
+                    path_add_${path_addin__loc} "$path_addin__dist"
+            done
+        fi
+    done
+}
+
+path_addin_pre()
+{
+    _path_addin pre "$@"
+}
+path_addin_base()
+{
+    _path_addin base "$@"
+}
+path_addin_post()
+{
+    _path_addin post "$@"
+}
+
+path_addin()
+{
+    path_addin_pre "$@"
+}
+
+_path_activate()
+{
+    if [ -n "$1" ]; then
+        _path_activate="$1"
+    else
+        [ -z "$_path_activate" ] && return 1
+        return 0
+    fi
+}
+
+_path_deactivate()
+{
+    _path_activate=
+}
+
+case "$ESH_OS" in
+    Darwin) path_add_base /opt/local /sw /usr/X11R6 ;;
+    SunOS) path_add_base /usr/dt /usr/openwin /usr/ccs /usr/ucb /usr/xpg6 /usr/xpg4 /usr/sfw ;;
+    FreeBSD) path_add_base /usr/games /usr/X11R6 ;;
+    Linux) path_add_base /snap /usr/games /usr/X11R6 ;;
+esac
+
+path_addin /opt
+
+
+path_pprint()
+{
+    echo "$PATH" | tr ':' '\012'
+}
+
+
+### PROCESS
+_process_ppid()
+{
+    _process_ppid=$(ps -p "${1:-$$}" -o ppid=)
+    _process_ppid="${_process_ppid##* }"
+}
+
+_process_comm()
+{
+    _process_comm=$(ps -p "${1:-$$}" -o comm=)
+    _process_comm="${_process_comm##* }"
+}
+
+
+### PREFERRED SHELLS
+preferred_shells_list()
+{
+    preferred_shells_list__conf="$ESH_DIR/conf/preferred_shell"
+    preferred_shells_list=
+    [ -r "$preferred_shells_list__conf" ] || return 0
+    for preferred_shells_list__s in `cat "$preferred_shells_list__conf"`; do
+        case $preferred_shells_list__s in
+            "#"*) continue ;;
+            "$ESH_SH_CUR|$ESH_SH_CUR_SHORT") break ;;
+            *) preferred_shells_list="${preferred_shells_list} ${preferred_shells_list__s}" ;;
+        esac
+    done
+}
+
+preferred_shells_switch()
+{
+    if $ESH_SH_LOGIN && test -t 0; then
+        preferred_shells_list
+        for preferred_shells_exec__s in $preferred_shells_list; do
+            preferred_shells_exec__s_r=`command -v $preferred_shells_exec__s 2>/dev/null`
+            if [ -n "$preferred_shells_exec__s_r" ]; then
+                exec "$preferred_shells_exec__s_r" -l || exec "$preferred_shells_exec__s_r"
+            fi
+        done
+    fi
+}
+
+preferred_shells_switch
+
+
+### INTERACTIVE
+esh_interactive()
+{
+    if [ -z "$esh_interactive" ]; then
+        if test -t 0; then
+            esh_interactive=TRUE
+        else
+            esh_interactive=FALSE
+        fi
+    fi
+    $esh_interactive
+}
+
+if esh_interactive; then
+    set -o emacs
+    [ "$ESH_SH_CUR_SHORT" = "bash" ] && [ -r ~/.bashrc ] &&  . ~/.bashrc
+fi
+
+
+### MODULE
+esh_module_load()
+{
+    [ $# -ne 1 ] && return 1
+    esh_module_load__m=
+    esh_module_load__m_alt=
+    case "$1" in
+        /*) esh_module_load__m="$1" ;;
+        *) esh_module_load__m="$ESH_DIR/modules/$1"
+           esh_module_load__m_alt="$ESH_DIR/$1"
+           ;;
+    esac
+    if [ -r "$esh_module_load__m" ]; then
+        ESH_MODULE_DIR="${esh_module_load__m%/?*}" . "$esh_module_load__m"
+    elif [ -d "$esh_module_load__m_alt" ]; then
+        [ -r "$esh_module_load__m_alt/base" ] &&
+            ESH_MODULE_DIR="${esh_module_load__m_alt}" . "$esh_module_load__m_alt/base"
+        esh_interactive && [ -r "$esh_module_load__m_alt/interactive" ] &&
+            ESH_MODULE_DIR="${esh_module_load__m_alt}" . "$esh_module_load__m_alt/interactive"
+    fi
+}
+
+for esh_module in terminal \
+                      host \
+                      utils \
+                      utilsh \
+                      tmux \
+                      $ESH_SH_CUR_SHORT \
+                      ssh-agent \
+                      interactive
+do
+        esh_module_load "$esh_module"
+done
+
+
+### TIMEOUT
+#TMOUT=600; export TMOUT
+if [ -n "$TMOUT" ]; then
+    TMOUT=
+    export TMOUT
+fi
+
+## History
+[ -d "$HOME/.log" ] || mkdir "$HOME/.log"
+HISTFILE="$HOME/.log/${HOSTNAME}_${ESH_SH_CUR_SHORT}"; export HISTFILE
+# ksh
+HISTSIZE=1000; export HISTSIZE
+# bash
+HISTFILESIZE=1000; export HISTFILESIZE
+# zsh
+SAVEHIST=1000; export SAVEHIST

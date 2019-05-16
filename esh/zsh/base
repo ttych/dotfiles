@@ -1,0 +1,82 @@
+#!/bin/sh
+
+
+###################
+# ##### SET ##### #
+###################
+
+
+
+######################
+# ##### SETOPT ##### #
+######################
+
+## Shell Emulation
+setopt   shwordsplit
+## Expansion and Globbing
+setopt   globsubst
+setopt   nonomatch
+## Input/Output
+setopt   rmstarsilent
+
+
+# non interactive
+#
+#
+#setopt   allexport            # assumes all variable assignments are exported to the environment
+#setopt   extendedglob         # enable extended globbing.
+#
+# interactive
+#
+#setopt   INTERACTIVE_COMMENTS # Allow comments even in interactive shells.
+#
+#setopt   correct              # correction
+#setopt   correctall           # correct all !
+#unsetopt hist_beep            # no beep
+#setopt   histignoredups       # keeps duplicates out of the history.
+#setopt   interactivecomments  # allows comments in the interactive shell. Useful for pasting.
+#unsetopt list_beep            # no beep
+#setopt   promptsubst          # parameter, command, and arithmetic substitution are performed in prompts.
+#setopt   pushdignoredups      # ignores directory stack duplicates.
+#unsetopt rm_star_silent       # prompt for rm *
+
+
+####
+
+
+#setopt	inc_append_history	# add to histo when executed
+##setopt append_history		# add to the end of the file
+#setopt	 hist_ignore_dups	# dont keep 2 similar lines
+##setopt  hist_ignore_all_dups	# remove all dups in hist file
+#setopt	 hist_expire_dups_first # remove dups when histfile is complete
+##setopt	 hist_save_no_dups	# don't save dups
+#setopt	 hist_find_no_dups	# no dups in history
+#unsetopt clobber		# >| to overwrite file
+#unsetopt ignore_eof		# CTRL + D => logout
+#setopt	print_exit_value	# affiche l'exitcode si != 0
+
+##setopt	 nullglob		# remove glob no output errors
+##setopt   menu_complete		# completion schema B
+#unsetopt list_ambiguous		# completion schema C
+#setopt	 auto_remove_slash	# remove completion end slash when press space
+##unsetopt glob_dots		# no completion on dot files
+#setopt   chase_links		# sym links management
+#setopt	 hist_verify		# check command beginning with ! (history)
+#unsetopt hup			# no HUP send to process when closing shell
+#unsetopt bg_nice		# bg jobs niced to 0
+
+
+#setopt   notify
+#setopt   globdots
+#setopt   cdablevars
+#setopt   autolist
+
+#setopt   recexact
+#setopt   longlistjobs
+#setopt   autoresume
+#setopt   histignoredups
+
+#setopt   extendedglob
+#setopt   rcquotes
+#setopt   mailwarning
+#unsetopt autoparamslash

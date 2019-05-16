@@ -1,0 +1,313 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+
+###################
+# ##### ESH ##### #
+###################
+[ -r "$ESH_DIR/prompt/prompt" ] && . "$ESH_DIR/prompt/prompt"
+
+
+#######################
+# ##### COLORS  ##### #
+#######################
+[ -r "$ESH_DIR/prompt/colors" ] && . "$ESH_DIR/prompt/colors"
+
+
+#######################
+# ##### HISTORY ##### #
+#######################
+# ignorespace : ignore commands that start with spaces
+# ignoredups : ignore duplicates
+# ignoreboth : ignorespace:ignoredups
+HISTCONTROL=ignoreboth
+export HISTCONTROL
+
+
+###################
+# ##### SET ##### #
+###################
+set -o emacs
+
+
+#####################
+# ##### SHOPT ##### #
+#####################
+shopt -s cdspell
+shopt -s checkhash
+shopt -s checkjobs
+shopt -s checkwinsize
+shopt -s cmdhist
+shopt -s expand_aliases
+shopt -s histappend histreedit histverify
+shopt -s interactive_comments
+shopt -s no_empty_cmd_completion
+shopt -s progcomp
+shopt -s promptvars
+
+
+############################
+# ##### KEY BINDINGS ##### #
+############################
+#bind '"\C-t": possible-completions' # replaces 'transpose-chars'
+#bind '"\M-t": menu-complete'        # replaces 'transpose-words'
+
+
+###########################
+# ##### COMPLETIONS ##### #
+###########################
+complete -A setopt set
+complete -A shopt shopt
+complete -A alias {,un}alias
+complete -A binding bind
+complete -A directory find cd pushd {mk,rm}dir
+complete -A file -A directory -A group chgrp
+complete -A file -A directory -A user chown
+complete -A file -A directory ln chmod
+complete -A file {,z}cat pico nano vi {,{,r}g,e,r}vi{m,ew} vimdiff elvis emacs {,r}ed e{,x} joe jstar jmacs rjoe jpico {,z}less {,z}more p{,g}
+complete -A helptopic help
+complete -A hostname ssh rsh telnet rlogin ftp ping fping host traceroute nslookup slogin rexec
+complete -A job -P '%' jobs disown
+complete -A signal -P '-' kill
+complete -A stopped -P '%' bg
+complete -A user -A hostname finger pinky
+complete -A user groups id
+complete -A variable readonly unset
+complete -a unalias
+complete -c -f -b man info pinfo whatis
+complete -c command type nohup exec nice eval strace whereis where which sudo
+complete -d mkdir rmdir cd
+complete -f -- . source
+complete -f -X '*.+(bz2|tar.bz2|zip)' bzip2
+complete -f -X '*.+(gz|tgz|tar.gz|zip)' gzip
+complete -f -X '*.Z' compress znew
+complete -f -d -u chown
+complete -f -d ln chmod
+complete -j -P '%' fg jobs disown
+complete -o default -W 'Makefile' -P '-o ' qmake
+complete -o dirnames -f -X '!*.@(?(e)ps|?(E)PS|?(e)ps.gz|pdf|PDF)' gv ggv ghostview kghostview gs gsview gslp gsbj gsdj gsjd500 gslj
+complete -o dirnames -f -X '!*.@(C|cc|cpp|cxx|c++|o)' g++
+complete -o dirnames -f -X '!*.@(Z|gz|tgz|Gz)' gunzip zcmp zdiff zcat zegrep zfgrep zgrep zless zmore
+complete -o dirnames -f -X '!*.@(arj|ARJ)' unarj
+complete -o dirnames -f -X '!*.@(avi|asf)' aviplay
+complete -o dirnames -f -X '!*.@(bz2|tar.bz2)' bunzip2 bzip2recover
+complete -o dirnames -f -X '!*.@(css|CSS)' csslint
+complete -o dirnames -f -X '!*.@(c|o)' gcc cc
+complete -o dirnames -f -X '!*.@(dvi|DVI)' dvips xdvi dviselect dvitype catdvi kdvi dvipdf dvi2fax dvi2tty dvibook dviconcat dvicopy dvipdfm dvipdft dvired dvitodvi dvitomp dvitype
+complete -o dirnames -f -X '!*.@(eps|EPS)' eps2eps epstopdf epsffit
+complete -o dirnames -f -X '!*.@(gif|GIF)' gif2png giftopnm
+complete -o dirnames -f -X '!*.@(gif|jpg|jpeg|tif|tiff|png|pbm|pgm|ppm|PBM|PGM|PPM|GIF|JPG|JPEG|TIF|TIFF|PNG|bmp|BMP)' ee xv qiv display eog gimp kuickshow
+complete -o dirnames -f -X '!*.@(htm|html|HTM|HTML)' lynx links mozilla w3m tidy validate linkchecker html2latex html2text lynx-color
+complete -o dirnames -f -X '!*.@(jpg|jpeg|JPG|JPEG)' jpegicc jpeg2yuv jpegtopnm
+complete -o dirnames -f -X '!*.@(mp3|MP3|ogg|OGG|pls)' mpg123 gqmpeg freeamp
+complete -o dirnames -f -X '!*.@(mpg|mpeg|avi|asf|vob|bin|vcd|ps|pes|fli|viv|rm|ram|yuv|wmv|wma|mov|mp3|qt|mp4|ogm|wav|mp2|vivo|js|sub|mpsub|smi|srt|mkv|MPG|MPEG|AVI|ASF|VOB|BIN|VCD|PS|PES|FLI|VIV|RM|RAM|YUV|WMV|WMA|MOV|MP3|QT|MP4|OGM|WAV|MP2|VIVO|JS|SUB|MPSUB|SMI|SRT|MKV)' mplayer
+complete -o dirnames -f -X '!*.@(mpg|mpeg|avi|mov)' xanim
+complete -o dirnames -f -X '!*.@(ogg|OGG)' ogg123 oggdec ogginfo
+complete -o dirnames -f -X '!*.@(pdf|PDF)' acroread xpdf pdf2dsc pdf2ps pdftosrc pdftohtml
+complete -o dirnames -f -X '!*.@(pl|pod)' pod2html pod2latex pod2text pod2usage pod2man podchecker podselect
+complete -o dirnames -f -X '!*.@(png|PNG)' pngcrush png2yuv pngtoico png2pnm
+complete -o dirnames -f -X '!*.@(ps|PS|eps|EPS)' fixdlsrps fixfmps fixmacps fixmswrd fixnt fixps fixpsditps fixpspps fixscribeps fixtpps fixvt fixwfwps fixwpps fixwwps ogonkify ps2ascii ps2epsi ps2frag ps2pdf ps2pdf12 ps2pdf13 ps2pdf14 ps2pdfwr ps2pk ps2ps psbook psmerge psresize psnup psselect pstopnm ps2ps
+complete -o dirnames -f -X '!*.@(ps|PS|txt|TXT)' lpr
+complete -o dirnames -f -X '!*.@(rar|RAR)' unrar
+complete -o dirnames -f -X '!*.@(rm|ram)' realplay
+complete -o dirnames -f -X '!*.@(tar.gz|tgz|tar.bz2|tar)' tar
+complete -o dirnames -f -X '!*.@(tex|TEX)' tex slitex jadetex pdfjadetex pdftex pdflatex detex makeindex
+complete -o dirnames -f -X '!*.@(tex|TEX|dtx|ins)' latex
+complete -o dirnames -f -X '!*.@(wad|WAD|deh|DEH|lmp|LMP)' prboom
+complete -o dirnames -f -X '!*.@(wav|WAV)' lame mp2enc normalize oggenc
+complete -o dirnames -f -X '!*.@(wav|cdr|au|snd|ul)' esdplay sox
+complete -o dirnames -f -X '!*.@(wmf|WMF)' wmf2eps wmf2fig wmf2gd wmf2svg wmf2x
+complete -o dirnames -f -X '!*.@(zip|ZIP|jar|JAR|exe|EXE|pk3)' unzip zipcloak zipnote zipsplit
+complete -o dirnames -f -X '!*.Z' uncompress zmore zcat znew
+complete -o dirnames -f -X '!*.bz2' bunzip2 bzcat bzcmp bzdiff bzegrep bzfgrep bzgrep
+complete -o dirnames -f -X '!*.f' gforth
+complete -o dirnames -f -X '!*.fig' xfig fig2dev fig2ps2tex
+complete -o dirnames -f -X '!*.l' flex lex
+complete -o dirnames -f -X '!*.m4' m4
+complete -o dirnames -f -X '!*.pl' perl
+complete -o dirnames -f -X '!*.py' python
+complete -o dirnames -f -X '!*.rpm' rpm
+complete -o dirnames -f -X '!*.texi*' makeinfo texi2dvi texi2html texi2dvi4a2ps texi2index texi2pdf texi2roff texinfo2man
+complete -o dirnames -f -X '!*.torrent' btdownloadcurses.py btdownloadgui.py btdownloadheadless.py
+complete -o dirnames -f -X '!*.y' bison yacc
+complete -o dirnames -f -u mail sendmail qmail
+complete -o dirnames -f grep egrep fgrep touch more cat strip xemacs pico nano emacs head tail less jed vi vim xe
+complete -u -A hostname finger
+complete -u su usermod userdel passwd sux talk ytalk
+complete -v readonly unset
+
+
+
+##############################
+# ##### PROMPT SECTION ##### #
+##############################
+
+prompt_padding()
+{
+    [ $# -eq 2 ] || echo "$1"
+    prompt_padding_ret="$1"
+    while [ ${#prompt_padding_ret} -lt $2 ]; do
+  prompt_padding_ret="${prompt_padding_ret}$1"
+    done
+    echo "$prompt_padding_ret"
+}
+
+PROMPT_TIMESTAMP=false
+prompt_timestamp()
+{
+    if [ -n "$PROMPT_TIMESTAMP" ] && $PROMPT_TIMESTAMP; then
+  PROMPT_TIMESTAMP=false
+    else
+  PROMPT_TIMESTAMP=true
+    fi
+}
+
+
+# prompt work
+prompt_work_command()
+{
+    PROMPT_LAST_RET=$?
+    PS1="${PROMPT_WORK_PS1}"
+
+    if $PROMPT_TIMESTAMP; then
+  prompt_work_command_padding=
+  if [ $COLUMNS -gt $PROMPT_WORK_TIMESTAMP_SIZE ]; then
+      prompt_work_command_pad_size=$(($COLUMNS - $PROMPT_WORK_TIMESTAMP_SIZE))
+      prompt_work_command_padding=$(prompt_padding '-' $prompt_work_command_pad_size)
+  fi
+  PS1="${PROMPT_WORK_COLOR_TIME}${prompt_work_command_padding}${PROMPT_WORK_TIMESTAMP_FORMAT}${COLOR_OFF}
+${PS1}"
+    fi
+
+    if [ $PROMPT_LAST_RET -ne 0 ]; then
+  PS1="${PROMPT_WORK_COLOR_ERROR}${PROMPT_LAST_RET}${COLOR_OFF}
+${PS1}"
+    fi
+}
+
+prompt_work()
+{
+    PROMPT_WORK_COLOR_PS1="$COLOR_B_IGREEN"
+    PROMPT_WORK_COLOR_PS2="$COLOR_IGREEN"
+    PROMPT_WORK_COLOR_PS1F="$COLOR_IGREEN"
+    PROMPT_WORK_COLOR_ERROR="$COLOR_B_IRED"
+    PROMPT_WORK_COLOR_TIME="$COLOR_CYAN"
+
+    PROMPT_WORK_PS1="${PROMPT_WORK_COLOR_PS1}\u@\h:\w${COLOR_OFF}
+\[${PROMPT_WORK_COLOR_PS1F}\]\! \$\[${COLOR_OFF}\] "
+    PROMPT_WORK_TIMESTAMP_FORMAT="\D{%Y-%m-%d %H:%M:%S}"
+    PROMPT_WORK_TIMESTAMP_SIZE=19
+    PROMPT_COMMAND=prompt_work_command
+    PS2=">"
+}
+
+
+
+
+prompt_plus_command()
+{
+    PROMPT_LAST_RET=$?
+    PS1="${PROMPT_PLUS_PS1}"
+
+    if $PROMPT_TIMESTAMP; then
+  prompt_plus_command_padding=
+  if [ $COLUMNS -gt $PROMPT_PLUS_TIMESTAMP_SIZE ]; then
+      prompt_plus_command_pad_size=$(($COLUMNS - $PROMPT_PLUS_TIMESTAMP_SIZE))
+      prompt_plus_command_padding=$(prompt_padding '-' $prompt_plus_command_pad_size)
+  fi
+  PS1="${PROMPT_PLUS_COLOR_TIME}${prompt_plus_command_padding}${PROMPT_PLUS_TIMESTAMP_FORMAT}${COLOR_OFF}
+${PS1}"
+    fi
+
+    if [ $PROMPT_LAST_RET -ne 0 ]; then
+        PS1="${PROMPT_PLUS_COLOR_ERROR}${PROMPT_LAST_RET}${COLOR_OFF}
+${PS1}"
+    fi
+}
+
+prompt_plus()
+{
+    PROMPT_PLUS_COLOR_PS1_U="$COLOR_B_GREEN"
+    PROMPT_PLUS_COLOR_PS1_P="$COLOR_B_BLUE"
+    PROMPT_PLUS_COLOR_PS2="$COLOR_GREEN"
+    PROMPT_PLUS_COLOR_PS1F="$COLOR_GREEN"
+    PROMPT_PLUS_COLOR_ERROR="$COLOR_B_IRED"
+    PROMPT_PLUS_COLOR_TIME="$COLOR_CYAN"
+    PROMPT_PLUS_COLOR_GIT="$COLOR_YELLOW"
+
+    PROMPT_PLUS_PS1="${PROMPT_PLUS_COLOR_PS1_U}\u@\h${COLOR_OFF}:${PROMPT_PLUS_COLOR_PS1_P}\w${COLOR_OFF}${PROMPT_PLUS_COLOR_GIT}"'$(prompt_git " %s")'"${COLOR_OFF}
+\[${PROMPT_PLUS_COLOR_PS1F}\]\$\[${COLOR_OFF}\] "
+    PROMPT_PLUS_TIMESTAMP_FORMAT="\D{%Y-%m-%d %H:%M:%S}"
+    PROMPT_PLUS_TIMESTAMP_SIZE=19
+    PROMPT_COMMAND=prompt_plus_command
+    PS2=">"
+}
+
+
+
+#prompt_plus
+
+
+
+prompt_ret_code()
+{
+    prompt_ret_code=$?
+    if [ $prompt_ret_code -ne 0 ]; then
+        prompt_ret_code="${COLOR_B_RED}${prompt_ret_code}${COLOR_OFF}"
+    else
+        prompt_ret_code=
+    fi
+}
+
+prompt_work_post_cwd()
+{
+    prompt_git
+    prompt_work_post_cwd="\[${COLOR_YELLOW}\]${prompt_git:+($prompt_git)}\[${COLOR_OFF}\]"
+}
+
+prompt_work_pre()
+{
+    prompt_python
+    prompt_ruby
+    prompt_work_pre="\[${COLOR_YELLOW}\]${prompt_python:+($prompt_python) }${prompt_ruby:+($prompt_ruby) }\[${COLOR_OFF}\]"
+}
+
+prompt_work_jobs()
+{
+    prompt_work_jobs=
+    if [ -n "$(jobs -p)" ]; then
+        prompt_work_jobs="\j "
+    fi
+}
+
+prompt_work_status()
+{
+    prompt_git
+    prompt_python
+    prompt_ruby
+    prompt_work_status="${prompt_git:+($prompt_git) }${prompt_python:+($prompt_python) }${prompt_ruby:+($prompt_ruby) }"
+    prompt_work_status="${prompt_work_status:+\n\[${COLOR_YELLOW}\]$prompt_work_status}\[${COLOR_OFF}\]"
+}
+
+prompt_work_command()
+{
+    prompt_ret_code
+    prompt_work_status
+    PS1="${prompt_ret_code:+$prompt_ret_code\n}${COLOR_B_GREEN}\u${COLOR_OFF}@${COLOR_B_GREEN}\h${COLOR_OFF}:${COLOR_B_BLUE}\w${COLOR_OFF}${prompt_work_status}\n\[${COLOR_GREEN}\]\$\[${COLOR_OFF}\] "
+}
+
+prompt_work()
+{
+    PS2='>'
+    PROMPT_COMMAND=prompt_work_command
+}
+
+
+
+prompt_work
+
+
+
+#######################
+# ##### THE END ##### #
+#######################

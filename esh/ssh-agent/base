@@ -1,0 +1,33 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+ESH_TRUSTED_HOST=false
+ESH_TRUSTED_CONF="$ESH_DIR/conf/trusted_host"
+if [ -r "$ESH_TRUSTED_CONF" ]; then
+    for h in `cat "$ESH_TRUSTED_CONF"`; do
+        if [ "$h" = "$HOSTNAME" ] || [ "$h" = "$SHORT_HOSTNAME" ]; then
+            ESH_TRUSTED_HOST=true
+            break
+        fi
+    done
+fi
+export ESH_TRUSTED_HOST
+
+if [ -n "$ESH_TRUSTED_HOST" ] && $ESH_TRUSTED_HOST; then
+    # keychain
+    if [ -x "$ESH_MODULE_DIR/keychain" ]; then
+        [ -r "$HOME/.ssh/keychain/$HOSTNAME-sh" ] && \
+            . "$HOME/.ssh/keychain/$HOSTNAME-sh"
+        shux_keychain_lkey=
+        for k in id_rsa id_dsa id_rsa_$HOSTNAME id_dsa_$HOSTNAME; do
+            if [ -r $HOME/.ssh/$k ]; then
+                shux_keychain_lkey="${shux_keychain_lkey:+$shux_keychain_lkey }$HOME/.ssh/$k"
+            fi
+        done
+        if [ -n "$shux_keychain_lkey" ]; then
+            "$ESH_MODULE_DIR/keychain" --quick --quiet --dir "$HOME/.ssh/keychain" $shux_keychain_lkey
+        fi
+        [ -r "$HOME/.ssh/keychain/$HOSTNAME-sh" ] && \
+            . "$HOME/.ssh/keychain/$HOSTNAME-sh"
+    fi
+fi

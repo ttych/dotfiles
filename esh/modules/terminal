@@ -1,0 +1,26 @@
+#!/bin/sh
+# -*- mode: shell -*-
+
+_terminal_colors_count()
+{
+    _terminal_colors_count="$(tput colors 2>/dev/null)"
+}
+
+_terminal_switch_to_256_colors()
+{
+    if _terminal_colors_count; then
+        if [ "$_terminal_colors_count" != '256' ]; then
+            _terminal_switch_to_256_colors__bkp="$TERM"
+            export TERM="${TERM%-*}-256color" 2>/dev/null
+            if _terminal_colors_count; then
+                return 0
+            else
+                export TERM="$_terminal_switch_to_256_colors__bkp"
+            fi
+        fi
+    fi
+}
+
+if esh_interactive; then
+    _terminal_switch_to_256_colors
+fi

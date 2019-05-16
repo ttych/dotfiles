@@ -1,0 +1,61 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+### LANG
+lang_support()
+{
+    [ -z "$1" ] && return 1
+    locale -a 2>/dev/null | grep -q "^${1}$"
+}
+
+lang_charmap_support()
+{
+    [ -z "$1" ] && return 1
+    locale -m 2>/dev/null | grep -q "^${1}$"
+}
+
+lang_autoset()
+{
+    if lang_charmap_support 'UTF-8'; then
+        for lang in en_US.utf8 fr_FR.utf8 C.UTF-8; do
+            if [ "$LANG" = "$lang" ]; then
+                break
+            fi
+            if lang_support "$lang"; then
+                export LANG="$lang"
+                break
+            fi
+        done
+    fi
+}
+
+lang_autoset
+
+if [ -z "$LANG" ]; then
+    LANG=C
+    export LANG
+fi
+
+
+### HOSTNAME
+HOSTNAME=`uname -n`
+HOSTNAME_SHORT="${HOSTNAME%%.*}"; export HOSTNAME_SHORT
+HOSTNAME_DOMAIN="${HOSTNAME#$HOSTNAME_SHORT}"; export HOSTNAME_DOMAIN
+
+
+### HOME
+home()
+{
+    cd "$HOME"
+}
+
+home_alt()
+{
+    [ -z "$HOME_ALT" ] &&
+        echo >&2 "no HOME_ALT set, check $HOME/.host/home/$HOSTNAME" &&
+        return 1
+    cd "$HOME_ALT"
+}
+
+HOME_ALT=$(cd "$HOME/.host/home/$HOSTNAME" 2>/dev/null && pwd -P)
+export HOME_ALT

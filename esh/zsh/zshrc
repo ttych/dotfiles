@@ -1,0 +1,209 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+
+###################
+# ##### ESH ##### #
+###################
+[ -r "$ESH_DIR/prompt/prompt" ] &&
+    . "$ESH_DIR/prompt/prompt"
+
+
+
+
+## key
+# bindkey -v			# vi key bindings
+# bindkey -mv			# vi key bindings with Meta = Esc
+bindkey -e			# emacs key bindings
+#bindkey -me			# emacs key bindings with Meta = Esc
+
+#bindkey "^P" vi-up-line-or-history
+#bindkey "^N" vi-down-line-or-history
+
+#bindkey "^[[1~" vi-beginning-of-line   # Home
+#bindkey "^[[4~" vi-end-of-line         # End
+#bindkey '^[[2~' beep                   # Insert
+#bindkey '^[[3~' delete-char            # Del
+#bindkey '^[[5~' vi-backward-blank-word # Page Up
+#bindkey '^[[6~' vi-forward-blank-word  # Page Down
+
+
+## completion
+autoload -U compinit && compinit
+
+
+## colors
+autoload -U colors && colors
+# for c in $(echo ${(o)color}) ; do printf "%15s : %s\n" "$c" "$fg[$c]TEST 1234567890$reset_color" ; done
+
+
+## prompt
+autoload zsh/terminfo
+autoload -U promptinit && promptinit
+
+
+######################
+# ##### SETOPT ##### #
+######################
+
+
+unsetopt beep
+setopt   emacs
+setopt   interactivecomments
+setopt   promptsubst
+setopt   correct
+setopt   correctall
+unsetopt hist_beep
+unsetopt list_beep
+
+
+
+OS_NAME=`uname -s`
+
+
+############################
+# ##### PROMPT TOOLS ##### #
+############################
+prompt_padding()
+{
+    [ $# -eq 2 ] || echo "$1"
+    prompt_padding_ret="$1"
+    while [ ${#prompt_padding_ret} -lt $2 ]; do
+	prompt_padding_ret="${prompt_padding_ret}$1"
+    done
+    echo "$prompt_padding_ret"
+}
+
+PROMPT_TIMESTAMP_STATUS=false
+prompt_timestamp()
+{
+    if [ -n "$PROMPT_TIMESTAMP_STATUS" ] && $PROMPT_TIMESTAMP_STATUS; then
+	PROMPT_TIMESTAMP_STATUS=false
+    else
+	PROMPT_TIMESTAMP_STATUS=true
+    fi
+}
+
+prompt_timestamp_precmd()
+{
+    #prompt_work_last_ret=$?
+    #[ $prompt_work_last_ret -ne 0 ] && printf "${COLOR_RED}${prompt_work_last_ret}${COLOR_OFF}\n"
+    psvar[9]=
+    [ -n "$PROMPT_TIMESTAMP_STATUS" ] && $PROMPT_TIMESTAMP_STATUS && psvar[9]=$(prompt_timer '=')
+}
+
+prompt_timestamp_preexec()
+{
+    PROMPT_LAST_CMD="$2"
+    [ -n "$PROMPT_TIMESTAMP_STATUS" ] && $PROMPT_TIMESTAMP_STATUS && {
+            printf "%s%s%s" "$fg_no_bold[cyan]" "$(prompt_timer)" "$reset_color"
+        }
+}
+
+prompt_timer()
+{
+    prompt_timer_size=19
+    prompt_timer_sep="${1--}"
+    prompt_timer=`date "+%Y-%m-%d %H:%M:%S"`
+    prompt_timer_padding=`prompt_padding ${prompt_timer_sep} $(($COLUMNS - $prompt_timer_size))`
+    printf "%s%s\n" "$prompt_timer_padding"  "$prompt_timer"
+}
+
+zsh_xterm_title()
+{
+    print -Pn "\e]0;%n@%m:%~ %# $*\a"
+}
+
+
+######################
+# ##### COLORS ##### #
+######################
+for color in RED GREEN YELLOW BLUE MAGENTA CYAN BLACK WHITE; do
+    eval COLOR_$color='%{$fg_no_bold[${(L)color}]%}'
+    eval COLOR_B_$color='%{$fg_bold[${(L)color}]%}'
+done
+eval COLOR_OFF='%{$reset_color%}'
+
+
+######################
+# ##### PROMPT ##### #
+######################
+
+prompt_work()
+{
+    case $TERM in
+        xterm*)
+            precmd()
+            {
+                prompt_timestamp_precmd
+                zsh_xterm_title
+            }
+            preexec()
+            {
+                prompt_timestamp_preexec "$@"
+                zsh_xterm_title "$2"
+            }
+            ;;
+    esac
+
+    PROMPT_WORK_BASE="${COLOR_B_GREEN}%n@%m:%~${COLOR_OFF}
+${COLOR_GREEN}%(1j.%jj .)%h %(!.${COLOR_B_RED}.)%#${COLOR_OFF} "
+    PROMPT_WORK_ERROR="%(?..${COLOR_B_RED}%?${COLOR_OFF}
+)"
+    PROMPT_WORK_TIMESTAMP="%(9V.${COLOR_CYAN}%9v${COLOR_OFF}
+.)"
+
+    PROMPT="${PROMPT_WORK_BASE}"
+    PROMPT="${PROMPT_WORK_ERROR}${PROMPT_WORK_TIMESTAMP}${PROMPT}"
+}
+
+prompt_pre_set_timestamp()
+{
+    precmd()
+    {
+        prompt_timestamp_precmd
+        case $TERM in
+            xterm*) zsh_xterm_title ;;
+        esac
+    }
+    preexec()
+    {
+        prompt_timestamp_preexec "$@"
+        case $TERM in
+            xterm*) zsh_xterm_title "$2" ;;
+        esac
+    }
+}
+
+prompt_set_base()
+{
+    PROMPT_BASE_1="${COLOR_B_GREEN}%n@%m${COLOR_OFF}:${COLOR_B_BLUE}%~${COLOR_OFF}"
+    PROMPT_BASE_2="${COLOR_GREEN}%(1j.%jj .)%(!.${COLOR_B_RED}.)%#${COLOR_OFF} "
+    PROMPT_ERROR="%(?..${COLOR_B_RED}%?${COLOR_OFF}
+)"
+    PROMPT_TIMESTAMP="%(9V.${COLOR_CYAN}%9v${COLOR_OFF}
+.)"
+    PROMPT_GIT="${COLOR_YELLOW}"'$(prompt_git_printf " (%s)")'"${COLOR_OFF}"
+    PROMPT_RUBY="${COLOR_YELLOW}"'$(prompt_ruby_printf "(%s) ")'"${COLOR_OFF}"
+    PROMPT_PYTHON="${COLOR_YELLOW}"'$(prompt_python_printf "(%s) ")'"${COLOR_OFF}"
+}
+
+prompt_old_dev()
+{
+    prompt_pre_set_timestamp
+    prompt_set_base
+
+    PROMPT="${PROMPT_BASE_1}${PROMPT_GIT}${PROMPT_BASE_2}"
+    PROMPT="${PROMPT_ERROR}${PROMPT_TIMESTAMP}${PROMPT}"
+}
+
+prompt_dev()
+{
+    prompt_pre_set_timestamp
+    prompt_set_base
+
+    PROMPT="${PROMPT_TIMESTAMP}${PROMPT_ERROR}${PROMPT_BASE_1}${PROMPT_GIT}
+${PROMPT_PYTHON}${PROMPT_RUBY}${PROMPT_BASE_2}"
+}
+
+prompt_dev
