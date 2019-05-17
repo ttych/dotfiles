@@ -83,7 +83,10 @@ emx()
 {
     em -e '(client-save-kill-emacs)'
 }
-
+emd()
+{
+    ALTERNATE_EDITOR="" TMPDIR="/tmp" emacs --daemon
+}
 
 ESHELL="${ESH_SH_CUR_SHORT}_login_shell"
 export ESHELL
