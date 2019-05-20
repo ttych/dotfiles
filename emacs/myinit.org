@@ -1,0 +1,195 @@
+#+STARTUP: content
+
+* base
+** ui
+
+#+BEGIN_SRC emacs-lisp
+  ;; Turn off mouse interface early in startup to avoid momentary display
+  (if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+  (if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+  (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+  ; (if (fboundp 'blink-cursor-mode) (blink-cursor-mode -1))
+
+  (setq inhibit-startup-message t
+		inhibit-startup-screen t
+		inhibit-startup-echo-area-message ""
+		inhibit-startup-buffer-menu t
+		initial-scratch-message nil)
+#+END_SRC
+
+** user
+
+#+BEGIN_SRC emacs-lisp
+  (defvar users-settings-dir (expand-file-name "users/" user-emacs-directory)
+	"This folder stores user specific setting.")
+  (defvar user-settings-file
+	(expand-file-name (concat user-login-name ".el")
+					  users-settings-dir))
+  (if (file-exists-p user-settings-file)
+	  (load user-settings-file))
+#+END_SRC
+
+** bindings
+
+   #+BEGIN_SRC emacs-lisp
+	 ;; buffers
+	 ;; (defalias 'list-buffers 'ibuffer)
+	 (global-set-key (kbd "C-x B") 'ibuffer)
+	 ;; (global-set-key (kbd "C-x B") 'ibuffer-other-window)
+
+	 ;; Comment
+	 (global-set-key (kbd "C-c #") 'comment-region)
+	 (global-set-key (kbd "C-c @") 'uncomment-region)
+	 (global-set-key (kbd "M-* #") 'comment-region)
+	 (global-set-key (kbd "M-* @") 'uncomment-region)
+
+
+	 ;; Search
+	 (global-set-key (kbd "M-s O") 'multi-occur)
+	 (global-set-key (kbd "M-s d") 'find-dired)
+	 (global-set-key (kbd "M-s g") 'rgrep)
+	 (global-set-key (kbd "M-s r") 'query-replace-regexp)
+
+
+	 ;; Modes
+	 (global-set-key (kbd "M-* m f") 'auto-fill-mode)
+	 (global-set-key (kbd "M-* m w") 'whitespace-mode)
+	 (global-set-key (kbd "M-* m s") 'auto-save-mode)
+	 (global-set-key (kbd "M-* m l") 'display-line-numbers-mode)
+
+
+	 ;; Align
+	 (global-set-key (kbd "C-x \\") 'align-regexp)
+	 (global-set-key (kbd "M-* \\") 'align-regexp)
+
+
+	 ; C-c C-r    =>  recentf
+	 ; C-c C-g g  => magit-status
+	 ; C-c C-g t  => git-timemachine
+   #+END_SRC
+
+** shell
+
+   #+BEGIN_SRC emacs-lisp
+	 (add-hook
+	  'term-mode-hook
+	  (lambda()
+		(setq-local show-trailing-whitespace nil)
+		(hl-line-mode nil)
+		(display-line-numbers-mode -1)
+		(linum-mode -1)
+		))
+
+	 (add-hook
+	  'eshell-mode-hook
+	  (lambda()
+		(setq-local show-trailing-whitespace nil)
+		(hl-line-mode nil)
+		(display-line-numbers-mode -1)
+		(linum-mode -1)
+		))
+   #+END_SRC
+
+** tools
+
+   #+BEGIN_SRC emacs-lisp
+	 (global-set-key (kbd "M-j")
+					 (lambda ()
+					   (interactive)
+					   (join-line -1)))
+   #+END_SRC
+
+* daemon
+  #+BEGIN_SRC emacs-lisp
+	(defun client-save-kill-emacs()
+	  " This is a function that can bu used to shutdown save buffers and
+	shutdown the emacs daemon. It should be called using
+	emacsclient -e '(client-save-kill-emacs)'.  This function will
+	check to see if there are any modified buffers or active clients
+	or frame.  If so an x window will be opened and the user will
+	be prompted."
+
+	  (let (new-frame modified-buffers active-clients-or-frames)
+
+		;; Check if there are modified buffers or active clients or frames.
+		(setq modified-buffers (modified-buffers-exist))
+		(setq active-clients-or-frames ( or (> (length server-clients) 1)
+											(> (length (frame-list)) 1)
+											))
+
+		;; When displaying the number of clients and frames:
+		;; subtract 1 from the clients for this client.
+		;; subtract 2 from the frames this frame (that we just created) and the default frame.
+		(when ( or (not active-clients-or-frames)
+				   (yes-or-no-p (format "There are currently %d clients and %d frames. Exit anyway?" (- (length server-clients) 1) (- (length (frame-list)) 2))))
+
+		  ;; If the user quits during the save dialog then don't exit emacs.
+		  ;; Still close the terminal though.
+		  (let((inhibit-quit t))
+			;; Save buffers
+			(with-local-quit
+			  (save-some-buffers))
+
+			(if quit-flag
+				(setq quit-flag nil)
+			  ;; Kill all remaining clients
+			  (progn
+				(dolist (client server-clients)
+				  (server-delete-client client))
+				;; Exit emacs
+				(kill-emacs)))
+			))
+		)
+	  )
+
+	(defun modified-buffers-exist()
+	  "This function will check to see if there are any buffers
+	that have been modified.  It will return true if there are
+	and nil otherwise. Buffers that have buffer-offer-save set to
+	nil are ignored."
+	  (let (modified-found)
+		(dolist (buffer (buffer-list))
+		  (when (and (buffer-live-p buffer)
+					 (buffer-modified-p buffer)
+					 (not (buffer-base-buffer buffer))
+					 (or
+					  (buffer-file-name buffer)
+					  (progn
+						(set-buffer buffer)
+						(and buffer-offer-save (> (buffer-size) 0))))
+					 )
+			(setq modified-found t)
+			)
+		  )
+		modified-found
+		)
+	  )
+  #+END_SRC
+
+* packages
+** htmlize
+   #+BEGIN_SRC emacs-lisp
+	 (use-package htmlize
+	   :ensure t)
+   #+END_SRC
+
+* Org mode
+** basic bindings
+   #+BEGIN_SRC emacs-lisp
+	 (global-set-key (kbd "C-c o l") 'org-store-link)
+	 (global-set-key (kbd "C-c o a") 'org-agenda)
+	 (global-set-key (kbd "C-c o c") 'org-capture)
+	 (global-set-key (kbd "M-* o l") 'org-store-link)
+	 (global-set-key (kbd "M-* o a") 'org-agenda)
+	 (global-set-key (kbd "M-* o c") 'org-capture)
+   #+END_SRC
+
+** reveal.js
+   #+BEGIN_SRC emacs-lisp
+	 (use-package ox-reveal
+	   :ensure t
+	   :config
+	   (setq org-reveal-root "https://cdn.jsdelivr.net/reveal.js/3.0.0/")
+	   (setq org-reveal-mathjax t)
+	   )
+   #+END_SRC
