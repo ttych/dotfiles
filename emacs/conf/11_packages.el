@@ -10,8 +10,6 @@
 ;;   (ido-mode t)
 ;;   )
 
-(use-package try
-  :ensure t)
 
 (use-package delight
   :ensure t)

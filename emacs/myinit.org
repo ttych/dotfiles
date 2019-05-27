@@ -100,6 +100,7 @@
    #+END_SRC
 
 * daemon
+
   #+BEGIN_SRC emacs-lisp
 	(defun client-save-kill-emacs()
 	  " This is a function that can bu used to shutdown save buffers and
@@ -167,7 +168,63 @@
   #+END_SRC
 
 * packages
-** htmlize
+** utilities
+*** try
+   #+BEGIN_SRC emacs-lisp
+	 (use-package try
+	   :ensure t)
+   #+END_SRC
+** editing
+*** (disabled) ivy / counsel / swiper
+   #+BEGIN_SRC
+	 (use-package ivy
+	   :ensure t
+	   :bind (
+	          ([remap switch-to-buffer] . ivy-switch-buffer)
+			  )
+	   :config
+	   (ivy-mode 1)
+	   (setq ivy-use-virtual-buffers t)
+	   (setq enable-recursive-minibuffers t)
+	   )
+
+	 (use-package counsel
+	   :ensure t
+	   :bind (
+  	          ([remap execute-extended-command] . counsel-M-x)
+			  ([remap find-file] . counsel-find-file)
+			  ;; ("C-c k" . counsel-ag)
+			  )
+	   )
+
+	 (use-package swiper
+	   :ensure t
+	   :bind (
+			  ("C-s" . swiper)
+			  ("C-r" . swiper)
+			  ("C-c C-r" . ivy-resume)
+			  )
+	   )
+   #+END_SRC
+*** (disabled) avy
+	#+BEGIN_SRC
+	  (use-package avy
+		:ensure t
+		:bind ("M-g c" . avy-goto-char)
+		)
+	#+END_SRC
+** auto-completion
+*** (disabled) auto-complete
+	#+BEGIN_SRC
+	  (use-package auto-complete
+		:ensure t
+		:config
+		(ac-config-default)
+		(global-auto-complete-mode t)
+		)
+	#+END_SRC
+** extra
+*** htmlize
    #+BEGIN_SRC emacs-lisp
 	 (use-package htmlize
 	   :ensure t)
