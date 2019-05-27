@@ -1,0 +1,145 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+
+
+_RUBY_TMPDIR="${_RUBY_TMPDIR:-$_TMPDIR}"
+_RUBY_TMPDIR="${_RUBY_TMPDIR:-/tmp}"
+
+_RUBY_DEFAULT_VERSION=2.5.3
+
+
+
+########## clean
+gem_clean()
+{
+    if [ -n "$GEM_HOME" ]; then
+        unset GEM_HOME || echo >&2 "cannot reset GEM_HOME"
+    fi
+    if [ -n "$GEM_PATH" ]; then
+        unset GEM_PATH || echo >&2 "cannot reset GEM_PATH"
+    fi
+}
+
+
+
+########## rbenv
+RBENV_REPO_ORGA="${RBENV_REPO_ORGA:-https://github.com/rbenv}"
+RBENV_REPO_NAME="${RBENV_REPO_NAME:-rbenv}"
+RBENV_PLUGINS="${RBENV_PLUGINS:-ruby-build rbenv-vars}"
+
+
+rbenv_guess_path()
+{
+    rbenv_guess_path="${1}"
+    rbenv_guess_path="${rbenv_guess_path:-$(rbenv root 2>/dev/null)}"
+    rbenv_guess_path="${rbenv_guess_path:-$RBENV_ROOT}"
+    rbenv_guess_path="${rbenv_guess_path:-$HOME/.rbenv}"
+}
+
+rbenv_install()
+{
+    rbenv_guess_path "$1"
+    rbenv_install__path="$rbenv_guess_path"
+
+    rbenv_install_base "$rbenv_install__path" &&
+        rbenv_install_plugins "$rbenv_install__path" &&
+        rbenv_load "$rbenv_install__path" &&
+        rbenv_install_ruby &&
+        rbenv_install_bundler
+}
+
+rbenv_install_base()
+{
+    rbenv_guess_path "$1"
+    rbenv_install_base__path="$rbenv_guess_path"
+
+    _git_clone_or_update "$RBENV_REPO_ORGA/$RBENV_REPO_NAME" "$rbenv_install_base__path"
+}
+
+rbenv_install_plugins()
+{
+    rbenv_guess_path "$1"
+    rbenv_install_plugins__path="$rbenv_guess_path"
+
+    mkdir -p "$rbenv_install_plugins__path/plugins"
+    for rbenv_install_plugins__p in $RBENV_PLUGINS; do
+        _git_clone_or_update "$RBENV_REPO_ORGA/$rbenv_install_plugins__p" \
+                             "$rbenv_install_plugins__path/plugins/$rbenv_install_plugins__p"
+    done
+}
+
+rbenv_install_ruby()
+{
+    rbenv_install_ruby__version="${1:-$_RUBY_DEFAULT_VERSION}"
+    [ -n "$_RUBY_TMPDIR" ] && RBENV_BUILD_ROOT="$_RUBY_TMPDIR"
+    rbenv install -s "$rbenv_install_ruby__version"
+    rbenv_install_ruby__global=$(rbenv global)
+    [ -z "$rbenv_install_ruby__global" ] &&
+        rbenv global "$rbenv_install_ruby__version"
+}
+
+rbenv_install_bundler()
+{
+    gem install bundler
+}
+
+rbenv_update()
+{
+    rbenv_guess_path "$1"
+    rbenv_update__path="$rbenv_guess_path"
+
+    rbenv_install_base "$rbenv_update__path" &&
+        rbenv_install_plugins "$rbenv_update__path"
+}
+
+rbenv_load()
+{
+    rbenv_guess_path "$1"
+    RBENV_ROOT="$rbenv_guess_path"
+    export RBENV_ROOT
+    PATH="$RBENV_ROOT/bin:$PATH"
+    export PATH
+    eval "$(rbenv init -)"
+    #[ -r "$RBENV_ROOT/completions/rbenv.${SHELL_SHORT}" ] &&
+    #    . "$RBENV_ROOT/completions/rbenv.${SHELL_SHORT}"
+}
+
+
+
+########## rvm
+rvm_load()
+{
+    source "${1:-$HOME/.rvm/scripts/rvm}"
+}
+
+
+
+########## env
+ruby_env()
+{
+    [ -n "$ruby_env" ] && return 0
+
+    for _RUBY_HOME in "${HOME_ALT}" "${HOME}"; do
+        _RUBY_RBENV_AVAILABLE=false
+        _RUBY_RBENV_ROOT="$_RUBY_HOME/.rbenv"
+        ( cd "$_RUBY_RBENV_ROOT" 2>/dev/null ) && [ -x "$_RUBY_RBENV_ROOT/bin/rbenv" ] && _RUBY_RBENV_AVAILABLE=true
+
+        _RUBY_RVM_AVAILABLE=false
+        _RUBY_RVM_ROOT="$_RUBY_HOME/.rvm"
+        ( cd "$_RUBY_RVM_ROOT" 2>/dev/null ) && [ -x "$_RUBY_RVM_ROOT/scripts/rvm" ] && _RUBY_RVM_AVAILABLE=true
+
+
+        if $_RUBY_RBENV_AVAILABLE; then
+            rbenv_load "$_RUBY_RBENV_ROOT"
+            ruby_env="rbenv"
+            break
+        elif $_RUBY_RVM_AVAILABLE; then
+            rvm_load "$_RUBY_RVM_ROOT"
+            ruby_env="rvm"
+            break
+        fi
+    done
+}
+
+ruby_env

@@ -1,0 +1,34 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+for f in `find "${1:-.}" -name '*mp3'`; do
+    f_name="${f##*/}"
+
+    f_dir="${f%/$f_name}"
+    f_dir="${f_dir##*/}"
+
+    f_name="$(echo $f_name | tr '_' ' ')"
+    f_dir="$(echo $f_dir | tr '_' ' ')"
+
+    f_year="${f_dir##* }"
+    f_year="${f_year%)}"
+
+    f_title="${f_name%\.mp3}"
+    f_title="${f_title##*\.}"
+
+    f_num="${f_name%%\.*}"
+    f_num="${f_num#t}"
+
+    while true; do
+        case $f_num in
+            0*) f_num="${f_num#0}" ;;
+            *) break ;;
+        esac
+    done
+
+    set -x
+    eyeD3 -G 'Histoires pour enfants' -A "$f_dir" -N 3 -n $f_num \
+          -Y $f_year \
+          -t "$f_title" -a 'VA' "$f"
+    set +x
+done

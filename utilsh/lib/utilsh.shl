@@ -1,0 +1,58 @@
+#!/bin/sh
+
+# to be sourced in a shell session
+
+UTILSH_DISTRIBUTIONS_DIR="$UTILSH_DIR/dists"
+UTILSH_AUTOLOAD="$UTILSH_DIR/autoload"
+
+utilsh_autoload_wrapper()
+{
+    if [ $# -ne 0 ]; then
+        command utilsh autoload "$@"
+    else
+        utilsh_autoload_all
+    fi
+}
+
+utilsh_autoload_all()
+{
+    [ -r "$UTILSH_AUTOLOAD" ] || return 0
+
+    while read utilsh_autoload__f; do
+        utilsh_load "$utilsh_autoload__f"
+    done < "$UTILSH_AUTOLOAD"
+}
+
+utilsh_load()
+{
+    # FIXME
+    case "$utilsh_autoload__f" in
+        /*) ;;
+        *)
+            utilsh_autoload__f="${UTILSH_TARGET_DIR}/${utilsh_autoload__f}"
+            ;;
+    esac
+    if [ -r "$utilsh_autoload__f" ]; then
+        . "$utilsh_autoload__f"
+    fi
+}
+
+utilsh()
+{
+    utilsh__command="${1:-}"
+    if [ "$#" -gt 0 ]; then
+        shift
+    fi
+
+    case "$utilsh__command" in
+        autoload)
+            utilsh_autoload_wrapper "$@"
+            ;;
+        load)
+            utilsh_load "$@"
+            ;;
+        *)
+            command utilsh "$utilsh__command" "$@"
+            ;;
+    esac
+}

@@ -1,0 +1,104 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+
+#%%load%% std.shl
+
+
+##################################################
+# file monitore
+##################################################
+file_mon()
+(
+    file_mon__usage="fmon [-d] [-c command] [-p] [-s X] path1 path2 path..."
+    file_mon__directory=FALSE
+    file_mon__sleep=5
+    file_mon__separator=
+    file_mon__command='echo "%s"'
+    file_mon__print=FALSE
+
+    file_mon__hash=$(which md5sum)
+    [ -z "$file_mon__hash" ] && file_mon__hash=$(which md5)
+    [ -z "$file_mon__hash" ] && file_mon__hash=$(which sha256sum)
+    [ -z "$file_mon__hash" ] && file_mon__error="no checksum method" && return 1
+
+    OPTIND=1
+    while getopts :hdc:ps:S: opt; do
+	    case $opt in
+	        h) printf "%s\n" "$file_mon__usage"; return 0 ;;
+	        d) file_mon__directory=TRUE ;;
+	        c) file_mon__command="$OPTARG" ;;
+	        p) file_mon__print=TRUE ;;
+	        s) file_mon__sleep="$OPTARG" ;;
+	        S) file_mon__separator="$OPTARG" ;;
+	    esac
+    done
+    shift $(($OPTIND - 1))
+
+    file_mon__init=TRUE
+    while true; do
+        for file_mon__p; do
+            for file_mon__p_f in $(find "$file_mon__p"); do
+                test -f "$file_mon__p_f" || \
+                    ($file_mon__directory && test -d "$file_mon__p_f") || \
+                    continue
+                file_mon__p_f_hash=$(echo "$file_mon__p_f" | $file_mon__hash)
+                file_mon__p_f_hash=${file_mon__p_f_hash%% *}
+                file_mon__p_f_time=$(stat -c %Z "$file_mon__p_f")
+                eval file_mon__p_f_last_time=\$file_mon__p_f_${file_mon__p_f_hash}
+                if ! $file_mon__init; then
+                    if [ -z "$file_mon__p_f_last_time" ] ||
+                           [ "$file_mon__p_f_last_time" != "$file_mon__p_f_time" ]; then
+                        # print
+                        $file_mon__print && printf "%s\n" "$file_mon__p_f"
+                        # command
+                        [ -n "$file_mon__command" ] && eval $(printf "$file_mon__command" "$file_mon__p_f")
+                        # separator
+                        case $file_mon__separator in
+                            line) echo '========================================' ;;
+                            clear) clear ;;
+                        esac
+                    fi
+                fi
+                eval file_mon__p_f_${file_mon__p_f_hash}="${file_mon__p_f_time}"
+            done
+        done
+        file_mon__init=FALSE
+        sleep $file_mon__sleep
+    done
+)
+
+
+########## find_duplicate
+_print_duplicate()
+{
+    printf 'duplicate: "%s" and "%s"\n' "$1" "$2"
+}
+
+find_duplicate()
+(
+    if [ $# -lt 1 ]; then
+        echo >&2 "Usage: find_duplicate [action(_print_duplicate)] dir-1 ... dir-n"
+        return 1
+    fi
+    find_duplicate__action=_print_duplicate
+    if [ $# -gt 1 ] && [ ! -d "$1" ]; then
+        find_duplicate__action="$1"
+        shift
+    fi
+    find_duplicate__sum=$(which md5sum)
+    [ -z "$find_duplicate__sum" ] && find_duplicate__sum=$(which md5)
+    [ -z "$find_duplicate__sum" ] && find_duplicate__sum=$(which sha256sum)
+    : ${CKSUM:="$find_duplicate__sum"}
+    find "$@" | while read find_duplicate__file; do
+        test -f "$find_duplicate__file" || continue
+        find_duplicate__sum=`"$CKSUM" < "$find_duplicate__file"`
+        find_duplicate__sum=${find_duplicate__sum%% *}
+        eval find_duplicate__assoc=\$find_duplicate__${find_duplicate__sum}
+        if test -z "$find_duplicate__assoc"; then
+            eval find_duplicate__${find_duplicate__sum}=\$find_duplicate__file
+        else
+            $find_duplicate__action "$find_duplicate__file" "$find_duplicate__assoc"
+        fi
+    done
+)

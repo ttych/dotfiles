@@ -1,0 +1,276 @@
+#!/bin/sh
+
+UTILSH_DIR=$(cd "${0%/*}/.." ; echo "$PWD")
+
+UTILSH_LIB="$UTILSH_DIR/lib/utilsh.shl"
+. "$UTILSH_LIB"
+
+### common
+
+git_update()
+{
+    if git rev-parse @{u} >/dev/null 2>&1; then
+        git reset --quiet --hard HEAD &&
+            git pull --no-rebase --ff-only
+    fi
+    git submodule update --recursive
+}
+
+path_check_in()
+(
+    case $PATH in
+        "$1"|*:"$1"|"$1":*|*:"$1":*)
+            return 0
+            ;;
+    esac
+    return 1
+)
+
+
+### init
+
+utilsh_init()
+{
+    utilsh_init_env
+    utilsh_init_lib
+    utilsh_init_dists
+    utilsh_init_autoload
+}
+
+utilsh_init_env()
+{
+    utilsh_init_env__path=
+    for utilsh_init_env__d in "$UTILSH_DIR/bin"; do
+        if ! path_check_in "$utilsh_init_env__d"; then
+            utilsh_init_env__path="${utilsh_init_env__d}${utilsh_init_env__path:+:$utilsh_init_env__path}"
+        fi
+    done
+
+    cat <<EOF
+export UTILSH_DIR="$UTILSH_DIR"
+export PATH="${utilsh_init_env__path:+$utilsh_init_env__path:}$PATH"
+EOF
+}
+
+utilsh_init_lib()
+{
+    cat <<EOF
+. "$UTILSH_LIB"
+EOF
+}
+
+utilsh_init_dists()
+{
+    utilsh_init_dists__path=
+    for utilsh_init_dists__dist in "$UTILSH_DISTRIBUTIONS_DIR/"*/; do
+        [ -d "$utilsh_init_dists__dist" ] || continue
+        utilsh_init_dists__dist="${utilsh_init_dists__dist%/}"
+        utilsh_init_dists__added=
+        for utilsh_init_dists__spath in sbin bin; do
+            utilsh_init_dists__tmp="$utilsh_init_dists__dist/$utilsh_init_dists__spath"
+            [ -d "$utilsh_init_dists__tmp" ] || continue
+            utilsh_init_dists__added=done
+            if ! path_check_in "$utilsh_init_dists__tmp"; then
+                utilsh_init_dists__path="${utilsh_init_dists__tmp}${utilsh_init_dists__path:+:$utilsh_init_dists__path}"
+            fi
+        done
+        if [ -z "$utilsh_init_dists__added" ]; then
+            if ! path_check_in "$utilsh_init_dists__dist"; then
+                utilsh_init_dists__path="${utilsh_init_dists__dist}${utilsh_init_dists__path:+:$utilsh_init_dists__path}"
+            fi
+        fi
+    done
+
+    cat <<EOF
+export PATH="${utilsh_init_dists__path:+$utilsh_init_dists__path:}$PATH"
+EOF
+}
+
+utilsh_init_autoload()
+{
+    cat <<EOF
+utilsh autoload
+EOF
+}
+
+
+### update
+
+utilsh_update()
+{
+    utilsh_update_fetch &&
+        utilsh_distribution update &&
+        utilsh_build
+}
+
+utilsh_update_fetch()
+(
+    if cd "$UTILSH_DIR"; then
+        git_update
+    else
+        return 1
+    fi
+)
+
+
+### build
+
+utilsh_build()
+{
+    utilsh_distribution build
+}
+
+
+### distribution
+
+utilsh_distribution()
+{
+    utilsh_distribution__command="$1"
+    case "$utilsh_distribution__command" in
+        add|rm)
+            shift
+            utilsh_distribution_"${utilsh_distribution__command}" "$@"
+            ;;
+        update|build)
+            shift
+            utilsh_distribution_iter "utilsh_distribution_${utilsh_distribution__command}"
+            ;;
+        *)
+            echo >&2 "unsupported command \"distribution $1 $@\""
+            return 1
+            ;;
+    esac
+}
+
+utilsh_distribution_add()
+(
+    mkdir -p "$UTILSH_DISTRIBUTIONS_DIR"
+
+    utilsh_distribution_add__name="${1##*/}"
+    utilsh_distribution_add__name="${utilsh_distribution_add__name%.git}"
+
+    cd "$UTILSH_DISTRIBUTIONS_DIR" || return $?
+    [ -d "$utilsh_distribution_add__name" ] && rm -Rf "$utilsh_distribution_add__name" || return $?
+    git clone "$1" || return $?
+    utilsh_distribution build
+)
+
+utilsh_distribution_rm()
+(
+    rm -Rf "$UTILSH_DISTRIBUTIONS_DIR/$1"
+)
+
+utilsh_distribution_update()
+(
+    cd "$1" &&
+        git_update
+ )
+
+utilsh_distribution_iter()
+{
+    utilsh_distribution_iter__command="$1"
+
+    for utilsh_build__d in "$UTILSH_DISTRIBUTIONS_DIR"/*; do
+        if [ -d "$utilsh_build__d" ]; then
+            "$utilsh_distribution_iter__command" "$utilsh_build__d" ||
+                echo >&2 "failed to build distribution $utilsh_build__d"
+        fi
+    done
+}
+
+utilsh_distribution_find()
+{
+    find "${1:-.}" -name '[._]?*' -prune \
+         -o -name '*.md' -prune \
+         -o -type f -print \
+         -o -type l -print
+}
+
+utilsh_distribution_build()
+(
+    cd "$1" || return 1
+    [ -d "src" ] || return 0
+    mkdir -p "bin" || return 1
+
+    utilsh_distribution_find "src" | while read utilsh_distribution_build__f; do
+        utilsh_distribution_build_file "$utilsh_distribution_build__f"
+    done
+)
+
+utilsh_distribution_build_file()
+{
+    utilsh_distribution_build_file_src="$1"
+    utilsh_distribution_build_file_tgt="bin/${1#src/}"
+    utilsh_distribution_build_file__pwd="$PWD"
+
+    sed -e "s;^\#%%load%%  *;. \"$utilsh_distribution_build_file__pwd\"/;g" \
+        -e "s;^\#%%set_cur_dir%%;SCRIPT_DIR=\"$utilsh_distribution_build_file__pwd\";g" \
+        -e "s;^\#%%set_cur_file%%;SCRIPT_FILE=\"$utilsh_distribution_build_file_tgt\";g" \
+        "$utilsh_distribution_build_file_src" > "$utilsh_distribution_build_file_tgt"
+
+    utilsh_distribution_build_file__right=755
+    case "$utilsh_distribution_build_file_tgt" in
+        *.lib|*.shl) utilsh_distribution_build_file__right=644 ;;
+    esac
+    chmod "$utilsh_distribution_build_file__right" "$utilsh_distribution_build_file_tgt"
+}
+
+
+### autoload
+
+utilsh_autoload()
+{
+    # FIXME
+    [ -z "$1" ] && return 0
+
+    utilsh_autoload="$1"
+    case "$utilsh_autoload" in
+        /* )
+            utilsh_autoload="${utilsh_autoload#$UTILSH_TARGET_DIR/}"
+            ;;
+    esac
+
+    if [ -r "$UTILSH_TARGET_DIR/$utilsh_autoload" ]; then
+        echo "$utilsh_autoload" >> "$UTILSH_AUTOLOAD"
+    fi
+}
+
+
+### help
+
+utilsh_help()
+{
+    cat >&2 <<EOF
+usage is :
+  $0 action
+
+action is :
+  init
+  distribution
+  update
+  build
+  autoload
+EOF
+}
+
+
+### main
+
+command="$1"
+case $command in
+    build|init|distribution|update|autoload)
+        shift
+        utilsh_"${command}" "$@";
+        status=$?
+        ;;
+    -h|--help|help)
+        utilsh_help
+        status=$?
+        ;;
+    *)
+        echo >&2 "unsupported command $command"
+        status=2
+        ;;
+esac
+
+exit $status

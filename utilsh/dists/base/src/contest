@@ -1,0 +1,6 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+#%%load%% contest.shl
+
+contest "$@"

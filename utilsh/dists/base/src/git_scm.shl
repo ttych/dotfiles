@@ -1,0 +1,190 @@
+#!/bin/sh
+
+
+GIT=git
+
+_git_current_branch()
+{
+    _git_current_branch=$(git symbolic-ref HEAD 2> /dev/null || \
+                                   git rev-parse --short HEAD 2> /dev/null)
+    _git_current_branch="${_git_current_branch#refs/heads/}"
+}
+
+_git_info()
+{
+    _git_info__rev_parse="$(git rev-parse --git-dir --is-bare-repository --is-inside-git-dir --is-inside-work-tree --short HEAD 2>/dev/null)"
+
+    [ $? -ne 0 ] && return 1
+    [ -z "$_git_info__rev_parse" ] && return 1
+
+    _git_info__tmp="${_git_info__rev_parse}"
+    _git_info__dir="${_git_info__tmp%%
+*}"
+    _git_info__tmp="${_git_info__tmp#*
+}"
+    _git_info__is_bare="${_git_info__tmp%%
+*}"
+    _git_info__tmp="${_git_info__tmp#*
+}"
+    _git_info__is_inside_git="${_git_info__tmp%%
+*}"
+    _git_info__tmp="${_git_info__tmp#*
+}"
+    _git_info__is_inside_work_tree="${_git_info__tmp%%
+*}"
+    _git_info__tmp="${_git_info__tmp#*
+}"
+    _git_info__head_sha="${_git_info__tmp%%
+*}"
+
+    _git_info__branch="$(git symbolic-ref HEAD 2>/dev/null)"
+    _git_info__branch="${_git_info__branch##*/}"
+
+    _git_info__ignore=false
+    _git_info__diff=false
+    _git_info__diff_staged=false
+    _git_info__untracked=false
+    if $_git_info__is_inside_work_tree; then
+        git check-ignore -q . >/dev/null 2>/dev/null && _git_info__ignore=true
+
+        git diff --no-ext-diff --quiet >/dev/null 2>/dev/null || _git_info__diff=true
+        git diff --no-ext-diff --cached --quiet >/dev/null 2>/dev/null || _git_info__diff_staged=true
+
+        git ls-files --others --exclude-standard --directory --no-empty-directory --error-unmatch -- ':/*' >/dev/null 2>/dev/null && _git_info__untracked=true
+    fi
+
+    return 0
+}
+
+is_inside_git()
+{
+    is_inside_git__inside_work_tree=$($GIT rev-parse --is-inside-work-tree 2>/dev/null)
+}
+
+is_inside_git_work_tree()
+{
+    is_inside_git || return 1
+    [ "$is_inside_git__inside_work_tree" = 'true' ]
+}
+
+git_add()
+{
+    [ -n "$1" ] || return 1
+    [ -f "$1" ] || return 1
+
+    is_inside_git || return 1
+    [ "$is_inside_git__inside_work_tree" = "true" ] && $GIT add "$1"
+}
+
+_git_branch_current_name()
+{
+    _git_branch_current_name=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+}
+
+_git_last_tag()
+{
+    _git_last_tag=$(git describe --abbrev=0 --tags 2>/dev/null)
+}
+
+_git_stable_state()
+{
+    test -z "$(git status --porcelain)"
+}
+
+_git_clone()
+{
+    _git_clone__opts=
+    _git_clone__name_opts=
+    _git_clone__suffix=
+    OPTIND=1
+    while getopts :123bs: _git_clone__opt; do
+        case $_git_clone__opt in
+            1|2|3) _git_clone__name_opts="$_git_clone__name_opts -$_git_clone__opt" ;;
+            b) _git_clone__opts="$_git_clone__opts --bare"
+               _git_clone__name_opts="$_git_clone__name_opts -$_git_clone__opt" ;;
+            s) _git_clone__name_opts="$_git_clone__name_opts -$_git_clone__opt $OPTARG" ;;
+        esac
+    done
+    shift $(($OPTIND - 1))
+
+    [ -z "$1" ] && return 1
+    _git_clone__target="$2"
+    if [ -z "$_git_clone__target" ]; then
+        _git_url_to_name $_git_clone__name_opts "$1" || return 1
+        _git_clone__target="$_git_url_to_name"
+        [ -z "$_git_url_to_name" ] && return 1
+        mkdir -p "$_git_url_to_name" || return 1
+    fi
+    git clone $_git_clone__opts "$1" $_git_clone__target
+}
+
+_git_url_to_name()
+{
+    _git_url_to_name=
+
+    _git_url_to_name__mode=1
+    _git_url_to_name__sep=/
+    _git_url_to_name__suffix=
+    OPTIND=1
+    while getopts :123bs: _git_url_to_name__opt; do
+        case $_git_url_to_name__opt in
+            1|2|3) _git_url_to_name__mode=$_git_url_to_name__opt ;;
+            s) _git_url_to_name__sep="$OPTARG" ;;
+            b) _git_url_to_name__suffix=.git ;;
+        esac
+    done
+    shift $(($OPTIND - 1))
+
+    [ -z "$1" ] && return 1
+
+    _git_url_to_name__ifs="$IFS"
+    IFS='@:/'
+    set -- $1
+    while [ $_git_url_to_name__mode -gt 0 ]; do
+        eval _git_url_to_name="${_git_url_to_name:+$_git_url_to_name$_git_url_to_name__sep}"\${$(($# + 1 - $_git_url_to_name__mode))}
+        _git_url_to_name__mode=$(($_git_url_to_name__mode - 1))
+    done
+    IFS="$_git_url_to_name__ifs"
+
+    _git_url_to_name="${_git_url_to_name%.git}${_git_url_to_name__suffix}"
+
+    _git_url_to_name="$(echo $_git_url_to_name | tr '[A-Z]' '[a-z]')"
+}
+
+###
+
+_semver_split()
+{
+    _semver_split="$1"
+    _semver_split__major=${_semver_split%%.*}
+    _semver_split=${_semver_split#$_semver_split__major}
+    _semver_split=${_semver_split#.}
+    _semver_split__minor=${_semver_split%%.*}
+    _semver_split=${_semver_split#$_semver_split__major}
+    _semver_split=${_semver_split#.}
+    _semver_split__fix=${_semver_split}
+    _semver_split__patch=${_semver_split__fix}
+}
+
+
+########## clone
+_git_clone_or_update()
+(
+    _git_clone_or_update__source="$1"
+    _git_clone_or_update__target="$2"
+
+    [ -z "$_git_clone_or_update__source" ] && return 1
+    [ -z "$_git_clone_or_update__target" ] && return 1
+
+    cd "${_git_clone_or_update__target}" 2>/dev/null ||
+        mkdir -p "${_git_clone_or_update__target}" ||
+        return 1
+
+    if [ -d "$_git_clone_or_update__target/.git" ]; then
+        cd "${_git_clone_or_update__target}" &&
+            git pull -q --no-rebase --ff-only
+    else
+        git clone -q "${_git_clone_or_update__source%.git}.git" \
+                     "${_git_clone_or_update__target}"
+    fi
+)

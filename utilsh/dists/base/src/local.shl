@@ -1,0 +1,38 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+############################################
+# local
+############################################
+
+LOCAL_DIR="$HOME/local"
+LOCAL_OS_DIR="$LOCAL_DIR/${ESH_OS}"
+LOCAL_OS_ARCH_DIR="$LOCAL_OS_DIR/${ESH_OS_ARCH}"
+export LOCAL_DIR LOCAL_OS_DIR LOCAL_OS_ARCH_DIR
+
+if [ -n "$HOME_ALT" ]; then
+    LOCAL_ALT_DIR="$HOME_ALT/local"
+    LOCAL_ALT_OS_DIR="$LOCAL_ALT_DIR/${ESH_OS}"
+    LOCAL_ALT_OS_ARCH_DIR="$LOCAL_ALT_OS_DIR/${ESH_OS_ARCH}"
+
+    export LOCAL_ALT_DIR LOCAL_ALT_OS_DIR LOCAL_ALT_OS_ARCH_DIR
+fi
+
+path_load_local()
+{
+    path_add_pre_pre "$LOCAL_DIR"
+    path_addin_pre "$LOCAL_OS_DIR"
+    path_addin_pre "$LOCAL_OS_ARCH_DIR"
+    path_add_pre_pre "$LOCAL_ALT_DIR"
+    path_addin_pre "$LOCAL_ALT_OS_DIR"
+    path_addin_pre "$LOCAL_ALT_OS_ARCH_DIR"
+}
+path_load_local
+
+path_reload_local()
+{
+    path_purge "$LOCAL_DIR"
+    path_load_local
+}
+
+############################################

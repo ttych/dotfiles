@@ -1,0 +1,536 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+
+###########################################
+# vars
+############################################
+vars_char () {
+    printf "%b\n" \
+    "NL=\"\n\"" \
+    "CR=\"\r\"" \
+    "TAB=\"\t\"" \
+    "ESC=\"\e\"" \
+    "SPC=\"\040\"" \
+    "BS=\"\b\"" \
+    "DEL=\"\0177\"" \
+    "BEL=\"\a\"" \
+    "FS=\"\034\"" \
+    "GS=\"\035\"" \
+    "RS=\"\036\"" \
+    "US=\"\037\"" \
+    "export NL CR TAB ESC SPC NS DEL BEL FS GS RS US"
+}
+
+eval "$(vars_char)"
+
+
+###########################################
+# date
+###########################################
+vars_date()
+{
+    eval $(date "$@" "+DATE=%Y-%m-%d
+	DATE_YEAR=%Y
+	DATE_MONTH=%m
+	DATE_DAY=%d
+	DATE_TIME=%H:%M:%S
+	DATE_HOUR=%H
+	DATE_MINUTE=%M
+	DATE_SECOND=%S
+	DATE_STAMP=%Y-%m-%d_%H.%M.%S
+	DATE_DayOfWeek=%a
+	DATE_DayOfYear=%j
+	DATE_DayNum=%w
+	DATE_MonthAbbrev=%b")
+    ## Remove leading zeroes for use in arithmetic expressions
+    _DATE_MONTH=${DATE_MONTH#0}
+    _DATE_DAY=${DATE_DAY#0}
+    _DATE_HOUR=${DATE_HOUR#0}
+    _DATE_MINUTE=${DATE_MINUTE#0}
+    _DATE_SECOND=${DATE_SECOND#0}
+    ## Sometimes the variable, TODAY, is more appropriate in the context of a
+    ## particular script, so it is created as a synonym for $DATE
+    DATE_TODAY=$DATE
+    export DATE DATE_YEAR DATE_MONTH DATE_DAY DATE_TODAY DATE_TIME DATE_HOUR DATE_MINUTE DATE_SECOND DATE_STAMP
+    export DATE_MonthAbbrev DATE_DayOfWeek DATE_DayNum
+}
+
+
+###########################################
+# me
+###########################################
+ME=`whoami`
+export ME
+
+
+##################################################
+# OS
+##################################################
+OS=`uname -s`
+OS_ARCH=`uname -m`
+export OS OS_ARCH
+
+
+##################################################
+# boolean
+##################################################
+TRUE()
+{
+    return 0
+}
+
+FALSE()
+{
+    return 1
+}
+
+
+##################################################
+# try
+##################################################
+yell() { echo "$0: $*" >&2; }
+die() { yell "$*"; exit 111; }
+try() { "$@" || die "cannot $*"; }
+
+
+##################################################
+# timeout
+##################################################
+# timeout TIME CMD
+timeout()
+{
+    timeout__t=$1
+    shift
+    eval "$@" &
+    timeout__childpid=$!
+    timeout__childpids=$(ps --pid $timeout__childpid --ppid $timeout__childpid -o pid=)
+    (
+        trap 'kill -TERM $timeout__sleeppid 2>/dev/null; exit 0' TERM
+        sleep "$timeout__t" &
+        timeout__sleeppid=$!
+        wait $timeout__sleeppid 2>/dev/null
+        kill -TERM $timeout__childpids 2>/dev/null
+        sleep 2
+        kill -KILL $timeout__childpids 2>/dev/null
+    ) &
+    timeout__alarmpid=$!
+    wait $timeout__childpid 2>/dev/null
+    timeout__status=$?
+    kill -TERM $timeout__alarmpid 2>/dev/null
+    return $timeout__status
+}
+
+
+##################################################
+# temp
+##################################################
+_tmpdir()
+{
+    for _tmpdir__d; do
+        if [ -d "$_tmpdir__d" ]; then
+            _tmpdir__d=$(cd "$_tmpdir__d" && \
+                                  touch _tmpdir.$$ && \
+                                  rm _tmpdir.$$ && \
+                                  pwd -P)
+            [ $? -ne 0 ] && continue
+            _TMPDIR="$_tmpdir__d"
+            export _TMPDIR
+            return 0
+        fi
+    done
+    return 1
+}
+_tmpdir "/ram" || {
+    [ "$OS" = "Linux" ] && _tmpdir "/tmp"
+} ||
+    _tmpdir "/local" \
+            "${HOME_ALT:+$HOME_ALT/tmp}" \
+            "${HOME:+$HOME/tmp}" \
+            "/var/tmp"
+
+_mktemp_tpl()
+{
+    _mktemp_tpl=
+    case "$1" in
+        '') ;;
+        *XXXX) _mktemp_tpl="${1}" ;;
+        *) _mktemp_tpl="${1}.XXXXXXXXXX" ;;
+    esac
+}
+
+_mktemp()
+{
+    [ -z "$_TMPDIR" ] && return 1
+    mktemp -p "$_TMPDIR" "$@"
+}
+
+_mktemp_file()
+{
+    _mktemp_tpl "$1"
+    _mktemp_file=$(_mktemp $_mktemp_tpl)
+}
+mktemp_file()
+{
+    _mktemp_file && \
+        printf "%s\n" "$_mktemp_file"
+}
+
+_mktemp_dir()
+{
+    _mktemp_tpl "$1"
+    _mktemp_dir=$(_mktemp -d $_mktemp_tpl)
+}
+mktemp_dir()
+{
+    _mktemp_dir && \
+        printf "%s\n" "$_mktemp_dir"
+}
+
+mktemp_dir_do()
+(
+    _mktemp_dir || return 1
+    cd "$_mktemp_dir" || return 1
+    [ $# -eq 0 ] && return 0
+    eval "$@"
+)
+
+
+##################################################
+# retry
+##################################################
+retry()
+{
+    retry__usage="retry [-h] [-0 : end on success] [-1 : end on failure] [-q : quiet] [-c count] [-s sleep] [-S : no subshell] -- cmd"
+    retry__count=
+    retry__sleep=
+    retry__break_flag=
+    retry__break_test=
+    retry__quiet=FALSE
+    retry__sshell=TRUE
+    retry__cmd_status=0
+
+    OPTIND=1
+    while getopts :h01qc:s:St: opt; do
+        case $opt in
+            h) printf "%s\n" "$retry__usage"; return 0 ;;
+            q) retry__quiet=TRUE ;;
+            S) retry__sshell=FALSE ;;
+            c) retry__count="$OPTARG" ;;
+            s) retry__sleep="$OPTARG" ;;
+            0) retry__break_flag="-eq"; retry__break_test= ;;
+            1) retry__break_flag="-ne"; retry__break_test= ;;
+            t) retry__break_flag=     ; retry__break_test="$OPTARG" ;;
+            *) printf "%s\n" "$retry__usage"; return 1 ;;
+        esac
+    done
+    shift $(($OPTIND - 1))
+
+    while true; do
+        [ -n "$retry__count" ] && [ $retry__count -eq 0 ] && break
+        if $retry__sshell; then
+            (eval "$@")
+        else
+            eval "$@"
+        fi
+        retry__cmd_status=$?
+        [ -n "$retry__break_flag" ] && [ $retry__cmd_status $retry__break_flag 0 ] && break
+        [ -n "$retry__break_test" ] && ( eval $retry__break_test ) && break
+        [ -n "$retry__count" ] && [ $retry__count -gt 0 ] && retry__count=$(($retry__count - 1))
+        [ -n "$retry__sleep" ] && sleep "$retry__sleep"
+    done
+    return $retry__cmd_status
+}
+
+
+##################################################
+# extract
+##################################################
+extract_zip()
+{
+    unzip "$1"
+}
+
+extract_rar()
+{
+    unrar x "$1"
+}
+
+extract_tar()
+{
+    tar -xf "$1"
+}
+
+extract_tgz()
+{
+    tar -xzf "$1"
+}
+
+extract_tar_xz()
+{
+    tar -xJf "$1"
+}
+
+extract_tar_gz()
+{
+    tar -xzf "$1"
+}
+
+extract_tar_bz2()
+{
+    tar -xjf "$1"
+}
+
+extract_gz()
+{
+    gunzip -k "$1"
+}
+
+extract_bz2()
+{
+    bunzip2 -k "$1"
+}
+
+extract_xz()
+{
+    unxz -k "$1"
+}
+
+extract()
+{
+    extract__delete=FALSE
+    if [ "X$1" = "X-rm" ]; then
+        extract__delete=TRUE
+        shift
+    fi
+
+    [ -z "$1" ] && return 1
+    if [ -n "$2" ]; then
+        mkdir -p "$2" && cd "$2" || \
+                return 1
+    fi
+    extract__possible=TRUE
+    extract__file="$1"
+    while $extract__possible; do
+        extract__possible=FALSE
+        for extract__ext in zip rar tar tgz tar.xz tar.gz tar.bz2 gz bz2 xz; do
+            case "$extract__file" in
+                *."$extract__ext")
+                    extract__ext_norm=`echo "$extract__ext" | tr '.' '_'`
+                    extract_"${extract__ext_norm}" "$extract__file" || return 1
+                    $extract__delete && rm -f "$extract__file"
+                    extract__file="${extract__file%.$extract__ext}"
+                    extract__possible=TRUE
+                    break
+                    ;;
+                *) continue ;;
+            esac
+        done
+    done
+    return 0
+}
+
+xtr()
+{
+    extract "$@"
+}
+xtrr()
+{
+    extract -rm "$@"
+}
+
+
+##################################################
+# download
+##################################################
+WGET()
+{
+    wget -q $WGET_NO_SSL "$@"
+}
+CURL()
+{
+    curl -s -S -L $CURL_NO_SSL "$@"
+}
+
+download()
+{
+    download=
+    download__src="${1}"
+    download__file=
+    download__target="${2}"
+    download__act=
+    download__header="${3}"
+
+    case "$download__src" in
+        "")
+            return 1
+            ;;
+        http*|ftp*)
+            download__act=curl
+            ;;
+        *)
+            download__act=cp
+            ;;
+    esac
+    download__file="${download__src##*/}"
+    download__file="${download__file%%\?*}"
+
+    if [ -z "$download__target" ]; then
+        _mktemp_dir && download="$_mktemp_dir/${download__file}" || return 1
+    elif [ -f "$download__target" ]; then
+        download="$download__target"
+    elif [ -d "$download__target" ]; then
+        download="${download__target%/}/${download__file}"
+    else
+        mkdir -p "$download__target" && \
+            download="${download__target%/}/${download__file}" || \
+                return 1
+    fi
+
+    case $download__act in
+        cp)
+            cp "$download__src" "$download"
+            ;;
+        wget)
+            WGET "${download__header:+--header '$download__header'}"  -O "$download" "$download__src"
+            ;;
+        curl)
+            CURL ${download__header:+-H "$download__header"} "$download__src" -o "$download"
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
+
+##################################################
+# pipe_to_arg
+##################################################
+pipe_to_arg()
+{
+    while read pipe_to_arg__stdin; do
+        for pipe_to_arg__cmd in "$@"; do
+            $pipe_to_arg__cmd "$pipe_to_arg__stdin"
+        done
+    done
+}
+
+
+############################################
+# calc
+############################################
+calc()
+{
+    awk 'BEGIN {print '"$*"'; exit }'
+}
+
+
+############################################
+# ssl
+############################################
+no_ssl()
+{
+    eval GIT_SSL_NO_VERIFY='true' \
+        MAVEN_OPTS='-Dmaven.wagon.http.ssl.insecure=true' \
+        WGET_NO_SSL='--no-check-certificate' \
+        CURL_NO_SSL='-k' \
+        "$@"
+}
+
+ca_cert()
+{
+    eval CURL_CA_BUNDLE="$HOME/etc/ssl/cacert.pem" SSL_CERT_FILE="$HOME/etc/ssl/cacert.pem" "$@"
+}
+
+
+############################################
+# proxy
+############################################
+proxy_conf()
+{
+    proxy_conf=
+    proxy_conf_alt=
+    [ -r "$HOME/.proxy" ] && . "$HOME/.proxy"
+}
+proxy_conf
+
+proxify()
+{
+    proxify__proxy="$proxy_conf"
+    case "$1" in
+        [Aa][Ll][Tt])
+            proxify__proxy="$proxy_conf_alt"
+            shift
+            ;;
+    esac
+    eval ${proxy_conf_no:+no_proxy="$proxy_conf_no"} ${proxify__proxy:+http_proxy="$proxify__proxy"} ${proxify__proxy:+https_proxy="$proxify__proxy"} ${proxify__proxy:+ftp_proxy="$proxify__proxy"} "$@"
+}
+
+
+##################################################
+# library
+##################################################
+lib_source()
+{
+    [ -r "$1" ] && . "$1" 2>/dev/null && return 0
+    case "$1" in
+        *.shl|*.lib) ;;
+        *)
+            [ -r "$1.shl" ] && . "$1.shl" && return 0
+            [ -r "$1.lib" ] && . "$1.lib" && return 0
+            ;;
+    esac
+    return 1
+}
+
+lib_load()
+{
+    lib_load__r=0
+    for lib_load__l; do
+        lib_load__found=0
+        lib_load__ext_lib='.shl'
+        case $lib_load__l in
+            *.shl|*.lib) lib_load__ext_lib= ;;
+        esac
+        for lib_load__ext in $lib_load__ext_lib ""; do
+            case "${lib_load__l}" in
+                /*) lib_load__prefix= ;;
+                *) lib_load__prefix="./" ;;
+            esac
+            # direct
+            if [ -r "${lib_load__prefix}${lib_load__l}${lib_load__ext}" ]; then
+                . "${lib_load__prefix}${lib_load__l}${lib_load__ext}" 2>/dev/null && \
+                    lib_load__found=1 && \
+                    break
+            elif [ -n "$lib_load__prefix" ]; then
+                # if rel : rel to script location
+                if [ -n "$0" ]; then
+                    lib_load__sc_name="${0##*/}"
+                    lib_load__sc_rpath="${0%$lib_load__sc_name}"
+                    lib_load__sc_path=`cd "${lib_load__sc_rpath:-.}" && pwd`
+                    if [ -r "$lib_load__sc_path/${lib_load__l}${lib_load__ext}" ]; then
+                        . "$lib_load__sc_path/${lib_load__l}${lib_load__ext}" 2>/dev/null && \
+                            lib_load__found=1 && \
+                            break
+                    fi
+                fi
+                # if rel : rel to $PATH
+                if [ $lib_load__found -eq 0 ]; then
+                    [ -z "$lib_load__bIFS" ] && lib_load__bIFS="$IFS"
+                    IFS=:
+                    for lib_load__p in $PATH; do
+                        [ -r "${lib_load__p}/${lib_load__l}${lib_load__ext}" ] || continue
+                        IFS="$lib_load__bIFS" . "${lib_load__p}/${lib_load__l}${lib_load__ext}" && \
+                            lib_load__found=1 && \
+                            break
+                    done
+                    IFS="$lib_load__bIFS"
+                    lib_load__bIFS=
+                fi
+            fi
+        done
+        [ "$lib_load__found" -eq 0 ] && lib_load__r=1
+    done
+    return $lib_load__r
+}

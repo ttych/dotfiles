@@ -1,0 +1,282 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+
+### var
+
+eval $(printf "%b\n" "_HASH_RS=\"\036\"")
+
+_Hash_h()
+{
+    # reserve namespace _Hash_h__
+    :
+}
+
+
+### help & usage
+
+_HASH_HELP=\
+"usage: %s [-h] hash_name <action> key [value]
+
+with action in :
+ - has_key key       : check if key exist
+ - get key           : get key content
+ - set|add key value : add new key / value association
+ - del / rm key      : delete key / value
+ - clear / clean     : empty hash_name
+ - each function     : execute function on each key/value
+"
+
+_Hash_help()
+{
+    printf "$_HASH_HELP\n" _Hash
+}
+
+Hash_help()
+{
+    printf "$_HASH_HELP\n" Hash
+}
+
+
+### Hash utils
+
+_Hash_base_name()
+{
+    _Hash_base_name=
+    [ -z "$1" ] && return 1
+    _Hash_base_name="_Hash_h__${1}__"
+}
+
+_Hash_base_keyvalue()
+{
+    _Hash_base_kv=
+    if _Hash_base_name "$1"; then
+        _Hash_base_keyvalue="${_Hash_base_name}kv__$2"
+    else
+        return 1
+    fi
+}
+
+_Hash_base_keys()
+{
+    _Hash_base_keys=
+    if _Hash_base_name "$1"; then
+        _Hash_base_keys="${_Hash_base_name}ks"
+    else
+        return 1
+    fi
+}
+
+_Hash_init()
+{
+    if _Hash_base_keys "$1"; then
+        eval ${_Hash_base_keys}="\"\${${_Hash_base_keys}:-${_HASH_RS}}\""
+    else
+        return 1
+    fi
+}
+
+_Hash_ks_get()
+{
+    _Hash_ks_get=
+    if _Hash_base_keys "$1"; then
+        eval _Hash_ks_get="\"\$${_Hash_base_keys}\""
+        _Hash_ks_get="${_Hash_ks_get:-${_HASH_RS}}"
+    else
+        return 1
+    fi
+}
+
+_Hash_ks_set()
+{
+    _Hash_ks_set="${2:-${_HASH_RS}}"
+    if _Hash_base_keys "$1"; then
+        eval ${_Hash_base_keys}="\"\$_Hash_ks_set\""
+    else
+        return 1
+    fi
+}
+
+_Hash_kv_get()
+{
+    _Hash_kv_get=
+    if _Hash_base_keyvalue "$1" "$2"; then
+        eval _Hash_kv_get="\"\$${_Hash_base_keyvalue}\""
+    else
+        return 1
+    fi
+}
+
+_Hash_kv_set()
+{
+    _Hash_kv_set="$3"
+    if _Hash_base_keyvalue "$1" "$2"; then
+        eval ${_Hash_base_keyvalue}=\"\$3\"
+    else
+        return 1
+    fi
+}
+
+_Hash_ks_has_key()
+{
+    _Hash_ks_has_key=
+    if _Hash_ks_get "$1"; then
+        _Hash_ks_has_key__content="$_Hash_ks_get"
+        case "$_Hash_ks_has_key__content" in
+            *"${_HASH_RS}${2}${_HASH_RS}"*) _Hash_ks_has_key=true
+                                            return 0
+                                            ;;
+            *) _Hash_ks_has_key=false
+               return 1
+               ;;
+        esac
+    else
+        return 1
+    fi
+}
+
+_Hash_has_key()
+{
+    _Hash_ks_has_key "$@"
+}
+
+_Hash_ks_add()
+{
+    _Hash_init "$1" || return 1
+    if ! _Hash_has_key "$1"; then
+        _Hash_ks_get "$1" || return 1
+        _Hash_ks_add__content="${_Hash_ks_get}${2}${_HASH_RS}"
+        _Hash_ks_set "$1" "$_Hash_ks_add__content" || return 1
+    fi
+}
+
+_Hash_get()
+{
+    _Hash_get=
+    if _Hash_ks_has_key "$@"; then
+        if _Hash_kv_get "$@"; then
+            _Hash_get="$_Hash_kv_get"
+        else
+            return 1
+        fi
+    fi
+}
+
+_Hash_add()
+{
+    _Hash_add=
+    if _Hash_ks_add "$@"; then
+        _Hash_kv_set "$@" && \
+            _Hash_add="$_Hash_kv_set"
+    else
+        return 1
+    fi
+}
+
+_Hash_ks_each()
+{
+    _Hash_ks_each__e="$1"
+    _Hash_ks_each__h="$2"
+    _Hash_ks_each__f="$3"
+
+    if _Hash_ks_get "$_Hash_ks_each__h"; then
+        _Hash_ks_each__content="${_Hash_ks_get#${_HASH_RS}}"
+
+        while [ -n "$_Hash_ks_each__content" ]; do
+            _Hash_ks_each__k="${_Hash_ks_each__content%%${_HASH_RS}*}"
+            _Hash_ks_each__content="${_Hash_ks_each__content#${_Hash_ks_each__k}}"
+            _Hash_ks_each__content="${_Hash_ks_each__content#${_HASH_RS}}"
+
+            $_Hash_ks_each__e "$_Hash_ks_each__h" "$_Hash_ks_each__k" "$_Hash_ks_each__f"
+        done
+    else
+        return 1
+    fi
+}
+
+_Hash_each_exec()
+{
+    _Hash_kv_get "$1" "$2"
+    $3 "$2" "$_Hash_kv_get"
+}
+
+_Hash_each()
+{
+    _Hash_ks_each _Hash_each_exec "$@"
+}
+
+_Hash_del()
+{
+    if _Hash_ks_has_key "$1" "$2"; then
+        _Hash_kv_set "$1" "$2" ""
+        _Hash_ks_get "$1"
+        _Hash_del__content="$_Hash_ks_get"
+        _Hash_del__to_rm="${_HASH_RS}$2${_HASH_RS}"
+        _Hash_del__front="${_Hash_del__content%${_Hash_del__to_rm}*}"
+        _Hash_del__back="${_Hash_del__content#${_Hash_del__front}}"
+        _Hash_del__back="${_Hash_del__back#${_Hash_del__to_rm}}"
+        _Hash_ks_set "$1" "${_Hash_del__front}${_HASH_RS}${_Hash_del__back}"
+    else
+        return 1
+    fi
+}
+
+_Hash_clear_exec()
+{
+    _Hash_kv_get "$1" "$3" ""
+}
+
+_Hash_clear()
+{
+    _Hash_ks_each _Hash_clear_exec "$@"
+    _Hash_ks_set "$1" ""
+}
+
+
+### Hash
+
+_Hash()
+{
+    _Hash=
+
+    _Hash__name="$1" ; shift
+    if [ -z "$_Hash__name" ]; then
+        echo >&2 "Hash_name could not be empty"
+        _Hash_help
+        return 1
+    fi
+
+    _Hash__action="$1" ; shift
+    case "$_Hash__action" in
+        'has_key') _Hash_has_key "$_Hash__name" "$@" && \
+                         _Hash="$_Hash_has_key"
+                   ;;
+        'get') _Hash_get "$_Hash__name" "$@" && \
+                     _Hash="$_Hash_get"
+               ;;
+        'set'|'add') _Hash_add "$_Hash__name" "$@" && \
+                           _Hash="$_Hash_add"
+                     ;;
+        'del'|'rm') _Hash_del "$_Hash__name" "$@"
+                    ;;
+        'clean'|'clear') _Hash_clear "$_Hash__name" "$@"
+                         ;;
+        'each') _Hash_each "$_Hash__name" "$@"
+                ;;
+        *) echo >&2 "unknown action $_Hash__action"
+           _Hash_help
+           return 1
+           ;;
+    esac
+}
+
+Hash()
+{
+    if _Hash "$@"; then
+        if [ -n "$_Hash" ]; then
+            printf "%s\n" $_Hash
+        fi
+        return 0
+    fi
+    return 1
+}

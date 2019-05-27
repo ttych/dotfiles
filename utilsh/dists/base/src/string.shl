@@ -1,0 +1,98 @@
+#!/bin/sh
+
+_string_replace_all()
+{
+    _string_replace_all=
+    _string_replace_all__str2="$1"
+    _string_replace_all__pattern="$2"
+    _string_replace_all__rpl_char="$3"
+    _string_replace_all__str1=
+
+    [ -z "$_string_replace_all__pattern" ] && return 1
+
+    while :
+    do
+        case $_string_replace_all__str2 in
+            *${_string_replace_all__pattern}*)
+                _string_replace_all__str1="$_string_replace_all__str1${_string_replace_all__str2%%$_string_replace_all__pattern*}$_string_replace_all__rpl_char"
+                _string_replace_all__str2="${_string_replace_all__str2#*$_string_replace_all__pattern}"
+                ;;
+            *) break ;;
+        esac
+    done
+    _string_replace_all="${_string_replace_all__str1}${_string_replace_all__str2}"
+}
+
+string_replace_all()
+{
+    _string_replace_all "$@" && printf "%s\n" "$_string_replace_all"
+}
+
+_gsub()
+{
+    _gsub=
+    _string_replace_all "$@" && _gsub="$_string_replace_all"
+}
+
+gsub()
+{
+    _gsub "$@" && printf "%s\n" "$_gsub"
+}
+
+
+### string_pad [-l : left] [-m : middle] [-r : right]
+STRING_PAD=' '
+_string_pad()
+{
+    _string_pad__usage="usage: string_pad [-l : left] [-m : middle] [-r right] str size pad"
+    _string_pad__pos=l
+    _string_pad__pos_switch=false
+    _string_pad__pad="${3:-$STRING_PAD}"
+    OPTIND=1
+    while getopts :hlmr _string_pad__var
+    do
+        case $_string_pad__var in
+            h) printf >&2 "$_string_pad__usage" ;;
+            l) _string_pad__pos=l ;;
+            m) _string_pad__pos=l ; _string_pad__pos_switch=true ;;
+            r) _string_pad__pos=r ;;
+            *) break ;;
+        esac
+    done
+    shift $(( $OPTIND - 1 ))
+
+    _string_pad="$1"
+    while [ ${#_string_pad} -lt $2 ]; do
+        case $_string_pad__pos in
+            l) _string_pad="${_string_pad__pad}$_string_pad"
+               $_string_pad__pos_switch && _string_pad__pos=r
+               ;;
+            r) _string_pad="$_string_pad${_string_pad__pad}"
+               $_string_pad__pos_switch && _string_pad__pos=l
+               ;;
+        esac
+    done
+    while [ ${#_string_pad} -gt $2 ]; do
+        case $_string_pad__pos in
+            l) _string_pad="${_string_pad#?}"
+               $_string_pad__pos_switch && _string_pad__pos=r
+               ;;
+            r) _string_pad="${_string_pad%?}"
+               $_string_pad__pos_switch && _string_pad__pos=l
+               ;;
+        esac
+    done
+}
+string_pad()
+{
+    _string_pad "$@" && printf "%s\n" "$_string_pad"
+}
+
+_pad()
+{
+    _string_pad "$@"
+}
+pad()
+{
+    string_pad "$@"
+}

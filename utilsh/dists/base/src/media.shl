@@ -1,0 +1,182 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+_media_info_data()
+{
+    _media_info_data=
+    [ -r "$1" ] || return 1
+    _media_info_data="$(ffprobe "$1" 2>&1 | egrep '^Input |Duration: |Stream ')"
+}
+
+_media_info_clean()
+{
+    [ -z "$1" ] && return 1
+
+    for _media_info_clean__v in audio_bitrate audio_codec audio_hz bitrate \
+                                duration duration_sec format video_bitrate \
+                                video_codec video_fps video_resolution \
+                                _extra_stream subtitle; do
+        eval _media_info__${1}_${_media_info_clean__v}=
+    done
+}
+
+_media_info()
+{
+    _media_info__file="$1"
+
+    _media_info_data "$1" || return 1
+
+    # echo "$_media_info_data"
+    _media_info__parse=$(echo "$_media_info_data" | awk '
+         BEGIN { input_index=0
+                 print ":" }
+         $1 ~ /Input/ { input_index=substr($2,2,index($2,",")-2)
+                        print " ; _media_info_clean "input_index" ; "
+                        print "_media_info__"input_index"_format=\""substr($3,0,length($3))"\"" }
+         $1 ~ /Duration/ { print "_media_info__"input_index"_duration=\""substr($2,0,length($2)-1)"\""
+                           for(i=3;i<=NF;i++) {
+                               if ($i ~ /bitrate:/) { tmp=i+1 ; tmp2=i+2
+                                                      print "_media_info__"input_index"_bitrate=\""$tmp" "$tmp2"\""
+                                                      i=i+2
+                                                    }
+                                              }
+                         }
+f         $1 ~ /Stream/ { if ($3 ~ /Video/) { print "_media_info__"input_index"_video_codec=\""$4"\""
+                                             for(i=4;i<=NF;i++) {
+                                                 if ($i ~ /fps/) { tmp=i-1
+                                                                   print "_media_info__"input_index"_video_fps=\""$tmp"\"" }
+                                                 if ($i ~ /[0-9][0-9]x[0-9][0-9]/) { print "_media_info__"input_index"_video_resolution=\""$i"\"" }
+                                                 if ($i ~ /kb\/s/) { tmp2=substr($i,0,length($i))
+                                                                     tmp=i-1
+                                                                     print "_media_info__"input_index"_video_bitrate=\""$tmp" "tmp2"\"" }
+                                                                 }
+                                           }
+                         else if ($3 ~ /Audio/) { print "_media_info__"input_index"_audio_codec=\""$4"\""
+                                                  for(i=4;i<=NF;i++) {
+                                                      if ($i ~ /Hz/) { tmp=i-1
+                                                                       print "_media_info__"input_index"_audio_hz=\""$tmp"\"" }
+                                                      if ($i ~ /kb\/s/) { tmp=i-1
+                                                                          print "_media_info__"input_index"_audio_bitrate=\""$tmp" "$i"\"" }
+                                                                     }
+                                                }
+                         else if ($3 ~ /Subtitle/) { $1=$2=$3=""
+                                                     print "_media_info__"input_index"_subtitle=\""$0"\""
+                                                   }
+                         else { print "_media_info__"input_index"__extra_stream=\""$0"\"" } }
+         END { print "_media_info__last_index="input_index }
+    ')
+
+    eval "$_media_info__parse"
+
+    _media_info__total_duration_sec=0
+    _media_info___index=0
+    while [ $_media_info___index -le $_media_info__last_index ]; do
+        eval _media_info__${_media_info___index}_duration_sec=
+        eval _media_info___index_tmp=\$_media_info__${_media_info___index}_duration
+        if [ -n "$_media_info___index_tmp" ] &&
+               time_to_sec "$_media_info___index_tmp"; then
+            eval _media_info__${_media_info___index}_duration_sec=$time_to_sec
+            _media_info__total_duration_sec=$(($_media_info__total_duration_sec + $time_to_sec))
+        fi
+
+        _media_info___index=$(($_media_info___index + 1))
+    done
+
+    file_size_kB "$1"
+    _media_info__file_size="$file_size_kB"
+
+    _media_info__computed_bitrate=$(($_media_info__file_size * 8 / $_media_info__total_duration_sec))
+}
+
+media_info()
+(
+    _media_info "$1" &&
+        set | grep '^_media_info__[0-9a-z]' | sort
+)
+
+time_to_sec()
+{
+    time_to_sec=
+
+    [ -z "$1" ] && return 1
+
+    time_to_sec__oldIFS="$IFS"
+    IFS=":"
+    set -- ${1%.*}
+    IFS="$time_to_sec__oldIFS"
+    time_to_sec=$(( ${1#0} * 3600 + ${2#0} * 60 + ${3#0} ))
+}
+
+file_size_kB()
+{
+    file_size_kB=
+    file_size_kB__unit=kB
+
+    [ -z "$1" ] && return 1
+
+    file_size_kB=$(ls -lk --block-size=$file_size_kB__unit "$1" | awk '{print $5}')
+    file_size_kB=${file_size_kB%$file_size_kB__unit}
+}
+
+video_to_audio()
+{
+    video_to_audio__format=
+
+    OPTIND=1
+    while getopts :f: video_to_audio__opt; do
+        case $video_to_audio__opt in
+            f) video_to_audio__format="$OPTARG" ;;
+        esac
+    done
+    shift $(($OPTIND - 1))
+
+    video_to_audio__input="$1"
+    video_to_audio__output="$2"
+
+    _media_info "$video_to_audio__input" || return 1
+
+    [ -z "$video_to_audio__format" ] &&
+        video_to_audio__format="$_media_info__0_audio_codec"
+    [ -z "$video_to_audio__output" ] &&
+        video_to_audio__output="${video_to_audio__input%.*}.${video_to_audio__format}"
+
+    if [ "$video_to_audio__format" = "$_media_info__0_audio_codec" ]; then
+        video_to_audio__encode_options='-q:a 0 -map a'
+    else
+        video_to_audio__encode_options='-ab 256k'
+    fi
+    ffmpeg -i "$video_to_audio__input" -vn $video_to_audio__encode_options "$video_to_audio__output"
+}
+
+audio_convert()
+{
+    :
+    # flac => mp3
+    #      ffmpeg -i input.flac -ab 196k -ac 2 -ar 48000 output.mp3
+}
+
+_exif_info()
+{
+    [ $# -ne 1 ] && return 1
+    _exif_info=$(
+        exiftool "$1" |
+            ruby -ne 'k, v = $_.match(/^([^:]*)\s+:\s+(.*$)$/).captures; puts "_exif_info__#{k.downcase.strip.tr(" /", "_")}=\"#{v}\""'
+    )
+    eval "$_exif_info"
+}
+
+exif_info()
+{
+    _exif_info "$1" &&
+        echo "$_exif_info"
+}
+
+mts_rename_with_date()
+{
+    _exif_info "$1" || return 1
+    mts_rename_with_date__basedir=
+    [ "${1%/*}" != "${1}" ] && mts_rename_with_date__basedir="${1%/*}/"
+
+    mts_rename_with_date="${mts_rename_with_date__basedir}$(echo ${_exif_info__date_time_original%+*} | tr ': ' '-_').${1##*.}"
+    mv -i "$1" "$mts_rename_with_date"
+}

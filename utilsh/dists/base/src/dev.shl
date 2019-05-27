@@ -1,0 +1,39 @@
+#!/bin/sh
+
+#%%load%% terminal.shl
+
+
+dev_display_wrap()
+{
+    terminal_set_attr 0  $TERMINAL_BOLD
+    #terminal_set_fg $TERMINAL_CYAN
+    terminal_set_fg $TERMINAL_YELLOW
+    "$@"
+    terminal_set_fg ''
+}
+
+dev_green_display_wrap()
+{
+    terminal_set_attr 0  $TERMINAL_BOLD
+    terminal_set_fg $TERMINAL_GREEN
+    "$@"
+    terminal_set_fg ''
+}
+
+dev_red_display_wrap()
+{
+    terminal_set_attr 0  $TERMINAL_BOLD
+    terminal_set_fg $TERMINAL_RED
+    "$@"
+    terminal_set_fg ''
+}
+
+dev_title()
+{
+    printf "|>>> %s <<<|\n" "$@"
+}
+
+dev_subtitle()
+{
+    printf "|  > %s <  |\n" "$@"
+}

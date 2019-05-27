@@ -1,0 +1,6 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+#%%load%% file.shl
+
+find_duplicate "$@"

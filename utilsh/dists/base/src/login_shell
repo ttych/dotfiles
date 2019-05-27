@@ -1,0 +1,6 @@
+#!/bin/sh
+
+script_name="${0##*/}"
+shell=${script_name%_login_shell}
+[ -z "$shell" ] && exit 1
+exec $shell --login

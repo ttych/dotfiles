@@ -1,0 +1,396 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+
+### var
+
+eval $(printf "%b\n" "_LIST_RS=\"\036\"")
+
+_List_l()
+{
+    # reserve namespace _List_l
+    :
+}
+
+
+### help & usage
+
+_LIST_HELP=\
+"usage: %s [-h] List_name <action> [item]
+
+with action in :
+ - clear / clean / empty    : empty list
+ - is_empty                 : is the list empty ?
+ - size                     : return the size of the list
+ - get_at index             : get item at index
+ - index_of item            : return first index for item
+ - prepend / unshift        : add to front
+ - add / append / push item : add to back
+ - pop                      : remove last item
+ - shift item               : remove first item
+ - del_at / rm_at index     : remove at index
+ - del / rm item            : del first item from list
+ - del_all / rm_all item    : del all item from list
+ - duplicate new_list       : copy to new_list
+ - equal other_list         : test equality with other_list
+ - each function            : iterate on each item
+ - each_with_index function : iterate on each item with index
+"
+
+_List_help()
+{
+    printf "$_LIST_HELP\n" _List
+}
+
+List_help()
+{
+    printf "$_LIST_HELP\n" List
+}
+
+
+### List utils
+
+_List_base_name()
+{
+    _List_base_name=
+    [ -z "$1" ] && return 1
+    _List_base_name="_List_l__${1}"
+}
+
+_List_content_get()
+{
+    _List_content_get=
+    if _List_base_name "$@"; then
+        eval _List_content_get="\"\$${_List_base_name}\""
+        _List_content_get="${_List_content_get:-${_LIST_RS}}"
+    else
+        return 1
+    fi
+}
+
+_List_content_set()
+{
+    _List_content_set=
+    if _List_base_name "$@"; then
+        _List_content_set="${2:-${_LIST_RS}}"
+        eval "$_List_base_name"="\"\${_List_content_set}\""
+    else
+        return 1
+    fi
+}
+
+_List_empty()
+{
+    _List_content_set "$1" ""
+}
+
+_List_is_empty()
+{
+    if _List_content_get "$1"; then
+        [ -z "${_List_content_get}" ] && return 0
+        [ "${_List_content_get}" = "${_LIST_RS}" ] && return 0
+        return 1
+    fi
+    return 0
+}
+
+_List_size_set_from_index()
+{
+    _List_size=$(($2 + 1))
+}
+
+_List_size()
+{
+    _List_size=0
+    _List_each_with_index "$1" _List_size_set_from_index
+}
+
+_List_get_at()
+{
+    _List_get_at=
+    if _List_content_get "$1"; then
+        _List_get_at__content="${_List_content_get#${_LIST_RS}}"
+
+        _List_get_at__index=0
+        while [ -n "$_List_get_at__content" ]; do
+            _List_get_at__k="${_List_get_at__content%%${_LIST_RS}*}"
+            _List_get_at__content="${_List_get_at__content#${_List_get_at__k}}"
+            _List_get_at__content="${_List_get_at__content#${_LIST_RS}}"
+
+            if [ $_List_get_at__index -eq $2 ]; then
+                _List_get_at="$_List_get_at__k"
+                return 0
+            fi
+
+            _List_get_at__index=$(($_List_get_at__index + 1))
+        done
+    else
+        return 1
+    fi
+    return 1
+}
+
+_List_index_of()
+{
+    _List_index_of=
+    if _List_content_get "$1"; then
+        _List_index_of__content="${_List_content_get#${_LIST_RS}}"
+
+        _List_index_of__index=0
+        while [ -n "$_List_index_of__content" ]; do
+            _List_index_of__k="${_List_index_of__content%%${_LIST_RS}*}"
+            _List_index_of__content="${_List_index_of__content#${_List_index_of__k}}"
+            _List_index_of__content="${_List_index_of__content#${_LIST_RS}}"
+
+            if [ "$_List_index_of__k" = "$2" ]; then
+                _List_index_of=$_List_index_of__index
+                return 0
+            fi
+
+            _List_index_of__index=$(($_List_index_of__index + 1))
+        done
+    else
+        return 1
+    fi
+    return 1
+}
+
+_List_append()
+{
+    if _List_content_get "$1"; then
+        _List_content_set "$1" "${_List_content_get}${2}${_LIST_RS}"
+    else
+        return 1
+    fi
+}
+
+_List_prepend()
+{
+    if _List_content_get "$1"; then
+        _List_content_set "$1" "${_LIST_RS}${2}${_List_content_get}"
+    else
+        return 1
+    fi
+}
+
+_List_pop()
+{
+    _List_pop=
+    if _List_content_get "$1"; then
+        _List_pop__content="${_List_content_get%${_LIST_RS}}"
+
+        if [ -n "$_List_pop__content" ]; then
+            _List_pop="${_List_pop__content##*${_LIST_RS}}"
+            _List_pop__content="${_List_pop__content%${_List_pop}}"
+            _List_content_set "$1" "$_List_pop__content" && return 0
+        fi
+    fi
+    return 1
+}
+
+_List_shift()
+{
+    _List_shift=
+    if _List_content_get "$1"; then
+        _List_shift__content="${_List_content_get#${_LIST_RS}}"
+
+        if [ -n "$_List_shift__content" ]; then
+            _List_shift="${_List_shift__content%%${_LIST_RS}*}"
+            _List_shift__content="${_List_shift__content#${_List_shift}}"
+            _List_content_set "$1" "$_List_shift__content" && return 0
+        fi
+    fi
+    return 1
+}
+
+_List_del_at()
+{
+    _List_del_at=
+    if _List_content_get "$1"; then
+        _List_del_at__content="${_List_content_get#${_LIST_RS}}"
+        _List_del_at__content_new="${_LIST_RS}"
+
+        _List_del_at__index=0
+        while [ -n "$_List_del_at__content" ]; do
+            if [ $_List_del_at__index -gt $2 ]; then
+                _List_del_at__content_new="${_List_del_at__content_new}${_List_del_at__content}"
+                break
+            else
+                _List_del_at__k="${_List_del_at__content%%${_LIST_RS}*}"
+                _List_del_at__content="${_List_del_at__content#${_List_del_at__k}}"
+                _List_del_at__content="${_List_del_at__content#${_LIST_RS}}"
+
+                if [ $_List_del_at__index -eq $2 ]; then
+                    _List_del_at="$_List_del_at__k"
+                else
+                    _List_del_at__content_new="${_List_del_at__content_new}${_List_del_at__k}${_LIST_RS}"
+                fi
+            fi
+
+            _List_del_at__index=$(($_List_del_at__index + 1))
+        done
+
+        if [ $_List_del_at__index -le $2 ]; then
+            return 1
+        else
+            _List_content_set "$1" "$_List_del_at__content_new"
+            return 0
+        fi
+    fi
+    return 1
+}
+
+_List_del()
+{
+    if _List_index_of "$1" "$2"; then
+        _List_del_at "$1" "$_List_index_of"
+    else
+        return 1
+    fi
+}
+
+_List_del_all()
+{
+    _List_del_all__del=1
+    while _List_index_of "$1" "$2"; do
+        _List_del_all__del=0
+        _List_del_at "$1" "$_List_index_of"
+    done
+    return $_List_del_all__del
+}
+
+_List_duplicate()
+{
+    if _List_content_get "$1"; then
+        _List_content_set "$2" "$_List_content_get"
+    else
+        return 1
+    fi
+}
+
+_List_equal()
+{
+    if _List_content_get "$1"; then
+        _List_equal__a_content="$_List_content_get"
+    else
+        return 1
+    fi
+
+    if _List_content_get "$2"; then
+        _List_equal__b_content="$_List_content_get"
+    else
+        return 1
+    fi
+
+    [ "$_List_equal__a_content" = "$_List_equal__b_content" ] && return 0
+    return 1
+}
+
+_List_each()
+{
+    if _List_content_get "$1"; then
+        _List_each__content="${_List_content_get#${_LIST_RS}}"
+
+        while [ -n "$_List_each__content" ]; do
+            _List_each__k="${_List_each__content%%${_LIST_RS}*}"
+            _List_each__content="${_List_each__content#${_List_each__k}}"
+            _List_each__content="${_List_each__content#${_LIST_RS}}"
+
+            $2 "$_List_each__k"
+        done
+    else
+        return 1
+    fi
+}
+
+_List_each_with_index()
+{
+    if _List_content_get "$1"; then
+        _List_each_with_index__content="${_List_content_get#${_LIST_RS}}"
+
+        _List_each_with_index__count=0
+        while [ -n "$_List_each_with_index__content" ]; do
+            _List_each_with_index__k="${_List_each_with_index__content%%${_LIST_RS}*}"
+            _List_each_with_index__content="${_List_each_with_index__content#${_List_each_with_index__k}}"
+            _List_each_with_index__content="${_List_each_with_index__content#${_LIST_RS}}"
+
+            $2 "$_List_each_with_index__k" "$_List_each_with_index__count"
+
+            _List_each_with_index__count=$(($_List_each_with_index__count + 1))
+        done
+    else
+        return 1
+    fi
+}
+
+
+### List
+
+_List()
+{
+    _List=
+    _List__name="$1" ; shift
+    if [ -z "$_List__name" ]; then
+        echo >&2 "List_name could not be empty"
+        _List_help
+        return 1
+    fi
+
+    _List__action="$1" ; shift
+    case "$_List__action" in
+        'clear'|'clean'|'empty') _List_empty "$_List__name"
+                                 _List__retcode=$? ;;
+        'is_empty') _List_is_empty "$_List__name"
+                    _List__retcode=$? ;;
+        'size') _List_size "$_List__name"
+                _List__retcode=$?
+                _List="$_List_size" ;;
+        'get_at') _List_get_at "$_List__name" "$@"
+                  _List__retcode=$?
+                  _List="$_List_get_at" ;;
+        'index_of') _List_index_of "$_List__name" "$@"
+                    _List__retcode=$?
+                    _List="$_List_index_of" ;;
+        'prepend'|'unshift') _List_prepend "$_List__name" "$@"
+                             _List__retcode=$? ;;
+        'add'|'append'|'push') _List_append "$_List__name" "$@"
+                               _List__retcode=$? ;;
+        'pop') _List_pop "$_List__name"
+               _List__retcode=$?
+               _List="$_List_pop" ;;
+        'shift') _List_shift "$_List__name"
+                 _List__retcode=$?
+                 _List="$_List_shift" ;;
+        'del_at'|'rm_at') _List_del_at "$_List__name" "$@"
+                          _List__retcode=$?
+                          _List="$_List_del_at" ;;
+        'del'|'rm') _List_del "$_List__name" "$@"
+                    _List__retcode=$?
+                    ;;
+        'del_all'|'rm_all') _List_del_all "$_List__name" "$@"
+                            _List__retcode=$?
+                            ;;
+        'duplicate') _List_duplicate "$_List__name" "$@"
+                     _List__retcode=$? ;;
+        'equal') _List_equal "$_List__name" "$@"
+                 _List__retcode=$? ;;
+        'each') _List_each "$_List__name" "$@" ;;
+        'each_with_index') _List_each_with_index "$_List__name" "$@" ;;
+        *)  echo >&2 "unknown action $_List__action"
+            _List_help
+            return 1
+            ;;
+    esac
+    return $_List__retcode
+}
+
+List()
+{
+    if _List "$@"; then
+        if [ -n "$_List" ]; then
+            printf "%s\n" $_List
+        fi
+        return 0
+    fi
+    return 1
+}

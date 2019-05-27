@@ -1,0 +1,6 @@
+#!/bin/sh
+# -*- mode: shell -*-
+
+#%%load%% http.shl
+
+curl_json "$@"

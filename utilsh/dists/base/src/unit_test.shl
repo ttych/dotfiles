@@ -1,0 +1,156 @@
+#!/bin/sh
+
+
+### Counters
+
+_tests_init()
+{
+    _tests_counter_ok=0
+    _tests_counter_ko=0
+    _tests_counter_skip=0
+}
+_tests_init
+
+_tests_ok_inc()
+{
+    _tests_counter_ok=$(($_tests_counter_ok + 1))
+}
+
+_tests_ko_inc()
+{
+    _tests_counter_ko=$(($_tests_counter_ko + 1))
+}
+
+_tests_skip_inc()
+{
+    _tests_counter_skip=$(($_tests_counter_skip + 1))
+}
+
+_tests_exit_status()
+{
+    [ $_tests_counter_ko -eq 0 ]
+    exit $?
+}
+
+_tests_counter_report()
+{
+    _tests_counter_all=$(($_tests_counter_ok +
+                          $_tests_counter_ko +
+                          $_tests_counter_skip))
+    printf "\n"
+    printf "  test  counts : %s\n" $_tests_counter_all
+    printf "  test    ok   : %s\n" $_tests_counter_ok
+    printf "  test    ko   : %s\n" $_tests_counter_ko
+    printf "  test skipped : %s\n" $_tests_counter_skip
+}
+
+_test_init()
+{
+    _test_assert_failed=0
+    _test_set_skip=1
+}
+
+_test_ko()
+{
+    _test_assert_failed=$(($_test_assert_failed + 1))
+}
+
+_test_set_skip()
+{
+    _test_set_skip=0
+}
+
+_test_skipped()
+{
+    return $_test_set_skip
+}
+
+_test_status()
+{
+    _test_status=$1
+    if [ $_test_status -eq 0 ]; then
+        if [ $_test_assert_failed -ne 0 ]; then
+            _test_status=2
+        fi
+    fi
+}
+
+### Asserts
+
+_assert_base()
+{
+    _test_skipped && return 1
+    return 0
+}
+
+_assert_failed()
+{
+    _assert_base || return 1
+    _test_ko
+    _assert_failed__code="$1"; shift
+    _assert_failed__msg="$1"; shift
+    printf >&2 "** test \`%s\` failed with code %s:\n" \
+               "${test_name:--}" \
+               "$_assert_failed__code"
+    printf >&2 "** %s: %s\n" \
+               "$_assert_failed__msg" \
+               "$*"
+    return 1
+}
+
+assert_true()
+{
+    _assert_base || return 1
+    assert_true__msg="this doesn't evaluate to true"
+    eval "$@" >/dev/null
+    [ $? -eq 0 ] ||
+        _assert_failed $? "$assert_true__msg" "$@"
+}
+
+assert_false()
+{
+    _assert_base || return 1
+    assert_false__msg="this doesn't evaluate to false"
+    eval "$@" >/dev/null
+    [ $? -ne 0 ] ||
+        _assert_failed $? "$assert_false__msg" "$@"
+}
+
+
+
+### temporary situation
+
+fixme()
+{
+    _test_set_skip
+    printf -- "-- %s\n" skipped
+}
+
+
+
+### Runner
+
+test_run()
+{
+    _tests_init
+    printf "%s:\n" "${0##*/}"
+    for test_run__t in `grep -E '^test_\w*\(\)' $0`; do
+        test_name="${test_run__t%()}"
+        printf ">> Running: %s ... \n" "$(echo $test_name | tr '_' ' ')"
+        _test_init
+        $test_name
+        _test_status $?
+        if _test_skipped; then
+            _tests_skip_inc
+        else
+            if [ $_test_status -eq 0 ]; then
+                _tests_ok_inc
+            else
+                _tests_ko_inc
+            fi
+        fi
+    done
+    _tests_counter_report
+    _tests_exit_status
+}
+trap test_run EXIT

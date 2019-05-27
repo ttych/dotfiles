@@ -1,0 +1,140 @@
+#!/bin/sh
+
+#%%load%% std.shl
+#%%load%% string.shl
+
+
+### POSIX
+FILENAME_POSIX_CHARS="a-zA-Z0-9._-"
+is_filename_posix()
+{
+  is_filename_posix__pattern="[!$FILENAME_POSIX_CHARS]"
+  case $1 in
+    "" | -* | *${is_filename_posix__pattern}* ) return 1;;
+  esac
+}
+
+_filename_to_posix()
+{
+  _filename_to_posix=
+  _filename_to_posix__pattern="[!$FILENAME_POSIX_CHARS]"
+  _string_replace_all "$1" "$_filename_to_posix__pattern" "${PAD_CHAR:-_}"
+  case $_string_replace_all in
+    -*) _filename_to_posix=_${_string_replace_all#?} ;;
+    *) _filename_to_posix=${_string_replace_all} ;;
+  esac
+}
+
+filename_to_posix()
+{
+  _filename_to_posix "$@" &&
+  printf "%s\n" "$_filename_to_posix"
+}
+
+
+### OK / KO
+FILENAME_KO_CHARS="][|#?!><*&${BKS}\$'\"${SPC}${NL}${TAB}${CR}${BS}${DEL}()"
+is_filename_ok()
+{
+    case $1 in
+        "" | -* | *[${FILENAME_KO_CHARS}]* ) return 1 ;;
+    esac
+}
+
+_filename_to_ok()
+{
+    _filename_to_ok=
+    _filename_to_ok__pattern="[$FILENAME_KO_CHARS]"
+    _string_replace_all "$1" "$_filename_to_ok__pattern" "${PAD_CHAR:-_}"
+    case $_string_replace_all in
+        -*) _filename_to_ok="_${_string_replace_all#?}" ;;
+        *) _filename_to_ok="${_string_replace_all}" ;;
+    esac
+}
+
+filename_to_ok()
+{
+    _filename_to_ok "$@" &&
+        printf "%s\n" "$_filename_to_ok"
+}
+
+
+### NO WHITESPACE
+FILENAME_WHITESPACE_CHARS="${SPC}${TAB}${NL}${CR}"
+is_filename_nowhitespace()
+{
+    case $1 in
+        *[$FILENAME_WHITESPACE_CHARS]*) return 1 ;;
+    esac
+}
+
+_filename_to_nowhitespace()
+{
+    _filename_to_nowhitespace=
+    _string_replace_all "$1" "[${SPC}${TAB}${NL}${CR}]" "${PAD_CHAR:-_}"
+    case $_string_replace_all in
+        -*) _filename_to_nowhitespace="_${_string_replace_all#?}" ;;
+        *) _filename_to_nowhitespace="${_string_replace_all}" ;;
+    esac
+}
+
+filename_to_nowhitespace()
+{
+    _filename_to_nowhitespace "$@" &&
+        printf "%s\n" "$_filename_to_nowhitespace"
+}
+
+
+### STANDARD
+FILENAME_STANDARD=${FILENAME_STANDARD:-ok}
+is_filename_standard()
+{
+  is_filename_${FILENAME_STANDARD} "$@"
+}
+
+_filename_standardize()
+{
+  _filename_standardize=
+  _filename_to_${FILENAME_STANDARD} "$@" &&
+      eval _filename_standardize="\"\$_filename_to_${FILENAME_STANDARD}\""
+}
+
+filename_standardize()
+{
+  _filename_standardize "$@" &&
+  printf "%s\n" "$_filename_standardize"
+}
+
+
+filename_fix_one()
+{
+  filename_fix_one=
+  [ -e "$1" ] || return 1
+
+  filename_fix_one="$1"
+  if ! is_filename_standard "$1"; then
+    _filename_standardize "$1" || return 1
+    filename_fix_one__base="$_filename_standardize"
+    filename_fix_one="$filename_fix_one__base"
+
+    filename_fix_one__n=1
+    while [ -e "$filename_fix_one" ]; do
+      filename_fix_one="$filename_fix_one__base.$filename_fix_one__n"
+      filename_fix_one__n=$(($filename_fix_one__n + 1))
+    done
+
+    mv "$1" "$filename_fix_one" || return 1
+  fi
+}
+
+filename_fix()
+{
+  [ $# -eq 0 ] && set -- *
+
+  for filename_fix__f; do
+    filename_fix_one "$filename_fix__f"
+    if [ -d "$filename_fix_one" ]; then
+      (cd "$filename_fix_one"; filename_fix)
+    fi
+  done
+}

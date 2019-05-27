@@ -1,0 +1,33 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+# -dPDFSETTINGS=/screen 72dpi
+# -dPDFSETTINGS=/ebook 150dpi
+# -dPDFSETTINGS=/prepress 300dpi
+# -dPDFSETTINGS=/printer 300 dpi
+# -dPDFSETTINGS=/default
+pdf_compress()
+{
+    pdf_compress__settings=printer
+    case "$1" in
+        screen|ebook|prepress|printer|default)
+            pdf_compress__settings="$1"
+            shift
+            ;;
+    esac
+
+    for pdf_compress__f; do
+        if [ ! -r "$pdf_compress__f" ]; then
+            echo >&2 "can't read $pdf_compress__f"
+            continue
+        fi
+        pdf_compress__f_out="${pdf_compress__f%\.pdf}.c.pdf"
+        gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 \
+           -dPDFSETTINGS=/$pdf_compress__settings \
+           -dNOPAUSE -dQUIET -dBATCH \
+           -sOutputFile="$pdf_compress__f_out" "$pdf_compress__f"
+    done
+}
+
+# alternativ
+# convert -density 200x200 -quality 60 -compress jpeg input.pdf output.pdf

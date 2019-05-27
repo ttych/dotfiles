@@ -81,7 +81,12 @@ export DOTFILES_FORCE
 
 cd "${SCRIPT_RPATH}" || exit 1
 
-[ $# -eq 0 ] && set -- */
+if [ $# -eq 0 ]; then
+    set -- */
+else
+    DOTFILES_FORCE=true
+fi
+
 for app; do
     if [ ! -d "$app" ]; then
         echo >&2 "no conf for $app app"

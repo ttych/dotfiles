@@ -1,0 +1,7 @@
+#!/bin/sh
+
+#%%load%% filename.shl
+
+for fix_fname__f; do
+  filename_fix "$fix_fname__f"
+done

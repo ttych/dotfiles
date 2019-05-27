@@ -1,0 +1,5 @@
+#!/bin/sh
+
+#%%load%% std.shl
+
+timeout "$@"

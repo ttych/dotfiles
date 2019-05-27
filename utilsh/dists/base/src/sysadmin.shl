@@ -1,0 +1,26 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+
+### ps
+pstop()
+{
+    kill -STOP "$@"
+}
+
+prun()
+{
+    kill -CONT "$@"
+}
+
+
+### getent
+gh()
+{
+    getent hosts "$@"
+}
+
+gp()
+{
+    getent passwd "$@"
+}

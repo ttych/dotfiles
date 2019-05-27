@@ -1,0 +1,127 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+
+##################################################
+# apt-get
+##################################################
+apt_install()
+{
+    [ $# -eq 0 ] && return 0
+    sudo apt-get -qq -y install "$@"
+}
+
+apt_installed()
+{
+    [ $# -eq 0 ] && return 1
+    dpkg -l "$@" >/dev/null
+}
+
+
+##################################################
+# yum
+##################################################
+yum_install()
+{
+    [ $# -eq 0 ] && return 0
+    sudo yum install -y "$@"
+}
+
+yum_installed()
+{
+    [ $# -eq 0 ] && return 1
+    yum list installed "$@" >/dev/null
+}
+
+
+##################################################
+# os
+##################################################
+OS=`uname -s`
+OS_ARCH=`uname -m`
+export OS OS_ARCH
+
+os_guess_lsb_release()
+{
+    which lsb_release >/dev/null 2>/dev/null || return 1
+    os_guess_lsb_release=`lsb_release -s -i`
+}
+
+os_guess_trick()
+{
+    if [ -r /etc/redhat-release ]; then
+        os_guess_trick=`rpm -qf /etc/redhat-release --queryformat '%{NAME}'`
+    else
+        return 1
+    fi
+}
+
+os_guess_standardize()
+{
+    case "$1" in
+        RedHatEnterpriseServer|redhat-release-server)
+            os_guess_standardize=RedHat ;;
+        *)
+            os_guess_standardize="$1" ;;
+    esac
+}
+
+os_guess()
+{
+    if os_guess_lsb_release; then
+        os_guess=$os_guess_lsb_release
+    elif os_guess_trick; then
+        os_guess=$os_guess_trick
+    else
+        os_guess=Unknown
+    fi
+
+    os_guess_standardize "$os_guess"
+    os_guess="$os_guess_standardize"
+}
+os_guess
+OS_NAME=$os_guess
+export OS_NAME
+
+OS_PKG=
+case $OS_NAME in
+    Ubuntu) OS_PKG=apt ;;
+    RedHat) OS_PKG=yum ;;
+    *) echo >&2 "os.shl: $OS_NAME not supported" ;;
+esac
+export OS_PKG
+
+os_install()
+{
+    [ -z "$OS_PKG" ] && return 1
+
+    os_installed "$@" || ${OS_PKG}_install "$@"
+}
+
+os_installed()
+{
+    [ -z "$OS_PKG" ] && return 1
+
+    ${OS_PKG}_installed "$@"
+}
+
+
+##################################################
+# hardware
+##################################################
+cpu_count()
+{
+    cpu_count=1
+    case $OS in
+        Linux) linux_cpu_count && cpu_count=$linux_cpu_count ;;
+    esac
+}
+
+
+##################################################
+# Linux
+##################################################
+linux_cpu_count()
+{
+    linux_cpu_count=`grep '^processor' /proc/cpuinfo | wc -l`
+}

@@ -1,0 +1,233 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+#%%load%% filename.shl
+#%%load%% file.shl
+#%%load%% string.shl
+#%%load%% dev.shl
+
+
+CONTEST_HELP=\
+'usage: contest [-h] ...
+'
+
+_contest_help()
+{
+    printf "%s\n" "$CONTEST_HELP"
+}
+
+_contest_save()
+{
+    _contest_pwd="$PWD"
+}
+
+_contest_restore()
+{
+    cd "$_contest_pwd"
+}
+
+_contest_repo()
+{
+    [ -z "$1" ] && return 1
+    _filename_standardize "$1"
+    _contest_repo="$_filename_standardize"
+    [ ! -d "$_contest_repo" ] && mkdir "$_contest_repo"
+    cd "$_contest_repo"
+}
+
+CONTEST_EDITOR="${CONTEST_EDITOR:-emacs}"
+contest_editor()
+{
+    $CONTEST_EDITOR "$@" 2>/dev/null
+}
+
+CONTEST_LANG="${CONTEST_LANG:-ruby}"
+contest_lang()
+{
+    $CONTEST_LANG "$@"
+}
+
+contest_lang_load()
+{
+    lib_load ${CONTEST_LANG}.shl
+}
+contest_lang_load
+
+contest_set_lang()
+{
+    CONTEST_LANG="$1"
+    contest_lang_load
+}
+
+_contest_start()
+{
+    _contest_save
+
+    if _contest_repo "$1"; then
+        contest_guard_xterm .
+
+        _contest_start__index=1
+
+        while : ; do
+            dev_display_wrap dev_title "EXERCISE $_contest_start__index"
+            (
+                mkdir $_contest_start__index &&
+                    cd $_contest_start__index &&
+                    contest_exercise_init
+            )
+
+            dev_display_wrap dev_title "CONTINUE ?"
+            read _contest_start__input
+            case $_contest_start__input in
+                [Qq]*|[Nn]*) break ;;
+            esac
+
+            _contest_start__index=$(($_contest_start__index + 1))
+        done
+    fi
+
+    _contest_restore
+}
+
+_contest_guard()
+{
+    file_mon -d -c 'contest_test "%s"' "$@"
+}
+
+contest_guard_xterm()
+{
+    xterm -e "contest guard $@" &
+}
+
+contest_test()
+{
+    if [ -d "$1" ]; then
+        #contest_exercise_init "$1"
+        :
+    else
+        contest_exercise_test "$1"
+    fi
+}
+
+contest_exercise_init_sample()
+{
+    contest_exercise_init_sample=1
+    while : ; do
+        contest_editor input_$contest_exercise_init_sample \
+                       output_$contest_exercise_init_sample
+        if [ ! -s input_$contest_exercise_init_sample ] &&
+               [ ! -s output_$contest_exercise_init_sample ]; then
+            rm -f input_$contest_exercise_init_sample \
+                  output_$contest_exercise_init_sample
+            break
+        fi
+        contest_exercise_init_sample=$(($contest_exercise_init_sample + 1))
+    done
+}
+
+contest_exercise_init_soluce()
+{
+    ${CONTEST_LANG}_script_name soluce
+    eval ${CONTEST_LANG}_script_init \$${CONTEST_LANG}_script_name
+    eval chmod +x \$${CONTEST_LANG}_script_name
+    eval contest_editor \$${CONTEST_LANG}_script_name &
+}
+
+contest_exercise_init()
+{
+    contest_exercise_init_sample
+    contest_exercise_init_soluce
+}
+
+contest_exercise_test()
+{
+    contest_exercise_test__dir="${1%/*}"
+    contest_exercise_test__file="${1#$contest_exercise_test__dir/}"
+
+    dev_display_wrap dev_title "TRIGGER ($contest_exercise_test__dir/)$contest_exercise_test__file"
+
+    case "$contest_exercise_test__file" in
+        soluce*) contest_exercise_test_soluce "$contest_exercise_test__dir" \
+                                              "$contest_exercise_test__file" ;;
+        input_*) contest_exercise_test_sample "${contest_exercise_test__dir}" \
+                                              "${contest_exercise_test__file#input_}" ;;
+        output_*) contest_exercise_test_sample "${contest_exercise_test__dir}" \
+                                               "${contest_exercise_test__file#output_}" ;;
+        *) dev_title "TEST trigger for $1 skipped ..." ;;
+    esac
+}
+
+contest_exercise_test_soluce()
+{
+    contest_exercise_test_samples "$1" "$2"
+}
+
+contest_exercise_test_samples()
+{
+    for contest_exercise_test_samples__i in "$1"/input_* ; do
+        contest_exercise_test_sample "$1" "${contest_exercise_test_samples__i##*_}" "$2"
+    done
+}
+
+contest_exercise_test_sample()
+(
+    cd "$1" || return 1
+    [ -f "input_$2" ] || return 1
+    [ -f "output_$2" ] || return 1
+
+    soluce="$3"
+    if [ -z "$soluce" ]; then
+        soluce=$(ls -1ta soluce* 2>/dev/null | head -1)
+    fi
+    [ -z "$soluce" ] && return 1
+
+    expected="$(cat output_$2)"
+
+    printf " > test %s against %s ... " "$1/input_$2" "$1/$soluce"
+
+    result="$(cat input_$2 | ./$soluce)"
+
+    if [ "$result" = "$expected" ]; then
+        dev_green_display_wrap printf "%s\n" "OK"
+    else
+        dev_red_display_wrap printf "%s\n" "NOOO !"
+        dev_display_wrap printf "   %s:\n" expected
+        printf "%s\n" "$expected"
+        dev_display_wrap printf "   %s:\n" got
+        printf "%s\n" "$result"
+    fi
+)
+
+_contest()
+{
+    _contest=
+    _contest__ret=0
+
+    case $1 in
+        ''|'-h'|h|help)
+            _contest_help
+            return 0 ;;
+        g|guard)
+            shift
+            _contest_guard "$@"
+            _contest__ret=$?
+            _contest="$_contest_guard" ;;
+        xg|xguard)
+            shift
+            contest_guard_xterm "$@"
+            _contest__ret=$? ;;
+        *) _contest_start "$@"
+           _contest__ret=$?
+           _contest="$_contest_start" ;;
+    esac
+
+    return $_contest_ret
+}
+
+contest()
+{
+    _contest "$@"
+    contest=$?
+    [ -n "$_contest" ] && print "%s\n" "$_contest"
+    return $contest
+}

@@ -1,0 +1,192 @@
+#!/bin/sh
+
+#%%load%% std.shl
+#%%load%% file.shl
+
+samples()
+{
+    samples__arch=
+    samples__dir=
+    [ -z "$1" ] && return 1
+
+    samples__arch="${1##*/}"
+    samples__dir="${samples__arch%.*}"
+
+    rm -f "samples" "$samples__dir" "$samples__arch" || return 1
+    wget "$1" -O"$samples__arch" || return 1
+    extract -rm "$samples__arch" || return 1
+    rm -f "$samples__arch" || return 1
+    mv "$samples__dir" "samples"
+}
+
+TOSA_SOLUCE=soluce
+
+TOSA_TIMEOUT_DEFAULT=30
+tosa_timeout=$TOSA_TIMEOUT_DEFAULT
+tosa_timeout()
+{
+    if [ -z "$1" ]; then
+        echo $tosa_timeout
+        return 0
+    fi
+
+    tosa_timeout="$1"
+}
+
+tosa_samples_guess()
+{
+    tosa_samples_guess__d="${1%/*}"
+    tosa_samples_guess__i=
+    tosa_samples_guess__o=
+    tosa_samples_guess__c=
+    case "$1" in
+        */input[0-9]*)
+            tosa_samples_guess__i="$1"
+            tosa_samples_guess__o="${tosa_samples_guess__d}/output${1#*/input}"
+            tosa_samples_guess__c="${tosa_samples_guess__d}/computed${1#*/input}"
+            ;;
+        */output[0-9]*)
+            tosa_samples_guess__i="${tosa_samples_guess__d}/input${1#*/output}"
+            tosa_samples_guess__o="$1"
+            tosa_samples_guess__c="${tosa_samples_guess__d}/computed${1#*/output}"
+            ;;
+        */computed[0-9]*)
+            tosa_samples_guess__i="${tosa_samples_guess__d}/input${1#*/computed}"
+            tosa_samples_guess__o="${tosa_samples_guess__d}/output${1#*/computed}"
+            tosa_samples_guess__c="$1"
+            ;;
+    esac
+    tosa_samples_guess__d="${tosa_samples_guess__i%/*}"
+}
+
+tosa_dump_file()
+{
+    (cat "$1"; echo) | tosa_format "$2"
+}
+
+tosa_format()
+{
+    while read line; do
+        printf "${2:-  }%s\n" "$line"
+    done
+}
+
+tosa_test()
+{
+    tosa_test__status=0
+    tosa_test__verbose=
+
+    if [ "$1" = 'v' ] || [ "$1" = '-v' ]; then
+        tosa_test__verbose=true
+        shift
+    fi
+
+    tosa_samples_guess "$1"
+    [ -r "$tosa_samples_guess__i" ] || return 1
+
+    if [ ! -r "$TOSA_SOLUCE" ]; then
+        tosa_test__status=3
+    else
+        [ -x "$TOSA_SOLUCE" ] || chmod +x "./$TOSA_SOLUCE"
+        if "./$TOSA_SOLUCE" < "$tosa_samples_guess__i" > "$tosa_samples_guess__c"; then
+            tosa_test__output=$(cat "$tosa_samples_guess__c")
+            tosa_test__expected=$(cat "$tosa_samples_guess__o")
+            if [ "$tosa_test__output" = "$tosa_test__expected" ]; then
+                tosa_test__status=0
+            else
+                tosa_test__status=2
+                if [ -n "$tosa_test__verbose" ]; then
+                    printf "INPUT %s\n" "$tosa_samples_guess__i"
+                    tosa_dump_file "$tosa_samples_guess__i"
+                    printf "EXPECTED %s\n" "$tosa_samples_guess__o"
+                    tosa_dump_file "$tosa_samples_guess__o"
+                    printf "COMPUTED %s\n" "$tosa_samples_guess__c"
+                    tosa_dump_file "$tosa_samples_guess__c"
+                    printf "DIFF\n"
+                    diff -u "$tosa_samples_guess__o" "$tosa_samples_guess__c" | tosa_format
+                fi
+            fi
+        else
+            tosa_test__status=1
+        fi
+    fi
+    return $tosa_test__status
+}
+
+tosa_test_status()
+{
+    tosa_test_status__code="$1"
+    case $1 in
+        0) tosa_test_status='OK' ;;
+        1) tosa_test_status='ERROR' ;;
+        2) tosa_test_status='DIFF' ;;
+        3) tosa_test_status='NO-SOLUCE' ;;
+        *) tosa_test_status='TIMEOUT' ;;
+    esac
+}
+
+tosa_tests()
+{
+    for tosa_tests__f in samples/input*; do
+        [ -r "$tosa_tests__f" ] || continue
+        printf "  testing soluce with %s ..." "$tosa_tests__f"
+        timeout "${tosa_timeout:-$TOSA_TIMEOUT_DEFAULT}" \
+                tosa_test "$tosa_tests__f"
+        tosa_tests__status=$?
+
+        tosa_test_status "$tosa_tests__status"
+        printf "  %s\n" "$tosa_test_status"
+    done
+}
+
+tosa_run()
+(
+    cd "$1" || return 1
+    printf "in %s\n" "$1"
+    tosa_tests
+)
+
+tosa_run_for()
+{
+    tosa_run_for__d=
+    case "$1" in
+        */samples/input*|*/samples/output*) tosa_run_for__d="${1%/samples*}" ;;
+        "$TOSA_SOLUCE"|*/"$TOSA_SOLUCE") tosa_run_for__d="${1%/soluce*}" ;;
+        *) #echo >&2 skipping "$1" ;
+           return 1 ;;
+    esac
+    tosa_run "$tosa_run_for__d"
+}
+
+tosa_guard()
+{
+    file_mon -c "tosa_run_for %s" -s 1 "$@"
+}
+
+#
+
+tosa_soluce_ruby_tpl()
+{
+    cat <<EOF > soluce
+#!/usr/bin/env ruby
+# -*- mode: ruby -*-
+
+require 'pp'
+def local_print(item)
+  PP.pp(item, \$stderr, 200)
+end
+
+#
+
+input = Array.new
+while i = \$stdin.gets
+  input << i.strip
+end
+
+#
+
+EOF
+    chmod +x soluce
+    e soluce &
+    disown
+}

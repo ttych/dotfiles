@@ -1,0 +1,20 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+ANDROID_DIR="${ANDROID_DIR:-${HOME_ALT:+$HOME_ALT/local/android/}}"
+ANDROID_DIR="${ANDROID_DIR:-$HOME/local/android}"
+
+#
+
+android_load_env()
+{
+    ANDROID_HOME="$ANDROID_DIR/android-sdk"
+    export ANDROID_HOME
+    PATH="$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/23.0.1:$ANDROID_HOME/tools/bin:$ANDROID_HOME/tools:$PATH"
+    export PATH
+}
+
+android_load_env
+
+# TIPS
+#  (grep -Riwo -e "path.*>" ~/.android | awk -F'path="' -F'"' {'print $2'} | sort | uniq) | grep android-19 | xargs sdkmanager

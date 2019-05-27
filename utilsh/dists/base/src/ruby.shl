@@ -1,0 +1,491 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+#%toolsh_dir%
+#%toolsh_file%
+
+#%%load%% ruby_base.shl
+#%%load%% git_scm.shl
+
+
+_RUBY_FILE_EXT='rb gemspec'
+_RUBY_TEST_FRAMEWORKS='rspec minitest'
+
+_RUBY_MINITEST_DIR=test
+_RUBY_RSPEC_DIR=spec
+
+_RUBY_QUALITY_GEMS='rubocop
+                    reek
+                    cane
+                    flay
+                    flog
+                    roodi
+                    sandi_meter
+                    laser
+                    debt_ceiling
+                    heckle
+                    churn
+                    brakeman
+                    bullet
+                    coveralls
+                    rubycritic
+                    simplecov
+                    simplecov-html
+                    metric_fu'
+# rubocop      : Ruby static code analyzer, based on the community Ruby style guide.
+# reek         : Detects code smells like coupling, clumping, large areas, short names.
+# cane         : Code quality threshold checking as part of your build.
+# flay         : Analyzes code for structural similarities to find areas for refactoring.
+# flog         : Scores an ABC complexity metric: Assignments, Branches, Calls.
+# roodi        : Ruby Object Oriented Design Inferometer: parses code to warn on design issues.
+# sandi_meter  : Static analysis tool for checking Ruby code for Sandi Metz' rules.
+# laser        : LASER: Lexically- and Semantically-Enriched Ruby bug detector.
+# debt_ceiling : Scores a technical debt metric and manages debt reduction.
+# heckle       : Perturbs our tests to ensure they are working correctly.
+# churn        : Detects code that changes often for us to review, refactor, retest.
+# brakeman     : Detects security vulnerabilities in Rails apps via static analysis.
+# bullet       : Detects database N+1 queries, unused eager loading, and counter cache needs.
+# rails_best_practices : parse codes in vendor, spec, test and features directories. [Retired; less-maintained]
+# coveralls    : Web service to track code coverage over time.
+# rubycritic   : Reporter that wraps gems such as Reek, Flay and Flog.
+# simplecov           : Code coverage analyzer for Ruby 1.9+
+# simplecov-html      : HTML output formatter for SimpleCov.
+# simplecov-rcov-text : Text output formatter for SimpleCov. [Outdated]
+# metrical     : Executes MetricFu separate from your project's dependencies. [requires newer metric_fu]
+# metric_fu    : Meta-analytics that runs churn, reek, roodi, etc. and graphs results.
+
+
+
+
+
+
+########## divers
+is_ruby_file()
+{
+    [ -d "$1" ] && return 1
+    for is_ruby_file__ext in $_RUBY_FILE_EXT; do
+        case "$1" in
+            *.$is_ruby_file__ext) return 0;;
+        esac
+    done
+    return 1
+}
+
+ruby_script_template()
+{
+    cat <<EOF
+#!/usr/bin/env ruby
+# -*- mode: ruby -*-
+
+EOF
+}
+
+ruby_script_init()
+{
+    [ $# -ne 1 ] && return 1
+    ruby_script_template > "$1"
+}
+
+ruby_file_tag()
+{
+    ruby_file_tag=
+    case "$1" in
+        *_spec.rb) ruby_file_tag=rspec ;;
+        *_test.rb) ruby_file_tag=minitest ;;
+        *.rb)      ruby_file_tag=source ;;
+        *.gemspec) ruby_file_tag=ruby ;;
+    esac
+}
+
+ruby_exec()
+{
+    if [ -r 'Gemfile' ]; then
+        bundle exec "$@"
+    else
+        "$@"
+    fi
+}
+
+ruby_rake()
+{
+    [ -r 'Rakefile' ] || return 1
+    ruby_exec rake "$@"
+}
+
+ruby_guess_minitest()
+{
+    [ -d "$_RUBY_MINITEST_DIR" ] && return 0
+    return 1
+}
+
+ruby_guess_rspec()
+{
+    [ -d "$_RUBY_RSPEC_DIR" ] && return 0
+    return 1
+}
+
+ruby_guess_test()
+{
+    if ruby_guess_minitest; then
+        ruby_guess_test__type=minitest
+        ruby_guess_test__dir="$_RUBY_MINITEST_DIR"
+    elif ruby_guess_rspec; then
+        ruby_guess_test__type=rspec
+        ruby_guess_test__dir="$_RUBY_RSPEC_DIR"
+    else
+        ruby_guess_test__type=ruby
+        ruby_guess_test__dir="$_RUBY_MINITEST_DIR"
+    fi
+}
+
+
+
+########## quality
+#%%load%% file.shl
+#%%load%% terminal.shl
+
+RUBY_GUARD_TIMEOUT="${RUBY_GUARD_TIMEOUT:-2}"
+
+ruby_guard()
+{
+    file_mon -s $RUBY_GUARD_TIMEOUT -c 'ruby_rgr "%s"' "$@"
+}
+
+ruby_rgr()
+{
+    [ -r "$1" ] || return 1
+
+    ruby_rgr__verbose=true
+    if [ "$1" = '-q' ]; then
+        shift
+        ruby_rgr__verbose=false
+    fi
+
+    ruby_rgr__status=0
+    ruby_rgr__file="${1#\./}"
+
+    is_ruby_file "$ruby_rgr__file" || return 1
+
+    $ruby_rgr__verbose && \
+        ruby_rgr_title "Change on $ruby_rgr__file (`date '+%Y-%m-%d %H:%M:%S'`)"
+
+    ruby_rgr_test "$ruby_rgr__file" && \
+        ruby_rgr_rubocop "$ruby_rgr__file" && \
+        ruby_rgr_reek "$ruby_rgr__file" && \
+        ruby_rgr_stage "$ruby_rgr__file" || \
+            ruby_rgr__status=1
+
+    if [ $ruby_rgr__status -eq 0 ]; then
+        ruby_rgr__status_msg=OK
+    else
+        ruby_rgr__status_msg=FAILED
+    fi
+
+    $ruby_rgr__verbose && \
+        ruby_rgr_title "Check on $ruby_rgr__file $ruby_rgr__status_msg (`date '+%Y-%m-%d %H:%M:%S'`)"
+
+    return $ruby_rgr__status
+}
+
+ruby_rubocop()
+{
+    which rubocop 2>/dev/null >/dev/null || {
+        echo >&2 "missing rubocop command"
+        return 0
+    }
+    ruby_exec rubocop -f fu -R "$1"
+}
+
+ruby_reek()
+{
+    which reek 2>/dev/null >/dev/null || {
+        echo >&2 "missing reek command"
+        return 0
+    }
+    ruby_exec reek "$1"
+}
+
+ruby_rgr_rubocop()
+{
+    $ruby_rgr__verbose && \
+        ruby_rgr_subtitle "rubocop : $1"
+    ruby_rubocop "$1"
+}
+
+ruby_rgr_reek()
+{
+    $ruby_rgr__verbose && \
+        ruby_rgr_subtitle "reek : $1"
+    ruby_reek "$1"
+}
+
+ruby_rgr_stage()
+{
+    $ruby_rgr__verbose && \
+        ruby_rgr_subtitle "git stage : $1"
+    git_add "$1"
+}
+
+ruby_rspec()
+{
+    which rspec 2>/dev/null >/dev/null || {
+        echo >&2 "missing rspec command"
+        return 0
+    }
+    ruby_exec rspec "$@"
+}
+
+ruby_rspec_all()
+{
+    ruby_rspec
+}
+
+ruby_ruby()
+{
+    ruby_exec ruby "$@"
+}
+
+ruby_minitest()
+{
+    ruby_rake test TEST="$1" ||
+        ruby_exec "$1"
+}
+
+ruby_minitest_all()
+{
+    ruby_rake test ||
+        return 0
+}
+
+
+ruby_rgr_title()
+{
+    terminal_set_attr 0  $TERMINAL_BOLD
+    #terminal_set_fg $TERMINAL_CYAN
+    terminal_set_fg $TERMINAL_YELLOW
+    printf "|>>> %s <<<|\n" "$@"
+    terminal_set_fg ''
+}
+
+ruby_rgr_subtitle()
+{
+    terminal_set_attr 0  $TERMINAL_BOLD
+    #terminal_set_fg $TERMINAL_CYAN
+    terminal_set_fg $TERMINAL_YELLOW
+    printf "|  > %s <  |\n" "$@"
+    terminal_set_fg ''
+}
+
+ruby_find_test()
+{
+    ruby_find_test__file=
+    ruby_find_test__type=
+    is_ruby_file "$1" || return 1
+
+    case "$1" in
+        *_spec.rb)
+            ruby_find_test__file="$1"
+            ruby_find_test__type=rspec
+            ;;
+        *_test.rb)
+            ruby_find_test__file="$1"
+            ruby_find_test__type=minitest
+            ;;
+        spec/*.rb)
+            ruby_find_test__file="${1%\.rb}_spec.rb"
+            ruby_find_test__type=rspec
+            ;;
+        test/*.rb)
+            ruby_find_test__file="${1%\.rb}_test.rb"
+            ruby_find_test__type=minitest
+            ;;
+        # FIXME
+        app/*.rb|lib/*.rb)
+            ruby_guess_test || return 1
+            ruby_find_test__file="${1%.rb}_${ruby_guess_test__dir}.rb"
+            ruby_find_test__file="${ruby_find_test__file#*/}"
+            ruby_find_test__file="$ruby_guess_test__dir/$ruby_find_test__file"
+            ruby_find_test__type="$ruby_guess_test__type"
+            ;;
+        *.rb)
+            ruby_guess_test || return 1
+            ruby_find_test__file="${1%.rb}_${ruby_guess_test__dir}.rb"
+            ruby_find_test__type="$ruby_guess_test__type"
+            ;;
+    esac
+
+    if [ -n "$ruby_find_test__file" ] &&
+           [ "$ruby_find_test__file" != "$1" ]; then
+        [ -r "$ruby_find_test__file" ] ||
+            touch "$ruby_find_test__file"
+    fi
+}
+
+ruby_rgr_test()
+{
+    ruby_find_test "$1" || {
+        $ruby_rgr__verbose && \
+            ruby_rgr_subtitle "no test found for $1"
+        return 1
+    }
+
+    ruby_rgr_test_one "${ruby_find_test__type}" "$ruby_find_test__file" && \
+        ruby_rgr_test_all "${ruby_find_test__type}"
+}
+
+ruby_rgr_test_one()
+{
+    $ruby_rgr__verbose && \
+        ruby_rgr_subtitle "test : $2($1)"
+    ruby_"$1" "$2"
+}
+
+ruby_rgr_test_all()
+{
+    $ruby_rgr__verbose && \
+        ruby_rgr_subtitle "test : all($1)"
+    ruby_"${1}"_all
+}
+
+
+
+###############################################################################
+# init suite
+###############################################################################
+
+ruby_init_list()
+{
+    echo 'ruby_init actions are :'
+    grep '^ruby_init_[a-z_]*()' "$TOOLSH_FILE" | \
+        while read ruby_init_list__action; do
+            ruby_init_list__action="${ruby_init_list__action#ruby_init_}"
+            ruby_init_list__action="${ruby_init_list__action%()}"
+            printf " %s\n" "$ruby_init_list__action"
+        done
+}
+
+ruby_init()
+{
+    if [ -z "$1" ]; then
+        ruby_init_list
+        return 0
+    fi
+    ruby_init="$1" ; shift
+    ruby_init_"${ruby_init}" "$@"
+}
+
+ruby_init_kata()
+{
+    ruby_init_kata_gemfile "$@"   || return 1
+    ruby_init_kata_rakefile "$@"  || return 1
+    ruby_init_kata_guardfile "$@" || return 1
+    ruby_init_gitignore "$@" || return 1
+}
+
+_ruby_init_opts()
+{
+    _ruby_init_opts=
+    _ruby_init_opts__force=FALSE
+
+    OPTIND=1
+    while getopts :f _ruby_init_opts__opt; do
+        case $_ruby_init_opts__opt in
+            f) _ruby_init_opts="${_ruby_init_opts} -f"
+               _ruby_init_opts__force=TRUE ;;
+        esac
+    done
+    _ruby_init_opts__index=$(($OPTIND - 1))
+}
+
+_ruby_init_cd()
+{
+    _ruby_init_cd="${1:-.}"
+    cd "$_ruby_init_cd" || return 1
+    _ruby_init_cd="$PWD"
+    if [ -d "ruby" ]; then
+        cd "ruby" || return 1
+        _ruby_init_cd="$_ruby_init_cd/ruby/"
+    fi
+}
+
+_ruby_init_copy()
+{
+    [ -z "$1" ] && return 1
+    [ -z "$2" ] && return 1
+
+    if [ -r "$2" ]; then
+        echo "Diff from $2 to $1"
+        diff "$2" "$1"
+        echo
+    fi
+
+    cp "$1" "$2" || return 1
+    if git_is_inside_work_tree; then
+        git add "$2"
+    fi
+}
+
+ruby_init_kata_gemfile()
+(
+    _ruby_init_opts "$@" ; shift "$_ruby_init_opts__index"
+
+    _ruby_init_cd "$@" || return 1
+
+    _ruby_init_copy "$TOOLSH_DIR/../templates/ruby/Gemfile_kata" \
+                    'Gemfile'
+
+    bundle || return 1
+)
+
+ruby_init_kata_rakefile()
+(
+    _ruby_init_opts "$@" ; shift "$_ruby_init_opts__index"
+
+    _ruby_init_cd "$@" || return 1
+
+    _ruby_init_copy "$TOOLSH_DIR/../templates/ruby/Rakefile_kata" \
+                    'Rakefile'
+)
+
+ruby_init_kata_guardfile()
+(
+    _ruby_init_opts "$@" ; shift "$_ruby_init_opts__index"
+
+    _ruby_init_cd "$@" || return 1
+
+    ruby_init_kata_guardfile__source=
+    if [ -d 'spec' ] || [ -d 'test' ]; then
+        [ -d 'test' ] &&
+            ruby_init_kata_guardfile__source="$TOOLSH_DIR/../templates/ruby/Guardfile_test"
+        [ -d 'spec' ] &&
+            ruby_init_kata_guardfile__source="$TOOLSH_DIR/../templates/ruby/Guardfile_spec"
+    else
+        ruby_init_kata_guardfile__source="$TOOLSH_DIR/../templates/ruby/Guardfile_test"
+    fi
+
+    _ruby_init_copy "$ruby_init_kata_guardfile__source" \
+                    'Guardfile'
+)
+
+ruby_init_gitignore()
+(
+    _ruby_init_opts "$@" ; shift "$_ruby_init_opts__index"
+
+    _ruby_init_cd "$@" || return 1
+
+    _ruby_init_copy "$TOOLSH_DIR/../templates/ruby/gitignore_ruby" \
+                    '.gitignore'
+)
+
+
+
+###############################################################################
+# main
+###############################################################################
+
+main="${0##*/}"
+case "${main%\.sh}" in
+    rbenv_install|ruby_guard)
+        "${main%\.sh}" "$@"
+    ;;
+esac
