@@ -105,7 +105,9 @@ utilsh_distribution_add()
     utilsh_distribution_add__name="${utilsh_distribution_add__name%.git}"
 
     cd "$UTILSH_DISTRIBUTIONS_DIR" || return $?
-    [ -d "$utilsh_distribution_add__name" ] && rm -Rf "$utilsh_distribution_add__name" || return $?
+    if [ -d "$utilsh_distribution_add__name" ]; then
+        rm -Rf "$utilsh_distribution_add__name" || return $?
+    fi
     git clone "$1" || return $?
     utilsh_distribution build
 )
