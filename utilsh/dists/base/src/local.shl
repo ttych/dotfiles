@@ -20,18 +20,19 @@ fi
 
 path_load_local()
 {
-    path_add_pre_pre "$LOCAL_DIR"
-    path_addin_pre "$LOCAL_OS_DIR"
     path_addin_pre "$LOCAL_OS_ARCH_DIR"
-    path_add_pre_pre "$LOCAL_ALT_DIR"
-    path_addin_pre "$LOCAL_ALT_OS_DIR"
+    path_addin_pre "$LOCAL_OS_DIR"
+    path_add_pre "$LOCAL_DIR"
     path_addin_pre "$LOCAL_ALT_OS_ARCH_DIR"
+    path_addin_pre "$LOCAL_ALT_OS_DIR"
+    path_add_pre "$LOCAL_ALT_DIR"
 }
 path_load_local
 
 path_reload_local()
 {
     path_purge "$LOCAL_DIR"
+    path_purge "$LOCAL_ALT_DIR"
     path_load_local
 }
 
