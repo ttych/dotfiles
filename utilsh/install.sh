@@ -8,6 +8,7 @@ DISTRIBUTIONS='
   https://github.com/ttych/installer.git
   https://github.com/ttych/extrash.git
   https://github.com/ttych/wec.git
+  https://github.com/ttych/wucp.git
 '
 
 AUTOLOADS='
@@ -17,6 +18,7 @@ AUTOLOADS='
   goto.shl
   ruby_base.shl
   pyv.sh
+  wucp.shl
 '
 
 if [ -z "$UTILSH_DIR" ]; then
