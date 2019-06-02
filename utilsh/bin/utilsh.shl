@@ -12,9 +12,9 @@ git_update()
 {
     if git rev-parse @{u} >/dev/null 2>&1; then
         git reset --quiet --hard HEAD &&
-            git pull --no-rebase --ff-only
+            git pull --quiet --no-rebase --ff-only
     fi
-    git submodule update --recursive
+    git submodule --quiet update --recursive
 }
 
 path_check_in()
@@ -120,6 +120,7 @@ utilsh_distribution_rm()
 utilsh_distribution_update()
 (
     cd "$1" &&
+        echo updating "$1" &&
         git_update
  )
 
