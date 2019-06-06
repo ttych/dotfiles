@@ -157,20 +157,20 @@ utilsh_distribution_build()
 
 utilsh_distribution_build_file()
 {
-    utilsh_distribution_build_file_src="$1"
-    utilsh_distribution_build_file_tgt="bin/${1#src/}"
-    utilsh_distribution_build_file__pwd="$PWD"
+    utilsh_distribution_build_file__src="$1"
+    utilsh_distribution_build_file__dir="$PWD/bin"
+    utilsh_distribution_build_file__tgt="$utilsh_distribution_build_file__dir/${1#src/}"
 
-    sed -e "s;^\#%%load%%  *;. \"$utilsh_distribution_build_file__pwd\"/;g" \
+    sed -e "s;^\#%%load%%  *;. \"$utilsh_distribution_build_file__dir\"/;g" \
         -e "s;^\#%%set_cur_dir%%;SCRIPT_DIR=\"$utilsh_distribution_build_file__pwd\";g" \
-        -e "s;^\#%%set_cur_file%%;SCRIPT_FILE=\"$utilsh_distribution_build_file_tgt\";g" \
-        "$utilsh_distribution_build_file_src" > "$utilsh_distribution_build_file_tgt"
+        -e "s;^\#%%set_cur_file%%;SCRIPT_FILE=\"$utilsh_distribution_build_file__tgt\";g" \
+        "$utilsh_distribution_build_file__src" > "$utilsh_distribution_build_file__tgt"
 
     utilsh_distribution_build_file__right=755
-    case "$utilsh_distribution_build_file_tgt" in
+    case "$utilsh_distribution_build_file__tgt" in
         *.lib|*.shl) utilsh_distribution_build_file__right=644 ;;
     esac
-    chmod "$utilsh_distribution_build_file__right" "$utilsh_distribution_build_file_tgt"
+    chmod "$utilsh_distribution_build_file__right" "$utilsh_distribution_build_file__tgt"
 }
 
 
