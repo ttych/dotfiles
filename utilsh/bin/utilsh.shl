@@ -147,12 +147,16 @@ utilsh_distribution_find()
 utilsh_distribution_build()
 (
     cd "$1" || return 1
-    [ -d "src" ] || return 0
-    mkdir -p "bin" || return 1
-
-    utilsh_distribution_find "src" | while read utilsh_distribution_build__f; do
-        utilsh_distribution_build_file "$utilsh_distribution_build__f"
-    done
+    if [ -d "src" ]; then
+        mkdir -p "bin" || return 1
+        utilsh_distribution_find "src" | while read utilsh_distribution_build__f; do
+            utilsh_distribution_build_file "$utilsh_distribution_build__f"
+        done
+    else
+        find . -type f | while read utilsh_distribution_build__f; do
+            utilsh_distribution_build_chmod "$utilsh_distribution_build__f"
+        done
+    fi
 )
 
 utilsh_distribution_build_file()
@@ -166,13 +170,19 @@ utilsh_distribution_build_file()
         -e "s;^\#%%set_cur_file%%;SCRIPT_FILE=\"$utilsh_distribution_build_file__tgt\";g" \
         "$utilsh_distribution_build_file__src" > "$utilsh_distribution_build_file__tgt"
 
-    utilsh_distribution_build_file__right=755
-    case "$utilsh_distribution_build_file__tgt" in
-        *.lib|*.shl) utilsh_distribution_build_file__right=644 ;;
-    esac
-    chmod "$utilsh_distribution_build_file__right" "$utilsh_distribution_build_file__tgt"
+    utilsh_distribution_build_chmod "$utilsh_distribution_build_file__tgt"
 }
 
+utilsh_distribution_build_chmod()
+{
+    [ -r "$1" ] || return 1
+
+    utilsh_distribution_build_chmod__right=755
+    case "$1" in
+        *.lib|*.shl|*.md|*.txt) utilsh_distribution_build_chmod__right=644 ;;
+    esac
+    chmod "$utilsh_distribution_build_chmod__right" "$1"
+}
 
 ### build
 
