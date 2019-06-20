@@ -1044,7 +1044,7 @@ Start `ielm' if it's not already running."
 
    #+END_SRC
 * mode
-** Org mode
+** org-mode
 *** base
    #+BEGIN_SRC emacs-lisp
 	 (global-set-key (kbd "C-c o l") 'org-store-link)
@@ -1054,14 +1054,10 @@ Start `ielm' if it's not already running."
 	 (global-set-key (kbd "M-* o a") 'org-agenda)
 	 (global-set-key (kbd "M-* o c") 'org-capture)
 
-	 ;; ;(setq org-todo-keywords
-	 ;; ;      '((sequence "TODO" "FEEDBACK" "VERIFY" "|" "DONE" "DELEGATED")))
-	 ;; ;(setq org-todo-keywords
-	 ;; ;      '((sequence "TODO(t)" "PENDING(w@/!)" "VERIFY" "|" "DONE(d@/!)" "DELEGATED(D@/!)")
-	 ;; ;	(sequence "REPORT(r)" "BUG(b)" "KNOWNCAUSE(k)" "|" "FIXED(f)")
-	 ;; ;	(sequence "|" "CANCELED(c@)")))
-	 ;; (setq org-todo-keywords
-	 ;;       '((sequence "TODO" "IN-PROGRESS" "WAITING" "TEST" "|" "DELEGATED" "DONE")))
+	 (setq org-todo-keywords
+		   '((sequence "TODO(t)" "|" "DONE(d!)")
+			 (sequence "BACKLOG(b!)" "READY(r!)" "WIP(w!)" "BLOCKED(B@)" "|" "DONE(d!)" "CANCELLED(c@)"))
+		   )
 
 	 ;; ; log - time tracking
 	 ;; (setq org-log-done 'time)
