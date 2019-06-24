@@ -1,5 +1,6 @@
 #!/bin/sh
 
+
 UTILSH_DISTRIBUTIONS_DIR="$UTILSH_DIR/dists"
 UTILSH_AUTOLOAD="$UTILSH_DIR/autoload"
 UTILSH_LIB="$UTILSH_DIR/bin/utilsh.shl"
@@ -122,7 +123,7 @@ utilsh_distribution_update()
     cd "$1" &&
         echo updating "$1" &&
         git_update
- )
+)
 
 utilsh_distribution_iter()
 {
@@ -247,9 +248,9 @@ utilsh_autoload_load()
 {
     if [ -r "$1/$utilsh_autoload_load" ]; then
         . "$1/$utilsh_autoload_load"
-         return 0
+        return 0
     fi
-     return 1
+    return 1
 }
 
 
@@ -321,11 +322,11 @@ utilsh()
     case "$utilsh__command" in
         build|init|distribution|update|autoload|reload|help)
             utilsh_"${utilsh__command}" "$@";
-            status=$?
+            utilsh__status=$?
             ;;
         *)
             echo >&2 "unsupported command $command"
-            status=2
+            utilsh__status=2
             ;;
     esac
     return $status
