@@ -1,5 +1,5 @@
 #!/bin/sh
-# -*- mode: shell -*-
+# -*- mode: sh -*-
 
 ESH_DIR="${ESH_DIR:-$HOME/.esh}"
 export ESH_DIR
@@ -390,10 +390,10 @@ esh_module_load()
 
 for esh_module in terminal \
                       host \
-                      utils \
-                      utilsh \
                       tmux \
                       $ESH_SH_CUR_SHORT \
+                      utils \
+                      utilsh \
                       ssh-agent \
                       interactive
 do
