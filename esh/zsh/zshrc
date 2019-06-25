@@ -179,7 +179,7 @@ prompt_base()
 {
     NEWLINE=$'\n'
 
-    PROMPT_BASE_1="${COLOR_B_GREEN}%n@%m${COLOR_OFF}:${COLOR_B_BLUE}%~${COLOR_OFF}"
+    PROMPT_BASE_1="${COLOR_B_GREEN}%n${COLOR_OFF}@${COLOR_B_GREEN}%m${COLOR_OFF}:${COLOR_B_BLUE}%~${COLOR_OFF}"
     PROMPT_BASE_2="${COLOR_GREEN}%(1j.%jj .)%(!.${COLOR_B_RED}.)%#${COLOR_OFF} "
     PROMPT_ERROR="%(?..${COLOR_B_RED}%?${COLOR_OFF}
 )"
