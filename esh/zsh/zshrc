@@ -175,35 +175,43 @@ prompt_pre_set_timestamp()
     }
 }
 
-prompt_set_base()
+prompt_base()
 {
+    NEWLINE=$'\n'
+
     PROMPT_BASE_1="${COLOR_B_GREEN}%n@%m${COLOR_OFF}:${COLOR_B_BLUE}%~${COLOR_OFF}"
     PROMPT_BASE_2="${COLOR_GREEN}%(1j.%jj .)%(!.${COLOR_B_RED}.)%#${COLOR_OFF} "
     PROMPT_ERROR="%(?..${COLOR_B_RED}%?${COLOR_OFF}
 )"
     PROMPT_TIMESTAMP="%(9V.${COLOR_CYAN}%9v${COLOR_OFF}
 .)"
-    PROMPT_GIT="${COLOR_YELLOW}"'$(prompt_git_printf " (%s)")'"${COLOR_OFF}"
-    PROMPT_RUBY="${COLOR_YELLOW}"'$(prompt_ruby_printf "(%s) ")'"${COLOR_OFF}"
-    PROMPT_PYTHON="${COLOR_YELLOW}"'$(prompt_python_printf "(%s) ")'"${COLOR_OFF}"
+    PROMPT_GIT="${COLOR_YELLOW}"'$(prompt_git_printf "(%s)")'"${COLOR_OFF}"
+    PROMPT_RUBY="${COLOR_YELLOW}"'$(prompt_ruby_printf "(%s)")'"${COLOR_OFF}"
+    PROMPT_PYTHON="${COLOR_YELLOW}"'$(prompt_python_printf "(%s)")'"${COLOR_OFF}"
+
+    PROMPT_DEV="${COLOR_YELLOW}"'$(prompt_dev_printf)'"${COLOR_OFF}"
 }
 
-prompt_old_dev()
+prompt_dev_printf()
 {
-    prompt_pre_set_timestamp
-    prompt_set_base
-
-    PROMPT="${PROMPT_BASE_1}${PROMPT_GIT}${PROMPT_BASE_2}"
-    PROMPT="${PROMPT_ERROR}${PROMPT_TIMESTAMP}${PROMPT}"
+    prompt_dev_printf=
+    for prompt_dev_printf__t in git python ruby; do
+        prompt_${prompt_dev_printf__t}
+        eval prompt_dev_printf__tp="\"\$prompt_$prompt_dev_printf__t\""
+        if [ -n "$prompt_dev_printf__tp" ]; then
+            prompt_dev_printf="${prompt_dev_printf:+$prompt_dev_printf  }${prompt_dev_printf__tp}"
+        fi
+    done
+    prompt_dev_printf="${prompt_dev_printf:+\n$prompt_dev_printf}"
+    printf "%b" "$prompt_dev_printf"
 }
 
 prompt_dev()
 {
-    prompt_pre_set_timestamp
-    prompt_set_base
+    prompt_base
 
-    PROMPT="${PROMPT_TIMESTAMP}${PROMPT_ERROR}${PROMPT_BASE_1}${PROMPT_GIT}
-${PROMPT_PYTHON}${PROMPT_RUBY}${PROMPT_BASE_2}"
+    PROMPT="${PROMPT_ERROR}${PROMPT_BASE_1}${PROMPT_DEV}
+${PROMPT_BASE_2}"
 }
 
 prompt_dev
