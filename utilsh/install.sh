@@ -9,6 +9,7 @@ DISTRIBUTIONS='
   https://github.com/ttych/extrash.git
   https://github.com/ttych/wec.git
   https://github.com/ttych/wucp.git
+  https://github.com/ttych/rubysh.git
 '
 
 AUTOLOADS='
