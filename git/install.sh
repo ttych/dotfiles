@@ -18,16 +18,50 @@ GIT_VERSION=${GIT_VERSION##* }
 
 
 # config
-git config --global user.name "$USER_NAME"
-git config --global user.email "$USER_MAIL"
-
+[ -n "$USER_NAME" ] &&
+    git config --global user.name "$USER_NAME"
+[ -n "$USER_MAIL" ] &&
+    git config --global user.email "$USER_MAIL"
 
 # color output
 git config --global color.ui true
 
 # editor set to emacs if available
-which emacs >/dev/null 2>/dev/null &&
-    git config --global core.editor emacs
+for editor in em et emacs vim vi; do
+    if command -v $editor >/dev/null 2>/dev/null; then
+        git config --global core.editor $editor
+        break
+    fi
+done
+
+# algorithm : patience / histogram / <default>
+git config --global diff.algorithm histogram
+
+# pager
+git config --global core.pager 'less -RFX'
+
+# newline
+## To configure line endings correctly on Linux/Mac:
+##git config --global core.autocrlf input
+## To configure line endings correctly on Windows:
+##git config --global core.autocrlf true
+
+# ReReRe : Reuse Recorded Resolution
+git config --global rerere.enabled true
+
+# Rebase + autosquash
+## causes git rebase -i to parse magic comments created
+## by git commit --squash=some-hash and git commit --fixup=some-hash
+## and reorder the commit list before presenting it for further editing
+git config --global rebase.autosquash true
+
+# garbage collection cycle
+## 90 days reachable / gc.reflogExpire
+## 30 days unreachable / gc.reflogExpireUnreachable
+
+# merge
+git config --global merge.conflictStyle diff3
+
 
 # status
 git config --global alias.st status
@@ -45,6 +79,8 @@ git config --global alias.cor 'checkout --track'
 # branch
 git config --global alias.br branch
 ## git show-branch <br1> <br2>
+git config --global alias.merged 'branch --merged'
+git config --global alias.unmerged 'branch --no-merge'
 
 # commit
 git config --global alias.ci commit
@@ -53,19 +89,31 @@ git config --global alias.cam "commit --all -m"
 # fetch
 git config --global alias.fe fetch
 
-# reset
-## --hard / update : HEAD + index + workspace (destructive)
-## --mixed (default) / update : HEAD + index
-## --soft / update : HEAD
-git config --global alias.unstage 'reset HEAD'
-git config --global alias.resetto '!f() { f=$(git symbolic-ref HEAD 2>/dev/null); f="origin/${f#refs/heads/}" ; git reset --hard "${1:-$f}"; }; f'
-git config --global alias.resetfile '!f() { git reset @~ "$@" && git commit --amend --no-edit }; f'
-
 # diff
 git config --global alias.di diff
 git config --global alias.dic 'diff --cached'
-git config --global alias.wdiff 'diff --word-diff'
+git config --global alias.dis 'diff --staged'
+git config --global alias.diffword 'diff --word-diff'
+git config --global alias.wdiff 'diffword'
+git config --global alias.diffw 'diffword'
 git config --global alias.difftext 'diff --word-diff --unified=10'
+git config --global alias.tdiff 'difftext'
+git config --global alias.difft 'difftext'
+
+# log
+git config --global alias.ll 'log --pretty=fuller'
+git config --global alias.l1 'log --oneline --decorate --abbrev-commit --all'
+git config --global alias.l1g 'log --oneline --decorate --abbrev-commit --all --graph'
+git config --global alias.lg "log --pretty='%C(yellow)%h%Creset %C(red)%d%Creset %s %Cgreen(%cr)%Creset %C(cyan)[%an]%Creset' --graph"
+git config --global alias.la g "lg --all"
+## path from branch A to branch B (ancestor A / decendent B)
+## git lg --ancestry-path B..A
+
+# show
+git config --global alias.so "show --pretty='parent %C(yellow)%p%Creset commit %C(yellow)%h%Creset%Cred%d%Creset%n%n%w(72,2,2)%s%n%n%w(72,0,0)%C(cyan)%an%Creset %Cgreen%ar%Creset'"
+
+# plumb
+git config --global alias.plumb 'cat-file -p'
 
 # merge
 git config --global alias.mergeto '!git checkout $1 && git merge @{-1}'
@@ -82,33 +130,13 @@ git config --global alias.pushall "push --recurse-submodules=on-demand"
 git config --global push.default current
 git config --global alias.pushf 'push --force-with-lease'
 
-# rebase
-git config --global alias.irebase '!f() { f=$(git symbolic-ref HEAD 2>/dev/null); f="origin/${f#refs/heads/}" ; git rebase --interactive "${1:-$f}"; }; f'
-
-# grep
-git config --global alias.g "grep --break --heading --line-number"
-
-# log
-git config --global alias.l1 'log --oneline --decorate --abbrev-commit --all'
-git config --global alias.l1g 'log --oneline --decorate --abbrev-commit --all --graph'
-git config --global alias.lg "log --pretty='%C(yellow)%h%Creset %C(red)%d%Creset %s %Cgreen(%cr)%Creset %C(cyan)[%an]%Creset' --graph --all"
-## path from branch A to branch B (ancestor A / decendent B)
-## git lg --ancestry-path B..A
-
-# pager
-#git config --global core.pager 'less -RFX'
-
-
-# algorithm : patience / histogram / <default>
-git config --global diff.algorithm histogram
-
-# show
-git config --global alias.so "show --pretty='parent %C(yellow)%p%Creset commit %C(yellow)%h%Creset%Cred%d%Creset%n%n%w(72,2,2)%s%n%n%w(72,0,0)%C(cyan)%an%Creset %Cgreen%ar%Creset'"
-
-# dump
-git config --global alias.dump 'cat-file -p'
-
-
+# reset
+## --hard / update : HEAD + index + workspace (destructive)
+## --mixed (default) / update : HEAD + index
+## --soft / update : HEAD
+git config --global alias.unstage 'reset HEAD'
+git config --global alias.resetto '!f() { f=$(git symbolic-ref HEAD 2>/dev/null); f="origin/${f#refs/heads/}" ; git reset --hard "${1:-$f}"; }; f'
+git config --global alias.resetfile '!f() { git reset @~ "$@" && git commit --amend --no-edit }; f'
 
 # whitespace
 ## indent-with-non-tab, tab-in-indent : tab & indentation
@@ -116,40 +144,55 @@ git config --global alias.dump 'cat-file -p'
 ## space-before-tab : remove space before tab
 ## cr-at-eol : CR at end of line
 git config --global core.whitespace 'blank-at-eol,blank-at-eof,trailing-space,space-before-tab,cr-at-eol'
-git config --global alias.rmwhitespace '!f() {git rebase HEAD~${1:-1} --whitespace=fix}; f'
-
-# newline
-## To configure line endings correctly on Linux/Mac:
-##git config --global core.autocrlf input
-## To configure line endings correctly on Windows:
-##git config --global core.autocrlf true
+git config --global alias.fixwhitespace '!f() {git rebase HEAD~${1:-1} --whitespace=fix}; f'
 
 # stash = index + workspace (default)
-git config --global alias.save 'stash savel --keep-index --include-untracked'
-git config --global alias.save 'stash save --include-untracked'
+git config --global alias.saveall 'stash save --include-untracked "SAVE ALL"'
+git config --global alias.savec 'stash save --keep-index --include-untracked "SAVE BEFORE COMMIT"'
 
-# stats
-git config --global alias.contribs 'shortlog -s -n'
+# references
+git config --global alias.references 'show-ref'
+git config --global alias.refs 'show-ref'
+git config --global alias.logref "log --walk-reflogs"
+
+# fsck
+git config --global alias.dangling 'fsck --dangling --no-reflogs'  # --no-progress
+git config --global alias.unreachable 'fsck --unreachable --no-reflogs'  # --no-progress
 
 # cherry-pick
 git config --global alias.append '!git cherry-pick $(git merge-base HEAD $1)..$1'
 
-# 3 way merge
-git config --global alias.co3w 'checkout --conflict=diff3'
-#git config --global merge.conflictStyle diff3
+# contributors
+git config --global alias.contributors 'shortlog -s -n'
 
-# ReReRe : Reuse Recorded Resolution
-git config --global rerere.enabled true
 
-# Rebase + autosquash
-## causes git rebase -i to parse magic comments created
-## by git commit --squash=some-hash and git commit --fixup=some-hash
-## and reorder the commit list before presenting it for further editing
-git config --global rebase.autosquash true
+
+# branch-diff
+git config --global alias.branchdiff '!f() { br1=HEAD; [ $# -gt 1 ] && br1="$1" && shift; br2="$1" ; git lg --cherry-mark --left-right --no-merges "$br2"..."$br1"; }; f'
+git config --global alias.bdiff 'branchdiff'
+git config --global alias.branchdiffx '!f() { br1=HEAD; [ $# -gt 1 ] && br1="$1" && shift; br2="$1" ; git lg --cherry-pick --left-right --no-merges "$br2"..."$br1"; }; f'
+git config --global alias.bdiffx 'branchdiffx'
+git config --global alias.branchdiffmissing '!f() { br1=HEAD; [ $# -gt 1 ] && br1="$1" && shift; br2="$1" ; git lg --cherry-pick --left-only --no-merges "$br2"..."$br1"; }; f'
+
+# unmerged commit
+#git config --global alias.unmergedc '!f() { brs="$1" ; [ -z "$brs" ] && brs=$(git unmerged); for br in $brs; do echo "# $br"; git lg HEAD..$br; done; }; f'
+git config --global alias.unmergedc '!f() { brs="$1" ; [ -z "$brs" ] && brs=$(git unmerged); for br in $brs; do echo "# $br"; git branchdiffmissing $br; done; }; f'
+
+# merge conflict
+git config --global alias.mergecontext 'lg --merge --name-only'
+git config --global alias.diff3wm 'checkout --conflict=diff3'
 
 # reflog navigation
-git config --global alias.logref "log --walk-reflogs"
 git config --global alias.undo '!f() { git reset --hard $(git rev-parse --abbrev-ref HEAD)@{${1:-1}}; }; f'
+
+
+
+# rebase
+git config --global alias.irebase '!f() { f=$(git symbolic-ref HEAD 2>/dev/null); f="origin/${f#refs/heads/}" ; git rebase --interactive "${1:-$f}"; }; f'
+
+# grep
+git config --global alias.g "grep --break --heading --line-number"
+
 
 
 # git pull --rebase
@@ -170,16 +213,6 @@ if $WANT_REBASE; then
         fi
     fi
 fi
-
-
-
-# fsck
-git config --global alias.dangling 'fsck --dangling --no-reflogs'
-git config --global alias.unreachable 'fsck --unreachable --no-reflogs'
-
-# garbage collection cycle
-## 90 days reachable / gc.reflogExpire
-## 30 days unreachable / gc.reflogExpireUnreachable
 
 
 
