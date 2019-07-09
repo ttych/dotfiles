@@ -54,10 +54,12 @@ conf_install()
         done  < "${conf_install__app}/install.list"
     fi
 
-    if [ -x "${conf_install__app}/install.sh" ]; then
-        ( cd "${conf_install__app}" &&
-              INSTALL_DIR="$DOTFILES_INSTALL_DIR" ./install.sh )
-    fi
+    for conf_install__script in install.sh install_local.sh; do
+        if [ -x "${conf_install__app}/${conf_install__script}" ]; then
+            ( cd "${conf_install__app}" &&
+                  INSTALL_DIR="$DOTFILES_INSTALL_DIR" "./$conf_install__script" )
+        fi
+    done
 }
 
 
