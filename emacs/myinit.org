@@ -67,7 +67,6 @@
    #+END_SRC
 
 ** shell
-
    #+BEGIN_SRC emacs-lisp
 	 (add-hook
 	  'term-mode-hook
@@ -328,6 +327,26 @@
 		)
     #+END_SRC
 
+** termnial
+*** multi-term
+	#+BEGIN_SRC emacs-lisp
+	  (use-package multi-term
+		:ensure t
+		:bind (
+			   ("M-* t c" . multi-term)
+			   ("M-* t t" . multi-term)
+			   ("M-* t n" . multi-term-next)
+			   ("M-* t p" . multi-term-prev)
+			   ("M-* t o" . multi-term-dedicated-open)
+			   ("M-* t d" . multi-term-dedicated-close)
+			   ("M-* t T" . multi-term-dedicated-toggle)
+			   ("M-* t s" . multi-term-dedicated-select)
+
+			   )
+		:config
+		(setq multi-term-program (getenv "ESHELL"))
+		)
+	#+END_SRC
 ** ui
 *** ace-window
 	#+BEGIN_SRC emacs-lisp
@@ -415,9 +434,6 @@
 		:ensure t
 		:delight yas-minor-mode
 		:bind (
-			   ("C-c y n" . yas-new-snippet)
-			   ("C-c y i" . yas-insert-snippet)
-			   ("C-c y v" . yas-visit-snippet-file)
 			   ("M-* y n" . yas-new-snippet)
 			   ("M-* y i" . yas-insert-snippet)
 			   ("M-* y v" . yas-visit-snippet-file)
@@ -529,8 +545,6 @@
 	#+END_SRC
 
 *** htmlize
-
-*** 
    #+BEGIN_SRC emacs-lisp
 	 (use-package htmlize
 	   :ensure t)
@@ -546,507 +560,497 @@
 		:ensure t
 		:bind (("M-* g t" . git-timemachine)))
     #+END_SRC
-** development
+** syntax
 *** flycheck
     #+BEGIN_SRC emacs-lisp
 	  (use-package flycheck
-		:ensure t
-		:init (global-flycheck-mode))
+			:ensure t
+			:init (global-flycheck-mode))
+
+	  ;; (use-package flycheck-inline
+	  ;;       :ensure t
+	  ;;       :config
+	  ;;       ;; (global-flycheck-inline-mode 1)
+	  ;;       :hook
+	  ;;       (flycheck-mode . flycheck-inline-mode)
+	  ;;       )
     #+END_SRC
+
+*** company
+	#+BEGIN_SRC emacs-lisp
+	  (use-package company
+		:ensure t
+		:delight
+		:defer t
+		:init
+		(global-company-mode)
+		:config
+		(setq company-idle-delay 1
+			  ;; company-show-numbers t
+			  ;; company-tooltip-align-annotations t
+			  ;; company-tooltip-flip-when-above t
+			  ;; company-minimum-prefix-length 2
+			  ;; company-require-match nil
+			  ;; company-tooltip-limit 10
+			  )
+		)
+	#+END_SRC
 
 ** editing
 
 ** to filter
    #+BEGIN_SRC emacs-lisp
-;; more useful frame title, that show either a file or a
-;; buffer name (if the buffer isn't visiting a file)
-(setq frame-title-format
-      '((:eval (if (buffer-file-name)
-                   (abbreviate-file-name (buffer-file-name))
-                 "%b"))))
+		  ;; more useful frame title, that show either a file or a
+		  ;; buffer name (if the buffer isn't visiting a file)
+		  (setq frame-title-format
+				'((:eval (if (buffer-file-name)
+								 (abbreviate-file-name (buffer-file-name))
+						   "%b"))))
 
 
-;; hippie expand is dabbrev expand on steroids
-(setq hippie-expand-try-functions-list '(try-expand-dabbrev
-                                         try-expand-dabbrev-all-buffers
-                                         try-expand-dabbrev-from-kill
-                                         try-complete-file-name-partially
-                                         try-complete-file-name
-                                         try-expand-all-abbrevs
-                                         try-expand-list
-                                         try-expand-line
-                                         try-complete-lisp-symbol-partially
-                                         try-complete-lisp-symbol))
+		  ;; hippie expand is dabbrev expand on steroids
+		  (setq hippie-expand-try-functions-list '(try-expand-dabbrev
+												   try-expand-dabbrev-all-buffers
+												   try-expand-dabbrev-from-kill
+												   try-complete-file-name-partially
+												   try-complete-file-name
+												   try-expand-all-abbrevs
+												   try-expand-list
+												   try-expand-line
+												   try-complete-lisp-symbol-partially
+												   try-complete-lisp-symbol))
 
-;; use hippie-expand instead of dabbrev
-(global-set-key (kbd "M-/") #'hippie-expand)
-(global-set-key (kbd "s-/") #'hippie-expand)
+		  ;; use hippie-expand instead of dabbrev
+		  (global-set-key (kbd "M-/") #'hippie-expand)
+		  (global-set-key (kbd "s-/") #'hippie-expand)
 
-;; align code in a pretty way
-;(global-set-key (kbd "C-x \\") #'align-regexp)
+		  ;; align code in a pretty way
+		  ;(global-set-key (kbd "C-x \\") #'align-regexp)
 
-;(define-key 'help-command (kbd "C-i") #'info-display-manual)
+		  ;(define-key 'help-command (kbd "C-i") #'info-display-manual)
 
-;; misc useful keybindings
-;(global-set-key (kbd "s-<") #'beginning-of-buffer)
-;(global-set-key (kbd "s->") #'end-of-buffer)
-;(global-set-key (kbd "s-q") #'fill-paragraph)
-;(global-set-key (kbd "s-x") #'execute-extended-command)
+		  ;; misc useful keybindings
+		  ;(global-set-key (kbd "s-<") #'beginning-of-buffer)
+		  ;(global-set-key (kbd "s->") #'end-of-buffer)
+		  ;(global-set-key (kbd "s-q") #'fill-paragraph)
+		  ;(global-set-key (kbd "s-x") #'execute-extended-command)
 
-;; smart tab behavior - indent or complete
-;(setq tab-always-indent 'complete)
-
-
-;;; Packages :: additional
-
-
-(use-package move-text
-  :ensure t
-  :bind  (([(control shift up)] . move-text-up)
-		  ([(control shift down)] . move-text-down)))
+		  ;; smart tab behavior - indent or complete
+		  ;(setq tab-always-indent 'complete)
+
+
+		  ;;; Packages :: additional
+
+
+		  (use-package move-text
+			:ensure t
+			:bind  (([(control shift up)] . move-text-up)
+					([(control shift down)] . move-text-down)))
 
 
 
-
-(use-package rainbow-mode
-  :ensure t
-  :delight
-  :config
-  (add-hook 'prog-mode-hook 'rainbow-mode)
-  )
+
+		  (use-package rainbow-mode
+			:ensure t
+			:delight
+			:config
+			(add-hook 'prog-mode-hook 'rainbow-mode)
+			)
 
-(use-package webjump
-  :ensure t
-  :config
-  (eval-after-load "webjump"
-    '(add-to-list 'webjump-sites
-                  '("Urban Dictionary" .
-                    [simple-query
-                     "www.urbandictionary.com"
-                     "http://www.urbandictionary.com/define.php?term="
-                     ""])))
-  (global-set-key (kbd "C-c W") 'webjump)
-  )
+		  (use-package webjump
+			:ensure t
+			:config
+			(eval-after-load "webjump"
+			  '(add-to-list 'webjump-sites
+							'("Urban Dictionary" .
+							  [simple-query
+							   "www.urbandictionary.com"
+							   "http://www.urbandictionary.com/define.php?term="
+							   ""])))
+			(global-set-key (kbd "C-c W") 'webjump)
+			)
 
-;; Add Urban Dictionary to webjump
+		  ;; Add Urban Dictionary to webjump
 
-;;; Packages :: theme
+		  ;;; Packages :: theme
 
-;;; Packages :: to_validate
+		  ;;; Packages :: to_validate
 
 
 
 
 
 
-;; emacs buffer name unique
-(use-package uniquify
-  :config
-  (setq uniquify-buffer-name-style 'forward)
-  (setq uniquify-separator "/")
-  ;; rename after killing uniquified
-  (setq uniquify-after-kill-buffer-p t)
-  ;; don't muck with special buffers
-  (setq uniquify-ignore-buffers-re "^\\*"))
+		  ;; emacs buffer name unique
+		  (use-package uniquify
+			:config
+			(setq uniquify-buffer-name-style 'forward)
+			(setq uniquify-separator "/")
+			;; rename after killing uniquified
+			(setq uniquify-after-kill-buffer-p t)
+			;; don't muck with special buffers
+			(setq uniquify-ignore-buffers-re "^\\*"))
 
-;; (use-package windmove
-;;   :config
-;;   ;; use shift + arrow keys to switch between visible buffers
-;; (windmove-default-keybindings))
+		  ;; (use-package windmove
+		  ;;   :config
+		  ;;   ;; use shift + arrow keys to switch between visible buffers
+		  ;; (windmove-default-keybindings))
 
-(use-package dired
-  :config
-  ;; dired - reuse current buffer by pressing 'a'
-  (put 'dired-find-alternate-file 'disabled nil)
+		  (use-package dired
+			:config
+			;; dired - reuse current buffer by pressing 'a'
+			(put 'dired-find-alternate-file 'disabled nil)
 
-  ;; always delete and copy recursively
-  (setq dired-recursive-deletes 'always)
-  (setq dired-recursive-copies 'always)
+			;; always delete and copy recursively
+			(setq dired-recursive-deletes 'always)
+			(setq dired-recursive-copies 'always)
 
-  ;; if there is a dired buffer displayed in the next window, use its
-  ;; current subdir, instead of the current subdir of this dired buffer
-  (setq dired-dwim-target t)
+			;; if there is a dired buffer displayed in the next window, use its
+			;; current subdir, instead of the current subdir of this dired buffer
+			(setq dired-dwim-target t)
 
-  ;; enable some really cool extensions like C-x C-j(dired-jump)
-  (require 'dired-x))
+			;; enable some really cool extensions like C-x C-j(dired-jump)
+			(require 'dired-x))
 
-(use-package lisp-mode
-  :config
-  (defun user-visit-ielm ()
-    "Switch to default `ielm' buffer.
-Start `ielm' if it's not already running."
-    (interactive)
-    (crux-start-or-switch-to 'ielm "*ielm*"))
-
-  (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
-  (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode)
-  (define-key emacs-lisp-mode-map (kbd "C-c C-z") #'user-visit-ielm)
-  (define-key emacs-lisp-mode-map (kbd "C-c C-c") #'eval-defun)
-  (define-key emacs-lisp-mode-map (kbd "C-c C-b") #'eval-buffer)
-  (add-hook 'lisp-interaction-mode-hook #'eldoc-mode)
-  (add-hook 'eval-expression-minibuffer-setup-hook #'eldoc-mode))
-
-(use-package ielm
-  :config
-  (add-hook 'ielm-mode-hook #'eldoc-mode)
-  (add-hook 'ielm-mode-hook #'rainbow-delimiters-mode))
-
-(use-package whitespace
-  :init
-  (dolist (hook '(prog-mode-hook text-mode-hook))
-    (add-hook hook #'whitespace-mode))
-  ;(add-hook 'before-save-hook #'whitespace-cleanup)
-  :config
-  (setq whitespace-line-column 80) ;; limit line length
-  (setq whitespace-style '(face tabs empty trailing lines-tail)))
-                        ;; lines indentation space-after-tab space-before-tab
-
-
-;; third-party packages
-
-;; (use-package exec-path-from-shell
-;;   :ensure t
-;;   :config
-;;   (when (memq window-system '(mac ns))
-;;     (exec-path-from-shell-initialize)))
-
-(use-package rainbow-delimiters
-  :ensure t)
-
-
-
-;; (use-package avy
-;;   :ensure t
-;;   :bind (("s-." . avy-goto-word-or-subword-1)
-;;          ("s-," . avy-goto-char))
-;;   :config
-;;   (setq avy-background t))
-
-
-(use-package ag
-  :ensure t)
-
-;; (use-package projectile
-;;   :ensure t
-;;   :init
-;;   (setq projectile-completion-system 'ivy)
-;;   :config
-;;   (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
-;;   (projectile-mode +1))
-
-;; (use-package pt
-;;   :ensure t)
-
-(use-package elisp-slime-nav
-  :ensure t
-  :config
-  (dolist (hook '(emacs-lisp-mode-hook ielm-mode-hook))
-    (add-hook hook #'elisp-slime-nav-mode)))
-
-
-(use-package anzu
-  :ensure t
-  :bind (("M-%" . anzu-query-replace)
-         ("C-M-%" . anzu-query-replace-regexp))
-  :config
-  (global-anzu-mode))
-
-;; (use-package easy-kill
-;;   :ensure t
-;;   :config
-;;   (global-set-key [remap kill-ring-save] 'easy-kill))
-
-
-
-
-(use-package inf-ruby
-  :ensure t
-  :config
-  (add-hook 'ruby-mode-hook #'inf-ruby-minor-mode))
-
-(use-package ruby-mode
-  :config
-  (setq ruby-insert-encoding-magic-comment nil)
-  (add-hook 'ruby-mode-hook #'subword-mode))
-
-;; (use-package clojure-mode
-;;   :ensure t
-;;   :config
-;;   (add-hook 'clojure-mode-hook #'paredit-mode)
-;;   (add-hook 'clojure-mode-hook #'subword-mode)
-;;   (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode))
-
-;; (use-package cider
-;;   :ensure t
-;;   :config
-;;   (setq nrepl-log-messages t)
-;;   (add-hook 'cider-mode-hook #'eldoc-mode)
-;;   (add-hook 'cider-repl-mode-hook #'eldoc-mode)
-;;   (add-hook 'cider-repl-mode-hook #'paredit-mode)
-;;   (add-hook 'cider-repl-mode-hook #'rainbow-delimiters-mode))
-
-;; (use-package flycheck-joker
-;;   :ensure t)
-
-;; (use-package elixir-mode
-;;   :ensure t
-;;   :config
-;;   (add-hook 'elixir-mode #'subword-mode))
-
-;; (use-package erlang
-;;   :ensure t
-;;   :config
-;;   (when (eq system-type 'windows-nt)
-;;     (setq erlang-root-dir "C:/Program Files/erl7.2")
-;;     (add-to-list 'exec-path "C:/Program Files/erl7.2/bin")))
-
-;; (use-package haskell-mode
-;;   :ensure t
-;;   :config
-;;   (add-hook 'haskell-mode #'subword-mode))
-
-
-(use-package company
-  :ensure t
-  :config
-  (setq company-idle-delay 0.5)
-  (setq company-show-numbers t)
-  (setq company-tooltip-limit 10)
-  (setq company-minimum-prefix-length 2)
-  (setq company-tooltip-align-annotations t)
-  ;; invert the navigation direction if the the completion popup-isearch-match
-  ;; is displayed on top (happens near the bottom of windows)
-  (setq company-tooltip-flip-when-above t)
-  (global-company-mode))
-
-;; (use-package hl-todo
-;;   :ensure t
-;;   :config
-;;   (setq hl-todo-highlight-punctuation ":")
-;;   (global-hl-todo-mode)
-;;   :bind (("C-c T p" . hl-todo-previous)
-;; 		 ("C-c T n" . hl-todo-next)
-;; 		 ("C-c T o" . hl-todo-occur)))
-
-;; (use-package zop-to-char
-;;   :ensure t
-;;   :bind (("M-z" . zop-up-to-char)
-;;          ("M-Z" . zop-to-char)))
-
-;; (use-package imenu-anywhere
-;;   :ensure t
-;;   :bind (("C-c i" . imenu-anywhere)
-;;          ("s-i" . imenu-anywhere)))
-
-(use-package flyspell
-  :config
-  (when (eq system-type 'windows-nt)
-    (add-to-list 'exec-path "C:/Program Files (x86)/Aspell/bin/"))
-  (setq ispell-program-name "aspell" ; use aspell instead of ispell
-        ispell-extra-args '("--sug-mode=ultra"))
-  (add-hook 'text-mode-hook #'flyspell-mode))
-  ;(add-hook 'prog-mode-hook #'flyspell-prog-mode))
-
-;; (use-package super-save
-;;   :ensure t
-;;   :config
-;;   ;; add integration with ace-window
-;;   (add-to-list 'super-save-triggers 'ace-window)
-;;   (super-save-mode +1))
-
-;; (use-package crux
-;;   :ensure t
-;;   :bind (("C-c o" . crux-open-with)
-;;          ("M-o" . crux-smart-open-line)
-;;          ("C-c n" . crux-cleanup-buffer-or-region)
-;;          ("C-c f" . crux-recentf-find-file)
-;;          ("C-M-z" . crux-indent-defun)
-;;          ("C-c u" . crux-view-url)
-;;          ("C-c e" . crux-eval-and-replace)
-;;          ("C-c w" . crux-swap-windows)
-;;          ("C-c D" . crux-delete-file-and-buffer)
-;;          ("C-c r" . crux-rename-buffer-and-file)
-;;          ("C-c t" . crux-visit-term-buffer)
-;;          ("C-c k" . crux-kill-other-buffers)
-;;          ("C-c TAB" . crux-indent-rigidly-and-copy-to-clipboard)
-;;          ("C-c I" . crux-find-user-init-file)
-;;          ("C-c S" . crux-find-shell-init-file)
-;;          ("s-r" . crux-recentf-find-file)
-;;          ("s-j" . crux-top-join-line)
-;;          ("C-^" . crux-top-join-line)
-;;          ("s-k" . crux-kill-whole-line)
-;;          ("C-<backspace>" . crux-kill-line-backwards)
-;;          ("s-o" . crux-smart-open-line-above)
-;;          ([remap move-beginning-of-line] . crux-move-beginning-of-line)
-;;          ([(shift return)] . crux-smart-open-line)
-;;          ([(control shift return)] . crux-smart-open-line-above)
-;;          ([remap kill-whole-line] . crux-kill-whole-line)
-;;          ("C-c s" . crux-ispell-word-then-abbrev)))
-
-;; (use-package diff-hl
-;;   :ensure t
-;;   :config
-;;   (global-diff-hl-mode +1)
-;;   (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
-;;   (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
-
-;; (use-package undo-tree
-;;   :ensure t
-;;   :config
-;;   ;; autosave the undo-tree history
-;;   (setq undo-tree-history-directory-alist
-;;         `((".*" . ,temporary-file-directory)))
-;;   (setq undo-tree-auto-save-history t))
-
-
-;; ;; temporarily highlight changes from yanking, etc
-(use-package volatile-highlights
-  :ensure t
-  :config
-  (volatile-highlights-mode +1))
-
-;; (use-package ivy
-;;   :ensure t
-;;   :config
-;;   (ivy-mode 1)
-;;   (setq ivy-use-virtual-buffers t)
-;;   (setq enable-recursive-minibuffers t)
-;;   (global-set-key (kbd "C-c C-r") 'ivy-resume)
-;;   (global-set-key (kbd "<f6>") 'ivy-resume))
-
-;; (use-package swiper
-;;   :ensure t
-;;   :config
-;;   (global-set-key "\C-s" 'swiper))
-
-;; (use-package counsel
-;;   :ensure t
-;;   :config
-;;   (global-set-key (kbd "M-x") 'counsel-M-x)
-;;   (global-set-key (kbd "C-x C-f") 'counsel-find-file)
-;;   (global-set-key (kbd "<f1> f") 'counsel-describe-function)
-;;   (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
-;;   (global-set-key (kbd "<f1> l") 'counsel-find-library)
-;;   (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
-;;   (global-set-key (kbd "<f2> u") 'counsel-unicode-char)
-;;   (global-set-key (kbd "C-c g") 'counsel-git)
-;;   (global-set-key (kbd "C-c j") 'counsel-git-grep)
-;;   (global-set-key (kbd "C-c a") 'counsel-ag)
-;;   (global-set-key (kbd "C-x l") 'counsel-locate)
-;;   (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history))
-
-;;; my-init.el ends here
-
-
-
-;;; mode::emacs
-
-;; (use-package ido
-;;   :config
-;;   (setq ido-create-new-buffer 'always)
-;;   (setq ido-enable-flex-matching t)
-;;   (setq ido-everywhere t)
-;;   (ido-mode t)
-;;   )
-
-
-
-
-
-
-
-
-
-;; (use-package key-chord
-;;   :ensure t
-;;   :config
-;;   (key-chord-mode 1)
-;;   (key-chord-define-global "ss" 'isearch-forward)
-;;   )
-
-;; (use-package key-seq
-;;   :ensure t
-;;   )
-
-
-(use-package grep-a-lot
-  :ensure t
-  :config
-  (grep-a-lot-setup-keys)
-  )
-
-(use-package multi-term
-  :ensure t
-  :bind (
-         ("C-c t c" . multi-term)
-         ("C-c t t" . multi-term)
-         ("C-c t n" . multi-term-next)
-         ("C-c t p" . multi-term-prev)
-         ("C-c t o" . multi-term-dedicated-open)
-         ("C-c t d" . multi-term-dedicated-close)
-         ("C-c t T" . multi-term-dedicated-toggle)
-         ("C-c t s" . multi-term-dedicated-select)
-         ("M-* t c" . multi-term)
-         ("M-* t t" . multi-term)
-         ("M-* t n" . multi-term-next)
-         ("M-* t p" . multi-term-prev)
-         ("M-* t o" . multi-term-dedicated-open)
-         ("M-* t d" . multi-term-dedicated-close)
-         ("M-* t T" . multi-term-dedicated-toggle)
-         ("M-* t s" . multi-term-dedicated-select)
-
-         )
-  :config
-  (setq multi-term-program (getenv "ESHELL"))
-  )
-
-
-
-;;; mode::language
-
-(use-package paredit
-  :ensure t
-  :delight
-  :config
-  (add-hook 'emacs-lisp-mode-hogok #'paredit-mode)
-  ;; enable in the *scratch* buffer
-  (add-hook 'lisp-interaction-mode-hook #'paredit-mode)
-  (add-hook 'ielm-mode-hook #'paredit-mode)
-  (add-hook 'lisp-mode-hook #'paredit-mode)
-  (add-hook 'eval-expression-minibuffer-setup-hook #'paredit-mode)
-  (add-hook 'scheme-mode-hook #'paredit-mode)
-  )
-
-
-
-
-
-;;; org
-
-(use-package ox-md)
-
-(use-package org-bullets
-  :ensure t
-  :config
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
-  )
-
-
-
-;;; mode::tools
-
-(use-package restclient
-  :ensure t
-  :mode (("\\.http\\'" . restclient-mode))
-  )
-
-(use-package restclient-test
-  :ensure t
-  :config
-  (add-hook 'restclient-mode-hook #'restclient-test-mode)
-  )
-
-;;; 11_packages.el ends here
+		  (use-package lisp-mode
+			:config
+			(defun user-visit-ielm ()
+			  "Switch to default `ielm' buffer.
+		  Start `ielm' if it's not already running."
+			  (interactive)
+			  (crux-start-or-switch-to 'ielm "*ielm*"))
+
+			(add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
+			(add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode)
+			(define-key emacs-lisp-mode-map (kbd "C-c C-z") #'user-visit-ielm)
+			(define-key emacs-lisp-mode-map (kbd "C-c C-c") #'eval-defun)
+			(define-key emacs-lisp-mode-map (kbd "C-c C-b") #'eval-buffer)
+			(add-hook 'lisp-interaction-mode-hook #'eldoc-mode)
+			(add-hook 'eval-expression-minibuffer-setup-hook #'eldoc-mode))
+
+		  (use-package ielm
+			:config
+			(add-hook 'ielm-mode-hook #'eldoc-mode)
+			(add-hook 'ielm-mode-hook #'rainbow-delimiters-mode))
+
+		  (use-package whitespace
+			:init
+			(dolist (hook '(prog-mode-hook text-mode-hook))
+			  (add-hook hook #'whitespace-mode))
+			;(add-hook 'before-save-hook #'whitespace-cleanup)
+			:config
+			(setq whitespace-line-column 80) ;; limit line length
+			(setq whitespace-style '(face tabs empty trailing lines-tail)))
+								  ;; lines indentation space-after-tab space-before-tab
+
+
+		  ;; third-party packages
+
+		  ;; (use-package exec-path-from-shell
+		  ;;   :ensure t
+		  ;;   :config
+		  ;;   (when (memq window-system '(mac ns))
+		  ;;     (exec-path-from-shell-initialize)))
+
+		  (use-package rainbow-delimiters
+			:ensure t)
+
+
+
+		  ;; (use-package avy
+		  ;;   :ensure t
+		  ;;   :bind (("s-." . avy-goto-word-or-subword-1)
+		  ;;          ("s-," . avy-goto-char))
+		  ;;   :config
+		  ;;   (setq avy-background t))
+
+
+		  (use-package ag
+			:ensure t)
+
+		  ;; (use-package projectile
+		  ;;   :ensure t
+		  ;;   :init
+		  ;;   (setq projectile-completion-system 'ivy)
+		  ;;   :config
+		  ;;   (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+		  ;;   (projectile-mode +1))
+
+		  ;; (use-package pt
+		  ;;   :ensure t)
+
+		  (use-package elisp-slime-nav
+			:ensure t
+			:config
+			(dolist (hook '(emacs-lisp-mode-hook ielm-mode-hook))
+			  (add-hook hook #'elisp-slime-nav-mode)))
+
+
+		  (use-package anzu
+			:ensure t
+			:bind (("M-%" . anzu-query-replace)
+				   ("C-M-%" . anzu-query-replace-regexp))
+			:config
+			(global-anzu-mode))
+
+		  ;; (use-package easy-kill
+		  ;;   :ensure t
+		  ;;   :config
+		  ;;   (global-set-key [remap kill-ring-save] 'easy-kill))
+
+
+
+
+		  (use-package inf-ruby
+			:ensure t
+			:config
+			(add-hook 'ruby-mode-hook #'inf-ruby-minor-mode))
+
+		  (use-package ruby-mode
+			:config
+			(setq ruby-insert-encoding-magic-comment nil)
+			(add-hook 'ruby-mode-hook #'subword-mode))
+
+		  ;; (use-package clojure-mode
+		  ;;   :ensure t
+		  ;;   :config
+		  ;;   (add-hook 'clojure-mode-hook #'paredit-mode)
+		  ;;   (add-hook 'clojure-mode-hook #'subword-mode)
+		  ;;   (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode))
+
+		  ;; (use-package cider
+		  ;;   :ensure t
+		  ;;   :config
+		  ;;   (setq nrepl-log-messages t)
+		  ;;   (add-hook 'cider-mode-hook #'eldoc-mode)
+		  ;;   (add-hook 'cider-repl-mode-hook #'eldoc-mode)
+		  ;;   (add-hook 'cider-repl-mode-hook #'paredit-mode)
+		  ;;   (add-hook 'cider-repl-mode-hook #'rainbow-delimiters-mode))
+
+		  ;; (use-package flycheck-joker
+		  ;;   :ensure t)
+
+		  ;; (use-package elixir-mode
+		  ;;   :ensure t
+		  ;;   :config
+		  ;;   (add-hook 'elixir-mode #'subword-mode))
+
+		  ;; (use-package erlang
+		  ;;   :ensure t
+		  ;;   :config
+		  ;;   (when (eq system-type 'windows-nt)
+		  ;;     (setq erlang-root-dir "C:/Program Files/erl7.2")
+		  ;;     (add-to-list 'exec-path "C:/Program Files/erl7.2/bin")))
+
+		  ;; (use-package haskell-mode
+		  ;;   :ensure t
+		  ;;   :config
+		  ;;   (add-hook 'haskell-mode #'subword-mode))
+
+		  ;; (use-package hl-todo
+		  ;;   :ensure t
+		  ;;   :config
+		  ;;   (setq hl-todo-highlight-punctuation ":")
+		  ;;   (global-hl-todo-mode)
+		  ;;   :bind (("C-c T p" . hl-todo-previous)
+		  ;; 		 ("C-c T n" . hl-todo-next)
+		  ;; 		 ("C-c T o" . hl-todo-occur)))
+
+		  ;; (use-package zop-to-char
+		  ;;   :ensure t
+		  ;;   :bind (("M-z" . zop-up-to-char)
+		  ;;          ("M-Z" . zop-to-char)))
+
+		  ;; (use-package imenu-anywhere
+		  ;;   :ensure t
+		  ;;   :bind (("C-c i" . imenu-anywhere)
+		  ;;          ("s-i" . imenu-anywhere)))
+
+		  (use-package flyspell
+			:config
+			(when (eq system-type 'windows-nt)
+			  (add-to-list 'exec-path "C:/Program Files (x86)/Aspell/bin/"))
+			(setq ispell-program-name "aspell" ; use aspell instead of ispell
+				  ispell-extra-args '("--sug-mode=ultra"))
+			(add-hook 'text-mode-hook #'flyspell-mode))
+			;(add-hook 'prog-mode-hook #'flyspell-prog-mode))
+
+		  ;; (use-package super-save
+		  ;;   :ensure t
+		  ;;   :config
+		  ;;   ;; add integration with ace-window
+		  ;;   (add-to-list 'super-save-triggers 'ace-window)
+		  ;;   (super-save-mode +1))
+
+		  ;; (use-package crux
+		  ;;   :ensure t
+		  ;;   :bind (("C-c o" . crux-open-with)
+		  ;;          ("M-o" . crux-smart-open-line)
+		  ;;          ("C-c n" . crux-cleanup-buffer-or-region)
+		  ;;          ("C-c f" . crux-recentf-find-file)
+		  ;;          ("C-M-z" . crux-indent-defun)
+		  ;;          ("C-c u" . crux-view-url)
+		  ;;          ("C-c e" . crux-eval-and-replace)
+		  ;;          ("C-c w" . crux-swap-windows)
+		  ;;          ("C-c D" . crux-delete-file-and-buffer)
+		  ;;          ("C-c r" . crux-rename-buffer-and-file)
+		  ;;          ("C-c t" . crux-visit-term-buffer)
+		  ;;          ("C-c k" . crux-kill-other-buffers)
+		  ;;          ("C-c TAB" . crux-indent-rigidly-and-copy-to-clipboard)
+		  ;;          ("C-c I" . crux-find-user-init-file)
+		  ;;          ("C-c S" . crux-find-shell-init-file)
+		  ;;          ("s-r" . crux-recentf-find-file)
+		  ;;          ("s-j" . crux-top-join-line)
+		  ;;          ("C-^" . crux-top-join-line)
+		  ;;          ("s-k" . crux-kill-whole-line)
+		  ;;          ("C-<backspace>" . crux-kill-line-backwards)
+		  ;;          ("s-o" . crux-smart-open-line-above)
+		  ;;          ([remap move-beginning-of-line] . crux-move-beginning-of-line)
+		  ;;          ([(shift return)] . crux-smart-open-line)
+		  ;;          ([(control shift return)] . crux-smart-open-line-above)
+		  ;;          ([remap kill-whole-line] . crux-kill-whole-line)
+		  ;;          ("C-c s" . crux-ispell-word-then-abbrev)))
+
+		  ;; (use-package diff-hl
+		  ;;   :ensure t
+		  ;;   :config
+		  ;;   (global-diff-hl-mode +1)
+		  ;;   (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
+		  ;;   (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
+
+		  ;; (use-package undo-tree
+		  ;;   :ensure t
+		  ;;   :config
+		  ;;   ;; autosave the undo-tree history
+		  ;;   (setq undo-tree-history-directory-alist
+		  ;;         `((".*" . ,temporary-file-directory)))
+		  ;;   (setq undo-tree-auto-save-history t))
+
+
+		  ;; ;; temporarily highlight changes from yanking, etc
+		  (use-package volatile-highlights
+			:ensure t
+			:config
+			(volatile-highlights-mode +1))
+
+		  ;; (use-package ivy
+		  ;;   :ensure t
+		  ;;   :config
+		  ;;   (ivy-mode 1)
+		  ;;   (setq ivy-use-virtual-buffers t)
+		  ;;   (setq enable-recursive-minibuffers t)
+		  ;;   (global-set-key (kbd "C-c C-r") 'ivy-resume)
+		  ;;   (global-set-key (kbd "<f6>") 'ivy-resume))
+
+		  ;; (use-package swiper
+		  ;;   :ensure t
+		  ;;   :config
+		  ;;   (global-set-key "\C-s" 'swiper))
+
+		  ;; (use-package counsel
+		  ;;   :ensure t
+		  ;;   :config
+		  ;;   (global-set-key (kbd "M-x") 'counsel-M-x)
+		  ;;   (global-set-key (kbd "C-x C-f") 'counsel-find-file)
+		  ;;   (global-set-key (kbd "<f1> f") 'counsel-describe-function)
+		  ;;   (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
+		  ;;   (global-set-key (kbd "<f1> l") 'counsel-find-library)
+		  ;;   (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
+		  ;;   (global-set-key (kbd "<f2> u") 'counsel-unicode-char)
+		  ;;   (global-set-key (kbd "C-c g") 'counsel-git)
+		  ;;   (global-set-key (kbd "C-c j") 'counsel-git-grep)
+		  ;;   (global-set-key (kbd "C-c a") 'counsel-ag)
+		  ;;   (global-set-key (kbd "C-x l") 'counsel-locate)
+		  ;;   (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history))
+
+		  ;;; my-init.el ends here
+
+
+
+		  ;;; mode::emacs
+
+		  ;; (use-package ido
+		  ;;   :config
+		  ;;   (setq ido-create-new-buffer 'always)
+		  ;;   (setq ido-enable-flex-matching t)
+		  ;;   (setq ido-everywhere t)
+		  ;;   (ido-mode t)
+		  ;;   )
+
+
+
+
+
+
+
+
+
+		  ;; (use-package key-chord
+		  ;;   :ensure t
+		  ;;   :config
+		  ;;   (key-chord-mode 1)
+		  ;;   (key-chord-define-global "ss" 'isearch-forward)
+		  ;;   )
+
+		  ;; (use-package key-seq
+		  ;;   :ensure t
+		  ;;   )
+
+
+		  (use-package grep-a-lot
+			:ensure t
+			:config
+			(grep-a-lot-setup-keys)
+			)
+
+
+
+
+		  ;;; mode::language
+
+		  (use-package paredit
+			:ensure t
+			:delight
+			:config
+			(add-hook 'emacs-lisp-mode-hogok #'paredit-mode)
+			;; enable in the *scratch* buffer
+			(add-hook 'lisp-interaction-mode-hook #'paredit-mode)
+			(add-hook 'ielm-mode-hook #'paredit-mode)
+			(add-hook 'lisp-mode-hook #'paredit-mode)
+			(add-hook 'eval-expression-minibuffer-setup-hook #'paredit-mode)
+			(add-hook 'scheme-mode-hook #'paredit-mode)
+			)
+
+
+
+
+
+		  ;;; org
+
+		  (use-package ox-md)
+
+		  (use-package org-bullets
+			:ensure t
+			:config
+			(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+			)
+
+
+
+		  ;;; mode::tools
+
+		  (use-package restclient
+			:ensure t
+			:mode (("\\.http\\'" . restclient-mode))
+			)
+
+		  (use-package restclient-test
+			:ensure t
+			:config
+			(add-hook 'restclient-mode-hook #'restclient-test-mode)
+			)
+
+		  ;;; 11_packages.el ends here
 
    #+END_SRC
 * mode
@@ -1242,6 +1246,55 @@ Start `ielm' if it's not already running."
 	 (use-package puppet-mode
 	   :ensure t)
    #+END_SRC
+
+** language
+*** (disabled) lsp
+	#+BEGIN_SRC
+	 (use-package lsp-mode
+	   :ensure t
+	   :hook
+	   (python-mode . lsp)
+	   (ruby-mode . lsp)
+	   :commands lsp)
+
+	 (use-package lsp-ui
+	   :ensure t
+	   :commands lsp-ui-mode)
+
+     (use-package company-lsp :commands company-lsp)
+
+	 ;; (use-package helm-lsp :commands helm-lsp-workspace-symbol)
+	 ;; (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+
+	 ;; optionally if you want to use debugger
+	 ;; (use-package dap-mode)
+	 ;; (use-package dap-LANGUAGE) to load the dap adapter for your language
+	#+END_SRC
+
+** python
+*** jedi
+	#+BEGIN_SRC emacs-lisp
+	  (use-package jedi
+		:ensure t
+		:init
+		(add-hook 'python-mode-hook 'jedi:setup)
+		(add-hook 'python-mode-hook 'jedi:ac-setup)
+		:config
+		(setq jedi:complete-on-dot t
+		      jedi:get-in-function-call-delay 500
+			  jedi:install-imenu t
+			  )
+		)
+	#+END_SRC
+
+*** py-autopep8
+	#+BEGIN_SRC emacs-lisp
+	  (use-package py-autopep8
+		:ensure t
+		:config
+		(add-hook 'python-mode-hook 'py-autopep8-enable-on-save)
+		)
+	#+END_SRC
 
 * utils
 ** editing
