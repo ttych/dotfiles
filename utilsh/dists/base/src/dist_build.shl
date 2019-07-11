@@ -51,14 +51,23 @@ dist_build_prefix()
     fi
 }
 
+dist_build_configure_configure()
+{
+    if ./configure --help | grep -q -- --prefix; then
+        eval $2 ./configure --prefix="$dist_build_configure" $1
+    else
+        eval $2 ./configure $1
+    fi
+}
+
 dist_build_configure()
 {
     dist_build_prefix "$1" || return 1
     dist_build_configure="$dist_build_prefix/${PWD##*/}"
     mkdir -p "$dist_build_configure" && \
-        ./configure --prefix="$dist_build_configure" $2 && \
-        make && \
-        make install
+        dist_build_configure_configure "$2" "$3" && \
+        eval $3 make && \
+        eval $3 make install
 }
 
 dist_build_cmake()
@@ -67,8 +76,8 @@ dist_build_cmake()
     dist_build_cmake="$dist_build_prefix/${PWD##*/}"
     mkdir -p "$dist_build_cmake" &&
         #make CMAKE_EXTRAS="-DCMAKE_INSTALL_PREFIX=$dist_build_cmake $2" &&
-        cmake -DCMAKE_INSTALL_PREFIX=$dist_build_cmake $2 &&
-        make install
+        eval $3 cmake -DCMAKE_INSTALL_PREFIX=$dist_build_cmake $2 &&
+        eval $3 make install
 }
 
 dist_build_copy()
@@ -118,10 +127,10 @@ dist_build()
         fi
     fi
     if [ -x configure ]; then
-        dist_build_configure "$dist_build__loc" "$2"
+        dist_build_configure "$dist_build__loc" "$2" "$4"
         dist_build__ret=$?
     elif [ -r CMakeLists.txt ]; then
-        dist_build_cmake "$dist_build__loc" "$2"
+        dist_build_cmake "$dist_build__loc" "$2" "$4"
         dist_build__ret=$?
     elif [ -x Makefile ]; then
         echo >&2 "Makefile based build not supported"

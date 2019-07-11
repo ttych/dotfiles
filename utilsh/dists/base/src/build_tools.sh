@@ -145,6 +145,22 @@ BUILD_TOOLS_JQ_PREREQ_UBUNTU=
 BUILD_TOOLS_JQ_URL_PATTERN='https://github.com/stedolan/jq/releases/download/jq-${version}/jq-${version}.tar.gz'
 BUILD_TOOLS_JQ_DEFAULT_VERSION='1.6'
 
+#> stow - stow
+BUILD_TOOLS_STOW_CONFIG=
+BUILD_TOOLS_STOW_PREREQ_REDHAT='perl'
+BUILD_TOOLS_STOW_PREREQ_UBUNTU='perl'
+BUILD_TOOLS_STOW_URL_PATTERN='https://ftp.gnu.org/gnu/stow/stow-${version}.tar.bz2'
+BUILD_TOOLS_STOW_DEFAULT_VERSION='2.3.0'
+
+#> entr - entr
+BUILD_TOOLS_ENTR_ENV='CFLAGS=\"-static\" PREFIX=\"$dist_build_configure\"'
+BUILD_TOOLS_ENTR_CONFIG=
+BUILD_TOOLS_ENTR_PREREQ_REDHAT=
+BUILD_TOOLS_ENTR_PREREQ_UBUNTU=
+BUILD_TOOLS_ENTR_URL_PATTERN='https://bitbucket.org/eradman/entr/get/entr-${version}.tar.bz2'
+BUILD_TOOLS_ENTR_DEFAULT_VERSION='4.2'
+
+
 
 build_tools_env()
 {
@@ -165,6 +181,7 @@ build_tools_env()
     eval build_tools_env__prereq="\"\$BUILD_TOOLS_${build_tools_env__name}_PREREQ_${build_tools_env__os}\""
 
     eval build_tools_env__config="\"\$BUILD_TOOLS_${build_tools_env__name}_CONFIG\""
+    eval build_tools_env__env="\"\$BUILD_TOOLS_${build_tools_env__name}_ENV\""
 }
 
 build_tools()
@@ -176,7 +193,7 @@ build_tools()
     build_tools_env "$1" "$2" || return 1
 
     os_install $build_tools_env__prereq || return 1
-    dist_build $build_tools__loc "$build_tools_env__url" "$build_tools_env__config" "$build_tools_env__url_header"
+    dist_build $build_tools__loc "$build_tools_env__url" "$build_tools_env__config" "$build_tools_env__url_header" "$build_tools_env__env"
 }
 
 download_tools_to_build()
