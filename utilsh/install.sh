@@ -11,6 +11,7 @@ DISTRIBUTIONS='
   https://github.com/ttych/wucp.git
   https://github.com/ttych/rubysh.git
   https://github.com/ttych/git-hooks.git
+  https://github.com/ttych/trash.git
 '
 
 AUTOLOADS='
