@@ -534,3 +534,38 @@ lib_load()
     done
     return $lib_load__r
 }
+
+
+##################################################
+# sh
+##################################################
+shx()
+{
+    [ $# -lt 1 ] && return 1
+
+    shx__cmd="$1"
+    shift
+
+    case $(command -v "$shx__cmd") in
+        /*) shx__is_cmd=TRUE ;;
+        *) shx__is_cmd=FALSE ;;
+    esac
+
+    if $shx__is_cmd; then
+        shx__real_cmd=$(which "$shx__cmd") || {
+            echo >&2 "could not resolve \"$cmd\""
+            return 1
+        }
+
+        file "$shx__real_cmd" | grep -q 'shell script' || {
+            echo >&2 "\"$shx__cmd\" resolving as \"$shx__real_cmd\" is not a shell script"
+            return 2
+        }
+
+        sh -x "$(which $shx__cmd)" "$@"
+    else
+        set -x
+        "$shx__cmd" "$@"
+        set +x
+    fi
+}
