@@ -38,7 +38,7 @@ _git_info()
 *}"
 
     _git_info__branch="$(git symbolic-ref HEAD 2>/dev/null)"
-    _git_info__branch="${_git_info__branch##*/}"
+    _git_info__branch="${_git_info__branch##*/heads/}"
 
     _git_info__ignore=false
     _git_info__diff=false
