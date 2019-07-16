@@ -320,14 +320,14 @@ utilsh()
     fi
 
     case "$utilsh__command" in
-        build|init|distribution|update|autoload|reload|help)
-            utilsh_"${utilsh__command}" "$@";
+        build|init|distribution|update|autoload|reload|help|"")
+            utilsh_"${utilsh__command:-help}" "$@";
             utilsh__status=$?
             ;;
         *)
-            echo >&2 "unsupported command $command"
+            echo >&2 "unsupported command \"$command\""
             utilsh__status=2
             ;;
     esac
-    return $status
+    return $utilsh__status
 }
