@@ -149,11 +149,24 @@ pycharm()
 
 
 ### ls
-alias l='ls'
+#alias l='ls'
 alias ll='ls -l'
 alias l1='ls -1'
 alias lt='ls -1tr'
 alias la='ls -a'
+alias lh='ls -lh'
+l()
+{
+    l=
+    if [ -n "$1" ] && [ ! -r "$1" ]; then
+        case "$1" in
+            [1ahltr]*) l="-$1"
+                       shift
+                       ;;
+        esac
+    fi
+    ls $l "$@"
+}
 
 case $ESH_OS in
     Linux)
