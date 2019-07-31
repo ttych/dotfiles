@@ -464,7 +464,7 @@ proxify()
             shift
             ;;
     esac
-    eval ${proxy_conf_no:+no_proxy="$proxy_conf_no"} ${proxify__proxy:+http_proxy="$proxify__proxy"} ${proxify__proxy:+https_proxy="$proxify__proxy"} ${proxify__proxy:+ftp_proxy="$proxify__proxy"} "$@"
+    eval ${proxy_conf_no:+no_proxy="$proxy_conf_no"} ${proxify__proxy:+http_proxy="$proxify__proxy"} ${proxify__proxy:+https_proxy="$proxify__proxy"} ${proxify__proxy:+ftp_proxy="$proxify__proxy"} "\"\$@\""
 }
 
 
