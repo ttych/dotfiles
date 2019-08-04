@@ -1,0 +1,76 @@
+#!/bin/sh
+
+# -*- mode: sh -*-
+
+########## find_duplicate
+_print_duplicate()
+{
+    printf 'duplicate: "%s" and "%s"\n' "$1" "$2"
+}
+
+find_duplicate_orig()
+(
+    if [ $# -lt 1 ]; then
+        echo >&2 "Usage: find_duplicate_orig [action(_print_duplicate)] dir-1 ... dir-n"
+        return 1
+    fi
+    find_duplicate__action=_print_duplicate
+    if [ $# -gt 1 ] && [ ! -d "$1" ]; then
+        find_duplicate__action="$1"
+        shift
+    fi
+    find_duplicate__sum=$(which md5sum)
+    [ -z "$find_duplicate__sum" ] && find_duplicate__sum=$(which md5)
+    [ -z "$find_duplicate__sum" ] && find_duplicate__sum=$(which sha256sum)
+    : ${CKSUM:="$find_duplicate__sum"}
+    find "$@" | while read find_duplicate__file; do
+        test -f "$find_duplicate__file" || continue
+        find_duplicate__sum=`"$CKSUM" < "$find_duplicate__file"`
+        find_duplicate__sum=${find_duplicate__sum%% *}
+        eval find_duplicate__assoc=\$find_duplicate__${find_duplicate__sum}
+        if test -z "$find_duplicate__assoc"; then
+            eval find_duplicate__${find_duplicate__sum}=\$find_duplicate__file
+        else
+            $find_duplicate__action "$find_duplicate__file" "$find_duplicate__assoc"
+        fi
+    done
+)
+
+
+find_duplicate()
+(
+    find_duplicate__action=_print_duplicate
+
+    OPTIND=1
+    while getopts :ha: opt; do
+	    case $opt in
+	        h) echo >&2 "Usage: find_duplicate [-h] [-a action] dir-1 ... dir-n"
+               return 0
+               ;;
+            a) _print_duplicate__action="$OPTARG"
+               ;;
+	    esac
+    done
+    shift $(($OPTIND - 1))
+
+    if [ -z "$CKSUM" ]; then
+        for cksum__tool in sha1sum sha1 md5sum md5 sha256sum sha256; do
+            cksum=$(command -v $cksum__tool)
+            [ $? -eq 0 ] && break
+        done
+        [ -z "$cksum" ] && return 1
+        : ${CKSUM:="$cksum"}
+    fi
+
+    find "$@" | while read find_duplicate__file; do
+        test -f "$find_duplicate__file" || continue
+        find_duplicate__sum=`"$CKSUM" < "$find_duplicate__file"`
+        find_duplicate__sum=${find_duplicate__sum%% *}
+        eval find_duplicate__assoc=\$find_duplicate__${find_duplicate__sum}
+        if test -z "$find_duplicate__assoc"; then
+            eval find_duplicate__${find_duplicate__sum}=\$find_duplicate__file
+        else
+            $find_duplicate__action "$find_duplicate__file" "$find_duplicate__assoc"
+        fi
+    done
+)
