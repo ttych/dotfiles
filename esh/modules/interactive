@@ -91,6 +91,11 @@ emd()
 ESHELL="${ESH_SH_CUR_SHORT}_login_shell"
 export ESHELL
 
+etodo()
+{
+    em "$HOME/org/todo.org"
+}
+
 
 ### git
 g()
