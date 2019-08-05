@@ -301,7 +301,7 @@ prompt_work()
     PS2='>'
     COLOR_B_USER="$COLOR_B_GREEN"
     COLOR_USER="$COLOR_GREEN"
-    if [ "$(uid -u)" = "0" ]; then
+    if [ "$(id -u)" = "0" ]; then
         COLOR_B_USER="$COLOR_B_RED"
         COLOR_USER="$COLOR_RED"
     fi

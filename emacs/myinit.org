@@ -358,6 +358,14 @@
 		)
 	#+END_SRC
 
+*** (disabled) beacon
+	#+BEGIN_SRC
+	  (use-package beacon
+		:ensure t
+		:config
+		(beacon-mode 1)
+		)
+	#+END_SRC
 ** editing
 *** multiple-cursors
 	#+BEGIN_SRC emacs-lisp
@@ -487,6 +495,22 @@
 		)
 	#+END_SRC
 
+*** (disabled) undo-tree
+	#+BEGIN_SRC
+	  (use-package undo-tree
+		:ensure t
+		:config
+		(global-undo-tree-mode)
+		)
+	#+END_SRC
+*** (disabled) hungry-mode
+	#+BEGIN_SRC
+	  (use-package hungry-mode
+		:ensure t
+		:config
+		(global-hungry-delete-mode)
+		)
+	#+END_SRC
 ** auto-completion
 *** (disabled) auto-complete
 	#+BEGIN_SRC

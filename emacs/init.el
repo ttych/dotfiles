@@ -48,6 +48,9 @@
  '(max-lisp-eval-depth 2000)
  '(next-line-add-newlines nil)
  '(org-babel-load-languages (quote ((emacs-lisp . t))))
+ '(package-selected-packages
+   (quote
+    (undo-tree yasnippet-snippets yaml-mode which-key volatile-highlights use-package tuareg try restclient-test rainbow-mode rainbow-delimiters py-autopep8 puppet-mode paredit ox-reveal org-bullets multiple-cursors multi-term move-text magit lua-mode lsp-ui jedi iy-go-to-char inf-ruby htmlize gruvbox-theme groovy-mode grep-a-lot git-timemachine flycheck-inline expand-region emmet-mode emamux elisp-slime-nav delight counsel company-quickhelp company-lsp company-jedi cask-mode anzu ag adoc-mode ace-window ace-jump-mode)))
  '(read-quoted-char-radix 16)
  '(require-final-newline t)
  '(save-place-mode t)
@@ -83,3 +86,4 @@
 (org-babel-load-file (expand-file-name "myinit.org" user-emacs-directory))
 
 ;;; init.el ends here
+(put 'narrow-to-region 'disabled nil)
