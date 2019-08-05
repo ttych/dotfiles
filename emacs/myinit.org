@@ -39,8 +39,6 @@
 	 (global-set-key (kbd "<f5>") 'revert-buffer)
 
 	 ;; Comment
-	 (global-set-key (kbd "C-c #") 'comment-region)
-	 (global-set-key (kbd "C-c @") 'uncomment-region)
 	 (global-set-key (kbd "M-* #") 'comment-region)
 	 (global-set-key (kbd "M-* @") 'uncomment-region)
 
@@ -367,6 +365,15 @@
 		)
 	#+END_SRC
 ** editing
+*** comment-dwim-2
+	#+BEGIN_SRC emacs-lisp
+	  (use-package comment-dwim-2
+		  :ensure t
+		  :bind (
+				 ("M-#" . comment-dwim-2)
+				 )
+		  )
+	#+END_SRC
 *** multiple-cursors
 	#+BEGIN_SRC emacs-lisp
 	  (use-package multiple-cursors
