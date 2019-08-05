@@ -299,11 +299,11 @@ prompt_work_command()
 prompt_work()
 {
     PS2='>'
-    COLOR_B_USER=COLOR_B_GREEN
-    COLOR_USER=COLOR_GREEN
-    if [ "$(uid -u)" -eq 0 ]; then
-        COLOR_B_USER=COLOR_B_RED
-        COLOR_USER=COLOR_RED
+    COLOR_B_USER="$COLOR_B_GREEN"
+    COLOR_USER="$COLOR_GREEN"
+    if [ "$(uid -u)" = "0" ]; then
+        COLOR_B_USER="$COLOR_B_RED"
+        COLOR_USER="$COLOR_RED"
     fi
     PROMPT_COMMAND=prompt_work_command
 }
