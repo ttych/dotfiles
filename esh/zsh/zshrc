@@ -124,6 +124,13 @@ for color in RED GREEN YELLOW BLUE MAGENTA CYAN BLACK WHITE; do
 done
 eval COLOR_OFF='%{$reset_color%}'
 
+COLOR_B_USER="$COLOR_B_GREEN"
+COLOR_USER="$COLOR_GREEN"
+if [ "$(id -u)" = "0" ]; then
+    COLOR_B_USER="$COLOR_B_RED"
+    COLOR_USER="$COLOR_RED"
+fi
+
 
 ######################
 # ##### PROMPT ##### #
@@ -146,8 +153,8 @@ prompt_work()
             ;;
     esac
 
-    PROMPT_WORK_BASE="${COLOR_B_GREEN}%n@%m:%~${COLOR_OFF}
-${COLOR_GREEN}%(1j.%jj .)%h %(!.${COLOR_B_RED}.)%#${COLOR_OFF} "
+    PROMPT_WORK_BASE="${COLOR_B_USER}%n@%m:%~${COLOR_OFF}
+${COLOR_USER}%(1j.%jj .)%h %(!.${COLOR_B_RED}.)%#${COLOR_OFF} "
     PROMPT_WORK_ERROR="%(?..${COLOR_B_RED}%?${COLOR_OFF}
 )"
     PROMPT_WORK_TIMESTAMP="%(9V.${COLOR_CYAN}%9v${COLOR_OFF}
@@ -179,8 +186,8 @@ prompt_base()
 {
     NEWLINE=$'\n'
 
-    PROMPT_BASE_1="${COLOR_B_GREEN}%n${COLOR_OFF}@${COLOR_B_GREEN}%m${COLOR_OFF}:${COLOR_B_BLUE}%~${COLOR_OFF}"
-    PROMPT_BASE_2="${COLOR_GREEN}%(1j.%jj .)%(!.${COLOR_B_RED}.)%#${COLOR_OFF} "
+    PROMPT_BASE_1="${COLOR_B_USER}%n${COLOR_OFF}@${COLOR_B_USER}%m${COLOR_OFF}:${COLOR_B_BLUE}%~${COLOR_OFF}"
+    PROMPT_BASE_2="${COLOR_USER}%(1j.%jj .)%(!.${COLOR_B_RED}.)%#${COLOR_OFF} "
     PROMPT_ERROR="%(?..${COLOR_B_RED}%?${COLOR_OFF}
 )"
     PROMPT_TIMESTAMP="%(9V.${COLOR_CYAN}%9v${COLOR_OFF}
