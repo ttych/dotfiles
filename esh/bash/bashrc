@@ -293,12 +293,18 @@ prompt_work_command()
 {
     prompt_ret_code
     prompt_work_status
-    PS1="${prompt_ret_code:+$prompt_ret_code\n}${COLOR_B_GREEN}\u${COLOR_OFF}@${COLOR_B_GREEN}\h${COLOR_OFF}:${COLOR_B_BLUE}\w${COLOR_OFF}${prompt_work_status}\n\[${COLOR_GREEN}\]\$\[${COLOR_OFF}\] "
+    PS1="${prompt_ret_code:+$prompt_ret_code\n}${COLOR_B_USER}\u${COLOR_OFF}@${COLOR_B_USER}\h${COLOR_OFF}:${COLOR_B_BLUE}\w${COLOR_OFF}${prompt_work_status}\n\[${COLOR_USER}\]\$\[${COLOR_OFF}\] "
 }
 
 prompt_work()
 {
     PS2='>'
+    COLOR_B_USER=COLOR_B_GREEN
+    COLOR_USER=COLOR_GREEN
+    if [ "$(uid -u)" -eq 0 ]; then
+        COLOR_B_USER=COLOR_B_RED
+        COLOR_USER=COLOR_RED
+    fi
     PROMPT_COMMAND=prompt_work_command
 }
 
