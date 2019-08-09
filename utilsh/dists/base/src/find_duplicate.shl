@@ -47,7 +47,7 @@ find_duplicate()
 	        h) echo >&2 "Usage: find_duplicate [-h] [-a action] dir-1 ... dir-n"
                return 0
                ;;
-            a) _print_duplicate__action="$OPTARG"
+            a) find_duplicate__action="$OPTARG"
                ;;
 	    esac
     done
