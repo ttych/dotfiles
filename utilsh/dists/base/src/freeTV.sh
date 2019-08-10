@@ -1,6 +1,6 @@
 #!/bin/sh
 
-device=`ip link | grep 'state UP' | awk '{print $2}'`
+device=`ip link | grep 'state UP' | grep 'mode DEFAULT' | awk '{print $2}'`
 device="${device%:*}"
 [ -z "$device" ] && exit 1
 
