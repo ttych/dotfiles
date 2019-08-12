@@ -40,13 +40,6 @@ e()
     _emacs "$@" &
 }
 
-ee()
-{
-    for ee__f; do
-        e "$ee__f"
-    done
-}
-
 et()
 {
     _emacs -nw "$@"
@@ -88,12 +81,29 @@ emd()
     ALTERNATE_EDITOR="" TMPDIR="/tmp" emacs --daemon
 }
 
+ee()
+{
+    ALTERNATE_EDITOR="" TMPDIR="/tmp" _emacsclient --tty "$@"
+}
+eek()
+{
+    ee -e '(kill-emacs)'
+}
+eex()
+{
+    ee -e '(client-save-kill-emacs)'
+}
+eed()
+{
+    ALTERNATE_EDITOR="" TMPDIR="/tmp" emacs --daemon
+}
+
 ESHELL="${ESH_SH_CUR_SHORT}_login_shell"
 export ESHELL
 
 etodo()
 {
-    em "$HOME/org/todo.org"
+    ee "$HOME/org/todo.org"
 }
 
 
