@@ -325,7 +325,7 @@ preferred_shells_list()
     for preferred_shells_list__s in `cat "$preferred_shells_list__conf"`; do
         case $preferred_shells_list__s in
             "#"*) continue ;;
-            "$ESH_SH_CUR|$ESH_SH_CUR_SHORT") break ;;
+            "$ESH_SH_CUR"|"$ESH_SH_CUR_SHORT") break ;;
             *) preferred_shells_list="${preferred_shells_list} ${preferred_shells_list__s}" ;;
         esac
     done
