@@ -1,2 +1,2 @@
-zsh
 bash
+zsh
