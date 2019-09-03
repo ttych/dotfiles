@@ -160,6 +160,13 @@ BUILD_TOOLS_ENTR_PREREQ_UBUNTU=
 BUILD_TOOLS_ENTR_URL_PATTERN='https://bitbucket.org/eradman/entr/get/entr-${version}.tar.bz2'
 BUILD_TOOLS_ENTR_DEFAULT_VERSION='4.2'
 
+#> iperf - iperf
+BUILD_TOOLS_IPERF_ENV=
+BUILD_TOOLS_IPERF_CONFIG=
+BUILD_TOOLS_IPERF_PREREQ_REDHAT=
+BUILD_TOOLS_IPERF_PREREQ_UBUNTU=
+BUILD_TOOLS_IPERF_URL_PATTERN='https://iperf.fr/download/source/iperf-${version}-source.tar.gz'
+BUILD_TOOLS_IPERF_DEFAULT_VERSION='3.1.3'
 
 
 build_tools_env()
