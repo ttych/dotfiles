@@ -168,6 +168,14 @@ BUILD_TOOLS_IPERF_PREREQ_UBUNTU=
 BUILD_TOOLS_IPERF_URL_PATTERN='https://iperf.fr/download/source/iperf-${version}-source.tar.gz'
 BUILD_TOOLS_IPERF_DEFAULT_VERSION='3.1.3'
 
+#> tcpkali - tcpkali
+BUILD_TOOLS_TCPKALI_ENV=
+BUILD_TOOLS_TCPKALI_CONFIG=
+BUILD_TOOLS_TCPKALI_PREREQ_REDHAT='bison'
+BUILD_TOOLS_TCPKALI_PREREQ_UBUNTU='bison'
+BUILD_TOOLS_TCPKALI_URL_PATTERN='https://github.com/satori-com/tcpkali/releases/download/v${version}/tcpkali-${version}.tar.gz'
+BUILD_TOOLS_TCPKALI_DEFAULT_VERSION='1.1.1'
+
 
 build_tools_env()
 {

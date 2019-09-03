@@ -14,7 +14,7 @@ apt_install()
 apt_installed()
 {
     [ $# -eq 0 ] && return 1
-    dpkg -l "$@" >/dev/null
+    dpkg -s "$@" 2>/dev/null >/dev/null
 }
 
 
