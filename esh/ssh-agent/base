@@ -13,21 +13,57 @@ if [ -r "$ESH_TRUSTED_CONF" ]; then
 fi
 export ESH_TRUSTED_HOST
 
-if [ -n "$ESH_TRUSTED_HOST" ] && $ESH_TRUSTED_HOST; then
-    # keychain
-    if [ -x "$ESH_MODULE_DIR/keychain" ]; then
-        [ -r "$HOME/.ssh/keychain/$HOSTNAME-sh" ] && \
-            . "$HOME/.ssh/keychain/$HOSTNAME-sh"
-        esh_keychain_lkey=
-        for k in id_rsa id_dsa id_rsa_$HOSTNAME id_dsa_$HOSTNAME; do
-            if [ -r $HOME/.ssh/$k ]; then
-                esh_keychain_lkey="${esh_keychain_lkey:+$esh_keychain_lkey }$HOME/.ssh/$k"
-            fi
-        done
-        if [ -n "$esh_keychain_lkey" ]; then
-            "$ESH_MODULE_DIR/keychain" --quick --quiet --dir "$HOME/.ssh/keychain" $esh_keychain_lkey
+# DISPLAY= ssh-keygen -q -y -f id_ed25519 </dev/null
+# DISPLAY= ssh-keygen -q -y -f id_rsa_test </dev/null
+
+sshkey_protected()
+{
+    DISPLAY= ssh-keygen -q -y -f "$1" </dev/null 2>/dev/null >/dev/null && return 1
+    return 0
+}
+
+KEYCHAIN_DIR="$ESH_MODULE_DIR"
+
+keychain()
+{
+    [ -x "$KEYCHAIN_DIR/keychain" ] || return 1
+
+    "$KEYCHAIN_DIR/keychain" "$@"
+}
+
+keychain_load()
+{
+    [ -d "$HOME/.ssh" ] || return 1
+    [ -x "$KEYCHAIN_DIR/keychain" ] || return 1
+
+    keychain_load__login=
+    [ "$1" = "login" ] && keychain_load__login=true
+
+    [ -r "$HOME/.ssh/keychain/$HOSTNAME-sh" ] && \
+        . "$HOME/.ssh/keychain/$HOSTNAME-sh"
+
+    keychain_load__key=
+    for keyfile in "$HOME/.ssh"/*; do
+        case "$keyfile" in
+            */authorized_keys*|*/known_hosts*)
+                continue ;;
+            *.pub)
+                continue ;;
+        esac
+        [ -f "$keyfile" ] && [ -r "$keyfile" ] || continue
+        if [ -z "$keychain_load__login" ] || ! sshkey_protected "$keyfile"; then
+            keychain_load__key="${keychain_load__key:+$keychain_load__key }$keyfile"
         fi
-        [ -r "$HOME/.ssh/keychain/$HOSTNAME-sh" ] && \
-            . "$HOME/.ssh/keychain/$HOSTNAME-sh"
+    done
+
+    if [ -n "$keychain_load__key" ]; then
+        keychain --quiet --attempts 1 --dir "$HOME/.ssh/keychain" $keychain_load__key
     fi
+
+    [ -r "$HOME/.ssh/keychain/$HOSTNAME-sh" ] && \
+        . "$HOME/.ssh/keychain/$HOSTNAME-sh"
+}
+
+if [ -n "$ESH_TRUSTED_HOST" ] && $ESH_TRUSTED_HOST; then
+    keychain_load login
 fi
