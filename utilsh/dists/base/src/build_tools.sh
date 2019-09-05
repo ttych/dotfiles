@@ -176,6 +176,22 @@ BUILD_TOOLS_TCPKALI_PREREQ_UBUNTU='bison'
 BUILD_TOOLS_TCPKALI_URL_PATTERN='https://github.com/satori-com/tcpkali/releases/download/v${version}/tcpkali-${version}.tar.gz'
 BUILD_TOOLS_TCPKALI_DEFAULT_VERSION='1.1.1'
 
+#> kubectl - kubectl
+BUILD_TOOLS_KUBECTL_ENV=
+BUILD_TOOLS_KUBECTL_CONFIG=
+BUILD_TOOLS_KUBECTL_PREREQ_REDHAT=
+BUILD_TOOLS_KUBECTL_PREREQ_UBUNTU=
+BUILD_TOOLS_KUBECTL_URL_PATTERN='https://storage.googleapis.com/kubernetes-release/release/${version}/bin/linux/amd64/kubectl'
+BUILD_TOOLS_KUBECTL_DEFAULT_VERSION=`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`
+
+#> terraform - terraform
+BUILD_TOOLS_TERRAFORM_ENV=
+BUILD_TOOLS_TERRAFORM_CONFIG=
+BUILD_TOOLS_TERRAFORM_PREREQ_REDHAT=
+BUILD_TOOLS_TERRAFORM_PREREQ_UBUNTU=
+BUILD_TOOLS_TERRAFORM_URL_PATTERN='https://releases.hashicorp.com/terraform/${version}/terraform_${version}_linux_amd64.zip'
+BUILD_TOOLS_TERRAFORM_DEFAULT_VERSION='0.12.8'
+
 
 build_tools_env()
 {

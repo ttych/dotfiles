@@ -96,10 +96,15 @@ dist_build_copy()
 dist_build_fix_right()
 {
     cd "$1" || return 1
-    for dist_build_fix_right__f in *.AppImage; do
-        if [ -r "$dist_build_fix_right__f" ]; then
-            chmod +x "$dist_build_fix_right__f"
-        fi
+    for dist_build_fix_right__f in *; do
+        case "$dist_build_fix_right__f" in
+            *.AppImage)
+                chmod +x "$dist_build_fix_right__f" ;;
+            *)
+                if file "$dist_build_fix_right__f" | grep -q executable; then
+                    chmod +x "$dist_build_fix_right__f"
+                fi ;;
+        esac
     done
 }
 
