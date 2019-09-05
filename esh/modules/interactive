@@ -35,9 +35,14 @@ _emacs_reset()
 }
 
 #e() { emacs -fn -\*-fixed-\*-12-\* "$@" & }
-e()
+ex()
 {
     _emacs "$@" &
+}
+
+exq()
+{
+    ex -quick "$@"
 }
 
 et()
@@ -64,21 +69,26 @@ _emacsclient()
     $_EMACSCLIENT "$@"
 }
 
-em()
+# em()
+# {
+#     ALTERNATE_EDITOR="" TMPDIR="/tmp" _emacsclient --tty "$@"
+# }
+# emk()
+# {
+#     em -e '(kill-emacs)'
+# }
+# emx()
+# {
+#     em -e '(client-save-kill-emacs)'
+# }
+# emd()
+# {
+#     ALTERNATE_EDITOR="" TMPDIR="/tmp" emacs --daemon
+# }
+
+eex()
 {
-    ALTERNATE_EDITOR="" TMPDIR="/tmp" _emacsclient --tty "$@"
-}
-emk()
-{
-    em -e '(kill-emacs)'
-}
-emx()
-{
-    em -e '(client-save-kill-emacs)'
-}
-emd()
-{
-    ALTERNATE_EDITOR="" TMPDIR="/tmp" emacs --daemon
+    ALTERNATE_EDITOR="" TMPDIR="/tmp" _emacsclient --create-frame "$@"
 }
 
 ee()
@@ -89,13 +99,18 @@ eek()
 {
     ee -e '(kill-emacs)'
 }
-eex()
+ees()
 {
     ee -e '(client-save-kill-emacs)'
 }
 eed()
 {
     ALTERNATE_EDITOR="" TMPDIR="/tmp" emacs --daemon
+}
+
+e()
+{
+    ee "$@"
 }
 
 ESHELL="${ESH_SH_CUR_SHORT}_login_shell"
