@@ -88,7 +88,7 @@ _emacsclient()
 
 eex()
 {
-    ALTERNATE_EDITOR="" TMPDIR="/tmp" _emacsclient --create-frame "$@"
+    ALTERNATE_EDITOR="" TMPDIR="/tmp" _emacsclient --create-frame "$@" &
 }
 
 ee()
