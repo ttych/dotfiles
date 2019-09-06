@@ -44,13 +44,12 @@ keychain_load()
 
     keychain_load__key=
     for keyfile in "$HOME/.ssh"/*; do
-        case "$keyfile" in
-            */authorized_keys*|*/known_hosts*)
-                continue ;;
-            *.pub)
-                continue ;;
+        [ -d "$keyfile" ] && continue
+        [ ! -r "$keyfile" ] && continue
+        case `file -b "$keyfile"` in
+            *" private key") ;;
+            *) continue ;;
         esac
-        [ -f "$keyfile" ] && [ -r "$keyfile" ] || continue
         if [ -z "$keychain_load__login" ] || ! sshkey_protected "$keyfile"; then
             keychain_load__key="${keychain_load__key:+$keychain_load__key }$keyfile"
         fi
