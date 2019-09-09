@@ -126,6 +126,7 @@ git config --global alias.repull "pull --rebase"
 
 # push
 git config --global alias.pushall "push --recurse-submodules=on-demand"
+git config --global alias.push2all '!f() { for remote in `git remote`; do git push $remote "$@"; done }; f'
 # push : nothing | matching | simple | current
 git config --global push.default current
 git config --global alias.pushf 'push --force-with-lease'
