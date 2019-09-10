@@ -91,14 +91,14 @@ git config --global alias.fe fetch
 
 # diff
 git config --global alias.di diff
-git config --global alias.dic 'diff --cached'
-git config --global alias.dis 'diff --staged'
+git config --global alias.diffcached 'diff --cached'
+git config --global alias.diffc 'diff --cached'
+git config --global alias.diffstaged 'diff --staged'
+git config --global alias.diffs 'diff --staged'
 git config --global alias.diffword 'diff --word-diff'
-git config --global alias.wdiff 'diffword'
-git config --global alias.diffw 'diffword'
+git config --global alias.diffw 'diff --word-diff'
 git config --global alias.difftext 'diff --word-diff --unified=10'
-git config --global alias.tdiff 'difftext'
-git config --global alias.difft 'difftext'
+git config --global alias.difft 'diff --word-diff --unified=10'
 
 # log
 git config --global alias.ll 'log --pretty=fuller'
@@ -149,7 +149,7 @@ git config --global alias.fixwhitespace '!f() {git rebase HEAD~${1:-1} --whitesp
 
 # stash = index + workspace (default)
 git config --global alias.saveall 'stash save --include-untracked "SAVE ALL"'
-git config --global alias.savec 'stash save --keep-index --include-untracked "SAVE BEFORE COMMIT"'
+git config --global alias.saveun 'stash save --keep-index --include-untracked "SAVE UNTRACKED"'
 
 # references
 git config --global alias.references 'show-ref'
@@ -170,9 +170,7 @@ git config --global alias.contributors 'shortlog -s -n'
 
 # branch-diff
 git config --global alias.branchdiff '!f() { br1=HEAD; [ $# -gt 1 ] && br1="$1" && shift; br2="$1" ; git lg --cherry-mark --left-right --no-merges "$br2"..."$br1"; }; f'
-git config --global alias.bdiff 'branchdiff'
 git config --global alias.branchdiffx '!f() { br1=HEAD; [ $# -gt 1 ] && br1="$1" && shift; br2="$1" ; git lg --cherry-pick --left-right --no-merges "$br2"..."$br1"; }; f'
-git config --global alias.bdiffx 'branchdiffx'
 git config --global alias.branchdiffmissing '!f() { br1=HEAD; [ $# -gt 1 ] && br1="$1" && shift; br2="$1" ; git lg --cherry-pick --left-only --no-merges "$br2"..."$br1"; }; f'
 
 # unmerged commit
