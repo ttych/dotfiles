@@ -584,3 +584,24 @@ mkcd()
     mkdir -p "$1" &&
         cd "$1"
 }
+
+
+##################################################
+# mktouch
+##################################################
+mktouch()
+{
+    if [ $# -eq 0 ]; then
+        echo >&2 "mktouch: missing file operand"
+        return 1
+    fi
+
+    for mktouch__f; do
+        mktouch__f="${mktouch__f%/*}"
+        [ -z "$mktouch__f" ] && continue
+        [ -d "$mktouch__f" ] && continue
+        mkdir -p "$mktouch__f" || return 1
+    done
+
+    touch "$@"
+}
