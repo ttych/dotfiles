@@ -192,6 +192,10 @@ BUILD_TOOLS_TERRAFORM_PREREQ_UBUNTU=
 BUILD_TOOLS_TERRAFORM_URL_PATTERN='https://releases.hashicorp.com/terraform/${version}/terraform_${version}_linux_amd64.zip'
 BUILD_TOOLS_TERRAFORM_DEFAULT_VERSION='0.12.8'
 
+#> hub - hub
+BUILD_TOOLS_HUB_URL_PATTERN='https://github.com/github/hub/releases/download/v${version}/hub-${kernel_l}-${arch}-${version}.tgz'
+BUILD_TOOLS_HUB_DEFAULT_VERSION='2.12.4'
+
 
 build_tools_env()
 {
@@ -204,6 +208,12 @@ build_tools_env()
     [ -z "$build_tools_env__version" ] && return 1
     eval build_tools_env__url_header="\"\$BUILD_TOOLS_${build_tools_env__name}_URL_HEADER\""
 
+    kernel=`uname -s`
+    kernel_l=`echo $kernel | tr [A-Z] [a-z]`
+    machine=`uname -m`
+    case $machine in
+        x86_64) arch=amd64 ;;
+    esac
     name="$build_tools_env__name"
     version="$build_tools_env__version"
     eval build_tools_env__url="\"$build_tools_env__url_pattern\""
