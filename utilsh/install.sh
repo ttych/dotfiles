@@ -12,6 +12,7 @@ DISTRIBUTIONS='
   https://github.com/ttych/rubysh.git
   https://github.com/ttych/git-hooks.git
   https://github.com/ttych/trash.git
+  https://gitlab.com/ttych/myenv.git
 '
 
 AUTOLOADS='
@@ -22,6 +23,7 @@ AUTOLOADS='
   ruby_base.shl
   pyv.sh
   wucp.shl
+  myenv.shl
 '
 
 if [ -z "$UTILSH_DIR" ]; then
