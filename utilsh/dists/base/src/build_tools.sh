@@ -196,6 +196,14 @@ BUILD_TOOLS_TERRAFORM_DEFAULT_VERSION='0.12.8'
 BUILD_TOOLS_HUB_URL_PATTERN='https://github.com/github/hub/releases/download/v${version}/hub-${kernel_l}-${arch}-${version}.tgz'
 BUILD_TOOLS_HUB_DEFAULT_VERSION='2.12.4'
 
+#> xsel - xsel
+BUILD_TOOLS_XSEL_ENV=
+BUILD_TOOLS_XSEL_CONFIG=
+BUILD_TOOLS_XSEL_PREREQ_REDHAT=
+BUILD_TOOLS_XSEL_PREREQ_UBUNTU=libxt-dev
+BUILD_TOOLS_XSEL_URL_PATTERN='https://github.com/kfish/xsel/archive/${version}.tar.gz'
+BUILD_TOOLS_XSEL_DEFAULT_VERSION='1.2.0'
+
 
 build_tools_env()
 {

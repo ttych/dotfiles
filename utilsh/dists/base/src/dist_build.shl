@@ -70,6 +70,25 @@ dist_build_configure()
         eval $3 make install
 }
 
+dist_build_autogen_autogen()
+{
+    if ./autogen.sh --help | grep -q -- --prefix; then
+        eval $2 ./autogen.sh --prefix="$dist_build_autogen" $1
+    else
+        eval $2 ./autogen.sh $1
+    fi
+}
+
+dist_build_autogen()
+{
+    dist_build_prefix "$1" || return 1
+    dist_build_autogen="$dist_build_prefix/${PWD##*/}"
+    mkdir -p "$dist_build_autogen" && \
+        dist_build_autogen_autogen "$2" "$3" && \
+        eval $3 make && \
+        eval $3 make install
+}
+
 dist_build_cmake()
 {
     dist_build_prefix "$1" || return 1
@@ -136,6 +155,9 @@ dist_build()
         dist_build__ret=$?
     elif [ -r CMakeLists.txt ]; then
         dist_build_cmake "$dist_build__loc" "$2" "$4"
+        dist_build__ret=$?
+    elif [ -r autogen.sh ]; then
+        dist_build_autogen "$dist_build__loc" "$2" "$4"
         dist_build__ret=$?
     elif [ -x Makefile ]; then
         echo >&2 "Makefile based build not supported"
