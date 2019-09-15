@@ -1332,6 +1332,15 @@
 		)
 	#+END_SRC
 
+** terraform
+   #+BEGIN_SRC emacs-lisp
+	 (use-package terraform-mode
+	   :ensure t
+	   :config
+	   (custom-set-variables
+	   '(terraform-indent-level 2))
+	   )
+   #+END_SRC
 * utils
 ** editing
    #+BEGIN_SRC emacs-lisp
