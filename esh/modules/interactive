@@ -291,3 +291,59 @@ Bguard()
 {
     bundle_exec guard "$@"
 }
+
+
+### copy / paste
+
+# alias pbcopy='xsel --clipboard --input'
+# alias pbpaste='xsel --clipboard --output'
+
+
+has_xsel=FALSE
+which xsel >/dev/null 2>/dev/null && has_xsel=TRUE
+
+xsel_copy()
+{
+    xsel --input "${1:---clipboard}"
+}
+
+xsel_paste()
+{
+    xsel --output "${1:---clipboard}"
+}
+
+has_xclip=FALSE
+which xclip >/dev/null 2>/dev/null && hash_xclip=TRUE
+
+xclip_copy()
+{
+    xclip -selection clipboard
+}
+
+xclip_paste()
+{
+    xclip -selection clipboard -o
+}
+
+xcopy_paste()
+{
+    [ -z "$1" ] && return 1
+
+    xcopy_paste="$1"
+    shift
+    if $has_xsel; then
+        xsel_$xcopy_paste "$@"
+    elif $has_xclip; then
+        xclip_$xcopy_paste "$@"
+    fi
+}
+
+xcopy()
+{
+    xcopy_paste copy "$@"
+}
+
+xpaste()
+{
+    xcopy_paste paste "$@"
+}
