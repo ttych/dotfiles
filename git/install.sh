@@ -126,6 +126,7 @@ git config --global alias.ffmerge "merge --ff-only"
 # pull
 git config --global alias.ffpull "pull --no-rebase --ff-only"
 git config --global alias.repull "pull --rebase"
+git config --global alias.up '!git pull --rebase $@ && git submodule update --init --recursive'
 
 # push
 git config --global alias.pushall "push --recurse-submodules=on-demand"
