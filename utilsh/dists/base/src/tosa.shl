@@ -131,7 +131,7 @@ tosa_tests()
         [ -r "$tosa_tests__f" ] || continue
         printf "  testing soluce with %s ..." "$tosa_tests__f"
         timeout "${tosa_timeout:-$TOSA_TIMEOUT_DEFAULT}" \
-                tosa_test "$tosa_tests__f"
+                tosa_test "$tosa_tests__f" 2>/dev/null
         tosa_tests__status=$?
 
         tosa_test_status "$tosa_tests__status"
@@ -187,6 +187,6 @@ end
 
 EOF
     chmod +x soluce
-    e soluce &
+    ex soluce &
     disown
 }
