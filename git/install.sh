@@ -23,16 +23,19 @@ GIT_VERSION=${GIT_VERSION##* }
 [ -n "$USER_MAIL" ] &&
     git config --global user.email "$USER_MAIL"
 
+
 # color output
 git config --global color.ui true
 
 # editor set to emacs if available
-for editor in em et emacs vim vi; do
+for editor in e et emacs vim vi; do
     if command -v $editor >/dev/null 2>/dev/null; then
         git config --global core.editor $editor
         break
     fi
 done
+
+git config --global alias.ec 'config --global -e'
 
 # algorithm : patience / histogram / <default>
 git config --global diff.algorithm histogram
