@@ -249,3 +249,7 @@ fi
 ## log
 ## Two Dot Notation / Dot Dot Notation / A..B => commit reachable from ref B but not from ref A
 ## Three Dot Notation / Dot Dot Dot Notation / A...B => commit reachable for either of ref A or B but not from both
+
+
+# browse
+git config --global alias.browse '!f() { url=$(git config remote.origin.url | sed -e "s/^git@\([a-z.-]*\):\(.*\)$/https:\/\/\1\/\2/") ; xdg-open ${url}; }; f'
