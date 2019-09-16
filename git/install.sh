@@ -82,19 +82,29 @@ git config --global alias.cor 'checkout --track'
 
 # branch
 git config --global alias.br branch
-## git show-branch <br1> <br2>
 git config --global alias.merged 'branch --merged'
 git config --global alias.unmerged 'branch --no-merge'
+git config --global alias.bclean '!f() { git branch --merged ${1:-master} | grep -v " ${1:-master}$" | xargs git branch -d; }; f'
+## git show-branch <br1> <br2>
 
 # commit
 git config --global alias.ci commit
 git config --global alias.cam "commit --all -m"
+git config --global alias.cfill 'commit --amend -C HEAD'
+git config --global alias.amend 'commit --amend'
+git config --global alias.fixup 'commit --fixup'
+git config --global alias.squash 'commit --squash'
+
+# rm
+git config --global alias.untack 'rm --cache --'
 
 # fetch
 git config --global alias.fe fetch
 
 # diff
 git config --global alias.di diff
+git config --global alias.df diff
+git config --global alias.dc 'diff --cached'
 git config --global alias.diffcached 'diff --cached'
 git config --global alias.diffc 'diff --cached'
 git config --global alias.diffstaged 'diff --staged'
@@ -170,7 +180,6 @@ git config --global alias.append '!git cherry-pick $(git merge-base HEAD $1)..$1
 
 # contributors
 git config --global alias.contributors 'shortlog -s -n'
-
 
 
 # branch-diff
