@@ -3,20 +3,28 @@
 #%%load%% std.shl
 #%%load%% file.shl
 
-samples()
+tosa_samples()
 {
-    samples__arch=
-    samples__dir=
+    tosa_samples__arch=
+    tosa_samples__dir=
     [ -z "$1" ] && return 1
 
-    samples__arch="${1##*/}"
-    samples__dir="${samples__arch%.*}"
+    tosa_samples__arch="${1##*/}"
+    tosa_samples__dir="${tosa_samples__arch%.*}"
 
-    rm -f "samples" "$samples__dir" "$samples__arch" || return 1
-    wget "$1" -O"$samples__arch" || return 1
-    extract -rm "$samples__arch" || return 1
-    rm -f "$samples__arch" || return 1
-    mv "$samples__dir" "samples"
+    rm -f "samples" "$tosa_samples__dir" "$tosa_samples__arch" || return 1
+    wget "$1" -O"$tosa_samples__arch" || return 1
+    extract -rm "$tosa_samples__arch" || return 1
+    rm -f "$tosa_samples__arch" || return 1
+    mv "$tosa_samples__dir" "samples"
+}
+
+tosa_statement()
+{
+    [ -z "$1" ] && return 1
+
+    rm -f "statement.pdf" || return 1
+    wget "$1" -O statement.pdf || return 1
 }
 
 TOSA_SOLUCE=soluce
@@ -176,17 +184,19 @@ def local_print(item)
   PP.pp(item, \$stderr, 200)
 end
 
-#
+require 'byebug'
+
+##########################################
 
 input = Array.new
 while i = \$stdin.gets
   input << i.strip
 end
 
-#
+##########################################
 
 EOF
     chmod +x soluce
-    ex soluce &
-    disown
+    #ex soluce &
+    #disown
 }
