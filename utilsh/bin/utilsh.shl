@@ -15,7 +15,7 @@ git_update()
         git reset --quiet --hard HEAD &&
             git pull --quiet --no-rebase --ff-only
     fi
-    git submodule --quiet update --recursive
+    git submodule --quiet update --init --recursive
 }
 
 path_check_in()
