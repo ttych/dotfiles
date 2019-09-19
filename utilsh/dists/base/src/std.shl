@@ -489,9 +489,9 @@ lib_load()
     lib_load__r=0
     for lib_load__l; do
         lib_load__found=0
-        lib_load__ext_lib='.shl'
+        lib_load__ext_lib='.lib.sh .shl'
         case $lib_load__l in
-            *.shl|*.lib) lib_load__ext_lib= ;;
+            *.lib.sh|*.shl|*.lib) lib_load__ext_lib= ;;
         esac
         for lib_load__ext in $lib_load__ext_lib ""; do
             case "${lib_load__l}" in
