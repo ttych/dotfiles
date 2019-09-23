@@ -21,10 +21,17 @@ tosa_samples()
 
 tosa_statement()
 {
+    tosa_statement__suffix=
+    if [ $# -ge 2 ]; then
+        tosa_statement__suffix="$1"
+        shift
+    fi
+
     [ -z "$1" ] && return 1
 
-    rm -f "statement.pdf" || return 1
-    wget "$1" -O statement.pdf || return 1
+    tosa_statement__file="statement${tosa_statement__suffix:+.$tosa_statement__suffix}.pdf"
+    rm -f "$tosa_statement__file" || return 1
+    wget "$1" -O "$tosa_statement__file" || return 1
 }
 
 TOSA_SOLUCE=soluce
