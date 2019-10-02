@@ -48,30 +48,30 @@ tosa_timeout()
     tosa_timeout="$1"
 }
 
-tosa_samples_guess()
+tosa_guess_samples()
 {
-    tosa_samples_guess__d="${1%/*}"
-    tosa_samples_guess__i=
-    tosa_samples_guess__o=
-    tosa_samples_guess__c=
+    tosa_guess_samples__d="${1%/*}"
+    tosa_guess_samples__i=
+    tosa_guess_samples__o=
+    tosa_guess_samples__c=
     case "$1" in
         */input[0-9]*)
-            tosa_samples_guess__i="$1"
-            tosa_samples_guess__o="${tosa_samples_guess__d}/output${1#*/input}"
-            tosa_samples_guess__c="${tosa_samples_guess__d}/computed${1#*/input}"
+            tosa_guess_samples__i="$1"
+            tosa_guess_samples__o="${tosa_guess_samples__d}/output${1#*/input}"
+            tosa_guess_samples__c="${tosa_guess_samples__d}/computed${1#*/input}"
             ;;
         */output[0-9]*)
-            tosa_samples_guess__i="${tosa_samples_guess__d}/input${1#*/output}"
-            tosa_samples_guess__o="$1"
-            tosa_samples_guess__c="${tosa_samples_guess__d}/computed${1#*/output}"
+            tosa_guess_samples__i="${tosa_guess_samples__d}/input${1#*/output}"
+            tosa_guess_samples__o="$1"
+            tosa_guess_samples__c="${tosa_guess_samples__d}/computed${1#*/output}"
             ;;
         */computed[0-9]*)
-            tosa_samples_guess__i="${tosa_samples_guess__d}/input${1#*/computed}"
-            tosa_samples_guess__o="${tosa_samples_guess__d}/output${1#*/computed}"
-            tosa_samples_guess__c="$1"
+            tosa_guess_samples__i="${tosa_guess_samples__d}/input${1#*/computed}"
+            tosa_guess_samples__o="${tosa_guess_samples__d}/output${1#*/computed}"
+            tosa_guess_samples__c="$1"
             ;;
     esac
-    tosa_samples_guess__d="${tosa_samples_guess__i%/*}"
+    tosa_guess_samples__d="${tosa_guess_samples__i%/*}"
 }
 
 tosa_dump_file()
@@ -96,29 +96,29 @@ tosa_test()
         shift
     fi
 
-    tosa_samples_guess "$1"
-    [ -r "$tosa_samples_guess__i" ] || return 1
+    tosa_guess_samples "$1"
+    [ -r "$tosa_guess_samples__i" ] || return 1
 
     if [ ! -r "$TOSA_SOLUCE" ]; then
         tosa_test__status=3
     else
         [ -x "$TOSA_SOLUCE" ] || chmod +x "./$TOSA_SOLUCE"
-        if "./$TOSA_SOLUCE" < "$tosa_samples_guess__i" > "$tosa_samples_guess__c"; then
-            tosa_test__output=$(cat "$tosa_samples_guess__c")
-            tosa_test__expected=$(cat "$tosa_samples_guess__o")
+        if "./$TOSA_SOLUCE" < "$tosa_guess_samples__i" > "$tosa_guess_samples__c"; then
+            tosa_test__output=$(cat "$tosa_guess_samples__c")
+            tosa_test__expected=$(cat "$tosa_guess_samples__o")
             if [ "$tosa_test__output" = "$tosa_test__expected" ]; then
                 tosa_test__status=0
             else
                 tosa_test__status=2
                 if [ -n "$tosa_test__verbose" ]; then
-                    printf "INPUT %s\n" "$tosa_samples_guess__i"
-                    tosa_dump_file "$tosa_samples_guess__i"
-                    printf "EXPECTED %s\n" "$tosa_samples_guess__o"
-                    tosa_dump_file "$tosa_samples_guess__o"
-                    printf "COMPUTED %s\n" "$tosa_samples_guess__c"
-                    tosa_dump_file "$tosa_samples_guess__c"
+                    printf "INPUT %s\n" "$tosa_guess_samples__i"
+                    tosa_dump_file "$tosa_guess_samples__i"
+                    printf "EXPECTED %s\n" "$tosa_guess_samples__o"
+                    tosa_dump_file "$tosa_guess_samples__o"
+                    printf "COMPUTED %s\n" "$tosa_guess_samples__c"
+                    tosa_dump_file "$tosa_guess_samples__c"
                     printf "DIFF\n"
-                    diff -u "$tosa_samples_guess__o" "$tosa_samples_guess__c" | tosa_format
+                    diff -u "$tosa_guess_samples__o" "$tosa_guess_samples__c" | tosa_format
                 fi
             fi
         else
