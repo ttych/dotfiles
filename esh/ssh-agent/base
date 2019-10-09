@@ -46,7 +46,7 @@ keychain_load()
     for keyfile in "$HOME/.ssh"/*; do
         [ -d "$keyfile" ] && continue
         [ ! -r "$keyfile" ] && continue
-        case "$keyfile" in
+        case "${keyfile##*/}" in
             id_*.pub) continue ;;
             id_*) ;;
             *) case `file -b "$keyfile"` in
