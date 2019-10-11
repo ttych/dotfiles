@@ -171,6 +171,7 @@ pycharm()
     pycharm=`command -v pycharm.sh`
     if [ -n "$pycharm" ]; then
         "$pycharm" "$@" &
+        return $? # always 0
     fi
 
     echo >&2 'no pycharm distribution found'
