@@ -93,7 +93,9 @@ git config --global alias.cam "commit --all -m"
 git config --global alias.cfill 'commit --amend -C HEAD'
 git config --global alias.amend 'commit --amend'
 git config --global alias.fixup 'commit --fixup'
+git config --global alias.ffix '!f() { git commit --fixup ${1:-HEAD}; }; f'
 git config --global alias.squash 'commit --squash'
+git config --global alias.fsquash '!f() { git commit --squash ${1:-HEAD}; }; f'
 
 # rm
 git config --global alias.untack 'rm --cache --'
