@@ -2,6 +2,8 @@
 # -*- mode: sh -*-
 
 ### LANG
+LANG_SUFFIX=':utf8:UTF-8:'
+
 lang_support()
 {
     [ -z "$1" ] && return 1
@@ -29,7 +31,17 @@ lang_autoset()
     fi
 }
 
-lang_autoset
+lang_check()
+{
+    case "$LANG_SUFFIX" in
+        *:"${LANG##*.}":*)
+            return 0 ;;
+    esac
+
+    lang_autoset
+}
+
+lang_check
 
 if [ -z "$LANG" ]; then
     LANG=C
