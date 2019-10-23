@@ -39,6 +39,7 @@ prompt_rbenv()
         prompt_rbenv="rbenv:$RBENV_VERSION"
     else
         prompt_rbenv__version="`rbenv local 2>/dev/null`"
+        [ $? -eq 0 ] || return 1
         if [ -n "$prompt_rbenv__version" ]; then
             prompt_rbenv="rbenv:$prompt_rbenv__version"
         fi
