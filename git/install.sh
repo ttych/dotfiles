@@ -89,16 +89,20 @@ git config --global alias.bclean '!f() { git branch --merged ${1:-master} | grep
 
 # commit
 git config --global alias.ci commit
+git config --global alias.cim "commit -m"
 git config --global alias.cam "commit --all -m"
 git config --global alias.cfill 'commit --amend -C HEAD'
 git config --global alias.amend 'commit --amend'
 git config --global alias.fixup 'commit --fixup'
-git config --global alias.ffix '!f() { git commit --fixup ${1:-HEAD}; }; f'
+git config --global alias.cfix '!f() { git commit --fixup ${1:-HEAD}; }; f'
 git config --global alias.squash 'commit --squash'
-git config --global alias.fsquash '!f() { git commit --squash ${1:-HEAD}; }; f'
+git config --global alias.csquash '!f() { git commit --squash ${1:-HEAD}; }; f'
 
 # rm
 git config --global alias.untack 'rm --cache --'
+
+# remote
+git config --global alias.rem 'remote -v'
 
 # fetch
 git config --global alias.fe fetch
