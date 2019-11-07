@@ -13,7 +13,6 @@ DISTRIBUTIONS='
   https://github.com/ttych/git-hooks.git
   https://github.com/ttych/trash.git
   https://gitlab.com/ttych/myenv.git
-  https://gitlab.com/ttych/unix_utilsh.git
 '
 
 AUTOLOADS='
