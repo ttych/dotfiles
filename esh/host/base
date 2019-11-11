@@ -2,7 +2,7 @@
 # -*- mode: sh -*-
 
 ### LANG
-LANG_SUFFIX=':utf8:UTF-8:'
+LANG_SUFFIX=' utf8 UTF-8 '
 
 lang_support()
 {
@@ -34,7 +34,7 @@ lang_autoset()
 lang_check()
 {
     case "$LANG_SUFFIX" in
-        *:"${LANG##*.}":*)
+        *" ${LANG##*.} "*)
             return 0 ;;
     esac
 
@@ -48,6 +48,24 @@ if [ -z "$LANG" ]; then
     export LANG
 fi
 
+
+### FR
+fr()
+{
+    if [ -z "$fr__LANG" ]; then
+        for fr__s in $LANG_SUFFIX; do
+            if lang_support "fr_FR.$fr__s"; then
+                fr__LANG="fr_FR.$fr__s"
+                break
+            fi
+        done
+    fi
+    if [ -z "$fr__LANG" ]; then
+        echo >&2 'no locale matching fr_FR found'
+        return 1
+    fi
+    LANG="$fr__LANG" "$@"
+}
 
 ### HOSTNAME
 HOSTNAME=`uname -n`
