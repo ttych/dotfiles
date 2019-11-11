@@ -24,6 +24,7 @@ AUTOLOADS='
   pyv.sh
   wucp.shl
   myenv.shl
+  editors.lib.sh
 '
 
 if [ -z "$UTILSH_DIR" ]; then
