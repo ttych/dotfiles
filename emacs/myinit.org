@@ -584,6 +584,11 @@
 	#+END_SRC
 
 ** extra
+*** turnip
+	#+BEGIN_SRC emacs-lisp
+	  (use-package turnip
+		:ensure t)
+	#+END_SRC
 *** emamucs
 	#+BEGIN_SRC emacs-lisp
 	  (use-package emamux
