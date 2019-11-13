@@ -59,10 +59,8 @@
 	 (global-set-key (kbd "M-* \\") 'align-regexp)
 
 	 ;; Repeat (previously C-x z)
-	 (global-set-key (kbd "C-x c r") 'repeat)
-	 (global-set-key (kbd "C-x c c") 'repeat-complex-command)
-	 (global-set-key (kbd "M-* c r") 'repeat)
-	 (global-set-key (kbd "M-* c c") 'repeat-complex-command)
+	 (global-set-key (kbd "<f6>") 'repeat)
+	 (global-set-key (kbd "<M-f6>") 'repeat-complex-command)
 
 	 ; C-c C-r    =>  recentf
    #+END_SRC
@@ -584,17 +582,19 @@
 	#+END_SRC
 
 ** extra
-*** turnip
-	#+BEGIN_SRC emacs-lisp
+*** (disabled) turnip
+	#+BEGIN_SRC
 	  (use-package turnip
 		:ensure t)
 	#+END_SRC
-*** emamucs
-	#+BEGIN_SRC emacs-lisp
+*** (disabled) emamux
+	#+BEGIN_SRC
 	  (use-package emamux
-		:ensure t)
+		:ensure t
+		:config
+		(global-set-key (kbd "M-n") emamux:keymap)
+	  )
 	#+END_SRC
-
 *** htmlize
    #+BEGIN_SRC emacs-lisp
 	 (use-package htmlize
