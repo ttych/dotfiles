@@ -42,13 +42,11 @@
 	 (global-set-key (kbd "M-* #") 'comment-region)
 	 (global-set-key (kbd "M-* @") 'uncomment-region)
 
-
 	 ;; Search
 	 (global-set-key (kbd "M-s O") 'multi-occur)
 	 (global-set-key (kbd "M-s d") 'find-dired)
 	 (global-set-key (kbd "M-s g") 'rgrep)
 	 (global-set-key (kbd "M-s r") 'query-replace-regexp)
-
 
 	 ;; Modes
 	 (global-set-key (kbd "M-* m f") 'auto-fill-mode)
@@ -56,10 +54,15 @@
 	 (global-set-key (kbd "M-* m s") 'auto-save-mode)
 	 (global-set-key (kbd "M-* m l") 'display-line-numbers-mode)
 
-
 	 ;; Align
 	 (global-set-key (kbd "C-x \\") 'align-regexp)
 	 (global-set-key (kbd "M-* \\") 'align-regexp)
+
+	 ;; Repeat (previously C-x z)
+	 (global-set-key (kbd "C-x c r") 'repeat)
+	 (global-set-key (kbd "C-x c c") 'repeat-complex-command)
+	 (global-set-key (kbd "M-* c r") 'repeat)
+	 (global-set-key (kbd "M-* c c") 'repeat-complex-command)
 
 	 ; C-c C-r    =>  recentf
    #+END_SRC
@@ -346,6 +349,18 @@
 		)
 	#+END_SRC
 ** ui
+*** zoom
+	#+BEGIN_SRC emacs-lisp
+	  (use-package zoom-window
+		:ensure t
+		:bind (
+			   ("C-x z" . zoom-window-zoom)
+			   )
+		:config
+		(custom-set-variables
+		 '(zoom-window-mode-line-color "DarkGreen"))  ;; Darkblue
+		)
+	#+END_SRC
 *** ace-window
 	#+BEGIN_SRC emacs-lisp
 	  (use-package ace-window
