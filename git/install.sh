@@ -12,16 +12,34 @@ GIT_VERSION=`git --version`
 GIT_VERSION=${GIT_VERSION##* }
 
 
+# commit
+#  - parent (reference)
+#  - the state of the files (snapshot)
+# snapshot
+#  - directory (tree)
+#  - file (blob)
+# reference
+#  - tags (associated to a specific commit)
+#  - branches (latest commit in a history line)
+#  - HEAD (special reference to the snapshot of the current working directory)
+
+
 # git config --local --list
 # git config --global --list
 # git config --system --list
 
 
 # config
-[ -n "$USER_NAME" ] &&
-    git config --global user.name "$USER_NAME"
-[ -n "$USER_MAIL" ] &&
-    git config --global user.email "$USER_MAIL"
+git_current_user_name=`git config --global --get user.name`
+if [ -z "$git_current_user_name" ]; then
+    [ -n "$USER_NAME" ] &&
+        git config --global user.name "$USER_NAME"
+fi
+git_current_user_mail=`git config --global --get user.mail`
+if [ -z "$git_current_user_mail" ]; then
+    [ -n "$USER_MAIL" ] &&
+        git config --global user.email "$USER_MAIL"
+fi
 
 
 # color output
