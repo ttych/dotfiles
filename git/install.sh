@@ -2,6 +2,22 @@
 # -*- mode: sh -*-
 
 
+# A good commit
+# - Atomic
+#   self-contained: sementically related changes should not be splitted across commits
+#   coherent: all change in 1 commit should be semantically related
+# - Consistent
+#   no compilation errors
+#   no broken tests
+#   -> should not introduction quality regressions
+# - Incremental
+#   ordered: should be ordered deliberately (not arbitrary)
+#   explanatory: should be a trail of the programmer's thought process
+# - Documented
+#   a short summary: a short one-sentence summary
+#   detailed description: more details
+
+
 which git >/dev/null 2>&1 || {
     echo "No git command found ! Aborting git configuration"
     exit 1
@@ -127,7 +143,6 @@ git config --global alias.fe fetch
 
 # diff
 git config --global alias.di diff
-git config --global alias.df diff
 git config --global alias.dc 'diff --cached'
 git config --global alias.diffcached 'diff --cached'
 git config --global alias.diffc 'diff --cached'
@@ -278,7 +293,8 @@ fi
 ## log --grep=C --walk-reflogs
 ## bisect start ; bisect bad HEAD ; bisect good HEAD~4 ; bisect good | bad ; bisect reset
 ## bisect start HEAD HEAD~4 ; git bisect run <make>
-
+## diff
+#  diff HEAD~2:Readme.md..HEAD:Readme.md
 
 
 # dot Notation
