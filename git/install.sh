@@ -57,6 +57,7 @@ if [ -z "$git_current_user_mail" ]; then
         git config --global user.email "$USER_MAIL"
 fi
 
+git config --global alias.ec 'config --global -e'
 
 # color output
 git config --global color.ui true
@@ -69,7 +70,18 @@ for editor in e et emacs vim vi; do
     fi
 done
 
-git config --global alias.ec 'config --global -e'
+# global gitignore
+if [ -r "$HOME/.gitignore_global" ]; then
+    git config --global core.excludesfile "$HOME/.gitignore_global"
+fi
+
+# autocorrect
+# git config --global help.autocorrect 20
+
+# commit template
+if [ -r "$HOME/.gitmessage.txt" ]; then
+    git config --global commit.template "$HOME/.gitmessage.txt"
+fi
 
 # algorithm : patience / histogram / <default>
 git config --global diff.algorithm histogram
@@ -121,6 +133,9 @@ git config --global alias.unmerged 'branch --no-merge'
 git config --global alias.bclean '!f() { git branch --merged ${1:-master} | grep -v " ${1:-master}$" | xargs git branch -d; }; f'
 ## git show-branch <br1> <br2>
 
+# add
+git config --global alias.a add
+
 # commit
 git config --global alias.ci commit
 git config --global alias.cim "commit -m"
@@ -143,9 +158,10 @@ git config --global alias.fe fetch
 
 # diff
 git config --global alias.di diff
-git config --global alias.dc 'diff --cached'
+git config --global alias.dc 'diff --check'
 git config --global alias.diffcached 'diff --cached'
 git config --global alias.diffc 'diff --cached'
+git config --global alias.ds 'diff --staged'
 git config --global alias.diffstaged 'diff --staged'
 git config --global alias.diffs 'diff --staged'
 git config --global alias.diffword 'diff --word-diff'
@@ -189,7 +205,7 @@ git config --global alias.pushf 'push --force-with-lease'
 ## --hard / update : HEAD + index + workspace (destructive)
 ## --mixed (default) / update : HEAD + index
 ## --soft / update : HEAD
-git config --global alias.unstage 'reset HEAD'
+git config --global alias.unstage 'reset --mixed HEAD'
 git config --global alias.resetto '!f() { f=$(git symbolic-ref HEAD 2>/dev/null); f="origin/${f#refs/heads/}" ; git reset --hard "${1:-$f}"; }; f'
 git config --global alias.resetfile '!f() { git reset @~ "$@" && git commit --amend --no-edit }; f'
 
@@ -203,7 +219,7 @@ git config --global alias.fixwhitespace '!f() {git rebase HEAD~${1:-1} --whitesp
 
 # stash = index + workspace (default)
 git config --global alias.saveall 'stash save --include-untracked "SAVE ALL"'
-git config --global alias.saveun 'stash save --keep-index --include-untracked "SAVE UNTRACKED"'
+git config --global alias.savewip 'stash save --keep-index --include-untracked "SAVE WIP"'
 
 # references
 git config --global alias.references 'show-ref'
