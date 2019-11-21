@@ -148,11 +148,7 @@ git config --global alias.fixup 'commit --fixup'
 git config --global alias.squash 'commit --squash'
 
 # rebase
-# FIXME
-# get remote tracking branche
-# get branch starting point
-#git config --global alias.rb '!f() { base="$1"; [ -z "$base" ] && base= && git rebase --whitespace=warn  ; }; f'
-
+git config --global alias.rb 'rebase --whitespace=warn'
 
 # rm
 git config --global alias.untrack 'rm --cache --'
