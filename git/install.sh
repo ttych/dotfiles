@@ -276,6 +276,9 @@ git config --global alias.undo '!f() { git reset --hard $(git rev-parse --abbrev
 # grep
 git config --global alias.g "grep --break --heading --line-number"
 
+# clean
+git config --global alias.pristine '!f() { git reset --hard ${1:-HEAD} && git clean -fdx; }; f'
+git config --global alias.cleantmp 'clean -dX'
 
 
 # git pull --rebase
