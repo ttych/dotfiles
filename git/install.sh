@@ -57,7 +57,7 @@ if [ -z "$git_current_user_mail" ]; then
         git config --global user.email "$USER_MAIL"
 fi
 
-git config --global alias.ec 'config --global -e'
+git config --global alias.conf 'config --global -e'
 
 # color output
 git config --global color.ui true
@@ -91,9 +91,11 @@ git config --global core.pager 'less -RFX'
 
 # newline
 ## To configure line endings correctly on Linux/Mac:
-##git config --global core.autocrlf input
-## To configure line endings correctly on Windows:
-##git config --global core.autocrlf true
+git config --global core.autocrlf input
+## To configure line endings correctly on Linux/Windows:
+# git config --global core.autocrlf true
+## To configure line endings correctly on Windows only:
+# git config --global core.autocrlf false
 
 # ReReRe : Reuse Recorded Resolution
 git config --global rerere.enabled true
@@ -130,7 +132,7 @@ git config --global alias.cor 'checkout --track'
 git config --global alias.br branch
 git config --global alias.merged 'branch --merged'
 git config --global alias.unmerged 'branch --no-merge'
-git config --global alias.bclean '!f() { git branch --merged ${1:-master} | grep -v " ${1:-master}$" | xargs git branch -d; }; f'
+git config --global alias.cleanmerged '!f() { git branch --merged ${1:-master} | grep -v " ${1:-master}$" | xargs git branch -d; }; f'
 ## git show-branch <br1> <br2>
 
 # add
@@ -140,15 +142,20 @@ git config --global alias.a add
 git config --global alias.ci commit
 git config --global alias.cim "commit -m"
 git config --global alias.cam "commit --all -m"
-git config --global alias.cfill 'commit --amend -C HEAD'
 git config --global alias.amend 'commit --amend'
+git config --global alias.amendc 'commit --amend -C HEAD'
 git config --global alias.fixup 'commit --fixup'
-git config --global alias.cfix '!f() { git commit --fixup ${1:-HEAD}; }; f'
 git config --global alias.squash 'commit --squash'
-git config --global alias.csquash '!f() { git commit --squash ${1:-HEAD}; }; f'
+
+# rebase
+# FIXME
+# get remote tracking branche
+# get branch starting point
+#git config --global alias.rb '!f() { base="$1"; [ -z "$base" ] && base= && git rebase --whitespace=warn  ; }; f'
+
 
 # rm
-git config --global alias.untack 'rm --cache --'
+git config --global alias.untrack 'rm --cache --'
 
 # remote
 git config --global alias.rem 'remote -v'
@@ -171,12 +178,18 @@ git config --global alias.difft 'diff --word-diff --unified=10'
 
 # log
 git config --global alias.ll 'log --pretty=fuller'
-git config --global alias.l1 'log --oneline --decorate --abbrev-commit --all'
-git config --global alias.l1g 'log --oneline --decorate --abbrev-commit --all --graph'
-git config --global alias.lg "log --pretty='%C(yellow)%h%Creset %C(red)%d%Creset %s %Cgreen(%cr)%Creset %C(cyan)[%an]%Creset' --graph"
-git config --global alias.la g "lg --all"
+#git config --global alias.l1 'log --oneline --decorate --abbrev-commit --all'
+git config --global alias.l1 "log --pretty='%C(yellow)%h%Creset %C(red)%d%Creset %s %Cgreen(%cr)%Creset %C(cyan)[%an]%Creset'"
+git config --global alias.l1g '!git l1 --graph'
+git config --global alias.lg '!git l1 --graph'
+git config --global alias.la '!git l1 --all'
+git config --global alias.lag '!git la --graph'
 ## path from branch A to branch B (ancestor A / decendent B)
 ## git lg --ancestry-path B..A
+
+# show-branch
+git config --global alias.sb 'show-branch'
+git config --global alias.sbt '!f() { bt="$1"; [ $# -gt 0 ] && shift ; [ -z "$bt" ] && bt=$(git rev-parse --abbrev-ref HEAD); git show-branch --topic $bt "$@"; }; f'
 
 # show
 git config --global alias.so "show --pretty='parent %C(yellow)%p%Creset commit %C(yellow)%h%Creset%Cred%d%Creset%n%n%w(72,2,2)%s%n%n%w(72,0,0)%C(cyan)%an%Creset %Cgreen%ar%Creset'"
@@ -206,16 +219,15 @@ git config --global alias.pushf 'push --force-with-lease'
 ## --mixed (default) / update : HEAD + index
 ## --soft / update : HEAD
 git config --global alias.unstage 'reset --mixed HEAD'
-git config --global alias.resetto '!f() { f=$(git symbolic-ref HEAD 2>/dev/null); f="origin/${f#refs/heads/}" ; git reset --hard "${1:-$f}"; }; f'
+git config --global alias.resetto '!f() { branch=$(git rev-parse --abbrev-ref HEAD); git reset --hard "${1:-$branch}"; }; f'
 git config --global alias.resetfile '!f() { git reset @~ "$@" && git commit --amend --no-edit }; f'
 
 # whitespace
-## indent-with-non-tab, tab-in-indent : tab & indentation
-## trailing-space : remove trailing space
-## space-before-tab : remove space before tab
-## cr-at-eol : CR at end of line
-git config --global core.whitespace 'blank-at-eol,blank-at-eof,trailing-space,space-before-tab,cr-at-eol'
-git config --global alias.fixwhitespace '!f() {git rebase HEAD~${1:-1} --whitespace=fix}; f'
+## defaults: blank-at-eol,blank-at-eof,space-before-ta
+## additional: cr-at-eol,tab-in-indent,indent-with-non-tab
+## trailing-space = both blank-at-eol + blank-at-eof
+git config --global core.whitespace 'trailing-space,space-before-tab'
+git config --global alias.cleanwhitespace '!f() {git rebase HEAD~${1:-1} --whitespace=fix}; f'
 
 # stash = index + workspace (default)
 git config --global alias.saveall 'stash save --include-untracked "SAVE ALL"'
@@ -224,39 +236,46 @@ git config --global alias.savewip 'stash save --keep-index --include-untracked "
 # references
 git config --global alias.references 'show-ref'
 git config --global alias.refs 'show-ref'
+git config --global alias.logreferences "log --walk-reflogs"
 git config --global alias.logref "log --walk-reflogs"
+git config --global alias.reflogs 'log --walk-reflogs'
 
 # fsck
 git config --global alias.dangling 'fsck --dangling --no-reflogs'  # --no-progress
 git config --global alias.unreachable 'fsck --unreachable --no-reflogs'  # --no-progress
 
 # cherry-pick
+git config --global alias.cherry-picks '!git cherry-pick $(git merge-base HEAD $1)..$1'
 git config --global alias.append '!git cherry-pick $(git merge-base HEAD $1)..$1'
 
 # contributors
+git config --global alias.contribs 'shortlog -s -n'
 git config --global alias.contributors 'shortlog -s -n'
-
 
 # branch-diff
 git config --global alias.branchdiff '!f() { br1=HEAD; [ $# -gt 1 ] && br1="$1" && shift; br2="$1" ; git lg --cherry-mark --left-right --no-merges "$br2"..."$br1"; }; f'
-git config --global alias.branchdiffx '!f() { br1=HEAD; [ $# -gt 1 ] && br1="$1" && shift; br2="$1" ; git lg --cherry-pick --left-right --no-merges "$br2"..."$br1"; }; f'
-git config --global alias.branchdiffmissing '!f() { br1=HEAD; [ $# -gt 1 ] && br1="$1" && shift; br2="$1" ; git lg --cherry-pick --left-only --no-merges "$br2"..."$br1"; }; f'
+git config --global alias.brdiff '!git branchdiff'
+git config --global alias.branchdiffp '!f() { br1=HEAD; [ $# -gt 1 ] && br1="$1" && shift; br2="$1" ; git lg --cherry-pick --left-right --no-merges "$br2"..."$br1"; }; f'
+git config --global alias.brdiffp '!git branchdiffp'
+git config --global alias.missingto '!f() { [ $# -lt 2 ] && set -- HEAD "$1"; git lg --cherry-pick --left-only --no-merges "$1"..."$2"; }; f'
+git config --global alias.missto '!git missingto'
+git config --global alias.missingfrom '!f() { [ $# -lt 2 ] && set -- HEAD "$1"; git lg --cherry "$1"..."$2"; }; f'
+git config --global alias.missfrom '!git missingfrom'
+
+# tracking changes
+git config --global alias.commitsonfile '!git lg --follow'
+git config --global alias.commitsonstring '!f() { git lg -G"$1"; }; f'
 
 # unmerged commit
 #git config --global alias.unmergedc '!f() { brs="$1" ; [ -z "$brs" ] && brs=$(git unmerged); for br in $brs; do echo "# $br"; git lg HEAD..$br; done; }; f'
-git config --global alias.unmergedc '!f() { brs="$1" ; [ -z "$brs" ] && brs=$(git unmerged); for br in $brs; do echo "# $br"; git branchdiffmissing $br; done; }; f'
+git config --global alias.unmergedc '!f() { brs="$1" ; [ -z "$brs" ] && brs=$(git unmerged); for br in $brs; do echo "# $br"; git branchmissingfrom $br; done; }; f'
 
 # merge conflict
 git config --global alias.mergecontext 'lg --merge --name-only'
-git config --global alias.diff3wm 'checkout --conflict=diff3'
+git config --global alias.cod3 'checkout --conflict=diff3'
 
 # reflog navigation
 git config --global alias.undo '!f() { git reset --hard $(git rev-parse --abbrev-ref HEAD)@{${1:-1}}; }; f'
-
-
-
-# rebase
-git config --global alias.irebase '!f() { f=$(git symbolic-ref HEAD 2>/dev/null); f="origin/${f#refs/heads/}" ; git rebase --interactive "${1:-$f}"; }; f'
 
 # grep
 git config --global alias.g "grep --break --heading --line-number"
@@ -295,7 +314,8 @@ fi
 ## lg --cherry master...feature
 ## lg --merges feature..master
 ## log --merge --name-only
-## log --follow code_file.rb
+## all modification on a file code_file.rb
+# log --follow code_file.rb
 ## log -Sstring
 ## log -S".*pattern.*" --pickaxe-regex
 ## log -G".*pattern.*"
@@ -307,8 +327,11 @@ fi
 ## checkout --conflict=diff3 calculator.c
 ## rebase -i --root --autosquash (autosquashing / fixup! <commit_msg>)
 ## log --grep=C --walk-reflogs
-## bisect start ; bisect bad HEAD ; bisect good HEAD~4 ; bisect good | bad ; bisect reset
-## bisect start HEAD HEAD~4 ; git bisect run <make>
+## branch diff
+# git rev-list --left-right --count HEAD...origin/master
+## bisect
+# bisect start ; bisect bad HEAD ; bisect good HEAD~4 ; bisect good | bad ; bisect reset
+# bisect start HEAD HEAD~4 ; git bisect run <make>
 ## diff
 #  diff HEAD~2:Readme.md..HEAD:Readme.md
 
@@ -323,3 +346,9 @@ fi
 
 # browse
 git config --global alias.browse '!f() { url=$(git config remote.origin.url | sed -e "s/^git@\([a-z.-]*\):\(.*\)$/https:\/\/\1\/\2/") ; xdg-open ${url}; }; f'
+
+
+###############################################################################
+# trash
+###############################################################################
+#git config --global alias.irebase '!f() { f=$(git symbolic-ref HEAD 2>/dev/null); f="origin/${f#refs/heads/}" ; git rebase --interactive "${1:-$f}"; }; f'
