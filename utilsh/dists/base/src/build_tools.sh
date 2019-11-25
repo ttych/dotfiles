@@ -11,7 +11,7 @@
 
 #> ruby - ruby interpreter
 BUILD_TOOLS_RUBY_PREREQ_REDHAT='readline-devel openssl-devel zlib-devel sqlite-devel'
-BUILD_TOOLS_RUBY_PREREQ_UBUNTU='libreadline-dev libssl-dev libsqlite3-dev'
+BUILD_TOOLS_RUBY_PREREQ_UBUNTU='libreadline-dev libssl-dev libsqlite3-dev zlib1g-dev'
 BUILD_TOOLS_RUBY_URL_PATTERN='http://cache.ruby-lang.org/pub/ruby/ruby-${version}.tar.gz'
 BUILD_TOOLS_RUBY_DEFAULT_VERSION='2.4.3'
 
