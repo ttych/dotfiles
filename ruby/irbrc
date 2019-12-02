@@ -1,3 +1,5 @@
+# -*- mode: ruby -*-
+
 IRB.conf[:PROMPT_MODE] = :SIMPLE
 # IRB.conf[:AUTO_INDENT_MODE] = false
 IRB.conf[:AUTO_INDENT] = true
@@ -10,4 +12,9 @@ def i_m(obj)
   anc = obj.class.ancestors - [obj.class]
   anc.each {|a| list -= a.instance_methods }
   list.sort
+end
+
+def json_pp(json)
+  require 'json'
+  puts JSON.pretty_generate(JSON.parse(json))
 end
