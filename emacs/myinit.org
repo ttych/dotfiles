@@ -365,7 +365,8 @@
 		:ensure t
 		:bind ([remap other-window] . ace-window)
 		:config
-		(ace-window-display-mode t)
+		(setq aw-ignore-current t
+		      aw-scope 'frame)
 		)
 	#+END_SRC
 
