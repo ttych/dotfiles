@@ -85,6 +85,13 @@ alias fssh='ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10'
 alias fscp='scp -o StrictHostKeyChecking=no -o ConnectTimeout=10'
 
 
+### tail
+tailf()
+{
+    tail -f "$@"
+}
+
+
 ### BackSpace
 #alias eraz='stty erase '
 #stty erase '^H'
