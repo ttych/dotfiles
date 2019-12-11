@@ -148,7 +148,10 @@ git config --global alias.fixup 'commit --fixup'
 git config --global alias.squash 'commit --squash'
 
 # rebase
-git config --global alias.rb 'rebase --whitespace=warn'
+git config --global alias.rb 'rebase'
+git config --global alias.irb 'rebase -i --fork-point'
+# equivalent to
+# git rebase -i $(git merge-base --fork-point <branch>)
 
 # rm
 git config --global alias.untrack 'rm --cache --'
