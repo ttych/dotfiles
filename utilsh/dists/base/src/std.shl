@@ -68,7 +68,7 @@ export ME
 # OS
 ##################################################
 OS=`uname -s`
-OS_ARCH=`uname -m`
+ OS_ARCH=`uname -m`
 export OS OS_ARCH
 
 
@@ -130,7 +130,7 @@ _tmpdir()
     for _tmpdir__d; do
         if [ -d "$_tmpdir__d" ]; then
             _tmpdir__d=$(cd "$_tmpdir__d" && \
-                                  touch _tmpdir.$$ && \
+                                  touch _tmpdir.$$ 2>/dev/null && \
                                   rm _tmpdir.$$ && \
                                   pwd -P)
             [ $? -ne 0 ] && continue
@@ -141,13 +141,21 @@ _tmpdir()
     done
     return 1
 }
-_tmpdir "/ram" || {
-    [ "$OS" = "Linux" ] && _tmpdir "/tmp"
-} ||
-    _tmpdir "/local" \
-            "${HOME_ALT:+$HOME_ALT/tmp}" \
-            "${HOME:+$HOME/tmp}" \
-            "/var/tmp"
+
+# _tmpdir "/ram" || {
+#     [ "$OS" = "Linux" ] && _tmpdir "/tmp"
+# } ||
+#     _tmpdir "/local" \
+#             "${HOME_ALT:+$HOME_ALT/tmp}" \
+#             "${HOME:+$HOME/tmp}" \
+#             "/var/tmp"
+
+_tmpdir "/local" \
+        "/ram" \
+        "${HOME_ALT:+$HOME_ALT/tmp}" \
+        "${HOME:+$HOME/tmp}" \
+        "/tmp" \
+        "/var/tmp"
 
 _mktemp_tpl()
 {
