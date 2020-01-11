@@ -32,6 +32,24 @@ filename_to_posix()
 }
 
 
+### CPOSIX
+is_filename_cposix()
+{
+    LANG=C is_filename_posix "$@"
+}
+
+_filename_to_cposix()
+{
+    LANG=C _filename_to_posix "$@"
+    _filename_to_cposix="$_filename_to_posix"
+}
+
+filename_to_cposix()
+{
+    LANG=C filename_to_posix "$@"
+}
+
+
 ### OK / KO
 FILENAME_KO_CHARS="][|#?!><*&${BKS}\$'\"${SPC}${NL}${TAB}${CR}${BS}${DEL}()"
 is_filename_ok()
