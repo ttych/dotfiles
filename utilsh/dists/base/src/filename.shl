@@ -141,7 +141,7 @@ filename_fix_one()
       filename_fix_one__n=$(($filename_fix_one__n + 1))
     done
 
-    mv "$1" "$filename_fix_one" || return 1
+    mv -- "$1" "$filename_fix_one" || return 1
   fi
 }
 
