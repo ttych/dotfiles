@@ -37,8 +37,8 @@
 
 #xbindkeys show
 "xbindkeys_show"
-    m:0x40 + c:45
-    Mod4 + k 
+    m:0x41 + c:45
+    Shift+Mod4 + k 
 
 #terminal
 "xterm -name xtermlblue"
@@ -109,6 +109,16 @@
 "setxkbmap -option "compose:ralt""
     m:0x41 + c:54
     Shift+Mod4 + c 
+
+#xkill
+"xkill"
+    m:0x40 + c:45
+    Mod4 + k 
+
+#virtualbox
+"virtualbox"
+    m:0x40 + c:55
+    Mod4 + v 
 
 #
 # End of xbindkeys configuration
