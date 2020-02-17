@@ -132,7 +132,8 @@ git config --global alias.cor 'checkout --track'
 git config --global alias.br branch
 git config --global alias.merged 'branch --merged'
 git config --global alias.unmerged 'branch --no-merge'
-git config --global alias.cleanmerged '!f() { git branch --merged ${1:-master} | grep -v " ${1:-master}$" | xargs git branch -d; }; f'
+#git config --global alias.cleanmerged '!f() { git branch --merged ${1:-master} | grep -v " ${1:-master}$" | xargs git branch -d; }; f
+git config --global alias.cleanmerged '!f() { for br in $(git branch --merged ${1:-master} | grep -v " ${1:-master}$"); do git branch -d "$br"; done; }; f'
 ## git show-branch <br1> <br2>
 
 # add
@@ -149,7 +150,9 @@ git config --global alias.squash 'commit --squash'
 
 # rebase
 git config --global alias.rb 'rebase'
-git config --global alias.irb 'rebase -i --fork-point'
+git config --global alias.irb 'rebase -i'
+git config --global alias.irbf 'rebase -i --fork-point'
+git config --global alias.rbf 'rebase --fork-point'
 # equivalent to
 # git rebase -i $(git merge-base --fork-point <branch>)
 
