@@ -152,7 +152,6 @@ git config --global alias.squash 'commit --squash'
 git config --global alias.rb 'rebase'
 git config --global alias.irb 'rebase -i'
 git config --global alias.irbf 'rebase -i --fork-point'
-git config --global alias.rbf 'rebase --fork-point'
 # equivalent to
 # git rebase -i $(git merge-base --fork-point <branch>)
 
