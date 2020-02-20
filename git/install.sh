@@ -219,7 +219,7 @@ git config --global alias.pushf 'push --force-with-lease'
 ## --hard / update : HEAD + index + workspace (destructive)
 ## --mixed (default) / update : HEAD + index
 ## --soft / update : HEAD
-git config --global alias.unstage 'reset --mixed HEAD'
+git config --global alias.unstage 'reset HEAD --'
 git config --global alias.resetto '!f() { branch=$(git rev-parse --abbrev-ref HEAD); git reset --hard "${1:-$branch}"; }; f'
 git config --global alias.resetfile '!f() { git reset @~ "$@" && git commit --amend --no-edit }; f'
 
