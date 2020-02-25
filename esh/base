@@ -57,9 +57,9 @@ export ESH_OS ESH_OS_ARCH HOSTNAME
 
 
 ### PATH
-PATH_BASE=/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin
-MANPATH_BASE=/usr/man:/usr/share/man:/usr/local/man:/usr/local/share/man
-LD_LIBRARY_PATH_BASE=/lib:/usr/lib:/usr/local/lib
+PATH_BASE=/usr/local/bin:/usr/local/sbin:/bin:/usr/bin:/sbin:/usr/sbin
+MANPATH_BASE=/usr/local/man:/usr/local/share/man:/usr/man:/usr/share/man
+LD_LIBRARY_PATH_BASE=/usr/local/lib:/lib:/usr/lib
 
 _path_clear()
 {
