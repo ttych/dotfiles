@@ -1,9 +1,14 @@
 #!/bin/sh
-# -*- mode: shell -*-
+# -*- mode: sh -*-
 
 _want_auto_tmux()
 {
-    [ -r "$ESH_CONF_DIR/auto_tmux" ]
+    [ -r "$ESH_CONF_DIR/auto_tmux" ] || return 1
+
+    if grep "^${HOSTNAME}$" "$ESH_CONF_DIR/auto_tmux" >/dev/null 2>&1 || grep "^${SHORT_HOSTNAME}$" "$ESH_CONF_DIR/auto_tmux" >/dev/null 2>&1; then
+        return 0
+    fi
+    return 1
 }
 
 _has_tmux()

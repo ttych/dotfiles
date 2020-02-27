@@ -1,5 +1,5 @@
 #!/bin/sh
-# -*- mode: shell -*-
+# -*- mode: sh -*-
 
 if _process_ppid && _process_comm "$_process_ppid"; then
     case "$_process_comm" in
