@@ -237,13 +237,13 @@ retry()
     while true; do
         [ -n "$retry__count" ] && [ $retry__count -le 0 ] && break
         if $retry__sshell; then
-            (eval "$@")
+            ("$@")
         else
-            eval "$@"
+            "$@"
         fi
         retry__cmd_status=$?
         [ -n "$retry__break_flag" ] && [ $retry__cmd_status $retry__break_flag 0 ] && break
-        [ -n "$retry__break_test" ] && ( eval $retry__break_test ) && break
+        [ -n "$retry__break_test" ] && ( $retry__break_test ) && break
         if [ -n "$retry__count" ]; then
             retry__count=$(($retry__count - 1))
             [ $retry__count -le 0 ] && break
