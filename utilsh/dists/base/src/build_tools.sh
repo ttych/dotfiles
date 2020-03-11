@@ -190,7 +190,7 @@ BUILD_TOOLS_TERRAFORM_CONFIG=
 BUILD_TOOLS_TERRAFORM_PREREQ_REDHAT=
 BUILD_TOOLS_TERRAFORM_PREREQ_UBUNTU=
 BUILD_TOOLS_TERRAFORM_URL_PATTERN='https://releases.hashicorp.com/terraform/${version}/terraform_${version}_linux_amd64.zip'
-BUILD_TOOLS_TERRAFORM_DEFAULT_VERSION='0.12.9'
+BUILD_TOOLS_TERRAFORM_DEFAULT_VERSION='0.12.23'
 
 #> hub - hub
 BUILD_TOOLS_HUB_URL_PATTERN='https://github.com/github/hub/releases/download/v${version}/hub-${kernel_l}-${arch}-${version}.tgz'
