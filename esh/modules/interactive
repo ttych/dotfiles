@@ -63,7 +63,7 @@ esac
 
 ### mv
 alias mvi='mv -i'
-
+alias cpi='cp -i'
 
 ### terms
 xtermadm() { xterm -name xtermadm "$@" & }
