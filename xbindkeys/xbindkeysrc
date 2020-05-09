@@ -41,7 +41,7 @@
     Shift+Mod4 + k 
 
 #terminal
-"xterm -name xtermlblue"
+"xterm -name myTerm"
     m:0x40 + c:28
     Mod4 + t 
 
@@ -71,12 +71,12 @@
     Shift+Mod4 + l 
 
 #xterm1
-"xterm -name myxterm"
+"rxvt -name railscasts_dark"
     m:0x40 + c:53
     Mod4 + x 
 
 #xterm2
-"xterm -name xtermams"
+"xterm -name myTerm"
     m:0x41 + c:53
     Shift+Mod4 + x 
 
