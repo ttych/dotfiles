@@ -3,6 +3,680 @@
 ! then watch WM_CLASS(STRING) = ...
 
 
+! ---------- global settings
+*.loginShell:                   true
+*.saveLines:                    20000
+*.visualBell:                   false
+*.marginBell:                   false
+*.charClass:                    33:48,35:48,37:48,43:48,45-47:48,64:48,95:48,126:48
+*.font:                         6x13
+*.boldFont:                     6x13bold
+! *.font:                         -misc-fixed-medium-r-semicondensed--13-120-75-75-c-60-iso8859-?
+! *.font:                         -misc-fixed-medium-r-semicondensed-*-13-*-*-*-*-*-*-*
+! *.boldFont:                     -misc-fixed-bold-r-semicondensed-*-13-*-*-*-*-*-*-*
+*.scrollBar:                    false
+*.scrollbar.width:              8
+*.jumpScroll:                   true
+*.geometry:                     84x24
+*.cursorBlink:                  false
+
+
+! ---------- default color (white on black)
+*.background:                   black
+! *.foreground:   rgb:d7/d7/d7
+*.foreground:                   white
+*.cursorColor:                  white
+
+
+! ---------- default dark
+! special
+default_dark.*.foreground:   #d0d0d0
+default_dark.*.background:   #151515
+default_dark.*.cursorColor:  #d0d0d0
+! black
+default_dark.*.color0:       #151515
+default_dark.*.color8:       #505050
+! red
+default_dark.*.color1:       #ac4142
+default_dark.*.color9:       #ac4142
+! green
+default_dark.*.color2:       #90a959
+default_dark.*.color10:      #90a959
+! yellow
+default_dark.*.color3:       #f4bf75
+default_dark.*.color11:      #f4bf75
+! blue
+default_dark.*.color4:       #6a9fb5
+default_dark.*.color12:      #6a9fb5
+! magenta
+default_dark.*.color5:       #aa759f
+default_dark.*.color13:      #aa759f
+! cyan
+default_dark.*.color6:       #75b5aa
+default_dark.*.color14:      #75b5aa
+! white
+default_dark.*.color7:       #d0d0d0
+default_dark.*.color15:      #f5f5f5
+
+
+! ---------- 3024 dark
+! special
+3024_dark.*.foreground:   #a5a2a2
+3024_dark.*.background:   #090300
+3024_dark.*.cursorColor:  #a5a2a2
+! black
+3024_dark.*.color0:       #090300
+3024_dark.*.color8:       #5c5855
+! red
+3024_dark.*.color1:       #db2d20
+3024_dark.*.color9:       #db2d20
+! green
+3024_dark.*.color2:       #01a252
+3024_dark.*.color10:      #01a252
+! yellow
+3024_dark.*.color3:       #fded02
+3024_dark.*.color11:      #fded02
+! blue
+3024_dark.*.color4:       #01a0e4
+3024_dark.*.color12:      #01a0e4
+! magenta
+3024_dark.*.color5:       #a16a94
+3024_dark.*.color13:      #a16a94
+! cyan
+3024_dark.*.color6:       #b5e4f4
+3024_dark.*.color14:      #b5e4f4
+! white
+3024_dark.*.color7:       #a5a2a2
+3024_dark.*.color15:      #f7f7f7
+
+
+! ---------- terminal.sexy color (https://terminal.sexy/)
+! special
+terminal_sexy.*.foreground:   #c5c8c6
+terminal_sexy.*.background:   #1d1f21
+terminal_sexy.*.cursorColor:  #c5c8c6
+! black
+terminal_sexy.*.color0:       #282a2e
+terminal_sexy.*.color8:       #373b41
+! red
+terminal_sexy.*.color1:       #a54242
+terminal_sexy.*.color9:       #cc6666
+! green
+terminal_sexy.*.color2:       #8c9440
+terminal_sexy.*.color10:      #b5bd68
+! yellow
+terminal_sexy.*.color3:       #de935f
+terminal_sexy.*.color11:      #f0c674
+! blue
+terminal_sexy.*.color4:       #5f819d
+terminal_sexy.*.color12:      #81a2be
+! magenta
+terminal_sexy.*.color5:       #85678f
+terminal_sexy.*.color13:      #b294bb
+! cyan
+terminal_sexy.*.color6:       #5e8d87
+terminal_sexy.*.color14:      #8abeb7
+! white
+terminal_sexy.*.color7:       #707880
+terminal_sexy.*.color15:      #c5c8c6
+
+
+! ---------- zenburn color (-)
+! special
+zenburn.*.foreground:   #ffffff
+zenburn.*.background:   #000000
+zenburn.*.cursorColor:  #ffffff
+! black
+zenburn.*.color0:       #1e2320
+zenburn.*.color8:       #709080
+! red
+zenburn.*.color1:       #705050
+zenburn.*.color9:       #dca3a3
+! green
+zenburn.*.color2:       #60b48a
+zenburn.*.color10:      #c3bf9f
+! yellow
+zenburn.*.color3:       #dfaf8f
+zenburn.*.color11:      #f0dfaf
+! blue
+zenburn.*.color4:       #506070
+zenburn.*.color12:      #94bff3
+! magenta
+zenburn.*.color5:       #dc8cc3
+zenburn.*.color13:      #ec93d3
+! cyan
+zenburn.*.color6:       #8cd0d3
+zenburn.*.color14:      #93e0e3
+! white
+zenburn.*.color7:       #dcdccc
+zenburn.*.color15:      #ffffff
+
+
+! ---------- eighties dark (-) (emacs)
+! special
+eighties_dark.*.foreground:   #d3d0c8
+eighties_dark.*.background:   #2d2d2d
+eighties_dark.*.cursorColor:  #d3d0c8
+! black
+eighties_dark.*.color0:       #2d2d2d
+eighties_dark.*.color8:       #747369
+! red
+eighties_dark.*.color1:       #f2777a
+eighties_dark.*.color9:       #f2777a
+! green
+eighties_dark.*.color2:       #99cc99
+eighties_dark.*.color10:      #99cc99
+! yellow
+eighties_dark.*.color3:       #ffcc66
+eighties_dark.*.color11:      #ffcc66
+! blue
+eighties_dark.*.color4:       #6699cc
+eighties_dark.*.color12:      #6699cc
+! magenta
+eighties_dark.*.color5:       #cc99cc
+eighties_dark.*.color13:      #cc99cc
+! cyan
+eighties_dark.*.color6:       #66cccc
+eighties_dark.*.color14:      #66cccc
+! white
+eighties_dark.*.color7:       #d3d0c8
+eighties_dark.*.color15:      #f2f0ec
+
+
+! ---------- ocean dark
+! special
+ocean_dark.*.foreground:   #c0c5ce
+ocean_dark.*.background:   #2b303b
+ocean_dark.*.cursorColor:  #c0c5ce
+! black
+ocean_dark.*.color0:       #2b303b
+ocean_dark.*.color8:       #65737e
+! red
+ocean_dark.*.color1:       #bf616a
+ocean_dark.*.color9:       #bf616a
+! green
+ocean_dark.*.color2:       #a3be8c
+ocean_dark.*.color10:      #a3be8c
+! yellow
+ocean_dark.*.color3:       #ebcb8b
+ocean_dark.*.color11:      #ebcb8b
+! blue
+ocean_dark.*.color4:       #8fa1b3
+ocean_dark.*.color12:      #8fa1b3
+! magenta
+ocean_dark.*.color5:       #b48ead
+ocean_dark.*.color13:      #b48ead
+! cyan
+ocean_dark.*.color6:       #96b5b4
+ocean_dark.*.color14:      #96b5b4
+! white
+ocean_dark.*.color7:       #c0c5ce
+ocean_dark.*.color15:      #eff1f5
+
+
+! ---------- tomorrow dark
+! special
+tomorrow_dark.*.foreground:   #c5c8c6
+tomorrow_dark.*.background:   #1d1f21
+tomorrow_dark.*.cursorColor:  #c5c8c6
+! black
+tomorrow_dark.*.color0:       #1d1f21
+tomorrow_dark.*.color8:       #969896
+! red
+tomorrow_dark.*.color1:       #cc6666
+tomorrow_dark.*.color9:       #cc6666
+! green
+tomorrow_dark.*.color2:       #b5bd68
+tomorrow_dark.*.color10:      #b5bd68
+! yellow
+tomorrow_dark.*.color3:       #f0c674
+tomorrow_dark.*.color11:      #f0c674
+! blue
+tomorrow_dark.*.color4:       #81a2be
+tomorrow_dark.*.color12:      #81a2be
+! magenta
+tomorrow_dark.*.color5:       #b294bb
+tomorrow_dark.*.color13:      #b294bb
+! cyan
+tomorrow_dark.*.color6:       #8abeb7
+tomorrow_dark.*.color14:      #8abeb7
+! white
+tomorrow_dark.*.color7:       #c5c8c6
+tomorrow_dark.*.color15:      #ffffff
+
+
+! ---------- ashes dark (-) (too purple)
+! special
+ashes_dark.*.foreground:   #c7ccd1
+ashes_dark.*.background:   #1c2023
+ashes_dark.*.cursorColor:  #c7ccd1
+! black
+ashes_dark.*.color0:       #1c2023
+ashes_dark.*.color8:       #747c84
+! red
+ashes_dark.*.color1:       #c7ae95
+ashes_dark.*.color9:       #c7ae95
+! green
+ashes_dark.*.color2:       #95c7ae
+ashes_dark.*.color10:      #95c7ae
+! yellow
+ashes_dark.*.color3:       #aec795
+ashes_dark.*.color11:      #aec795
+! blue
+ashes_dark.*.color4:       #ae95c7
+ashes_dark.*.color12:      #ae95c7
+! magenta
+ashes_dark.*.color5:       #c795ae
+ashes_dark.*.color13:      #c795ae
+! cyan
+ashes_dark.*.color6:       #95aec7
+ashes_dark.*.color14:      #95aec7
+! white
+ashes_dark.*.color7:       #c7ccd1
+ashes_dark.*.color15:      #f3f4f5
+
+
+! ---------- Matrix (-)
+! special
+matrix.*.foreground:   #00cc00
+matrix.*.background:   #000000
+matrix.*.cursorColor:  #00cc00
+! black
+matrix.*.color0:       #000000
+matrix.*.color8:       #000000
+! red
+matrix.*.color1:       #55ff55
+matrix.*.color9:       #55ff55
+! green
+matrix.*.color2:       #00cc00
+matrix.*.color10:      #55ff55
+! yellow
+matrix.*.color3:       #00cc00
+matrix.*.color11:      #55ff55
+! blue
+matrix.*.color4:       #005500
+matrix.*.color12:      #005500
+! magenta
+matrix.*.color5:       #55ff55
+matrix.*.color13:      #55ff55
+! cyan
+matrix.*.color6:       #00cc00
+matrix.*.color14:      #55ff55
+! white
+matrix.*.color7:       #00cc00
+matrix.*.color15:      #00cc00
+
+
+! ---------- atelierdune_dark (-)
+! special
+atelierdune_dark.foreground:   #a6a28c
+atelierdune_dark.background:   #20201d
+atelierdune_dark.cursorColor:  #a6a28c
+! black
+atelierdune_dark.color0:       #20201d
+atelierdune_dark.color8:       #7d7a68
+! red
+atelierdune_dark.color1:       #d73737
+atelierdune_dark.color9:       #d73737
+! green
+atelierdune_dark.color2:       #60ac39
+atelierdune_dark.color10:      #60ac39
+! yellow
+atelierdune_dark.color3:       #cfb017
+atelierdune_dark.color11:      #cfb017
+! blue
+atelierdune_dark.color4:       #6684e1
+atelierdune_dark.color12:      #6684e1
+! magenta
+atelierdune_dark.color5:       #b854d4
+atelierdune_dark.color13:      #b854d4
+! cyan
+atelierdune_dark.color6:       #1fad83
+atelierdune_dark.color14:      #1fad83
+! white
+atelierdune_dark.color7:       #a6a28c
+atelierdune_dark.color15:      #fefbec
+
+
+! ---------- atelierforest_dark (-)
+! special
+atelierforest_dark.foreground:   #a8a19f
+atelierforest_dark.background:   #1b1918
+atelierforest_dark.cursorColor:  #a8a19f
+! black
+atelierforest_dark.color0:       #1b1918
+atelierforest_dark.color8:       #766e6b
+! red
+atelierforest_dark.color1:       #f22c40
+atelierforest_dark.color9:       #f22c40
+! green
+atelierforest_dark.color2:       #5ab738
+atelierforest_dark.color10:      #5ab738
+! yellow
+atelierforest_dark.color3:       #d5911a
+atelierforest_dark.color11:      #d5911a
+! blue
+atelierforest_dark.color4:       #407ee7
+atelierforest_dark.color12:      #407ee7
+! magenta
+atelierforest_dark.color5:       #6666ea
+atelierforest_dark.color13:      #6666ea
+! cyan
+atelierforest_dark.color6:       #00ad9c
+atelierforest_dark.color14:      #00ad9c
+! white
+atelierforest_dark.color7:       #a8a19f
+atelierforest_dark.color15:      #f1efee
+
+
+! ---------- atelierlakeside dark (-)
+! special
+atelierlakeside_dark.foreground:   #7ea2b4
+atelierlakeside_dark.background:   #161b1d
+atelierlakeside_dark.cursorColor:  #7ea2b4
+! black
+atelierlakeside_dark.color0:       #161b1d
+atelierlakeside_dark.color8:       #5a7b8c
+! red
+atelierlakeside_dark.color1:       #d22d72
+atelierlakeside_dark.color9:       #d22d72
+! green
+atelierlakeside_dark.color2:       #568c3b
+atelierlakeside_dark.color10:      #568c3b
+! yellow
+atelierlakeside_dark.color3:       #8a8a0f
+atelierlakeside_dark.color11:      #8a8a0f
+! blue
+atelierlakeside_dark.color4:       #257fad
+atelierlakeside_dark.color12:      #257fad
+! magenta
+atelierlakeside_dark.color5:       #5d5db1
+atelierlakeside_dark.color13:      #5d5db1
+! cyan
+atelierlakeside_dark.color6:       #2d8f6f
+atelierlakeside_dark.color14:      #2d8f6f
+! white
+atelierlakeside_dark.color7:       #7ea2b4
+atelierlakeside_dark.color15:      #ebf8ff
+
+! ---------- atelierseaside dark (-)
+! special
+atelierseaside_dark.foreground:   #8ca68c
+atelierseaside_dark.background:   #131513
+atelierseaside_dark.cursorColor:  #8ca68c
+! black
+atelierseaside_dark.color0:       #131513
+atelierseaside_dark.color8:       #687d68
+! red
+atelierseaside_dark.color1:       #e6193c
+atelierseaside_dark.color9:       #e6193c
+! green
+atelierseaside_dark.color2:       #29a329
+atelierseaside_dark.color10:      #29a329
+! yellow
+atelierseaside_dark.color3:       #c3c322
+atelierseaside_dark.color11:      #c3c322
+! blue
+atelierseaside_dark.color4:       #3d62f5
+atelierseaside_dark.color12:      #3d62f5
+! magenta
+atelierseaside_dark.color5:       #ad2bee
+atelierseaside_dark.color13:      #ad2bee
+! cyan
+atelierseaside_dark.color6:       #1999b3
+atelierseaside_dark.color14:      #1999b3
+! white
+atelierseaside_dark.color7:       #8ca68c
+atelierseaside_dark.color15:      #f0fff0
+
+
+! ---------- brewer dark
+! special
+brewer_dark.*.foreground:   #b7b8b9
+brewer_dark.*.background:   #0c0d0e
+brewer_dark.*.cursorColor:  #b7b8b9
+! black
+brewer_dark.*.color0:       #0c0d0e
+brewer_dark.*.color8:       #737475
+! red
+brewer_dark.*.color1:       #e31a1c
+brewer_dark.*.color9:       #e31a1c
+! green
+brewer_dark.*.color2:       #31a354
+brewer_dark.*.color10:      #31a354
+! yellow
+brewer_dark.*.color3:       #dca060
+brewer_dark.*.color11:      #dca060
+! blue
+brewer_dark.*.color4:       #3182bd
+brewer_dark.*.color12:      #3182bd
+! magenta
+brewer_dark.*.color5:       #756bb1
+brewer_dark.*.color13:      #756bb1
+! cyan
+brewer_dark.*.color6:       #80b1d3
+brewer_dark.*.color14:      #80b1d3
+! white
+brewer_dark.*.color7:       #b7b8b9
+brewer_dark.*.color15:      #fcfdfe
+
+
+! ---------- google dark
+! special
+google_dark.*.foreground:   #c5c8c6
+google_dark.*.background:   #1d1f21
+google_dark.*.cursorColor:  #c5c8c6
+! black
+google_dark.*.color0:       #1d1f21
+google_dark.*.color8:       #969896
+! red
+google_dark.*.color1:       #cc342b
+google_dark.*.color9:       #cc342b
+! green
+google_dark.*.color2:       #198844
+google_dark.*.color10:      #198844
+! yellow
+google_dark.*.color3:       #fba922
+google_dark.*.color11:      #fba922
+! blue
+google_dark.*.color4:       #3971ed
+google_dark.*.color12:      #3971ed
+! magenta
+google_dark.*.color5:       #a36ac7
+google_dark.*.color13:      #a36ac7
+! cyan
+google_dark.*.color6:       #3971ed
+google_dark.*.color14:      #3971ed
+! white
+google_dark.*.color7:       #c5c8c6
+google_dark.*.color15:      #ffffff
+
+
+! ---------- grayscale dark (-)
+! special
+grayscale_dark.foreground:   #b9b9b9
+grayscale_dark.background:   #101010
+grayscale_dark.cursorColor:  #b9b9b9
+! black
+grayscale_dark.color0:       #101010
+grayscale_dark.color8:       #525252
+! red
+grayscale_dark.color1:       #7c7c7c
+grayscale_dark.color9:       #7c7c7c
+! green
+grayscale_dark.color2:       #8e8e8e
+grayscale_dark.color10:      #8e8e8e
+! yellow
+grayscale_dark.color3:       #a0a0a0
+grayscale_dark.color11:      #a0a0a0
+! blue
+grayscale_dark.color4:       #686868
+grayscale_dark.color12:      #686868
+! magenta
+grayscale_dark.color5:       #747474
+grayscale_dark.color13:      #747474
+! cyan
+grayscale_dark.color6:       #868686
+grayscale_dark.color14:      #868686
+! white
+grayscale_dark.color7:       #b9b9b9
+grayscale_dark.color15:      #f7f7f7
+
+
+! ---------- monokai dark (-)
+! special
+monokai_dark.foreground:   #f8f8f2
+monokai_dark.background:   #272822
+monokai_dark.cursorColor:  #f8f8f2
+! black
+monokai_dark.color0:       #272822
+monokai_dark.color8:       #75715e
+! red
+monokai_dark.color1:       #f92672
+monokai_dark.color9:       #f92672
+! green
+monokai_dark.color2:       #a6e22e
+monokai_dark.color10:      #a6e22e
+! yellow
+monokai_dark.color3:       #f4bf75
+monokai_dark.color11:      #f4bf75
+! blue
+monokai_dark.color4:       #66d9ef
+monokai_dark.color12:      #66d9ef
+! magenta
+monokai_dark.color5:       #ae81ff
+monokai_dark.color13:      #ae81ff
+! cyan
+monokai_dark.color6:       #a1efe4
+monokai_dark.color14:      #a1efe4
+! white
+monokai_dark.color7:       #f8f8f2
+monokai_dark.color15:      #f9f8f5
+
+! ---------- railscasts dark
+! special
+railscasts_dark.*.foreground:   #e6e1dc
+railscasts_dark.*.background:   #2b2b2b
+railscasts_dark.*.cursorColor:  #e6e1dc
+! black
+railscasts_dark.*.color0:       #2b2b2b
+railscasts_dark.*.color8:       #5a647e
+! red
+railscasts_dark.*.color1:       #da4939
+railscasts_dark.*.color9:       #da4939
+! green
+railscasts_dark.*.color2:       #a5c261
+railscasts_dark.*.color10:      #a5c261
+! yellow
+railscasts_dark.*.color3:       #ffc66d
+railscasts_dark.*.color11:      #ffc66d
+! blue
+railscasts_dark.*.color4:       #6d9cbe
+railscasts_dark.*.color12:      #6d9cbe
+! magenta
+railscasts_dark.*.color5:       #b6b3eb
+railscasts_dark.*.color13:      #b6b3eb
+! cyan
+railscasts_dark.*.color6:       #519f50
+railscasts_dark.*.color14:      #519f50
+! white
+railscasts_dark.*.color7:       #e6e1dc
+railscasts_dark.*.color15:      #f9f7f3
+
+
+! ---------- shapeshifter dark
+! special
+shapeshifter_dark.*.foreground:   #ababab
+shapeshifter_dark.*.background:   #000000
+shapeshifter_dark.*.cursorColor:  #ababab
+
+! black
+shapeshifter_dark.*.color0:       #000000
+shapeshifter_dark.*.color8:       #343434
+! red
+shapeshifter_dark.*.color1:       #e92f2f
+shapeshifter_dark.*.color9:       #e92f2f
+! green
+shapeshifter_dark.*.color2:       #0ed839
+shapeshifter_dark.*.color10:      #0ed839
+! yellow
+shapeshifter_dark.*.color3:       #dddd13
+shapeshifter_dark.*.color11:      #dddd13
+! blue
+shapeshifter_dark.*.color4:       #3b48e3
+shapeshifter_dark.*.color12:      #3b48e3
+! magenta
+shapeshifter_dark.*.color5:       #f996e2
+shapeshifter_dark.*.color13:      #f996e2
+! cyan
+shapeshifter_dark.*.color6:       #23edda
+shapeshifter_dark.*.color14:      #23edda
+! white
+shapeshifter_dark.*.color7:       #ababab
+shapeshifter_dark.*.color15:      #f9f9f9
+
+
+! ---------- solarized dark (-)
+! special
+solarized_dark.*.foreground:   #93a1a1
+solarized_dark.*.background:   #002b36
+solarized_dark.*.cursorColor:  #93a1a1
+! black
+solarized_dark.*.color0:       #002b36
+solarized_dark.*.color8:       #657b83
+! red
+solarized_dark.*.color1:       #dc322f
+solarized_dark.*.color9:       #dc322f
+! green
+solarized_dark.*.color2:       #859900
+solarized_dark.*.color10:      #859900
+! yellow
+solarized_dark.*.color3:       #b58900
+solarized_dark.*.color11:      #b58900
+! blue
+solarized_dark.*.color4:       #268bd2
+solarized_dark.*.color12:      #268bd2
+! magenta
+solarized_dark.*.color5:       #6c71c4
+solarized_dark.*.color13:      #6c71c4
+! cyan
+solarized_dark.*.color6:       #2aa198
+solarized_dark.*.color14:      #2aa198
+! white
+solarized_dark.*.color7:       #93a1a1
+solarized_dark.*.color15:      #fdf6e3
+
+
+! ---------- twilight dark
+! special
+twilight_dark.*.foreground:   #a7a7a7
+twilight_dark.*.background:   #1e1e1e
+twilight_dark.*.cursorColor:  #a7a7a7
+! black
+twilight_dark.*.color0:       #1e1e1e
+twilight_dark.*.color8:       #5f5a60
+! red
+twilight_dark.*.color1:       #cf6a4c
+twilight_dark.*.color9:       #cf6a4c
+! green
+twilight_dark.*.color2:       #8f9d6a
+twilight_dark.*.color10:      #8f9d6a
+! yellow
+twilight_dark.*.color3:       #f9ee98
+twilight_dark.*.color11:      #f9ee98
+! blue
+twilight_dark.*.color4:       #7587a6
+twilight_dark.*.color12:      #7587a6
+! magenta
+twilight_dark.*.color5:       #9b859d
+twilight_dark.*.color13:      #9b859d
+! cyan
+twilight_dark.*.color6:       #afc4db
+twilight_dark.*.color14:      #afc4db
+! white
+twilight_dark.*.color7:       #a7a7a7
+twilight_dark.*.color15:      #ffffff
+
 
 ! ---------- Xcursor
 Xcursor.theme:		whiteglass
@@ -49,90 +723,14 @@ xclock*border:                          firebrick
 xclock*twentyfour:			true
 
 
-! ---------- rxvt
-rxvt*background:                black
-rxvt*foreground:                orange
-rxvt*colorBD:                   red
-rxvt*colorUL:                   orange
-rxvt*cursorColor:               darkblue
-rxvt*cursorColor2:              darkblue
-rxvt*jumpScroll:                true
-rxvt*scrollBar:                 false
-rxvt*visualBell:                false
-rxvt*loginShell:                true
-rxvt*scrollBar_right:           true
-rxvt*saveLines:                 10000
-rxvt*title:                     rxvT
-rxvt*font:                      6x13
-
-
-! ---------- aterm
-aterm*title:                    aTerm
-aterm*geometry:                 80x24
-aterm*background:               black
-aterm*foreground:               lightblue
-aterm*loginShell:               true
-aterm*saveLines:                20000
-aterm*transparent:              true
-aterm*shading:                  50
-aterm*visualBell:               false
-aterm*colorBD:                  red
-aterm*colorUL:                  orange
-aterm*cursorColor:              lightblue
-aterm*pointerColorBackground:   lightblue
-aterm*scrollBar:                off
-aterm*scrollColor:              lightblue
-aterm*scrollBar_right:          true
-aterm*transpscrollbar:          true
-aterm*font:                     7x14
-aterm*font1:                    6x10
-aterm*font2:                    6x13
-aterm*font3:                    8x13
-aterm*font4:                    9x15
-
-
-! ---------- terminal - global
-*loginShell:			true
-*saveLines:			20000
-*background:			black
-!*foreground:			rgb:d7/d7/d7
-*foreground:			white
-*cursorColor:			white
-*charClass:			33:48,35:48,37:48,43:48,45-47:48,64:48,95:48,126:48
-!! whether or not the last column bug in more should be worked around
-!*curses:			on
-*visualBell:			false
-*marginBell:			false
-*internalBorder:		1
-*scrollBorder:			1
-*jumpScroll:			true
-!! default max is 250msec between click
-*multiClickTime:		500
-*multiScroll:			true
-*titlebar:			true
-*TitleFont:			vtbold
-*.vt100.font:			*-fixed-*-*-*-10-*
-!*.vt100.encodingMode:		locale
-!*font:				6x10
-!*font:				*-fixed-*-*-*-10-*
-!*boldFont:			6x10
-!*selectToClipboard:             true
-
-
-
-! ---------- XTerm
-XTerm*termName:                 XTerm
-XTerm*metaSendsEscape:          true
-!XTerm*altSendsEscape:           false
-
-
-
 ! ---------- xterm
-xterm*name:                     xterm
-xterm*scrollBar:                false
+xterm*name:                     xTerm
 xterm*cutNewline:               false
 xterm*colorMode:                true
 xterm*colorAttrMode:            true
+!xterm*termName:                 xterm
+xterm*termName:                 xterm-256color
+!xterm*altSendsEscape:           false
 !xterm*logFile :                 $HOME/.log/test
 !xterm*selectToClipboard:        true
 !! bold mode
@@ -159,7 +757,146 @@ xterm*colorAttrMode:            true
 !# xterm*TextUnderIcon:			true
 !# xterm*reverseVideo:			false
 !# xterm*reverseWrap:			false
-!# xterm*geometry:			80x24
+XTerm.vt100.font:               6x13
+XTerm.vt100.encodingMode:	locale
+XTerm.vt100.locale:             true
+XTerm.vt100.metaSendsEscape:    true
+XTerm.vt100.backarrowKey:       false
+XTerm.ttyModes:                 erase ^?
+XTerm.vt100.geometry:           80x24
+! XTerm.vt100.bellIsUrgent:       true
+
+
+! ---------- myTerm
+myTerm.*.foreground:            rgb:d7/d7/af
+myTerm.*.background:            black
+myTerm.*.cursorColor:           rgb:d7/d7/af
+
+
+! ---------- color amsTerm
+amsTerm.*.foreground:           Yellow
+amsTerm.*.background:           Dark Blue
+amsTerm.*.cursorColor:          Yellow
+
+
+! ---------- rxvt
+rxvt*title:                     rxvT
+rxvt*scrollBar_right:           true
+rxvt*scrollstyle:               rxvt
+!! Xft: Bitstream fonts
+!!  Fedora/debian packages: bitstream-vera-sans-mono-fonts/ttf-bitstream-vera
+!rxvt*font: xft:Bitstream Vera Sans Mono:pixelsize=12:antialias=true:hinting=true
+!rxvt*boldFont: xft:Bitstream Vera Sans Mono:bold:pixelsize=12:antialias=true:hinting=true
+!! Xft: DejaVu fonts
+!!  Fedora/debian packages: dejavu-sans-mono-fonts/ttf-dejavu
+!rxvt*font: xft:DejaVu Sans Mono:pixelsize=10:antialias=true:hinting=true
+!rxvt*boldFont: xft:DejaVu Sans Mono:bold:pixelsize=10:antialias=true:hinting=true
+!! Xft: Liberation fonts
+!!  Fedora/debian packages: liberation-mono-fonts/ttf-liberation
+!rxvt*font: xft:Liberation Mono:pixelsize=13:antialias=true:hinting=true
+!rxvt*boldFont: xft:Liberation Mono:bold:pixelsize=13:antialias=true:hinting=true
+!! Xft: Terminus fonts
+!!  Fedora/debian packages: terminus-fonts/xfonts-terminus
+!rxvt*font: xft:terminus:pixelsize=15
+!rxvt*boldFont: xft:terminus:bold:pixelsize=15
+!! Traditional fonts - a more traditional font setup in lieu of xft
+!rxvt*font: -*-courier-medium-r-normal-*-12-*-*-*-*-*-iso8859-1
+!rxvt*boldFont: -*-courier-bold-r-normal-*-12-*-*-*-*-*-iso8859-1
+
+
+! ---------- URxvt
+URxvt.title:                    URxvT
+URxvt.transparent:              true
+URxvt.tintColor:                Blue
+! URxvt.shading:                50
+! URxvt.foreground:               White
+! URxvt.background:               Black
+!! Xft: Bitstream fonts
+!!  Fedora/debian packages: bitstream-vera-sans-mono-fonts/ttf-bitstream-vera
+! URxvt.font: xft:Bitstream Vera Sans Mono:pixelsize=10:antialias=true:hinting=true
+! URxvt.boldFont: xft:Bitstream Vera Sans Mono:bold:pixelsize=10:antialias=true:hinting=true
+!! Xft: DejaVu fonts
+!!  Fedora/debian packages: dejavu-sans-mono-fonts/ttf-dejavu
+! URxvt.font: xft:DejaVu Sans Mono:pixelsize=10:antialias=true:hinting=true
+! URxvt.boldFont: xft:DejaVu Sans Mono:bold:pixelsize=10:antialias=true:hinting=true
+!! Xft: Liberation fonts
+!!  Fedora/debian packages: liberation-mono-fonts/ttf-liberation
+! URxvt.font: xft:Liberation Mono:pixelsize=10antialias=true:hinting=true
+! URxvt.boldFont: xft:Liberation Mono:bold:pixelsize=10:antialias=true:hinting=true
+!! Xft: Terminus fonts
+!!  Fedora/debian packages: terminus-fonts/xfonts-terminus
+! URxvt.font: xft:terminus:pixelsize=10:antialias=true:hinting=true
+! URxvt.boldFont: xft:terminus:bold:pixelsize=10:antialias=true:hinting=true
+!! Traditional fonts - a more traditional font setup in lieu of xft
+!URxvt.font: -*-courier-medium-r-normal-*-12-*-*-*-*-*-iso8859-1
+!URxvt.boldFont: -*-courier-bold-r-normal-*-12-*-*-*-*-*-iso8859-1
+! URxvt.color4:                 RoyalBlue
+! URxvt.color12:                RoyalBlue
+URxvt.scrollBar_right:          true
+URxvt.scrollstyle:              rxvt
+URxvt.letterSpace:              -1
+URxvt.lineSpace:                0
+URxvt.cursorBlink:              true
+URxvt.cursorUnderline:          true
+URxvt.perl-ext-common:          default,matcher,font-size
+! URxvt.perl-ext-common:        ...,tabbed,...
+URxvt.urlLauncher:              firefox
+URxvt.matcher.button:           3
+URxvt.keysym.Control-0x2b:      perl:font-size:increase
+URxvt.keysym.Control-0x2d:      perl:font-size:decrease
+URxvt.font:                     xft:DejaVu Sans Mono:pixelsize=10
+URxvt.boldFont:                 xft:DejaVu Sans Mono:pixelsize=10:weight=bold
+URxvt.loginShell:               True
+! URxvt.perl-ext-common:        ...,clipboard,...
+! URxvt.clipboard.autocopy:     true
+! URxvt.keysym.M-c:             perl:clipboard:copy
+! URxvt.keysym.M-v:             perl:clipboard:paste
+! URxvt.perl-ext-common:        ...,fullscreen,...
+! URxvt.keysym.F11:             perl:fullscreen:switch
+
+
+! ---------- aterm
+aterm.title:                    aTerm
+aterm.geometry:                 80x24
+aterm.background:               black
+aterm.foreground:               lightblue
+aterm.loginShell:               true
+aterm.saveLines:                20000
+aterm.transparent:              true
+aterm.shading:                  50
+aterm.visualBell:               false
+aterm.colorBD:                  red
+aterm.colorUL:                  orange
+aterm.cursorColor:              lightblue
+aterm.pointerColorBackground:   lightblue
+aterm.scrollBar:                off
+aterm.scrollColor:              lightblue
+aterm.scrollBar_right:          true
+aterm.transpscrollbar:          true
+aterm.font:                     7x14
+aterm.font1:                    6x10
+aterm.font2:                    6x13
+aterm.font3:                    8x13
+aterm.font4:                    9x15
+
+
+! ---------- terminal - global
+
+!! whether or not the last column bug in more should be worked around
+!*curses:			on
+!*internalBorder:		1
+!*scrollBorder:			1
+!*jumpScroll:			true
+!! default max is 250msec between click
+!*multiClickTime:		500
+!*multiScroll:			true
+!*titlebar:			true
+!*TitleFont:			vtbold
+!
+!*font:				6x10
+!*font:				*-fixed-*-*-*-10-*
+!*boldFont:			6x10
+!*selectToClipboard:             true
 
 
 ! ---------- xterm - xtermdos - dos
@@ -187,20 +924,13 @@ xtermdos*color15: rgb:fc/fc/fc
 xtermdos*colorBDMode: true
 xtermdos*colorBD: rgb:fc/fc/fc
 
-! ---------- xterm - xtermcons - console
-xtermcons*foreground:           white
-xtermcons*background:           black
-xtermcons*name:                 xterm-console
-xtermcons*scrollBar:            false
-xtermcons*cutNewline:           false
 
 ! ---------- xterm - xtermadm - admin
 xtermadm*foreground:            orangered
 xtermadm*background:            black
 xtermadm*name:                  xterm-admin
-xtermadm*scrollBar:             false
-xtermadm*cutNewline:            false
 xtermadm*cursorColor:           orangered
+
 
 ! ---------- xterm - xtermlblue - usage
 xtermlblue*.foreground:         #93d2ff
@@ -242,14 +972,6 @@ xtermatrix*scrollBar:           false
 xtermatrix*cutNewline:          false
 xtermatrix*cursorColor:         green
 
-! ---------- xterm - xtermams - amstrad
-xtermams*foreground:            Yellow
-xtermams*background:            Dark Blue
-xtermams*name:                  xterm-amstrad
-xtermams*scrollBar:             false
-xtermams*cutNewline:            false
-xtermams*cursorColor:           Yellow
-
 
 ! ---------- xterm - myxterm - my
 !myxterm*foreground:            PaleGreen1
@@ -261,12 +983,6 @@ xtermams*cursorColor:           Yellow
 !myxterm*background:            SkyBlue4
 !myxterm*background:            SlateGray
 !myxterm*background:            LightBlue4
-myxterm*foreground:             rgb:d7/d7/af
-myxterm*background:             black
-myxterm*name:                   myxTerm
-myxterm*scrollBar:              false
-myxterm*cutNewline:             false
-myxterm*cursorColor:            rgb:d7/d7/af
 
 
 
@@ -296,7 +1012,3 @@ emacs*bitmapIcon: on
 !emacs.font:				7x13bold
 !#endif
 !emacs.ReverseVideo:			on
-
-
-
-
