@@ -802,6 +802,7 @@ rxvt*scrollstyle:               rxvt
 !! Traditional fonts - a more traditional font setup in lieu of xft
 !rxvt*font: -*-courier-medium-r-normal-*-12-*-*-*-*-*-iso8859-1
 !rxvt*boldFont: -*-courier-bold-r-normal-*-12-*-*-*-*-*-iso8859-1
+rxvt.cutchars:                  "BACKSLASH `\"'&()*,;<=>?@[]^{|}:"
 
 
 ! ---------- URxvt
@@ -840,7 +841,7 @@ URxvt.cursorBlink:              true
 URxvt.cursorUnderline:          true
 URxvt.perl-ext-common:          default,matcher,font-size
 ! URxvt.perl-ext-common:        ...,tabbed,...
-URxvt.urlLauncher:              firefox
+URxvt.urlLauncher:              xdg-open
 URxvt.matcher.button:           3
 URxvt.keysym.Control-0x2b:      perl:font-size:increase
 URxvt.keysym.Control-0x2d:      perl:font-size:decrease
@@ -853,6 +854,7 @@ URxvt.loginShell:               True
 ! URxvt.keysym.M-v:             perl:clipboard:paste
 ! URxvt.perl-ext-common:        ...,fullscreen,...
 ! URxvt.keysym.F11:             perl:fullscreen:switch
+URxvt.cutchars:                 "BACKSLASH `\"'&()*,;<=>?@[]^{|}:"
 
 
 ! ---------- aterm
