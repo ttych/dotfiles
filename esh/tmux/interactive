@@ -4,6 +4,7 @@
 if _process_ppid && _process_comm "$_process_ppid"; then
     case "$_process_comm" in
         *[Tt][Ee][Rr][Mm]*) export TMUX= ;;
+        *[Rr][Xx][Vv][Tt]*) export TMUX= ;;
     esac
 fi
 
