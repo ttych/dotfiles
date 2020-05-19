@@ -478,6 +478,18 @@ proxify()
     eval ${proxy_conf_no:+no_proxy="$proxy_conf_no"} ${proxify__proxy:+http_proxy="$proxify__proxy"} ${proxify__proxy:+https_proxy="$proxify__proxy"} ${proxify__proxy:+ftp_proxy="$proxify__proxy"} "\"\$@\""
 }
 
+proxydo()
+{
+    proxify__proxy="$proxy_conf"
+    case "$1" in
+        [Aa][Ll][Tt])
+            proxify__proxy="$proxy_conf_alt"
+            shift
+            ;;
+    esac
+    ${proxy_conf_no:+no_proxy="$proxy_conf_no"} ${proxify__proxy:+http_proxy="$proxify__proxy"} ${proxify__proxy:+https_proxy="$proxify__proxy"} ${proxify__proxy:+ftp_proxy="$proxify__proxy"} "$@"
+}
+
 
 ##################################################
 # library
