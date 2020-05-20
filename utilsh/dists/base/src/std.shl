@@ -570,13 +570,16 @@ shx()
     shift
 
     case $(command -v "$shx__cmd") in
+        "") echo >&2 "command $shx__cmd not found"
+            return 1
+            ;;
         /*) shx__is_cmd=TRUE ;;
         *) shx__is_cmd=FALSE ;;
     esac
 
     if $shx__is_cmd; then
         shx__real_cmd=$(which "$shx__cmd") || {
-            echo >&2 "could not resolve \"$cmd\""
+            echo >&2 "could not resolve \"$shx__cmd\""
             return 1
         }
 
@@ -590,6 +593,37 @@ shx()
         set -x
         "$shx__cmd" "$@"
         set +x
+    fi
+}
+
+shcat()
+{
+    [ $# -lt 1 ] && return 1
+
+    shcat__cmd="$1"
+
+    case $(command -v "$shcat__cmd") in
+        "") echo >&2 "command $shcat__cmd not found"
+            return 1
+            ;;
+        /*) shcat__is_cmd=TRUE ;;
+        *) shcat__is_cmd=FALSE ;;
+    esac
+
+    if $shcat__is_cmd; then
+        shcat__real_cmd=$(which "$shcat__cmd") || {
+            echo >&2 "could not resolve \"$shcat__cmd\""
+            return 1
+        }
+
+        file "$shcat__real_cmd" | grep -q 'shell script' || {
+            echo >&2 "\"$shcat__cmd\" resolving as \"$shcat__real_cmd\" is not a shell script"
+            return 2
+        }
+
+        cat "$shcat__real_cmd"
+    else
+        typeset -f "$shcat__cmd"
     fi
 }
 
