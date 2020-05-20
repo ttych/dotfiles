@@ -215,6 +215,9 @@ git config --global alias.push2all '!f() { for remote in `git remote`; do git pu
 git config --global push.default current
 git config --global alias.pushf 'push --force-with-lease'
 
+# tag
+git config --global alias.rtag 'describe --exact-match --tags'
+
 # reset
 ## --hard / update : HEAD + index + workspace (destructive)
 ## --mixed (default) / update : HEAD + index
