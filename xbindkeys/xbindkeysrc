@@ -71,12 +71,12 @@
     Shift+Mod4 + l 
 
 #xterm1
-"rxvt -name railscasts_dark"
+"rxvt -name google_dark"
     m:0x40 + c:53
     Mod4 + x 
 
 #xterm2
-"xterm -name myTerm"
+"rxvt -name 3024_dark"
     m:0x41 + c:53
     Shift+Mod4 + x 
 
