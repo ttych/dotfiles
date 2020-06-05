@@ -802,7 +802,7 @@ rxvt*scrollstyle:               rxvt
 !! Traditional fonts - a more traditional font setup in lieu of xft
 !rxvt*font: -*-courier-medium-r-normal-*-12-*-*-*-*-*-iso8859-1
 !rxvt*boldFont: -*-courier-bold-r-normal-*-12-*-*-*-*-*-iso8859-1
-rxvt.cutchars:                  "BACKSLASH `\"'&()*,;<=>?@[]^{|}:│"
+rxvt.cutchars:                  " \\`\"'&()*,;<=>?@[]^{|}:│"
 
 
 ! ---------- URxvt
@@ -854,7 +854,7 @@ URxvt.loginShell:               True
 ! URxvt.keysym.M-v:             perl:clipboard:paste
 ! URxvt.perl-ext-common:        ...,fullscreen,...
 ! URxvt.keysym.F11:             perl:fullscreen:switch
-URxvt.cutchars:                 "BACKSLASH `\"'&()*,;<=>?@[]^{|}:│"
+URxvt.cutchars:                 " \\`\"'&()*,;<=>?@[]^{|}:│"
 
 
 ! ---------- aterm
