@@ -157,6 +157,12 @@ _tmpdir "/local" \
         "/tmp" \
         "/var/tmp"
 
+tmpdir_do()
+(
+    cd "$_TMPDIR" &&
+        TMPDIR="$_TMPDIR" "$@"
+)
+
 _mktemp_tpl()
 {
     _mktemp_tpl=
