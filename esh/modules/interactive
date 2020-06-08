@@ -81,8 +81,15 @@ tterm() { xterm -name tterm "$@" & }
 
 ### ssh
 # -o CheckHostIP=no
-alias fssh='ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10'
-alias fscp='scp -o StrictHostKeyChecking=no -o ConnectTimeout=10'
+fssh()
+{
+    ssh -o StrictHostKeyChecking=no -o CheckHostIP=no -o ConnectTimeout=10 "$@"
+}
+
+fscp()
+{
+    scp -o StrictHostKeyChecking=no -o CheckHostIP=no -o ConnectTimeout=10 "$@"
+}
 
 
 ### tail
