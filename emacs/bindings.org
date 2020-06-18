@@ -1,0 +1,119 @@
+| Key           | <std>                                |   | Control                       |   | Meta (Alt)                       |   | Control-Meta       |   |
+|---------------+--------------------------------------+---+-------------------------------+---+----------------------------------+---+--------------------+---|
+| a             |                                      |   | move-beginning-of-line        |   | backward-sentence                |   | beginning-of-defun |   |
+| b             |                                      |   | backward-char                 |   | backward-word                    |   |                    |   |
+| c             |                                      |   | -<prefix>-------------------- |   | capitalize-word                  |   |                    |   |
+| d             |                                      |   | delete-char                   |   | kill-word                        |   |                    |   |
+| e             |                                      |   | move-end-of-line              |   | forward-sentence                 |   |                    |   |
+| f             |                                      |   | forward-char                  |   | forward-word                     |   |                    |   |
+| g             |                                      |   | keyboard-quit                 |   | <prefix>                         |   |                    |   |
+| h             |                                      |   | -<help>---------------------- |   | mark-paragraph                   |   |                    |   |
+| i             |                                      |   | indent-for-tab-command        |   | tab-to-tab-stop                  |   |                    |   |
+| j             |                                      |   | eval-print-last-sexp          |   | indent-new-comment-line          |   |                    |   |
+| k             |                                      |   | kill-line                     |   | kill-sentence                    |   |                    |   |
+| l             |                                      |   | recenter-top-bottom           |   | downcase-word                    |   |                    |   |
+| m             |                                      |   | <newline>                     |   | back-to-indentation              |   |                    |   |
+| n             |                                      |   | next-line                     |   |                                  |   |                    |   |
+| o             |                                      |   | open-line                     |   | <set face>                       |   |                    |   |
+| p             |                                      |   | previous-line                 |   |                                  |   |                    |   |
+| q             |                                      |   | quoted-insert                 |   | fill-paragraph                   |   |                    |   |
+| r             |                                      |   | isearch-backward              |   | move-to-window-line-top-bottom   |   |                    |   |
+| s             |                                      |   | isearch-forward               |   | <prefix>                         |   |                    |   |
+| t             |                                      |   | transpose-chars               |   | transpose-words                  |   |                    |   |
+| u             |                                      |   | <universal-argument>          |   | upcase-word                      |   |                    |   |
+| v             |                                      |   | scroll-up-command             |   | scroll-down-command              |   |                    |   |
+| w             |                                      |   | kill-region                   |   | kill-ring-save                   |   |                    |   |
+| x             |                                      |   | -<prefix>-------------------- |   | execute-extended-command         |   |                    |   |
+| y             |                                      |   | yank                          |   | yank-pop                         |   |                    |   |
+| z             |                                      |   | ----------------------------- |   | zap-to-char                      |   |                    |   |
+| A             |                                      |   |                               |   |                                  |   |                    |   |
+| B             |                                      |   |                               |   |                                  |   |                    |   |
+| C             |                                      |   |                               |   |                                  |   |                    |   |
+| D             |                                      |   |                               |   |                                  |   |                    |   |
+| E             |                                      |   |                               |   |                                  |   |                    |   |
+| F             |                                      |   |                               |   |                                  |   |                    |   |
+| G             |                                      |   |                               |   |                                  |   |                    |   |
+| H             |                                      |   |                               |   |                                  |   |                    |   |
+| J             |                                      |   |                               |   |                                  |   |                    |   |
+| K             |                                      |   |                               |   |                                  |   |                    |   |
+| L             |                                      |   |                               |   |                                  |   |                    |   |
+| M             |                                      |   |                               |   |                                  |   |                    |   |
+| N             |                                      |   |                               |   |                                  |   |                    |   |
+| O             |                                      |   |                               |   |                                  |   |                    |   |
+| P             |                                      |   |                               |   |                                  |   |                    |   |
+| Q             |                                      |   |                               |   |                                  |   |                    |   |
+| R             |                                      |   |                               |   |                                  |   |                    |   |
+| S             |                                      |   |                               |   |                                  |   |                    |   |
+| T             |                                      |   |                               |   |                                  |   |                    |   |
+| U             |                                      |   |                               |   |                                  |   |                    |   |
+| V             |                                      |   |                               |   |                                  |   |                    |   |
+| W             |                                      |   |                               |   |                                  |   |                    |   |
+| X             |                                      |   |                               |   |                                  |   |                    |   |
+| Y             |                                      |   |                               |   |                                  |   |                    |   |
+| Z             |                                      |   | ----------------------------- |   |                                  |   |                    |   |
+| 1             |                                      |   | 1                             |   | digit-argument                   |   |                    |   |
+| 2             |                                      |   | set-mark-command              |   | digit-argument                   |   |                    |   |
+| 3             |                                      |   | <ESC>                         |   | digit-argument                   |   |                    |   |
+| 4             |                                      |   | toggle-input-method           |   | digit-argument                   |   |                    |   |
+| 5             |                                      |   | abort-recursive-edit          |   | digit-argument                   |   |                    |   |
+| 6             |                                      |   |                               |   | digit-argument                   |   |                    |   |
+| 7             |                                      |   | undo                          |   | digit-argument                   |   |                    |   |
+| 8             |                                      |   | backward-delete-char-untabify |   | digit-argument                   |   |                    |   |
+| 9             |                                      |   | self-insert-command           |   | digit-argument                   |   |                    |   |
+| 0             |                                      |   | ----------------------------- |   | digit-argument                   |   |                    |   |
+|---------------+--------------------------------------+---+-------------------------------+---+----------------------------------+---+--------------------+---|
+| <space>       |                                      |   | set-mark-command              |   | ------------------------------   |   |                    |   |
+| -             |                                      |   | -negative-argument----------- |   | negative-argument                |   |                    |   |
+| _             |                                      |   | undo                          |   | <myMenu>                         | + |                    |   |
+| =             |                                      |   | ----------------------------- |   | count-words-region               |   |                    |   |
+| +             |                                      |   | ----------------------------- |   |                                  |   |                    |   |
+| !             |                                      |   | ----------------------------- |   | shell-command                    |   |                    |   |
+| @             |                                      |   | set-mark-command              |   | mark-word                        |   |                    |   |
+| #             |                                      |   | ----------------------------- |   |                                  | * |                    |   |
+| $             |                                      |   | ----------------------------- |   | ispell-word                      |   |                    |   |
+| %             |                                      |   | ----------------------------- |   | query-replace                    |   |                    |   |
+| ^             |                                      |   |                               |   | delete-indentation               |   |                    |   |
+| &             |                                      |   | ----------------------------- |   | async-shell-command              |   |                    |   |
+| *             |                                      |   | ----------------------------- |   |                                  |   |                    |   |
+| (             |                                      |   | ----------------------------- |   | insert-parentheses               |   |                    |   |
+| )             |                                      |   | ----------------------------- |   | move-past-close-and-reindent     |   |                    |   |
+| [             |                                      |   | <ESC>                         |   | <ESC>                            |   |                    |   |
+| ]             |                                      |   | abort-recursive-edit          |   |                                  |   |                    |   |
+| {             |                                      |   | ----------------------------- |   | backward-paragraph               |   |                    |   |
+| }             |                                      |   | ----------------------------- |   | forward-paragraph                |   |                    |   |
+| \             |                                      |   | toggle-input-method           |   | delete-horizontal-space          |   |                    |   |
+| ;             |                                      |   | ----------------------------- |   | comment-dwim                     |   |                    |   |
+| :             |                                      |   | ----------------------------- |   | eval-expression                  |   |                    |   |
+| '             |                                      |   | ----------------------------- |   | abbrev-prefix-mark               |   |                    |   |
+| "             |                                      |   | ----------------------------- |   |                                  |   |                    |   |
+| ,             |                                      |   | ----------------------------- |   | xref-pop-marker-stack            |   |                    |   |
+| .             |                                      |   | ----------------------------- |   | xref-find-definitions            |   |                    |   |
+| /             |                                      |   | -<C-_>----------------------- |   | dabbrev-expand                   |   |                    |   |
+| <             |                                      |   | ----------------------------- |   | beginning-of-buffer              |   |                    |   |
+| >             |                                      |   | ----------------------------- |   | end-of-buffer                    |   |                    |   |
+| ?             |                                      |   | ----------------------------- |   | xref-find-references             |   |                    |   |
+| <pipe>        |                                      |   | -<C-\>----------------------- |   | shell-command-on-region          |   |                    |   |
+|---------------+--------------------------------------+---+-------------------------------+---+----------------------------------+---+--------------------+---|
+| <return>      |                                      |   | ----------------------------- |   |                                  |   |                    |   |
+| <backword>    |                                      |   | -<C-h>----------------------- |   | backward-kill-word               |   |                    |   |
+| <delete>      |                                      |   | ----------------------------- |   | kill-word                        | + |                    |   |
+| <home>        |                                      |   | ----------------------------- |   | beginning-of-buffer-other-window |   |                    |   |
+| <end>         |                                      |   | ----------------------------- |   | end-of-buffer-other-window       |   |                    |   |
+| <insert>      |                                      |   | ----------------------------- |   |                                  |   |                    |   |
+| <PrintScreen> |                                      |   | ----------------------------- |   | -------------------------------- |   |                    |   |
+| <PageUp>      |                                      |   | ----------------------------- |   | scroll-other-window-down         |   |                    |   |
+| <PageDown>    |                                      |   | ----------------------------- |   | scroll-other-window              |   |                    |   |
+|---------------+--------------------------------------+---+-------------------------------+---+----------------------------------+---+--------------------+---|
+| F1            | <prefix>                             |   | ----------------------------- |   | -------------------------------- |   |                    |   |
+| F2            | <prefix>                             |   | ----------------------------- |   |                                  |   |                    |   |
+| F3            | kmacro-start-macro-or-insert-counter |   | ----------------------------- |   |                                  |   |                    |   |
+| F4            | kmacro-end-or-call-macro             |   | ----------------------------- |   | -------------------------------- |   |                    |   |
+| F5            | revert-buffer                        | + | ----------------------------- |   |                                  |   |                    |   |
+| F6            |                                      |   | ----------------------------- |   |                                  |   |                    |   |
+| F7            |                                      |   | ----------------------------- |   |                                  |   |                    |   |
+| F8            | repeat                               | + | ----------------------------- |   | repeat-complex-command           | + |                    |   |
+| F9            |                                      |   | ----------------------------- |   |                                  |   |                    |   |
+| F10           | menu-bar-open                        |   | ----------------------------- |   | toggle-frame-maximized           |   |                    |   |
+| F11           | toggle-frame-fullscreen              |   | ----------------------------- |   |                                  |   |                    |   |
+| F12           | -<F2>------------------------------- |   | ----------------------------- |   |                                  |   |                    |   |
+|---------------+--------------------------------------+---+-------------------------------+---+----------------------------------+---+--------------------+---|
