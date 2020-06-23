@@ -6,7 +6,7 @@
 | d             |                                      |   | delete-char                   |   | kill-word                        |   |                    |   |
 | e             |                                      |   | move-end-of-line              |   | forward-sentence                 |   |                    |   |
 | f             |                                      |   | forward-char                  |   | forward-word                     |   |                    |   |
-| g             |                                      |   | keyboard-quit                 |   | <prefix>                         |   |                    |   |
+| g             |                                      |   | keyboard-quit                 |   | -<prefix>----------------------- |   |                    |   |
 | h             |                                      |   | -<help>---------------------- |   | mark-paragraph                   |   |                    |   |
 | i             |                                      |   | indent-for-tab-command        |   | tab-to-tab-stop                  |   |                    |   |
 | j             |                                      |   | eval-print-last-sexp          |   | indent-new-comment-line          |   |                    |   |
@@ -18,7 +18,7 @@
 | p             |                                      |   | previous-line                 |   |                                  |   |                    |   |
 | q             |                                      |   | quoted-insert                 |   | fill-paragraph                   |   |                    |   |
 | r             |                                      |   | isearch-backward              |   | move-to-window-line-top-bottom   |   |                    |   |
-| s             |                                      |   | isearch-forward               |   | <prefix>                         |   |                    |   |
+| s             |                                      |   | isearch-forward               |   | -<prefix>----------------------- |   |                    |   |
 | t             |                                      |   | transpose-chars               |   | transpose-words                  |   |                    |   |
 | u             |                                      |   | <universal-argument>          |   | upcase-word                      |   |                    |   |
 | v             |                                      |   | scroll-up-command             |   | scroll-down-command              |   |                    |   |

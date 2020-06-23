@@ -5,7 +5,7 @@
 ;;; Code:
 
 ;; debug
-; (setq debug-on-error t)
+;; (setq debug-on-error t)
 
 (defvar emacs-working-dir (getenv "EMACS_WORKING_DIR"))
 (unless (and emacs-working-dir (not (string-equal emacs-working-dir "")))
@@ -63,6 +63,7 @@
  '(scroll-preserve-screen-position t)
  '(show-trailing-whitespace t)
  '(size-indication-mode t)
+ '(tab-always-indent 'complete)
  '(tab-width 8)
  '(tool-bar-mode nil)
  '(transient-mark-mode t)
@@ -83,9 +84,9 @@
 (defun load-directory (dir)
   (let ((load-it
          (lambda (f)
-		   (load-file (concat (file-name-as-directory dir) f)))
-		 ))
-	(mapc load-it (directory-files dir nil "\\.el$"))))
+	   (load-file (concat (file-name-as-directory dir) f)))
+	 ))
+    (mapc load-it (directory-files dir nil "\\.el$"))))
 (load-directory (expand-file-name "conf/" user-emacs-directory))
 
 (defvar users-settings-dir (expand-file-name "users/" user-emacs-directory)
@@ -108,12 +109,19 @@
 
 ;; enable y/n answers
 (fset 'yes-or-no-p 'y-or-n-p)
-; (defalias 'yes-or-no-p 'y-or-n-p)
+;; (defalias 'yes-or-no-p 'y-or-n-p)
 
 
-; (defconst *is-unix* (member system-type '(freebsd)))
-; (defconst *is-a-mac* (eq system-type 'darwin))
-; (defconst *is-linux* (member system-type '(gnu gnu/linux gnu/kfreebsd)))
+;; (defconst *is-unix* (member system-type '(freebsd)))
+;; (defconst *is-a-mac* (eq system-type 'darwin))
+;; (defconst *is-linux* (member system-type '(gnu gnu/linux gnu/kfreebsd)))
+
+;; more useful frame title, that show either a file or a
+;; buffer name (if the buffer isn't visiting a file)
+;; (setq frame-title-format
+;;       '((:eval (if (buffer-file-name)
+;;                    (abbreviate-file-name (buffer-file-name))
+;;                  "%b"))))
 
 
 ;;;;;;;;;; daemon
@@ -225,6 +233,9 @@
 
 ;;;;;;;;;; myinit.org
 
-(org-babel-load-file (expand-file-name "myinit.org" user-emacs-directory))
+(defvar myinit-org
+  (expand-file-name "myinit.org" user-emacs-directory))
+(if (file-exists-p myinit-org)
+    (org-babel-load-file myinit-org))
 
 ;;; init.el ends here
