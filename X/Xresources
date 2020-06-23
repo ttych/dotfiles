@@ -856,8 +856,11 @@ URxvt.loginShell:               True
 ! URxvt.keysym.F11:             perl:fullscreen:switch
 URxvt.cutchars:                 " \\`\"'&()*,;<=>?@[]^{|}:│"
 ! Disable ISO 14755 unicode input so we can use Ctrl-Shift bindings
-URxvt.iso14755:        false
-URxvt.iso14755_52:     false
+URxvt.iso14755:                 false
+URxvt.iso14755_52:              false
+URxvt.searchable-scrollback:    Meta-Shift-S
+! URxvt.keysym.Meta-S:            builtin-string:
+! URxvt.keysym.Meta-Shift-S:      searchable-scrollback:start
 
 
 ! ---------- aterm
