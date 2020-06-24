@@ -63,7 +63,7 @@
  '(scroll-preserve-screen-position t)
  '(show-trailing-whitespace t)
  '(size-indication-mode t)
- '(tab-always-indent 'complete)
+ '(tab-always-indent (quote complete))
  '(tab-width 8)
  '(tool-bar-mode nil)
  '(transient-mark-mode t)

@@ -351,8 +351,10 @@
 	 (use-package move-text
 	   :ensure t
 	   :bind  (
-			   ("M-g w" . move-text-up)
-			   ("M-g s" . move-text-down)
+	           ("<S-up>" . move-text-up)
+	           ("<S-down>" . move-text-down)
+			   ("M-[ 1 ; 2 a". move-text-up)
+			   ("M-[ 1 ; 2 b" . move-text-down)
 			   )
 	   )
    #+END_SRC
@@ -756,6 +758,20 @@
        :ensure t
        :config
        (load-theme 'mandm t))
+   #+END_SRC
+** monokai
+   #+BEGIN_SRC
+     (use-package monokai-theme
+       :ensure t
+       :config
+       (load-theme 'monokai t))
+   #+END_SRC
+** sublime-themes
+   #+BEGIN_SRC
+        (use-package sublime-themes
+       :ensure t
+       :config
+       (load-theme 'brin t))
    #+END_SRC
 * disabled
 ** auto-complete
