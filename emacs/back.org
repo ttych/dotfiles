@@ -1,0 +1,163 @@
+#+STARTUP: content
+
+* base
+* utils
+** exec-path-from-shell (MacOS)
+   #+BEGIN_SRC emacs-lisp
+	 (use-package exec-path-from-shell
+	   :ensure t
+	   :config
+	   (when (memq window-system '(mac ns))
+		 (exec-path-from-shell-initialize))
+	   )
+   #+END_SRC
+** move-text
+   #+BEGIN_SRC emacs-lisp
+	 (use-package move-text
+	   :ensure t
+	   :bind  (
+			   ("<S-up>" . move-text-up)
+			   ("<S-down>" . move-text-down)
+			   ("M-[ 1 ; 2 a". move-text-up)
+			   ("M-[ 1 ; 2 b" . move-text-down)
+			   )
+	   )
+   #+END_SRC
+* modes
+* themes
+** zenburn (+)
+   #+BEGIN_SRC emacs-lisp
+	 (use-package zenburn-theme
+	   :ensure t
+	   :config
+	   (load-theme 'zenburn t)
+	   )
+   #+END_SRC
+** solarized (-)
+   #+BEGIN_SRC emacs-lisp
+	 (use-package solarized-theme
+	   :ensure t
+	   :config
+	   (load-theme 'solarized-light t)
+	   )
+   #+END_SRC
+** heroku (-)
+   #+BEGIN_SRC emacs-lisp
+	 (use-package heroku-theme
+	   :ensure t
+	   :init
+	   (load-theme 'heroku t)
+	   )
+   #+END_SRC
+** distinguished (-)
+   #+BEGIN_SRC emacs-lisp
+	 (use-package distinguished-theme
+	   :ensure t
+	   :init
+	   (load-theme 'distinguished t)
+	   )
+   #+END_SRC
+** base16 (--)
+   #+BEGIN_SRC emacs-lisp
+	 (use-package base16-theme
+	   :ensure t
+	   :config
+	   (load-theme 'base16-eighties t)
+	   )
+   #+END_SRC
+** atom-one-dark (--)
+   #+BEGIN_SRC emacs-lisp
+	 (use-package atom-one-dark-theme
+	   :ensure t
+	   :config
+	   (load-theme 'atom-one-dark t)
+	   )
+   #+END_SRC
+** mandm (g) (-)
+   #+BEGIN_SRC emacs-lisp
+	 (use-package mandm-theme
+	   :ensure t
+	   :config
+	   (load-theme 'mandm t)
+	   )
+   #+END_SRC
+** monokai (-)
+   #+BEGIN_SRC emacs-lisp
+	 (use-package monokai-theme
+	   :ensure t
+	   :config
+	   (load-theme 'monokai t)
+	   )
+   #+END_SRC
+** sublime
+   #+BEGIN_SRC emacs-lisp
+	 (use-package sublime-themes
+	   :ensure t
+	   :config
+	   (load-theme 'brin t)
+	   )
+   #+END_SRC
+** sanityinc-tomorrow (pink) (-)
+   #+BEGIN_SRC emacs-lisp
+	 (use-package color-theme-sanityinc-tomorrow
+	   :ensure t
+	   :config
+	   (load-theme 'sanityinc-tomorrow-eighties t)
+	   )
+   #+END_SRC
+** material (g) (-)
+   #+BEGIN_SRC emacs-lisp
+	 (use-package material-theme
+	   :ensure t
+	   :config
+	   (load-theme 'material t)
+	   )
+   #+END_SRC
+** flatland (~)
+   #+BEGIN_SRC emacs-lisp
+	 (use-package flatland-theme
+	   :ensure t
+	   :init
+	   (load-theme 'flatland t)
+	   )
+   #+END_SRC
+** flatland-black (++)
+   #+BEGIN_SRC emacs-lisp
+	 (use-package flatland-black-theme
+	   :ensure t
+	   :init
+	   (load-theme 'flatland-black t)
+	   )
+   #+END_SRC
+** railscast (+)
+   #+BEGIN_SRC emacs-lisp
+	 (use-package railscasts-theme
+	   :ensure t
+	   :init
+	   (load-theme 'railscasts t)
+	   )
+   #+END_SRC
+** gruvbox (+)
+   #+BEGIN_SRC emacs-lisp
+	 (use-package gruvbox-theme
+	   :ensure t
+	   :config
+	   (load-theme 'gruvbox t)
+	   )
+   #+END_SRC
+** railscast-reloaded (++)
+   #+BEGIN_SRC emacs-lisp
+	 (use-package railscasts-reloaded-theme
+	   :ensure t
+	   :init
+	   (load-theme 'railscasts-reloaded t)
+	   )
+   #+END_SRC
+** afternoon (++)
+   #+BEGIN_SRC emacs-lisp
+	 (use-package afternoon-theme
+	   :ensure t
+	   :init
+	   (load-theme 'afternoon t)
+	   )
+   #+END_SRC

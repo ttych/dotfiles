@@ -1,6 +1,6 @@
 #+STARTUP: content
 
-* standard
+* base
 ** bindings
    #+BEGIN_SRC emacs-lisp
 	 ;; repeat (previously C-x z)
@@ -344,18 +344,6 @@
 	   :config
 	   ;; multiple-cursors
 	   (add-to-list 'mc/cursor-specific-vars 'iy-go-to-char-start-pos)
-	   )
-   #+END_SRC
-** move-text
-   #+BEGIN_SRC emacs-lisp
-	 (use-package move-text
-	   :ensure t
-	   :bind  (
-	           ("<S-up>" . move-text-up)
-	           ("<S-down>" . move-text-down)
-			   ("M-[ 1 ; 2 a". move-text-up)
-			   ("M-[ 1 ; 2 b" . move-text-down)
-			   )
 	   )
    #+END_SRC
 ** adoc
@@ -724,54 +712,13 @@
 	   (global-anzu-mode))
    #+END_SRC
 * themes
-** gruvbox
+** railscast-reloaded (++)
    #+BEGIN_SRC emacs-lisp
-     (use-package gruvbox-theme
-       :ensure t
-       :config
-       (load-theme 'gruvbox t))
-   #+END_SRC
-** zenburn
-   #+BEGIN_SRC
-     (use-package zenburn-theme
-       :ensure t
-       :config
-       (load-theme 'zenburn t))
-   #+END_SRC
-** solarized
-   #+BEGIN_SRC
-     (use-package solarized-theme
-       :ensure t
-       :config
-       (load-theme 'solarized-light t))
-   #+END_SRC
-** sanityinc-tomorrow
-   #+BEGIN_SRC
-     (use-package color-theme-sanityinc-tomorrow
-       :ensure t
-       :config
-       (load-theme 'sanityinc-tomorrow-eighties t))
-   #+END_SRC
-** mandm
-   #+BEGIN_SRC
-     (use-package mandm-theme
-       :ensure t
-       :config
-       (load-theme 'mandm t))
-   #+END_SRC
-** monokai
-   #+BEGIN_SRC
-     (use-package monokai-theme
-       :ensure t
-       :config
-       (load-theme 'monokai t))
-   #+END_SRC
-** sublime-themes
-   #+BEGIN_SRC
-        (use-package sublime-themes
-       :ensure t
-       :config
-       (load-theme 'brin t))
+	 (use-package railscasts-reloaded-theme
+	   :ensure t
+	   :init
+	   (load-theme 'railscasts-reloaded t)
+	   )
    #+END_SRC
 * disabled
 ** auto-complete
@@ -803,14 +750,6 @@
        :config
        (global-set-key (kbd "M-n") emamux:keymap)
        )
-   #+END_SRC
-** exec-path-from-shell (MacOS)
-   #+BEGIN_SRC
-     (use-package exec-path-from-shell
-       :ensure t
-       :config
-       (when (memq window-system '(mac ns))
-	 (exec-path-from-shell-initialize)))
    #+END_SRC
 ** lsp
    #+BEGIN_SRC
