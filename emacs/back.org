@@ -23,6 +23,21 @@
 			   )
 	   )
    #+END_SRC
+** key-seq
+   #+BEGIN_SRC emacs-lisp
+	 (use-package key-seq
+	   :ensure t
+	   )
+   #+END_SRC
+** key-chord
+   #+BEGIN_SRC emacs-lisp
+	 (use-package key-chord
+	   :ensure t
+	   :config
+	   (key-chord-mode 1)
+	   (key-chord-define-global "ss" 'isearch-forward)
+	   )
+   #+END_SRC
 * modes
 * themes
 ** zenburn (+)
