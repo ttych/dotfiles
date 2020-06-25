@@ -473,25 +473,24 @@
 
 ** text-mode
    #+BEGIN_SRC emacs-lisp
-     (add-hook 'text-mode-hook
-	       (lambda ()
-		 (visual-line-mode 1)
-		 (auto-fill-mode t)
-		 (setq
-		  ;; use tabs
-		  indent-tabs-mode t
-		  ;; tabs size is 4 spaces
-		  tab-width 4
-		  ;; default insert is also 4 and inc of 4
-		  ;; got to specify this or it will continue to expand to 8 spc
-		  tab-stop-list (number-sequence 4 120 4)
-		  )
-		 ;; ask to turn on hard line wrapping
-		 ;; (when (y-or-n-p "Auto Fill mode? ")
-		 ;; (turn-on-auto-fill))
-		 ))
+	 (add-hook 'text-mode-hook
+			   (lambda ()
+				 (turn-on-visual-line-mode)
+				 (turn-on-auto-fill)
+				 (setq
+				  ;; use tabs
+				  indent-tabs-mode t
+				  ;; tabs size is 4 spaces
+				  tab-width 4
+				  ;; default insert is also 4 and inc of 4
+				  ;; got to specify this or it will continue to expand to 8 spc
+				  tab-stop-list (number-sequence 4 120 4)
+				  )
+				 ;; ask to turn on hard line wrapping
+				 ;; (when (y-or-n-p "Auto Fill mode? ")
+				 ;; (turn-on-auto-fill))
+				 ))
    #+END_SRC
-
 ** lisp-mode
    #+BEGIN_SRC emacs-lisp
 	 (use-package lisp-mode
