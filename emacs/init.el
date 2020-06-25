@@ -46,6 +46,7 @@
  '(inhibit-startup-buffer-menu t)
  '(inhibit-startup-echo-area-message "")
  '(inhibit-startup-screen t)
+ '(initial-major-mode (quote org-mode))
  '(initial-scratch-message nil)
  '(large-file-warning-threshold 100000000)
  '(line-number-mode t)
