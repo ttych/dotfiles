@@ -3,9 +3,9 @@
 * base
 ** bindings
    #+BEGIN_SRC emacs-lisp
-	 ;; repeat (previously C-x z)
-	 (global-set-key (kbd "<f8>") 'repeat)
-	 (global-set-key (kbd "M-<f8>") 'repeat-complex-command)
+	 ;; repeat C-x z
+     ;; repeat-complex-command C-x Esc Esc
+	 (global-set-key (kbd "<f8>") 'repeat-complex-command)
 
 	 ;; revert
 	 (global-set-key (kbd "<f5>") 'revert-buffer)
@@ -38,10 +38,11 @@
 	 ;; (define-key key-translation-map (kbd "M-]") (kbd "M-_"))
 
 	 ;; Search
+	 (global-set-key (kbd "M-s r") 'query-replace-regexp)
+	 (global-set-key (kbd "M-s M-%") 'query-replace-regexp)
 	 (global-set-key (kbd "M-s O") 'multi-occur)
 	 (global-set-key (kbd "M-s d") 'find-dired)
 	 (global-set-key (kbd "M-s g") 'rgrep)
-	 (global-set-key (kbd "M-s r") 'query-replace-regexp)
 
 	 ;; windmove
 	 (global-set-key (kbd "M-g <up>") 'windmove-up)
@@ -142,11 +143,11 @@
 	   (global-hl-todo-mode)
 	   :config
 	   (setq hl-todo-keyword-faces
-			 '(("TODO"   . "#FF0000")
-			   ("FIXME"  . "#F2AF00")
-			   ("DEBUG"  . "#A020F0")
-			   ("GOTCHA" . "#FF4500")
-			   ("STUB"   . "#1E90FF")))
+			 '(("TODO"    . "#FF0000")
+			   ("FIXME"   . "#F2AF00")
+			   ("BUG"     . "#A020F0")
+			   ("REFACTO" . "#FF4500")
+			   ("DELETE"  . "#1E90FF")))
 	   ;; (add-hook 'prog-mode-hook #'hl-todo-mode 1)
 	   ;; (add-hook 'text-mode-hook #'hl-todo-mode 1)
 	   )
@@ -661,14 +662,21 @@
 ** flyspell
    #+BEGIN_SRC emacs-lisp
 	 (use-package flyspell
-       :delight
+	   :delight
 	   :config
 	   (when (eq system-type 'windows-nt)
 		 (add-to-list 'exec-path "C:/Program Files (x86)/Aspell/bin/"))
 	   (setq ispell-program-name "aspell" ; use aspell instead of ispell
 			 ispell-extra-args '("--sug-mode=ultra"))
-	   (add-hook 'text-mode-hook #'flyspell-mode))
-	   ;; (add-hook 'prog-mode-hook #'flyspell-prog-mode))
+	   (dolist (hook '(text-mode-hook))
+		 (add-hook hook (lambda () (flyspell-mode 1))))
+	   (dolist (hook '(change-log-mode-hook log-edit-mode-hook))
+		 (add-hook hook (lambda () (flyspell-mode -1))))
+	   (dolist (hook '(prog-mode-hook))
+		 (add-hook hook (lambda () (flyspell-prog-mode 1))))
+	   (dolist (hook '())
+		 (add-hook hook (lambda () (flyspell-prog-mode -1))))
+	   )
    #+END_SRC
 ** crux
    #+BEGIN_SRC emacs-lisp
