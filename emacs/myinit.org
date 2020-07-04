@@ -49,6 +49,10 @@
 	 (global-set-key (kbd "M-g <down>") 'windmove-down)
 	 (global-set-key (kbd "M-g <left>") 'windmove-left)
 	 (global-set-key (kbd "M-g <right>") 'windmove-right)
+
+     ;; window
+	 (global-set-key (kbd "C-x 9") 'delete-windows-on)
+	 (global-set-key (kbd "C-x C-^") 'shrink-window)
    #+END_SRC
 * utils
 ** editing
