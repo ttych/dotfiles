@@ -168,7 +168,12 @@
      (use-package abbrev
        :delight
        ;; (delight 'abbrev-mode "abv" 'abbrev)
-       :bind ()
+       :bind (("C-x a TAB" . expand-abbrev)
+              ("C-x a a" . add-mode-abbrev)
+	          ("C-x a e" . edit-abbrevs)
+			  ("C-x a k" . kill-all-abbrevs)
+              ("C-x a l" . list-abbrevs)
+              ("C-x a s" . write-abbrev-file))
        :config
        (setq save-abbrevs 'silent)
        (setq abbrev-file-name (expand-file-name "abbrevs" user-emacs-directory))
