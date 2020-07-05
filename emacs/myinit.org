@@ -530,28 +530,6 @@
 	   (dolist (hook '(emacs-lisp-mode-hook ielm-mode-hook))
 		 (add-hook hook #'elisp-slime-nav-mode)))
    #+END_SRC
-** shell
-   #+BEGIN_SRC emacs-lisp
-     (add-hook
-      'term-mode-hook
-      (lambda()
-	(setq-local show-trailing-whitespace nil)
-	(hl-line-mode nil)
-	(display-line-numbers-mode -1)
-	(linum-mode -1)
-	))
-
-     (add-hook
-      'eshell-mode-hook
-      (lambda()
-	(setq-local show-trailing-whitespace nil)
-	(hl-line-mode nil)
-	(display-line-numbers-mode -1)
-	(linum-mode -1)
-	))
-
-     (add-to-list 'auto-mode-alist '("\\.shl\\'" . shell-script-mode))
-   #+END_SRC
 ** whitespace
    #+BEGIN_SRC emacs-lisp
      ;; 2 - SPACES - INDENTED - MODES
@@ -603,7 +581,40 @@
        (setq whitespace-style '(face tabs empty trailing lines-tail)))
      ;; lines indentation space-after-tab space-before-tab
    #+END_SRC
+** shell
+   #+BEGIN_SRC emacs-lisp
+	 (add-hook
+	  'term-mode-hook
+	  (lambda()
+		(setq-local show-trailing-whitespace nil)
+		(hl-line-mode nil)
+		(display-line-numbers-mode -1)
+		(linum-mode -1)
+		))
 
+	 (add-hook
+	  'eshell-mode-hook
+	  (lambda()
+		(setq-local show-trailing-whitespace nil)
+		(hl-line-mode nil)
+		(display-line-numbers-mode -1)
+		(linum-mode -1)
+		))
+
+	 (add-hook
+	  'shell-mode-hook
+	  (lambda()
+		(setq-local show-trailing-whitespace nil)
+		(hl-line-mode nil)
+		(display-line-numbers-mode -1)
+		(linum-mode -1)
+		))
+
+	 (add-to-list 'auto-mode-alist '("\\.shl\\'" . shell-script-mode))
+
+	 (add-hook 'comint-output-filter-functions
+		   'comint-watch-for-password-prompt)
+   #+END_SRC
 ** htmlize
    #+BEGIN_SRC emacs-lisp
 	 (use-package htmlize
