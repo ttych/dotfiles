@@ -40,6 +40,7 @@
  '(global-auto-revert-mode t)
  '(global-auto-revert-non-file-buffers t)
  '(global-display-line-numbers-mode t)
+ '(global-font-lock-mode t)
  '(history-length 1000)
  '(icomplete-mode t)
  '(indent-tabs-mode t)
