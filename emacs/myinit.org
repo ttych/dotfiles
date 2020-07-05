@@ -188,7 +188,7 @@
    #+BEGIN_SRC emacs-lisp
      (use-package recentf
        :config
-       (setq recentf-save-file (expand-file-name "recentf" savefile-dir)
+       (setq recentf-save-file (expand-file-name "recentf" save-dir)
 	     recentf-max-menu-items 50
 	     recentf-max-saved-items 100
 	     ;; disable recentf-cleanup on Emacs start, because it can cause
@@ -210,7 +210,7 @@
 	;; save every minute
 	savehist-autosave-interval 60
 	;; keep the home clean
-	savehist-file (expand-file-name "savehist" savefile-dir))
+	savehist-file (expand-file-name "savehist" save-dir))
        (savehist-mode 1))
    #+END_SRC
 ** bookmark (minor) <M-_ b>
@@ -220,7 +220,7 @@
 	      ("M-_ b j" . bookmark-jump)
 	      ("M-_ b l" . bookmark-bmenu-list))
        :config
-       (setq bookmark-default-file (expand-file-name "bookmarks" savefile-dir)
+       (setq bookmark-default-file (expand-file-name "bookmarks" save-dir)
 	     bookmark-save-flag 1)
        )
    #+END_SRC

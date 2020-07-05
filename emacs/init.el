@@ -17,10 +17,10 @@
   (make-directory my-vendor-dir))
 (add-to-list 'load-path my-vendor-dir)
 
-(defvar savefile-dir (expand-file-name "savefile/" emacs-working-dir)
+(defvar save-dir (expand-file-name "save/" emacs-working-dir)
   "This folder stores all the automatically generated save/history-files.")
-(unless (file-exists-p savefile-dir)
-  (make-directory savefile-dir))
+(unless (file-exists-p save-dir)
+  (make-directory save-dir))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -28,11 +28,17 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(auto-revert-verbose nil)
+ '(auto-save-default t)
+ '(auto-save-visited-mode nil)
+ '(backup-by-copying t)
+ '(backup-directory-alist (quote (("." . save-dir))))
+ ;; '(auto-save-file-name-transforms `((".*" ,save-dir t)))
  '(backward-delete-char-untabify-method nil)
  '(blink-cursor-mode t)
  '(clean-buffer-list-delay-general 1)
  '(column-number-mode t)
  '(default-frame-alist (quote ((width . 80) (height . 45))))
+ '(delete-old-versions t)
  '(delete-selection-mode t)
  '(delete-trailing-lines t)
  '(delete-trailing-whitespace t)
@@ -51,9 +57,12 @@
  '(initial-frame-alist (quote ((top . 10) (left . 30) (width . 90) (height . 50))))
  '(initial-major-mode (quote org-mode))
  '(initial-scratch-message nil)
+ '(kept-new-versions 10)
+ '(kept-old-versions 2)
  '(large-file-warning-threshold 100000000)
  '(line-number-mode t)
  '(load-prefer-newer t)
+ '(make-backup-files t)
  '(max-lisp-eval-depth 2000)
  '(menu-bar-mode nil)
  '(next-line-add-newlines nil)
@@ -71,7 +80,9 @@
  '(tab-width 8)
  '(tool-bar-mode nil)
  '(transient-mark-mode t)
- '(uniquify-buffer-name-style (quote forward) nil (uniquify)))
+ '(uniquify-buffer-name-style (quote forward) nil (uniquify))
+ '(vc-make-backup-files t)
+ '(version-control t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -100,15 +111,6 @@
                     users-settings-dir))
 (if (file-exists-p user-settings-file)
     (load user-settings-file))
-
-;; Write backup files to own directory
-(setq backup-directory-alist
-      `(("." . ,savefile-dir)))
-;; Write all autosave files in the tmp dir
-(setq auto-save-file-name-transforms
-      `((".*" ,savefile-dir t)))
-;; Make backups of files, even when they're in version control
-(setq vc-make-backup-files t)
 
 
 ;; enable y/n answers
