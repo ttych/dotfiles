@@ -29,10 +29,9 @@
  ;; If there is more than one, they won't work right.
  '(auto-revert-verbose nil)
  '(auto-save-default t)
+ '(auto-save-interval 300)
  '(auto-save-visited-mode nil)
  '(backup-by-copying t)
- '(backup-directory-alist (quote (("." . save-dir))))
- ;; '(auto-save-file-name-transforms `((".*" ,save-dir t)))
  '(backward-delete-char-untabify-method nil)
  '(blink-cursor-mode t)
  '(clean-buffer-list-delay-general 1)
@@ -89,6 +88,12 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
+;; backup and auto-save dir
+(setq backup-directory-alist
+      `(("." . ,save-dir)))
+(setq auto-save-file-name-transforms
+      `((".*" ,save-dir t)))
 
 ;; (prefer-coding-system 'utf-8)
 ;; (set-default-coding-systems 'utf-8)
