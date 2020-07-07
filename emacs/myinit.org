@@ -53,6 +53,9 @@
      ;; window
 	 (global-set-key (kbd "C-x 9") 'delete-windows-on)
 	 (global-set-key (kbd "C-x C-^") 'shrink-window)
+
+	 ;; kmacro
+	 (global-set-key (kbd "C-x C-k i") 'insert-kbd-macro)
    #+END_SRC
 * utils
 ** editing

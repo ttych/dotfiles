@@ -34,6 +34,7 @@
  '(backup-by-copying t)
  '(backward-delete-char-untabify-method nil)
  '(blink-cursor-mode t)
+ '(calendar-week-start-day 1)
  '(clean-buffer-list-delay-general 1)
  '(column-number-mode t)
  '(default-frame-alist (quote ((width . 80) (height . 45))))
@@ -88,6 +89,8 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
+(setq european-calendar-style 't)
 
 ;; backup and auto-save dir
 (setq backup-directory-alist
@@ -203,7 +206,6 @@
 
 
 ;;;;;;;;;; package
-
 (require 'package)
 (setq package-enable-at-startup nil)
 ;; [Enter ↵] (package-menu-describe-package) → Describe the package under cursor.
@@ -241,12 +243,16 @@
 (require 'use-package)
 (setq use-package-verbose t)
 
-
 ;;;;;;;;;; myinit.org
-
 (defvar myinit-org
   (expand-file-name "myinit.org" user-emacs-directory))
 (if (file-exists-p myinit-org)
     (org-babel-load-file myinit-org))
+
+;;;;;;;;;; macros
+(defvar macros
+  (expand-file-name "macros" user-emacs-directory))
+(if (file-exists-p macros)
+    (load-file macros))
 
 ;;; init.el ends here
