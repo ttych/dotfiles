@@ -45,10 +45,14 @@
 	 (global-set-key (kbd "M-s g") 'rgrep)
 
 	 ;; windmove
-	 (global-set-key (kbd "M-g <up>") 'windmove-up)
-	 (global-set-key (kbd "M-g <down>") 'windmove-down)
-	 (global-set-key (kbd "M-g <left>") 'windmove-left)
-	 (global-set-key (kbd "M-g <right>") 'windmove-right)
+	 (global-set-key (kbd "C-<up>") 'windmove-up)
+	 (global-set-key (kbd "M-[ 1 ; 5 a") 'windmove-up)
+	 (global-set-key (kbd "C-<down>") 'windmove-down)
+	 (global-set-key (kbd "M-[ 1 ; 5 b") 'windmove-down)
+	 (global-set-key (kbd "C-<left>") 'windmove-left)
+	 (global-set-key (kbd "M-[ 1 ; 5 d") 'windmove-left)
+	 (global-set-key (kbd "C-<right>") 'windmove-right)
+	 (global-set-key (kbd "M-[ 1 ; 5 c") 'windmove-right)
 
      ;; window
 	 (global-set-key (kbd "C-x 9") 'delete-windows-on)
