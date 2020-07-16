@@ -7,6 +7,12 @@
 ;; debug
 ;; (setq debug-on-error t)
 
+(defvar my-elisp-dir (expand-file-name "elisp/" user-emacs-directory)
+  "elisp directory for home made elisp.")
+(unless (file-exists-p my-elisp-dir)
+  (make-directory my-elisp-dir))
+(add-to-list 'load-path my-elisp-dir)
+
 (defvar emacs-working-dir (getenv "EMACS_WORKING_DIR"))
 (unless (and emacs-working-dir (not (string-equal emacs-working-dir "")))
   (setq emacs-working-dir user-emacs-directory))
