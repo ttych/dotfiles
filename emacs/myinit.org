@@ -107,6 +107,16 @@
      ;;  :ensure t)
    #+END_SRC
 * modes
+** makefile-mode
+   #+BEGIN_SRC emacs-lisp
+	 (add-hook
+	  'makefile-mode-hook
+	  (lambda()
+		(setq indent-tabs-mode t
+			  tab-width 4)
+		)
+	  )
+   #+END_SRC
 ** dired
    #+BEGIN_SRC emacs-lisp
 	 (use-package dired
