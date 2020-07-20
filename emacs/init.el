@@ -98,6 +98,9 @@
 
 (setq european-calendar-style 't)
 
+(put 'downcase-region 'disabled nil)
+(put 'upcase-region 'disabled nil)
+
 ;; backup and auto-save dir
 (setq backup-directory-alist
       `(("." . ,save-dir)))
