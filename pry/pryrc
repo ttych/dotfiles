@@ -1,11 +1,33 @@
+# Documentation
+# https://github.com/pry/pry/wiki/Customization-and-configuration
 
-# Pry.config.pager = true
-# Pry.config.editor = "emacs"
-Pry.config.color = true
+
+if ENV["IN_EMACS"]
+  Pry.config.pager = false
+  # pry_instance.config.pager = false
+end
+
 
 # Prompt
-#Pry.config.prompt = [proc { "ruby> " },
+
+# Pry.config.prompt = [proc { "ruby> " },
 #                     proc { "    | " }]
+
+Pry.config.prompt = Pry::Prompt.new(
+  "custom",
+  "my custom prompt",
+  [proc { |obj, nest_level, _| "#{obj}:#{nest_level}> " }]
+)
+
+# Pry.prompt = Pry::Prompt.new(
+#   "custom",
+#   "my custom prompt",
+#   [ ->(obj, nest_level, _) { "✎ " }, ->(obj, nest_level, _) { "#{' ' * nest_level}  " } ]
+# )
+
+Pry.config.color = true
+Pry.config.theme = "railscasts"
+
 
 # Commands
 Pry.commands.alias_command 'c', 'continue' rescue nil
@@ -13,6 +35,7 @@ Pry.commands.alias_command 's', 'step' rescue nil
 Pry.commands.alias_command 'n', 'next' rescue nil
 Pry.commands.alias_command 'f', 'finish' rescue nil
 Pry.commands.alias_command 'l', 'whereami' rescue nil
+
 
 # Listing config
 Pry.config.ls.separator = "\n" # new lines between methods
