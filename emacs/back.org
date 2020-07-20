@@ -39,6 +39,17 @@
 	   )
    #+END_SRC
 * modes
+** ruby-mode
+   #+BEGIN_SRC emacs-lisp
+	 (use-package ruby-mode
+	   :config
+	   (setq ruby-insert-encoding-magic-comment nil)
+	   (add-hook 'ruby-mode-hook #'subword-mode))
+	 (use-package inf-ruby
+	   :ensure t
+	   :config
+	   (add-hook 'ruby-mode-hook #'inf-ruby-minor-mode))
+   #+END_SRC
 * themes
 ** zenburn (+)
    #+BEGIN_SRC emacs-lisp

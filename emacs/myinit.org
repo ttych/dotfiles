@@ -82,17 +82,24 @@
    #+END_SRC
 ** debugging
    #+BEGIN_SRC emacs-lisp
-     ;;; Usage :
-     ;;; (derived-mode-parents 'dog)
-     (defun derived-mode-parents (mode)
-       (and mode (cons mode (derived-mode-parents
-			     (get mode 'derived-mode-parent)))))
-     ;; Example :
-     ;; (derived-mode-parents 'html-mode)
-     ;; (derived-mode-parents 'ruby-mode)
-     ;; (derived-mode-parents 'python-mode)
-     ;; (derived-mode-parents 'lisp-mode)
-     (derived-mode-parents 'org-mode)
+	 ;; (setq debug-on-error t)
+
+	 ;;; Usage :
+	 ;;; (derived-mode-parents 'dog)
+	 (defun derived-mode-parents (mode)
+	   (and mode (cons mode (derived-mode-parents
+				 (get mode 'derived-mode-parent)))))
+	 ;; Example :
+	 ;; (derived-mode-parents 'html-mode)
+	 ;; (derived-mode-parents 'ruby-mode)
+	 ;; (derived-mode-parents 'python-mode)
+	 ;; (derived-mode-parents 'lisp-mode)
+	 ;; (derived-mode-parents 'org-mode)
+
+	 ;; increase max-lisp-eval-depth temporarly
+	 ;; (setq max-lisp-eval-depth (* max-lisp-eval-depth 10))
+	 ;; Limit on number of Lisp variable bindings
+	 ;; (setq max-specpdl-size (* max-specpdl-size 10))
    #+END_SRC
 ** try
    #+BEGIN_SRC
@@ -430,32 +437,32 @@
    #+END_SRC
 ** org-mode (org-bullets, ox-md, ox-reveal) <M-_ o>
    #+BEGIN_SRC emacs-lisp
-     (global-set-key (kbd "M-_ o l") 'org-store-link)
-     (global-set-key (kbd "M-_ o a") 'org-agenda)
-     (global-set-key (kbd "M-_ o c") 'org-capture)
+	 (global-set-key (kbd "M-_ o l") 'org-store-link)
+	 (global-set-key (kbd "M-_ o a") 'org-agenda)
+	 (global-set-key (kbd "M-_ o c") 'org-capture)
 
-     ;; adding special markers ‘!’ (for a timestamp) and ‘@’ (for a note) in parentheses after each keyword
-     (setq org-todo-keywords
-	   '((sequence "TODO(t)" "|" "DONE(d!)")
-	     (sequence "BACKLOG(b!)" "READY(r!)" "WIP(w!)" "BLOCKED(B@)" "|" "DONE(d!)" "CANCELLED(c@)"))
+	 ;; adding special markers ‘!’ (for a timestamp) and ‘@’ (for a note) in parentheses after each keyword
+	 (setq org-todo-keywords
+		   '((sequence "TODO(t)" "|" "DONE(d!)")
+			 (sequence "BACKLOG(b!)" "READY(r!)" "WIP(w!)" "BLOCKED(B@)" "|" "DONE(d!)" "CANCELLED(c@)"))
+		   )
+	 ;; (setq org-log-done 'time)
+	 ;; (setq org-log-done 'note)
+
+	 (use-package org-bullets
+	   :ensure t
+	   :config
+	   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 	   )
-     ;; (setq org-log-done 'time)
-     ;; (setq org-log-done 'note)
 
-     (use-package org-bullets
-       :ensure t
-       :config
-       (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
-       )
+	 (use-package ox-md)
 
-     (use-package ox-md)
-
-     (use-package ox-reveal
-       :ensure t
-       :config
-       (setq org-reveal-root "https://cdn.jsdelivr.net/reveal.js/3.0.0/")
-       (setq org-reveal-mathjax t)
-       )
+	 (use-package ox-reveal
+	   :ensure t
+	   :config
+	   (setq org-reveal-root "https://cdn.jsdelivr.net/reveal.js/3.0.0/")
+	   (setq org-reveal-mathjax t)
+	   )
    #+END_SRC
 ** prog-mode
    #+BEGIN_SRC emacs-lisp
@@ -629,14 +636,36 @@
    #+END_SRC
 ** ruby
    #+BEGIN_SRC emacs-lisp
-	 (use-package ruby-mode
+	 (use-package enh-ruby-mode
+	   :ensure t
+	   ;; :mode "\\.rb$" "\\.gemspec$" "Guardfile"
+	   :mode "\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'"
+	   :interpreter "ruby"
 	   :config
-	   (setq ruby-insert-encoding-magic-comment nil)
-	   (add-hook 'ruby-mode-hook #'subword-mode))
+	   ;; (remove-hook 'enh-ruby-mode-hook 'erm-define-faces)
+	   (add-hook 'enh-ruby-mode-hook 'inf-ruby-minor-mode)
+	   (add-hook 'compilation-filter-hook 'inf-ruby-auto-enter)
+	   (add-hook 'enh-ruby-mode-hook 'robe-mode)
+	   (add-hook 'enh-ruby-mode-hook 'yard-mode)
+	   (add-hook 'enh-ruby-mode-hook 'eldoc-mode)
+	   (add-hook 'enh-ruby-mode-hook 'seeing-is-believing)
+	   )
 	 (use-package inf-ruby
 	   :ensure t
+	   )
+	 (use-package robe
+	   :ensure t
+	   )
+	 (use-package yard-mode
+	   :ensure t
+	   :delight " Y"
+	   )
+	 (use-package seeing-is-believing
+	   :ensure t
+	   :delight (seeing-is-believing " oO")
 	   :config
-	   (add-hook 'ruby-mode-hook #'inf-ruby-minor-mode))
+	   (setq seeing-is-believing-timeout 10)
+	   )
    #+END_SRC
 ** rainbow
    #+BEGIN_SRC emacs-lisp
@@ -699,9 +728,9 @@
 		 (add-hook hook (lambda () (flyspell-mode 1))))
 	   (dolist (hook '(change-log-mode-hook log-edit-mode-hook))
 		 (add-hook hook (lambda () (flyspell-mode -1))))
-	   (dolist (hook '(prog-mode-hook))
-		 (add-hook hook (lambda () (flyspell-prog-mode 1))))
-	   (dolist (hook '())
+	   ;; (dolist (hook '(prog-mode-hook))
+	   ;;   (add-hook hook (lambda () (flyspell-prog-mode 1))))
+	   (dolist (hook '(enh-ruby-mode))
 		 (add-hook hook (lambda () (flyspell-prog-mode -1))))
 	   )
    #+END_SRC
