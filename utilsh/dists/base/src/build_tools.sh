@@ -136,7 +136,7 @@ BUILD_TOOLS_GROOVY_DEFAULT_VERSION='2.5.4'
 BUILD_TOOLS_TMUX_PREREQ_REDHAT='libevent-devel'
 BUILD_TOOLS_TMUX_PREREQ_UBUNTU='libevent-dev'
 BUILD_TOOLS_TMUX_URL_PATTERN='https://github.com/tmux/tmux/releases/download/${version}/tmux-${version}.tar.gz'
-BUILD_TOOLS_TMUX_DEFAULT_VERSION='2.9'
+BUILD_TOOLS_TMUX_DEFAULT_VERSION='3.1b'
 
 #> jq - jq
 BUILD_TOOLS_JQ_CONFIG='--without-oniguruma'
