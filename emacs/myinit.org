@@ -677,6 +677,13 @@
 	   (setq seeing-is-believing-timeout 10)
 	   )
    #+END_SRC
+** cucumber
+   #+BEGIN_SRC emacs-lisp
+	 (use-package feature-mode
+	   :ensure t
+	   :mode "\\.feature$"
+	   )
+   #+END_SRC
 ** rainbow
    #+BEGIN_SRC emacs-lisp
 	 (use-package rainbow-mode
