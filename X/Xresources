@@ -844,7 +844,9 @@ URxvt.perl-ext-common:          default,matcher,font-size
 URxvt.urlLauncher:              xdg-open
 URxvt.matcher.button:           3
 URxvt.keysym.Control-0x2b:      perl:font-size:increase
+! URxvt.keysym.Control-0x2d:      command:\000
 URxvt.keysym.Control-0x2d:      perl:font-size:decrease
+! URxvt.keysym.Control-0x5f:      perl:font-size:decrease
 URxvt.font:                     xft:DejaVu Sans Mono:pixelsize=10
 URxvt.boldFont:                 xft:DejaVu Sans Mono:pixelsize=10:weight=bold
 URxvt.loginShell:               True
