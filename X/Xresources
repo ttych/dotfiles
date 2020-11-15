@@ -28,7 +28,22 @@
 *.cursorColor:                  white
 
 
-! ---------- default dark
+! ---------- Term theme
+! ----- black
+! - brewer_dark
+! - 3024_dark
+! - shapeshifter_dark
+! - zenburn
+! ----- dark
+! - default_dark
+! ----- mid
+! - google_dark
+! - terminal_sexy
+! - tomorrow_dark
+! - eighties_dark
+! - twilight_dark
+
+! ---------- default_dark (+)
 ! special
 default_dark.*.foreground:   #d0d0d0
 default_dark.*.background:   #151515
@@ -59,7 +74,7 @@ default_dark.*.color7:       #d0d0d0
 default_dark.*.color15:      #f5f5f5
 
 
-! ---------- 3024 dark
+! ---------- 3024_dark
 ! special
 3024_dark.*.foreground:   #a5a2a2
 3024_dark.*.background:   #090300
@@ -90,7 +105,7 @@ default_dark.*.color15:      #f5f5f5
 3024_dark.*.color15:      #f7f7f7
 
 
-! ---------- terminal.sexy color (https://terminal.sexy/)
+! ---------- terminal.sexy color (https://terminal.sexy/) (+)
 ! special
 terminal_sexy.*.foreground:   #c5c8c6
 terminal_sexy.*.background:   #1d1f21
@@ -121,7 +136,7 @@ terminal_sexy.*.color7:       #707880
 terminal_sexy.*.color15:      #c5c8c6
 
 
-! ---------- zenburn color (-)
+! ---------- zenburn color (~) (red too fade)
 ! special
 zenburn.*.foreground:   #ffffff
 zenburn.*.background:   #000000
@@ -152,7 +167,7 @@ zenburn.*.color7:       #dcdccc
 zenburn.*.color15:      #ffffff
 
 
-! ---------- eighties dark (-) (emacs)
+! ---------- eighties dark (++) (emacs)
 ! special
 eighties_dark.*.foreground:   #d3d0c8
 eighties_dark.*.background:   #2d2d2d
@@ -183,7 +198,7 @@ eighties_dark.*.color7:       #d3d0c8
 eighties_dark.*.color15:      #f2f0ec
 
 
-! ---------- ocean dark
+! ---------- ocean dark (--)
 ! special
 ocean_dark.*.foreground:   #c0c5ce
 ocean_dark.*.background:   #2b303b
@@ -214,7 +229,7 @@ ocean_dark.*.color7:       #c0c5ce
 ocean_dark.*.color15:      #eff1f5
 
 
-! ---------- tomorrow dark
+! ---------- tomorrow dark (~)
 ! special
 tomorrow_dark.*.foreground:   #c5c8c6
 tomorrow_dark.*.background:   #1d1f21
@@ -245,7 +260,7 @@ tomorrow_dark.*.color7:       #c5c8c6
 tomorrow_dark.*.color15:      #ffffff
 
 
-! ---------- ashes dark (-) (too purple)
+! ---------- ashes dark (--) (too purple)
 ! special
 ashes_dark.*.foreground:   #c7ccd1
 ashes_dark.*.background:   #1c2023
@@ -276,7 +291,7 @@ ashes_dark.*.color7:       #c7ccd1
 ashes_dark.*.color15:      #f3f4f5
 
 
-! ---------- Matrix (-)
+! ---------- Matrix (--)
 ! special
 matrix.*.foreground:   #00cc00
 matrix.*.background:   #000000
@@ -430,7 +445,7 @@ atelierseaside_dark.color7:       #8ca68c
 atelierseaside_dark.color15:      #f0fff0
 
 
-! ---------- brewer dark
+! ---------- brewer dark (++)
 ! special
 brewer_dark.*.foreground:   #b7b8b9
 brewer_dark.*.background:   #0c0d0e
@@ -461,7 +476,7 @@ brewer_dark.*.color7:       #b7b8b9
 brewer_dark.*.color15:      #fcfdfe
 
 
-! ---------- google dark
+! ---------- google dark (++)
 ! special
 google_dark.*.foreground:   #c5c8c6
 google_dark.*.background:   #1d1f21
@@ -492,7 +507,7 @@ google_dark.*.color7:       #c5c8c6
 google_dark.*.color15:      #ffffff
 
 
-! ---------- grayscale dark (-)
+! ---------- grayscale dark (--)
 ! special
 grayscale_dark.foreground:   #b9b9b9
 grayscale_dark.background:   #101010
@@ -553,7 +568,7 @@ monokai_dark.color14:      #a1efe4
 monokai_dark.color7:       #f8f8f2
 monokai_dark.color15:      #f9f8f5
 
-! ---------- railscasts dark
+! ---------- railscasts dark (++) (emacs)
 ! special
 railscasts_dark.*.foreground:   #e6e1dc
 railscasts_dark.*.background:   #2b2b2b
@@ -616,7 +631,7 @@ shapeshifter_dark.*.color7:       #ababab
 shapeshifter_dark.*.color15:      #f9f9f9
 
 
-! ---------- solarized dark (-)
+! ---------- solarized dark (-) (too blue ?)
 ! special
 solarized_dark.*.foreground:   #93a1a1
 solarized_dark.*.background:   #002b36
@@ -647,7 +662,7 @@ solarized_dark.*.color7:       #93a1a1
 solarized_dark.*.color15:      #fdf6e3
 
 
-! ---------- twilight dark
+! ---------- twilight dark (~)
 ! special
 twilight_dark.*.foreground:   #a7a7a7
 twilight_dark.*.background:   #1e1e1e
