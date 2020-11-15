@@ -198,6 +198,37 @@ eighties_dark.*.color7:       #d3d0c8
 eighties_dark.*.color15:      #f2f0ec
 
 
+! ---------- nineties dark (tomorrow of eighties)
+! special
+nineties_dark.*.foreground:   #d3d0c8
+nineties_dark.*.background:   #1d1f21
+nineties_dark.*.cursorColor:  #d3d0c8
+! black
+nineties_dark.*.color0:       #1d1f21
+nineties_dark.*.color8:       #747369
+! red
+nineties_dark.*.color1:       #f2777a
+nineties_dark.*.color9:       #f2777a
+! green
+nineties_dark.*.color2:       #99cc99
+nineties_dark.*.color10:      #99cc99
+! yellow
+nineties_dark.*.color3:       #ffcc66
+nineties_dark.*.color11:      #ffcc66
+! blue
+nineties_dark.*.color4:       #6699cc
+nineties_dark.*.color12:      #6699cc
+! magenta
+nineties_dark.*.color5:       #cc99cc
+nineties_dark.*.color13:      #cc99cc
+! cyan
+nineties_dark.*.color6:       #66cccc
+nineties_dark.*.color14:      #66cccc
+! white
+nineties_dark.*.color7:       #d3d0c8
+nineties_dark.*.color15:      #f2f0ec
+
+
 ! ---------- ocean dark (--)
 ! special
 ocean_dark.*.foreground:   #c0c5ce
