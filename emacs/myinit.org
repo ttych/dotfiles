@@ -676,6 +676,12 @@
 	   :config
 	   (setq seeing-is-believing-timeout 10)
 	   )
+	 (use-package haml-mode
+	   :ensure t
+	   )
+	 (use-package slim-mode
+	   :ensure t
+	   )
    #+END_SRC
 ** cucumber
    #+BEGIN_SRC emacs-lisp
