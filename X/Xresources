@@ -73,7 +73,6 @@ default_dark.*.color14:      #75b5aa
 default_dark.*.color7:       #d0d0d0
 default_dark.*.color15:      #f5f5f5
 
-
 ! ---------- 3024_dark
 ! special
 3024_dark.*.foreground:   #a5a2a2
@@ -103,7 +102,6 @@ default_dark.*.color15:      #f5f5f5
 ! white
 3024_dark.*.color7:       #a5a2a2
 3024_dark.*.color15:      #f7f7f7
-
 
 ! ---------- terminal.sexy color (https://terminal.sexy/) (+)
 ! special
@@ -135,7 +133,6 @@ terminal_sexy.*.color14:      #8abeb7
 terminal_sexy.*.color7:       #707880
 terminal_sexy.*.color15:      #c5c8c6
 
-
 ! ---------- zenburn color (~) (red too fade)
 ! special
 zenburn.*.foreground:   #ffffff
@@ -165,7 +162,6 @@ zenburn.*.color14:      #93e0e3
 ! white
 zenburn.*.color7:       #dcdccc
 zenburn.*.color15:      #ffffff
-
 
 ! ---------- eighties dark (++) (emacs)
 ! special
@@ -197,38 +193,6 @@ eighties_dark.*.color14:      #66cccc
 eighties_dark.*.color7:       #d3d0c8
 eighties_dark.*.color15:      #f2f0ec
 
-
-! ---------- nineties dark (tomorrow of eighties)
-! special
-nineties_dark.*.foreground:   #d3d0c8
-nineties_dark.*.background:   #1d1f21
-nineties_dark.*.cursorColor:  #d3d0c8
-! black
-nineties_dark.*.color0:       #1d1f21
-nineties_dark.*.color8:       #747369
-! red
-nineties_dark.*.color1:       #f2777a
-nineties_dark.*.color9:       #f2777a
-! green
-nineties_dark.*.color2:       #99cc99
-nineties_dark.*.color10:      #99cc99
-! yellow
-nineties_dark.*.color3:       #ffcc66
-nineties_dark.*.color11:      #ffcc66
-! blue
-nineties_dark.*.color4:       #6699cc
-nineties_dark.*.color12:      #6699cc
-! magenta
-nineties_dark.*.color5:       #cc99cc
-nineties_dark.*.color13:      #cc99cc
-! cyan
-nineties_dark.*.color6:       #66cccc
-nineties_dark.*.color14:      #66cccc
-! white
-nineties_dark.*.color7:       #d3d0c8
-nineties_dark.*.color15:      #f2f0ec
-
-
 ! ---------- ocean dark (--)
 ! special
 ocean_dark.*.foreground:   #c0c5ce
@@ -258,7 +222,6 @@ ocean_dark.*.color14:      #96b5b4
 ! white
 ocean_dark.*.color7:       #c0c5ce
 ocean_dark.*.color15:      #eff1f5
-
 
 ! ---------- tomorrow dark (~)
 ! special
@@ -290,7 +253,6 @@ tomorrow_dark.*.color14:      #8abeb7
 tomorrow_dark.*.color7:       #c5c8c6
 tomorrow_dark.*.color15:      #ffffff
 
-
 ! ---------- ashes dark (--) (too purple)
 ! special
 ashes_dark.*.foreground:   #c7ccd1
@@ -320,7 +282,6 @@ ashes_dark.*.color14:      #95aec7
 ! white
 ashes_dark.*.color7:       #c7ccd1
 ashes_dark.*.color15:      #f3f4f5
-
 
 ! ---------- Matrix (--)
 ! special
@@ -352,7 +313,6 @@ matrix.*.color14:      #55ff55
 matrix.*.color7:       #00cc00
 matrix.*.color15:      #00cc00
 
-
 ! ---------- atelierdune_dark (-)
 ! special
 atelierdune_dark.foreground:   #a6a28c
@@ -383,7 +343,6 @@ atelierdune_dark.color14:      #1fad83
 atelierdune_dark.color7:       #a6a28c
 atelierdune_dark.color15:      #fefbec
 
-
 ! ---------- atelierforest_dark (-)
 ! special
 atelierforest_dark.foreground:   #a8a19f
@@ -413,7 +372,6 @@ atelierforest_dark.color14:      #00ad9c
 ! white
 atelierforest_dark.color7:       #a8a19f
 atelierforest_dark.color15:      #f1efee
-
 
 ! ---------- atelierlakeside dark (-)
 ! special
@@ -475,7 +433,6 @@ atelierseaside_dark.color14:      #1999b3
 atelierseaside_dark.color7:       #8ca68c
 atelierseaside_dark.color15:      #f0fff0
 
-
 ! ---------- brewer dark (++)
 ! special
 brewer_dark.*.foreground:   #b7b8b9
@@ -505,7 +462,6 @@ brewer_dark.*.color14:      #80b1d3
 ! white
 brewer_dark.*.color7:       #b7b8b9
 brewer_dark.*.color15:      #fcfdfe
-
 
 ! ---------- google dark (++)
 ! special
@@ -537,7 +493,6 @@ google_dark.*.color14:      #3971ed
 google_dark.*.color7:       #c5c8c6
 google_dark.*.color15:      #ffffff
 
-
 ! ---------- grayscale dark (--)
 ! special
 grayscale_dark.foreground:   #b9b9b9
@@ -567,7 +522,6 @@ grayscale_dark.color14:      #868686
 ! white
 grayscale_dark.color7:       #b9b9b9
 grayscale_dark.color15:      #f7f7f7
-
 
 ! ---------- monokai dark (-)
 ! special
@@ -629,13 +583,11 @@ railscasts_dark.*.color14:      #519f50
 railscasts_dark.*.color7:       #e6e1dc
 railscasts_dark.*.color15:      #f9f7f3
 
-
 ! ---------- shapeshifter dark
 ! special
 shapeshifter_dark.*.foreground:   #ababab
 shapeshifter_dark.*.background:   #000000
 shapeshifter_dark.*.cursorColor:  #ababab
-
 ! black
 shapeshifter_dark.*.color0:       #000000
 shapeshifter_dark.*.color8:       #343434
@@ -660,7 +612,6 @@ shapeshifter_dark.*.color14:      #23edda
 ! white
 shapeshifter_dark.*.color7:       #ababab
 shapeshifter_dark.*.color15:      #f9f9f9
-
 
 ! ---------- solarized dark (-) (too blue ?)
 ! special
@@ -692,7 +643,6 @@ solarized_dark.*.color14:      #2aa198
 solarized_dark.*.color7:       #93a1a1
 solarized_dark.*.color15:      #fdf6e3
 
-
 ! ---------- twilight dark (~)
 ! special
 twilight_dark.*.foreground:   #a7a7a7
@@ -722,6 +672,67 @@ twilight_dark.*.color14:      #afc4db
 ! white
 twilight_dark.*.color7:       #a7a7a7
 twilight_dark.*.color15:      #ffffff
+
+! ---------- gnometerm
+! special
+gnometerm.*.foreground:   #ffffff
+gnometerm.*.background:   #000000
+gnometerm.*.cursorColor:  #ffffff
+! black
+gnometerm.*.color0:       #000000
+gnometerm.*.color8:       #555753
+! red
+gnometerm.*.color1:       #cc0000
+gnometerm.*.color9:       #ef2929
+! green
+gnometerm.*.color2:       #4e9a06
+gnometerm.*.color10:      #8ae234
+! yellow
+gnometerm.*.color3:       #c4a000
+gnometerm.*.color11:      #fce94f
+! blue
+gnometerm.*.color4:       #3465a4
+gnometerm.*.color12:      #729fcf
+! magenta
+gnometerm.*.color5:       #75507b
+gnometerm.*.color13:      #ad7fa8
+! cyan
+gnometerm.*.color6:       #06989a
+gnometerm.*.color14:      #34e2e2
+! white
+gnometerm.*.color7:       #d3d7cf
+gnometerm.*.color15:      #eeeeec
+
+! ---------- codeschool_dark
+! special
+codeschool_dark.*.foreground:   #9ea7a6
+codeschool_dark.*.background:   #232c31
+codeschool_dark.*.cursorColor:  #9ea7a6
+! black
+codeschool_dark.*.color0:       #232c31
+codeschool_dark.*.color8:       #3f4944
+! red
+codeschool_dark.*.color1:       #2a5491
+codeschool_dark.*.color9:       #2a5491
+! green
+codeschool_dark.*.color2:       #237986
+codeschool_dark.*.color10:      #237986
+! yellow
+codeschool_dark.*.color3:       #a03b1e
+codeschool_dark.*.color11:      #a03b1e
+! blue
+codeschool_dark.*.color4:       #484d79
+codeschool_dark.*.color12:      #484d79
+! magenta
+codeschool_dark.*.color5:       #c59820
+codeschool_dark.*.color13:      #c59820
+! cyan
+codeschool_dark.*.color6:       #b02f30
+codeschool_dark.*.color14:      #b02f30
+! white
+codeschool_dark.*.color7:       #9ea7a6
+codeschool_dark.*.color15:      #b5d8f6
+
 
 
 ! ---------- Xcursor
