@@ -71,7 +71,7 @@
     Shift+Mod4 + l 
 
 #xterm1
-"rxvt -name nineties_dark"
+"rxvt -name default_dark"
     m:0x40 + c:53
     Mod4 + x 
 
