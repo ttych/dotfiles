@@ -733,6 +733,36 @@ codeschool_dark.*.color14:      #b02f30
 codeschool_dark.*.color7:       #9ea7a6
 codeschool_dark.*.color15:      #b5d8f6
 
+! ---------- numix_darkest
+! special
+numix_darkest.*.foreground:   #a2a2a2
+numix_darkest.*.background:   #282828
+numix_darkest.*.cursorColor:  #a2a2a2
+! black
+numix_darkest.*.color0:       #555555
+numix_darkest.*.color8:       #888888
+! red
+numix_darkest.*.color1:       #9c3528
+numix_darkest.*.color9:       #d64937
+! green
+numix_darkest.*.color2:       #61bc3b
+numix_darkest.*.color10:      #86df5d
+! yellow
+numix_darkest.*.color3:       #f3b43a
+numix_darkest.*.color11:      #fdd75a
+! blue
+numix_darkest.*.color4:       #0d68a8
+numix_darkest.*.color12:      #0f75bd
+! magenta
+numix_darkest.*.color5:       #744560
+numix_darkest.*.color13:      #9e5e83
+! cyan
+numix_darkest.*.color6:       #288e9c
+numix_darkest.*.color14:      #37c3d6
+! white
+numix_darkest.*.color7:       #a2a2a2
+numix_darkest.*.color15:      #f9f9f9
+
 
 
 ! ---------- Xcursor
