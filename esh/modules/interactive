@@ -151,6 +151,11 @@ Bguard()
     bundle_exec guard "$@"
 }
 
+Bcap()
+{
+    bundle_exec cap "$@"
+}
+
 
 ### copy / paste
 
