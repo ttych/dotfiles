@@ -46,19 +46,40 @@ autoload -U promptinit && promptinit
 # ##### SETOPT ##### #
 ######################
 
-
 unsetopt beep
 setopt   emacs
 setopt   interactivecomments
-setopt   promptsubst
 setopt   correct
 setopt   correctall
 unsetopt hist_beep
 unsetopt list_beep
+# prompt substitution
+setopt prompt_subst
 
 
+###################
+# ##### VCS ##### #
+###################
 
-OS_NAME=`uname -s`
+# autoload -Uz vcs_info
+# zstyle ':vcs_info:*' enable git # hg
+# zstyle ':vcs_info:git:*' formats '%F{240}(%b)%r%f'
+# alias vcs_i='vcs_info command; vcs_info_lastmsg'
+# precmd_vcs_info() { vcs_info }
+# # in prompt
+# #  precmd_functions+=( precmd_vcs_info )
+# #  RPROMPT=\$vcs_info_msg_0_
+
+# [ -r "$ESH_DIR/modules/git-prompt.sh" ] && . "$ESH_DIR/modules/git-prompt.sh"
+# precmd_git_prompt() { __git_ps1 "%n" ":%~$ " "|%s" }
+# export GIT_PS1_SHOWDIRTYSTATE=1
+# # export GIT_PS1_SHOWSTASHSTATE=1
+# export GIT_PS1_SHOWUNTRACKEDFILES=1
+# # export GIT_PS1_SHOWUPSTREAM="auto"
+# # export GIT_PS1_STATESEPARATOR=
+# # export GIT_PS1_DESCRIBE_STYLE=default
+# export GIT_PS1_SHOWCOLORHINTS=1
+# # export GIT_PS1_HIDE_IF_PWD_IGNORED=1
 
 
 ############################
@@ -220,5 +241,35 @@ prompt_dev()
     PROMPT="${PROMPT_ERROR}${PROMPT_BASE_1}${PROMPT_DEV}
 ${PROMPT_BASE_2}"
 }
+# prompt_dev
 
-prompt_dev
+prompt_with_prompt_git()
+{
+    prompt_2020_l1='%(?..%F{red}%? )%f%B%F{green}%n%f%b@%B%F{green}%m%f%b:%B%F{blue}%~%f%b'
+    prompt_2020_l2='
+%B%(!.%F{red}#.%F{green}>)%f%b '
+
+    # RPROMPT='%*'
+    # RPROMPT=\$vcs_info_msg_0_
+    prompt_2020_git_prompt() { __git_ps1 "$prompt_2020_l1" "$prompt_2020_l2" " %s" }
+    precmd_functions+=( prompt_2020_git_prompt )
+}
+# prompt_with_prompt_git
+
+prompt_2020()
+{
+    prompt_2020_l1='%(?..%F{red}%? )%f%B%F{green}%n%f%b@%B%F{green}%m%f%b:%B%F{blue}%~%f%b'
+    prompt_2020_l2='
+%B%(!.%F{red}#.%F{green}>)%f%b '
+    prompt_2020_dev1="  \$prompt_git \$prompt_ruby \$prompt_python"
+    prompt_2020_dev2=
+    PROMPT="${prompt_2020_l1}${prompt_2020_dev1}${prompt_2020_l2}"
+    RPROMPT='%*'
+    # RPROMPT=\$vcs_info_msg_0_
+
+    prompt_2020_git() { prompt_git "%F{yellow}" "%f" }
+    prompt_2020_ruby() { prompt_ruby "%F{yellow}" "%f" }
+    prompt_2020_python() { prompt_python "%F{yellow}" "%f" }
+    precmd_functions+=( prompt_2020_git prompt_2020_ruby prompt_2020_python )
+}
+prompt_2020

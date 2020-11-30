@@ -411,9 +411,9 @@ fi
 ## History
 [ -d "$HOME/.log" ] || mkdir "$HOME/.log"
 HISTFILE="$HOME/.log/${HOSTNAME}_${ESH_SH_CUR_SHORT}"; export HISTFILE
-# ksh
-HISTSIZE=1000; export HISTSIZE
-# bash
+# history file size
+HISTSIZE=2000; export HISTSIZE
+# bash history file size
 HISTFILESIZE=1000; export HISTFILESIZE
-# zsh
-SAVEHIST=1000; export SAVEHIST
+# session history size
+SAVEHIST=3000; export SAVEHIST

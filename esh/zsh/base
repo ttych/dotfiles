@@ -11,6 +11,11 @@
 # ##### SETOPT ##### #
 ######################
 
+# List default zsh options
+# emulate -lLR zsh
+# Revert to default zsh options
+# emulate -LR zsh
+
 ## Shell Emulation
 setopt   shwordsplit
 ## Expansion and Globbing
@@ -18,6 +23,31 @@ setopt   globsubst
 setopt   nonomatch
 ## Input/Output
 setopt   rmstarsilent
+
+## History
+# share history across multiple zsh sessions
+# setopt SHARE_HISTORY
+# append to history
+setopt APPEND_HISTORY
+# adds commands as they are typed, not at shell exit
+setopt INC_APPEND_HISTORY
+# expire duplicates first
+setopt HIST_EXPIRE_DUPS_FIRST
+# do not store duplications
+setopt HIST_IGNORE_DUPS
+# setopt  HIST_IGNORE_ALL_DUPS
+# ignore duplicates when searching
+setopt HIST_FIND_NO_DUPS
+# removes blank lines from history
+setopt HIST_REDUCE_BLANKS
+# verify history replacement
+setopt HIST_VERIFY
+# do not save duplications
+setopt HIST_SAVE_NO_DUPS
+
+## Correction
+setopt CORRECT
+setopt CORRECT_ALL
 
 
 # non interactive
@@ -30,10 +60,7 @@ setopt   rmstarsilent
 #
 #setopt   INTERACTIVE_COMMENTS # Allow comments even in interactive shells.
 #
-#setopt   correct              # correction
-#setopt   correctall           # correct all !
 #unsetopt hist_beep            # no beep
-#setopt   histignoredups       # keeps duplicates out of the history.
 #setopt   interactivecomments  # allows comments in the interactive shell. Useful for pasting.
 #unsetopt list_beep            # no beep
 #setopt   promptsubst          # parameter, command, and arithmetic substitution are performed in prompts.
@@ -44,13 +71,6 @@ setopt   rmstarsilent
 ####
 
 
-#setopt	inc_append_history	# add to histo when executed
-##setopt append_history		# add to the end of the file
-#setopt	 hist_ignore_dups	# dont keep 2 similar lines
-##setopt  hist_ignore_all_dups	# remove all dups in hist file
-#setopt	 hist_expire_dups_first # remove dups when histfile is complete
-##setopt	 hist_save_no_dups	# don't save dups
-#setopt	 hist_find_no_dups	# no dups in history
 #unsetopt clobber		# >| to overwrite file
 #unsetopt ignore_eof		# CTRL + D => logout
 #setopt	print_exit_value	# affiche l'exitcode si != 0
