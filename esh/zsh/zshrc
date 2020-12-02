@@ -256,33 +256,35 @@ prompt_with_prompt_git()
 }
 # prompt_with_prompt_git
 
+prompt_dev()
+{
+    prompt_dev=
+
+    prompt_git "%F{yellow}" "%F{green}" "%F{red}" "%f"
+    prompt_dev="${prompt_dev:+$prompt_dev }$prompt_git"
+    prompt_ruby "%F{yellow}" "%f"
+    prompt_dev="${prompt_dev:+$prompt_dev }$prompt_ruby"
+    prompt_python "%F{yellow}" "%f"
+    prompt_dev="${prompt_dev:+$prompt_dev }$prompt_python"
+
+    if [ -n "$prompt_dev" ]; then
+        prompt_dev="
+$prompt_dev"
+    fi
+}
+
 prompt_2020()
 {
     prompt_2020_error='%(?..%B%F{red}%?%f%b
 )'
     prompt_2020_l1='%f%B%F{green}%n%f%b@%B%F{green}%m%f%b:%B%F{blue}%~%f%b'
     prompt_2020_l2='
-%B%(!.%F{red}#.%F{130}>)%f%b '
+%B%(!.%F{red}.%F{130})%#%f%b '
 
-    PROMPT="${prompt_2020_error}${prompt_2020_l1}\${prompt_2020_dev}${prompt_2020_l2}"
+    PROMPT="${prompt_2020_error}${prompt_2020_l1}\${prompt_dev}${prompt_2020_l2}"
     RPROMPT="\$prompt_git_alt"
 
-    prompt_2020_dev()
-    {
-        prompt_2020_dev=
 
-        prompt_git "%F{yellow}" "%F{green}" "%F{red}" "%f"
-        prompt_2020_dev="${prompt_2020_dev:+$prompt_2020_dev }$prompt_git"
-        prompt_ruby "%F{yellow}" "%f"
-        prompt_2020_dev="${prompt_2020_dev:+$prompt_2020_dev }$prompt_ruby"
-        prompt_python "%F{yellow}" "%f"
-        prompt_2020_dev="${prompt_2020_dev:+$prompt_2020_dev }$prompt_python"
-
-        if [ -n "$prompt_2020_dev" ]; then
-            prompt_2020_dev="
-$prompt_2020_dev"
-        fi
-    }
-    precmd_functions+=( prompt_2020_dev )
+    precmd_functions+=( prompt_dev )
 }
 prompt_2020
