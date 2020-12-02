@@ -16,7 +16,7 @@ prompt_python()
             prompt_python__ver="${prompt_python__ver#Python }"
         fi
         if [ "$prompt_python_venv" != 'default' ]; then
-             prompt_python="${1}py$prompt_python__sep$prompt_python_venv${prompt_python__ver:+$prompt_python__sep$prompt_python__ver}${2}"
+             prompt_python="${1}py${prompt_python__sep}${prompt_python_venv}${prompt_python__ver:+$prompt_python__sep$prompt_python__ver}${2}"
         fi
     fi
 }
@@ -48,7 +48,7 @@ prompt_rbenv()
         prompt_rbenv__version="`rbenv local 2>/dev/null`"
         [ $? -eq 0 ] || return 1
         if [ -n "$prompt_rbenv__version" ]; then
-            prompt_rbenv="${1}rb$prompt_rbenv__sep$prompt_rbenv__version${2}"
+            prompt_rbenv="${1}rb${prompt_rbenv__sep}${prompt_rbenv__version}${2}"
         fi
     fi
 }
@@ -65,25 +65,10 @@ prompt_ruby_printf()
 prompt_git()
 {
     prompt_git=
-    prompt_git__sep="${3:-:}"
-    if _git_info 2>/dev/null; then
-        prompt_git="${_git_info__branch}"
-        if $_git_info__is_bare; then
-            prompt_git="bare:${prompt_git}"
-        else
-            if $_git_info__diff_staged ||
-               $_git_info__diff ||
-               $_git_info__untracked ; then
-                prompt_git__staged=-
-                prompt_git__diff=-
-                prompt_git__untracked=-
-                $_git_info__diff_staged && prompt_git__staged=*
-                $_git_info__diff && prompt_git__diff=*
-                $_git_info__untracked && prompt_git__untracked=u
-                prompt_git="${prompt_git}${prompt_git__sep}${prompt_git__staged}${prompt_git__diff}${prompt_git__untracked}"
-            fi
-        fi
-        prompt_git="${1}${prompt_git}${2}"
+    prompt_git_alt=
+    if _git_prompt "$@"; then
+        prompt_git="$_git_prompt"
+        prompt_git_alt="$_git_prompt_alt"
     fi
 }
 

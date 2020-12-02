@@ -21,6 +21,16 @@ g()
     fi
     "$G" "$@"
 }
+gcd()
+{
+    # if inside git work tree || inside git db; then
+       # gcd__base= # git base directory
+       # cd "$gcd__base/$1"
+       # return $?
+    # fi
+    echo >&2 "not inside git repository"
+    return 1
+}
 
 
 ### ls
