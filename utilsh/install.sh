@@ -18,12 +18,12 @@ DISTRIBUTIONS='
 AUTOLOADS='
   std.shl
   local.shl
-  git_scm.shl
   goto.shl
   ruby_base.shl
   pyv.sh
   wucp.shl
   myenv.shl
+  git.lib.sh
   editors.lib.sh
 '
 
