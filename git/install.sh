@@ -113,6 +113,8 @@ git config --global rebase.autosquash true
 # merge
 git config --global merge.conflictStyle diff3
 
+# init
+git config --global alias.i init
 
 # status
 git config --global alias.st status
