@@ -131,6 +131,13 @@
 	   (load-theme 'sanityinc-tomorrow-eighties t)
 	   )
    #+END_SRC
+   #+BEGIN_SRC emacs-lisp
+	 (use-package color-theme-sanityinc-tomorrow
+	   :ensure t
+	   :config
+	   (load-theme 'sanityinc-tomorrow-eighties t)
+	   )
+   #+END_SRC
 ** material (g) (-)
    #+BEGIN_SRC emacs-lisp
 	 (use-package material-theme

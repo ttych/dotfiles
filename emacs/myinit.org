@@ -801,12 +801,12 @@
   #+BEGIN_SRC emacs-lisp
   #+END_SRC
 * themes
-** railscast-reloaded (++)
+** railscast
    #+BEGIN_SRC emacs-lisp
-	 (use-package railscasts-reloaded-theme
+	 (use-package railscasts-theme
 	   :ensure t
 	   :init
-	   (load-theme 'railscasts-reloaded t)
+	   (load-theme 'railscasts t)
 	   )
    #+END_SRC
 * disabled
