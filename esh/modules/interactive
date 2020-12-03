@@ -23,13 +23,32 @@ g()
 }
 gcd()
 {
-    # if inside git work tree || inside git db; then
-       # gcd__base= # git base directory
-       # cd "$gcd__base/$1"
-       # return $?
-    # fi
-    echo >&2 "not inside git repository"
-    return 1
+    gcd=$(git rev-parse --absolute-git-dir --is-bare-repository 2>/dev/null)
+    if [ $? -ne 0 ] || [ -z "$gcd" ];  then
+        echo >&2 "not inside git repository"
+        return 1
+    fi
+
+    case $gcd in
+        *true)
+            gcd="${gcd%?true}"
+            ;;
+        *false)
+            gcd="${gcd%/.git?false}"
+            ;;
+    esac
+
+    case $1 in
+        -) case "$OLDPWD" in
+               "$gcd"/*) cd - ;;
+               *) echo >&2 "not inside git repository"
+                  return 1
+                  ;;
+           esac ;;
+        /*) cd "$gcd/$1" ;;
+        .|./*|..|../*) cd "$1" ;;
+        *) cd "$gcd/$1" ;;
+    esac
 }
 
 
