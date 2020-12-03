@@ -803,10 +803,10 @@
 * themes
 ** railscast
    #+BEGIN_SRC emacs-lisp
-	 (use-package railscasts-theme
+	 (use-package railscasts-reloaded-theme
 	   :ensure t
 	   :init
-	   (load-theme 'railscasts t)
+	   (load-theme 'railscasts-reloaded t)
 	   )
    #+END_SRC
 * disabled
