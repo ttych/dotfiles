@@ -19,7 +19,7 @@ AUTOLOADS='
   std.shl
   local.shl
   goto.shl
-  ruby_base.shl
+  ruby_env.shl
   pyv.sh
   wucp.shl
   myenv.shl
