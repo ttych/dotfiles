@@ -185,6 +185,11 @@ Bcap()
     bundle_exec cap "$@"
 }
 
+Bjekyll()
+{
+    bundle_exec jekyll "$@"
+}
+
 
 ### copy / paste
 
