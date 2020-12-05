@@ -1,6 +1,15 @@
 #!/bin/sh
 
-#%%load%% std.shl
+
+terminal_esc()
+{
+    printf "%b\n" \
+           "ESC=\"\e\"" \
+           "export ESC"
+}
+
+eval "$(terminal_esc)"
+
 
 ## attributes: printf “$TERMINAL_SET_ATTR” $TERMINAL_BOLD
 TERMINAL_BOLD=1

@@ -1,0 +1,67 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+set -e
+
+OK_C=green
+ALERT_C=red
+WARN_C=#ffff00
+
+cpus()
+{
+    cpus=`grep processor /proc/cpuinfo | wc -l`
+}
+
+load_average()
+{
+    load_average=`cat /proc/loadavg`
+    load_average="${load_average%% *}"
+}
+
+load_avg_info()
+{
+    cpus
+    load_average
+
+    if which ruby >/dev/null 2>/dev/null; then
+        load_average_percentage=$(ruby --disable-all -e "puts ($load_average*100.0/$cpus).round")
+    elif which python >/dev/null 2>/dev/null; then
+        load_average_percentage=$(python -c "print(round($load_average*100.0/$cpus))")
+    fi
+
+    if [ $load_average_percentage -le 35 ]; then
+        load_average_color=$OK_C
+    elif [ $load_average_percentage -le 65 ]; then
+        load_average_color=$WARN_C
+    else
+        load_average_color=$ALERT_C
+    fi
+}
+
+load_avg()
+{
+    if [ -z "$load_average" ] || [ -z "$cpus" ]; then
+        return 0
+    fi
+    printf "$format" "$load_average/$cpus"
+}
+
+load_avg_tmux()
+{
+    if [ -z "$load_average" ] || [ -z "$cpus" ]; then
+        return 0
+    fi
+    printf "$format" "#[fg=${load_average_color}][l:$load_average/$cpus]#[fg=default]"
+}
+
+action=load_avg
+while getopts :t opt; do
+    case $opt in
+        t) action=load_avg_tmux ;;
+    esac
+done
+shift $(($OPTIND - 1))
+format="${1:-%s}"
+
+load_avg_info
+$action

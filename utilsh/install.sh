@@ -6,7 +6,6 @@ DISTRIBUTIONS='
   https://github.com/ttych/wtmux.git
   https://github.com/ttych/wwine.git
   https://github.com/ttych/installer.git
-  https://github.com/ttych/extrash.git
   https://github.com/ttych/wec.git
   https://github.com/ttych/wucp.git
   https://github.com/ttych/rubysh.git
