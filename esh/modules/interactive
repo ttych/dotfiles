@@ -189,6 +189,10 @@ Bjekyll()
 {
     bundle_exec jekyll "$@"
 }
+Bjekylls()
+{
+    bundle_exec jekyll serve --drafts --livereload --watch "$@"
+}
 
 
 ### copy / paste
