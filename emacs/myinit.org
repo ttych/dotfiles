@@ -1,3 +1,6 @@
+#+TITLE: literal emacs config
+#+AUTHOR: Thomas Tych
+#+DATE: 2020-01-01
 #+STARTUP: content
 
 * base
@@ -556,54 +559,55 @@
    #+END_SRC
 ** whitespace
    #+BEGIN_SRC emacs-lisp
-     ;; 2 - SPACES - INDENTED - MODES
-     (defvar 2-spaces-indented-modes
-       '(ruby-mode
-	 html-mode
-	 yaml-mode
-	 ))
-     (dolist (mode 2-spaces-indented-modes)
-       (add-hook (intern (format "%s-hook" mode))
-		 (lambda ()
-		   (setq indent-tabs-mode nil
-			 tab-width 2
-			 )
-		   )))
+	 ;; 2 SPACES - INDENTED - MODES
+	 (defvar 2-spaces-indented-modes
+	   '(ruby-mode
+		 html-mode
+		 yaml-mode
+		 ))
+	 (dolist (mode 2-spaces-indented-modes)
+	   (add-hook (intern (format "%s-hook" mode))
+				 (lambda ()
+				   (setq indent-tabs-mode nil
+						 tab-width 2
+						 )
+				   )))
 
-     ;; 4 - SPACES - INDENTED - MODES
-     (defvar 4-spaces-indented-modes
-       '(python-mode
-	 groovy-mode
-	 ))
-     (dolist (mode 4-spaces-indented-modes)
-       (add-hook (intern (format "%s-hook" mode))
-		 (lambda ()
-		   (setq indent-tabs-mode nil
-			 tab-width 4
-			 )
-		   )))
+	 ;; 4 SPACES - INDENTED - MODES
+	 (defvar 4-spaces-indented-modes
+	   '(python-mode
+		 groovy-mode
+         markdown-mode
+		 ))
+	 (dolist (mode 4-spaces-indented-modes)
+	   (add-hook (intern (format "%s-hook" mode))
+				 (lambda ()
+				   (setq indent-tabs-mode nil
+						 tab-width 4
+						 )
+				   )))
 
-     ;; TAB - INDENTED - MODES
-     (defvar tab-indented-modes
-       '(
-	 ))
-     (dolist (mode tab-indented-modes)
-       (add-hook (intern (format "%s-hook" mode))
-		 (lambda ()
-		   (setq indent-tabs-mode t
-			 tab-width 4
-			 )
-		   )))
+	 ;; TAB 4 - INDENTED - MODES
+	 (defvar tab-indented-modes
+	   '(
+		 ))
+	 (dolist (mode tab-indented-modes)
+	   (add-hook (intern (format "%s-hook" mode))
+				 (lambda ()
+				   (setq indent-tabs-mode t
+						 tab-width 4
+						 )
+				   )))
 
-     (use-package whitespace
-       :init
-       (dolist (hook '(prog-mode-hook text-mode-hook))
-	 (add-hook hook #'whitespace-mode))
-       ;; (add-hook 'before-save-hook #'whitespace-cleanup)
-       :config
-       (setq whitespace-line-column 80) ;; limit line length
-       (setq whitespace-style '(face tabs empty trailing lines-tail)))
-     ;; lines indentation space-after-tab space-before-tab
+	 (use-package whitespace
+	   :init
+	   (dolist (hook '(prog-mode-hook text-mode-hook))
+		 (add-hook hook #'whitespace-mode))
+	   ;; (add-hook 'before-save-hook #'whitespace-cleanup)
+	   :config
+	   (setq whitespace-line-column 80) ;; limit line length
+	   (setq whitespace-style '(face tabs empty trailing lines-tail)))
+	 ;; lines indentation space-after-tab space-before-tab
    #+END_SRC
 ** shell
    #+BEGIN_SRC emacs-lisp
