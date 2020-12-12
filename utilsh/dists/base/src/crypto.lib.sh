@@ -160,7 +160,7 @@ _digest_integrity_s()
 # ### Main
 
 case ${0##*/} in
-    cert_*)
+    cert_*|digest_*)
         ${0##*/} "$@"
         ;;
 esac
