@@ -64,15 +64,18 @@ gpart_root()
         return 1
     }
 
+    gpart_root__i=0
     for gpart_root__d; do
         gpart_gpt "$gpart_root__d" || return 1
 
         case "$gpart_root__boot" in
-            uefi|efi) gpart_root_add_efi "$gpart_root__d" || return 1 ;;
-            bios) gpart_root_add_bios "$gpart_root__d" || return 1 ;;
+            uefi|efi) gpart_root_add_efi "$gpart_root__d" "$gpart_root__i" || return 1 ;;
+            bios) gpart_root_add_bios "$gpart_root__d" "$gpart_root__i" || return 1 ;;
         esac
 
-        gpart_root_add_zfs "$gpart_root__d" root || return 1
+        gpart_root_add_zfs "$gpart_root__d" "$gpart_root__i" root || return 1
+
+        gpart_root__i=$(($gpart_root__i + 1))
     done
 }
 
@@ -83,17 +86,17 @@ gpart_gpt()
 
 gpart_root_add_efi()
 {
-    gpart add -a 4k -s 200M -l "$1-efi" -t efi "$1"
+    gpart add -a 4k -s 200M -l "efi-${2}" -t efi "$1"
 }
 
 gpart_root_add_bios()
 {
-    gpart add -a 4k -s 512k -l "$1-boot" -t freebsd-boot "$1"
+    gpart add -a 4k -s 512k -l "boot-${2}" -t freebsd-boot "$1"
 }
 
 gpart_root_add_zfs()
 {
-    gpart add -a 4k -l "$1-${2:-data}" -t freebsd-zfs "$1"
+    gpart add -a 4k -l "${3:-data}-${2}" -t freebsd-zfs "$1"
 }
 
 
@@ -135,8 +138,10 @@ zfs_root_mirror()
     }
 
     zfs_root_mirror__ds=
+    zfs_root_mirror__i=0
     for zfs_root_mirror__d; do
-        zfs_root_mirror__ds="$zfs_root_mirror__ds /dev/gpt/${zfs_root_mirror__d}-root"
+        zfs_root_mirror__ds="$zfs_root_mirror__ds /dev/gpt/root-$zfs_root_mirror__i"
+        zfs_root_mirror__i=$(($zfs_root_mirror__i + 1))
     done
     zpool create -f -o altroot=$zfs_root_mirror__mountpoint -O compress=lz4 -O atime=off -m none $zfs_root_mirror__pool mirror $zfs_root_mirror__ds
 }
@@ -238,7 +243,7 @@ zfs_root_datasets()
 
     (cd $zfs_root_datasets__mountpoint/usr && ln -sf /home)
 
-    chmod 0700 $zfs_root_datasets__mountpoint/root
+    chmod 0700 $zfs_root_datasets__mountpoint/home/root
     chmod 0700 $zfs_root_datasets__mountpoint/home/admin
     chmod 1777 $zfs_root_datasets__mountpoint/tmp
     chmod 1777 $zfs_root_datasets__mountpoint/var/tmp
@@ -273,7 +278,7 @@ pw_user_a()
 
     mkdir -p /usr/local/etc/sudoers.d
     echo '%admin ALL=(ALL) NOPASSWD: ALL' > /usr/local/etc/sudoers.d/admin
-    chmod 640 /usr/local/etc/sudoers.d/admin
+    chmod 600 /usr/local/etc/sudoers.d/admin
 }
 
 
