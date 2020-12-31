@@ -193,6 +193,10 @@ Bjekylls()
 {
     bundle_exec jekyll serve --drafts --livereload --watch "$@"
 }
+Bjekylls2()
+{
+    bundle_exec jekyll serve --port 4001 --drafts --livereload --livereload-port 4011 --watch "$@"
+}
 
 
 ### copy / paste
