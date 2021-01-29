@@ -66,6 +66,14 @@
   (add-hook 'haskell-mode #'subword-mode)
   )
 
+;;;;;;;;;; lisp
+(use-package elisp-slime-nav
+  :ensure t
+  :config
+  (dolist (hook '(emacs-lisp-mode-hook ielm-mode-hook))
+    (add-hook hook #'elisp-slime-nav-mode))
+  )
+
 ;;;;;;;;;; lua
 (use-package lua-mode
   :ensure t
@@ -117,6 +125,14 @@
 ;;   :config
 ;;   (add-hook 'python-mode-hook 'py-autopep8-enable-on-save)
 ;;   )
+
+;;;;;;;;;; ruby
+(use-package haml-mode
+  :ensure t
+  )
+(use-package slim-mode
+  :ensure t
+  )
 
 ;;;;;;;;;; terraform
 (use-package terraform-mode

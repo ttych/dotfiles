@@ -39,6 +39,25 @@
                     )
               )))
 
+;;;;;;;;;; lisp
+(defun user-visit-ielm ()
+  "Switch to default `ielm' buffer.
+	 Start `ielm' if it's not already running."
+  (interactive)
+  (crux-start-or-switch-to 'ielm "*ielm*"))
+
+(add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
+(add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode)
+(define-key emacs-lisp-mode-map (kbd "C-c C-z") #'user-visit-ielm)
+(define-key emacs-lisp-mode-map (kbd "C-c C-c") #'eval-defun)
+(define-key emacs-lisp-mode-map (kbd "C-c C-b") #'eval-buffer)
+(add-hook 'lisp-interaction-mode-hook #'eldoc-mode)
+(add-hook 'eval-expression-minibuffer-setup-hook #'eldoc-mode)
+
+(add-hook 'ielm-mode-hook #'eldoc-mode)
+(add-hook 'ielm-mode-hook #'rainbow-delimiters-mode)
+
+
 ;;;;;;;;;; org <M-_ o>
 (global-set-key (kbd "M-_ o l") 'org-store-link)
 (global-set-key (kbd "M-_ o a") 'org-agenda)
