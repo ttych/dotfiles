@@ -68,3 +68,35 @@
 ;;                 emacs-lisp-mode-hook
 ;;                 text-mode-hook))
 ;; (add-hook hook #'abbrev-mode))
+
+;;;;;;;;;; bookmark <M-_ b>
+(setq bookmark-default-file (expand-file-name "bookmarks" save-dir)
+      bookmark-save-flag 1)
+(global-set-key (kbd "M-_ b s") 'bookmark-set)
+(global-set-key (kbd "M-_ b j") 'bookmark-jump)
+(global-set-key (kbd "M-_ b l") 'bookmark-bmenu-list)
+
+;;;;;;;;;; recentf <M-_ e r> <f9>
+(recentf-mode 1)
+(setq recentf-save-file (expand-file-name "recentf" save-dir)
+      recentf-max-menu-items 50
+      recentf-max-saved-items 100
+      ;; disable recentf-cleanup on Emacs start, because it can cause
+      ;; problems with remote files
+      recentf-auto-cleanup 'never
+      )
+(global-set-key (kbd "M-_ e r") 'recentf-open-files)
+(global-set-key (kbd "<f9>") 'recentf-open-files)
+;; update list periodically, every 5 minutes
+(run-at-time nil (* 5 60) 'recentf-save-list)
+
+;;;;;;;;;; savehist
+(savehist-mode 1)
+(setq
+ ;; search entries
+ savehist-additional-variables '(search-ring regexp-search-ring)
+ ;; save every 5 minutes
+ savehist-autosave-interval (* 5 60)
+ ;; keep the home clean
+ savehist-file (expand-file-name "savehist" save-dir)
+ )

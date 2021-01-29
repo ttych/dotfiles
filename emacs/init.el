@@ -86,6 +86,9 @@
  '(menu-bar-mode nil)
  '(next-line-add-newlines nil)
  '(org-babel-load-languages (quote ((emacs-lisp . t))))
+ '(org-export-backends
+   (quote
+    (ascii beamer html icalendar latex man md odt org texinfo)))
  '(package-selected-packages (quote (abbrev dired use-package)))
  '(read-quoted-char-radix 16)
  '(require-final-newline t)

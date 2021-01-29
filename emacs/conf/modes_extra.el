@@ -89,6 +89,23 @@
   (setq markdown-fontify-code-blocks-natively t)
   )
 
+;;;;;;;;;; org
+(use-package org-bullets
+  :ensure t
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+  )
+;; https://github.com/DarkBuffalo/ox-report
+(use-package ox-report
+  :ensure t
+  )
+;; (use-package ox-reveal
+;;   :ensure t
+;;   :config
+;;   (setq org-reveal-root "https://cdn.jsdelivr.net/reveal.js/3.0.0/")
+;;   (setq org-reveal-mathjax t)
+;;   )
+
 ;;;;;;;;;; puppet
 (use-package puppet-mode
   :ensure t

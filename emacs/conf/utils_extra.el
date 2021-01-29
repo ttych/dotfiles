@@ -48,6 +48,15 @@
         aw-scope 'frame)
   )
 
+;;;;;;;;;; anzu
+(use-package anzu
+  :ensure t
+  :bind (("M-%" . anzu-query-replace)
+         ("C-M-%" . anzu-query-replace-regexp))
+  :config
+  (global-anzu-mode)
+  )
+
 ;;;;;;;;;; comment
 (use-package comment-dwim-2
   :ensure t
@@ -66,13 +75,19 @@
   :ensure t
   )
 
-;;;;;;;;;; rainbow-mode
-(use-package rainbow-mode
+;;;;;;;;;; multiple-cursors
+(use-package multiple-cursors
   :ensure t
-  :delight
-  :config
-  (add-hook 'prog-mode-hook 'rainbow-mode)
-  (add-hook 'text-mode-hook 'rainbow-mode)
+  :bind (
+         ("M-_ c e" . mc/edit-lines)
+         ("M-_ c n" . mc/mark-next-like-this)
+         ("M-_ c p" . mc/mark-previous-like-this)
+         ("M-_ c w" . mc/mark-next-like-this-word)
+         ("M-_ c W" . mc/mark-previous-like-this-word)
+         ("M-_ c s" . mc/mark-next-like-this-word)
+         ("M-_ c S" . mc/mark-previous-like-this-word)
+         ("M-_ c a" . mc/mark-all-like-this)
+         )
   )
 
 ;;;;;;;;;; paren
@@ -80,6 +95,15 @@
   :config
   (show-paren-mode 1)
   (setq show-paren-delay 0)
+  )
+
+;;;;;;;;;; rainbow-mode
+(use-package rainbow-mode
+  :ensure t
+  :delight
+  :config
+  (add-hook 'prog-mode-hook 'rainbow-mode)
+  (add-hook 'text-mode-hook 'rainbow-mode)
   )
 
 ;;;;;;;;;; yasnippet
