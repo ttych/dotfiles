@@ -44,11 +44,22 @@
 	 (use-package ruby-mode
 	   :config
 	   (setq ruby-insert-encoding-magic-comment nil)
-	   (add-hook 'ruby-mode-hook #'subword-mode))
+	   (add-hook 'ruby-mode-hook #'subword-mode)
+
+	   (add-hook 'enh-ruby-mode-hook 'inf-ruby-minor-mode)
+	   (add-hook 'compilation-filter-hook 'inf-ruby-auto-enter)
+	   (add-hook 'enh-ruby-mode-hook 'seeing-is-believing)
+       )
+
 	 (use-package inf-ruby
 	   :ensure t
 	   :config
 	   (add-hook 'ruby-mode-hook #'inf-ruby-minor-mode))
+	 (use-package seeing-is-believing
+	   :ensure t
+	   :delight (seeing-is-believing " oO")
+	   :config
+	   (setq seeing-is-believing-timeout 10))
    #+END_SRC
 * themes
 ** zenburn (+)

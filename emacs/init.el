@@ -4,30 +4,43 @@
 
 ;;; Code:
 
-;; debug
+;;;;;;;;;; debug
 ;; (setq debug-on-error t)
 
-(defvar my-elisp-dir (expand-file-name "elisp/" user-emacs-directory)
-  "elisp directory for home made elisp.")
-(unless (file-exists-p my-elisp-dir)
-  (make-directory my-elisp-dir))
-(add-to-list 'load-path my-elisp-dir)
+(defun derived-mode-parents (mode)
+  (and mode (cons mode (derived-mode-parents
+            (get mode 'derived-mode-parent)))))
+;; Example :
+;; (derived-mode-parents 'html-mode)
+;; (derived-mode-parents 'ruby-mode)
+;; (derived-mode-parents 'python-mode)
+;; (derived-mode-parents 'lisp-mode)
+;; (derived-mode-parents 'org-mode)
 
+;; increase max-lisp-eval-depth temporarly
+;; (setq max-lisp-eval-depth (* max-lisp-eval-depth 10))
+;; Limit on number of Lisp variable bindings
+;; (setq max-specpdl-size (* max-specpdl-size 10))
+
+
+;;;;;;;;;; path
 (defvar emacs-working-dir (getenv "EMACS_WORKING_DIR"))
 (unless (and emacs-working-dir (not (string-equal emacs-working-dir "")))
   (setq emacs-working-dir user-emacs-directory))
-
-(defvar my-vendor-dir (expand-file-name "packages/" emacs-working-dir)
-  "This directory houses packages that are not yet available in ELPA (or MELPA).")
-(unless (file-exists-p my-vendor-dir)
-  (make-directory my-vendor-dir))
-(add-to-list 'load-path my-vendor-dir)
 
 (defvar save-dir (expand-file-name "save/" emacs-working-dir)
   "This folder stores all the automatically generated save/history-files.")
 (unless (file-exists-p save-dir)
   (make-directory save-dir))
 
+(defvar elisp-dir (expand-file-name "elisp" emacs-working-dir)
+  "This directory houses packages that are not yet available in ELPA (or MELPA).")
+(unless (file-exists-p elisp-dir)
+  (make-directory elisp-dir))
+(add-to-list 'load-path elisp-dir)
+
+
+;;;;;;;;;; conf
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -73,6 +86,7 @@
  '(menu-bar-mode nil)
  '(next-line-add-newlines nil)
  '(org-babel-load-languages (quote ((emacs-lisp . t))))
+ '(package-selected-packages (quote (abbrev dired use-package)))
  '(read-quoted-char-radix 16)
  '(require-final-newline t)
  '(save-place-mode t)
@@ -101,33 +115,19 @@
 (put 'downcase-region 'disabled nil)
 (put 'upcase-region 'disabled nil)
 
+
 ;; backup and auto-save dir
 (setq backup-directory-alist
       `(("." . ,save-dir)))
 (setq auto-save-file-name-transforms
       `((".*" ,save-dir t)))
 
+
 ;; (prefer-coding-system 'utf-8)
 ;; (set-default-coding-systems 'utf-8)
 ;; (set-terminal-coding-system 'utf-8)
 ;; (set-keyboard-coding-system 'utf-8)
 ;; (set-language-environment 'utf-8)
-
-(defun load-directory (dir)
-  (let ((load-it
-         (lambda (f)
-	   (load-file (concat (file-name-as-directory dir) f)))
-	 ))
-    (mapc load-it (directory-files dir nil "\\.el$"))))
-(load-directory (expand-file-name "conf/" user-emacs-directory))
-
-(defvar users-settings-dir (expand-file-name "users/" user-emacs-directory)
-  "This folder stores user specific setting.")
-(defvar user-settings-file
-  (expand-file-name (concat user-login-name ".el")
-                    users-settings-dir))
-(if (file-exists-p user-settings-file)
-    (load user-settings-file))
 
 
 ;; enable y/n answers
@@ -214,43 +214,75 @@
   )
 
 
-;;;;;;;;;; package
-(require 'package)
-(setq package-enable-at-startup nil)
-;; [Enter ↵] (package-menu-describe-package) → Describe the package under cursor.
-;; [i] (package-menu-mark-install) → mark for installation.
-;; [u] (package-menu-mark-unmark) → unmark.
-;; [d] (package-menu-mark-delete) → mark for deletion (removal of a installed package).
-;; [x] (package-menu-execute) → for “execute” (start install/uninstall of marked items).
-;; [r] (package-menu-refresh) → refresh the list from server.
-;; (For complete list of keys, call describe-mode [Ctrl+h m])
-(let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
-		    (not (gnutls-available-p))))
-       (proto (if no-ssl "http" "https")))
-  (when no-ssl (warn "\
-	  Your version of Emacs does not support SSL connections,
-	  which is unsafe because it allows man-in-the-middle attacks.
-	  There are two things you can do about this warning:
-	  1. Install an Emacs version that does support SSL and be safe.
-	  2. Remove this warning from your init file so you won't see it again."))
-  ;; Comment/uncomment these two lines to enable/disable MELPA and MELPA Stable as desired
-  (add-to-list 'package-archives (cons "melpa" (concat proto "://melpa.org/packages/")) t)
-  (add-to-list 'package-archives (cons "melpa-stable" (concat proto "://stable.melpa.org/packages/")) t)
-  (when (< emacs-major-version 24)
-    ;; For important compatibility libraries like cl-lib
-    (add-to-list 'package-archives (cons "gnu" (concat proto "://elpa.gnu.org/packages/")))))
-(package-initialize)
+;;;;;;;;;; bindings
+;; revert
+(global-set-key (kbd "<f5>") 'revert-buffer)
+;; buffers
+;;  (defalias 'list-buffers 'ibuffer)
+(global-set-key (kbd "C-x B") 'ibuffer)
+;;  (global-set-key (kbd "C-x B") 'ibuffer-other-window)
+;; kill-word
+(global-set-key (kbd "M-<deletechar>") 'kill-word)
+;; Search
+(global-set-key (kbd "M-s r") 'query-replace-regexp)
+(global-set-key (kbd "M-s M-%") 'query-replace-regexp)
+(global-set-key (kbd "M-s O") 'multi-occur)
+(global-set-key (kbd "M-s d") 'find-dired)
+(global-set-key (kbd "M-s g") 'rgrep)
+;; windmove
+(global-set-key (kbd "C-<up>") 'windmove-up)
+(global-set-key (kbd "M-[ 1 ; 5 a") 'windmove-up)
+(global-set-key (kbd "C-<down>") 'windmove-down)
+(global-set-key (kbd "M-[ 1 ; 5 b") 'windmove-down)
+(global-set-key (kbd "C-<left>") 'windmove-left)
+(global-set-key (kbd "M-[ 1 ; 5 d") 'windmove-left)
+(global-set-key (kbd "C-<right>") 'windmove-right)
+(global-set-key (kbd "M-[ 1 ; 5 c") 'windmove-right)
+;; window
+(global-set-key (kbd "C-x 9") 'delete-windows-on)
+(global-set-key (kbd "C-x C-^") 'shrink-window)
+;; kmacro
+(global-set-key (kbd "C-x C-k i") 'insert-kbd-macro)
 
-(setq package-user-dir (expand-file-name "elpa" emacs-working-dir))
+;; myMenu - modes
+(global-set-key (kbd "M-_ m f") 'auto-fill-mode)
+(global-set-key (kbd "M-_ m l") 'display-line-numbers-mode)
+(global-set-key (kbd "M-_ m s") 'auto-save-mode)
+(global-set-key (kbd "M-_ m w") 'whitespace-mode)
+;; myMenu - comments
+(global-set-key (kbd "M-_ #") 'comment-region)
+(global-set-key (kbd "M-_ @") 'uncomment-region)
+;; myMenu - align
+(global-set-key (kbd "M-_ \\") 'align-regexp)
+;;  (global-set-key (kbd "C-x \\") 'align-regexp)
+;; myMenu - join
+(global-set-key (kbd "M-_ <deletechar>")
+                (lambda ()
+                  (interactive)
+                  (join-line -1)))
+;; myMenu - alias
+;; (define-key key-translation-map (kbd "M-]") (kbd "M-_"))
 
-(unless package-archive-contents
-  (package-refresh-contents))
-(global-set-key (kbd "C-x P") 'list-packages)
 
-(unless (package-installed-p 'use-package)
-  (package-install 'use-package))
-(require 'use-package)
-(setq use-package-verbose t)
+;;;;;;;;;; conf load
+(defun load-directory (dir)
+  (let ((load-it
+         (lambda (f)
+	   (load-file (concat (file-name-as-directory dir) f)))
+	 ))
+    (mapc load-it (directory-files dir nil "\\.el$"))))
+(defvar conf-dir (expand-file-name "conf/" emacs-working-dir)
+  "conf-dir for emacs configuration directory")
+(load-directory conf-dir)
+
+(defvar users-settings-dir (expand-file-name "users/" conf-dir)
+  "This folder stores user specific setting.")
+(defvar user-settings-file
+  (expand-file-name (concat user-login-name ".el")
+                    users-settings-dir))
+(if (file-exists-p user-settings-file)
+    (load user-settings-file))
+
 
 ;;;;;;;;;; myinit.org
 (defvar myinit-org
@@ -258,9 +290,10 @@
 (if (file-exists-p myinit-org)
     (org-babel-load-file myinit-org))
 
+
 ;;;;;;;;;; macros
 (defvar macros
-  (expand-file-name "macros" user-emacs-directory))
+  (expand-file-name "macros" elisp-dir))
 (if (file-exists-p macros)
     (load-file macros))
 

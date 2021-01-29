@@ -6,210 +6,10 @@
 * base
 ** bindings
    #+BEGIN_SRC emacs-lisp
-	 ;; repeat C-x z
-     ;; repeat-complex-command C-x Esc Esc
-	 (global-set-key (kbd "<f8>") 'repeat-complex-command)
-
-	 ;; revert
-	 (global-set-key (kbd "<f5>") 'revert-buffer)
-
-	 ;; buffers
-	 ;;  (defalias 'list-buffers 'ibuffer)
-	 (global-set-key (kbd "C-x B") 'ibuffer)
-	 ;;  (global-set-key (kbd "C-x B") 'ibuffer-other-window)
-
-	 ;; kill-word
-	 (global-set-key (kbd "M-<deletechar>") 'kill-word)
-
-	 ;; myMenu - modes
-	 (global-set-key (kbd "M-_ m f") 'auto-fill-mode)
-	 (global-set-key (kbd "M-_ m l") 'display-line-numbers-mode)
-	 (global-set-key (kbd "M-_ m s") 'auto-save-mode)
-	 (global-set-key (kbd "M-_ m w") 'whitespace-mode)
-	 ;; myMenu - comments
-	 (global-set-key (kbd "M-_ #") 'comment-region)
-	 (global-set-key (kbd "M-_ @") 'uncomment-region)
-	 ;; myMenu - align
-	 (global-set-key (kbd "M-_ \\") 'align-regexp)
-	 ;;  (global-set-key (kbd "C-x \\") 'align-regexp)
-	 ;; myMenu - join
-	 (global-set-key (kbd "M-_ <deletechar>")
-					 (lambda ()
-					   (interactive)
-					   (join-line -1)))
-	 ;; myMenu - alias
-	 ;; (define-key key-translation-map (kbd "M-]") (kbd "M-_"))
-
-	 ;; Search
-	 (global-set-key (kbd "M-s r") 'query-replace-regexp)
-	 (global-set-key (kbd "M-s M-%") 'query-replace-regexp)
-	 (global-set-key (kbd "M-s O") 'multi-occur)
-	 (global-set-key (kbd "M-s d") 'find-dired)
-	 (global-set-key (kbd "M-s g") 'rgrep)
-
-	 ;; windmove
-	 (global-set-key (kbd "C-<up>") 'windmove-up)
-	 (global-set-key (kbd "M-[ 1 ; 5 a") 'windmove-up)
-	 (global-set-key (kbd "C-<down>") 'windmove-down)
-	 (global-set-key (kbd "M-[ 1 ; 5 b") 'windmove-down)
-	 (global-set-key (kbd "C-<left>") 'windmove-left)
-	 (global-set-key (kbd "M-[ 1 ; 5 d") 'windmove-left)
-	 (global-set-key (kbd "C-<right>") 'windmove-right)
-	 (global-set-key (kbd "M-[ 1 ; 5 c") 'windmove-right)
-
-     ;; window
-	 (global-set-key (kbd "C-x 9") 'delete-windows-on)
-	 (global-set-key (kbd "C-x C-^") 'shrink-window)
-
-	 ;; kmacro
-	 (global-set-key (kbd "C-x C-k i") 'insert-kbd-macro)
-   #+END_SRC
-* utils
-** editing
-   #+BEGIN_SRC emacs-lisp
-     (defun open-line-below ()
-       (interactive)
-       (end-of-line)
-       (newline)
-       (indent-for-tab-command))
-
-     (defun open-line-above ()
-       (interactive)
-       (beginning-of-line)
-       (newline)
-       (forward-line -1)
-       (indent-for-tab-command))
-
-     ;; (global-set-key (kbd "<C-return>") 'open-line-below)
-     ;; (global-set-key (kbd "<C-S-return>") 'open-line-above)
-   #+END_SRC
-** debugging
-   #+BEGIN_SRC emacs-lisp
-	 ;; (setq debug-on-error t)
-
-	 ;;; Usage :
-	 ;;; (derived-mode-parents 'dog)
-	 (defun derived-mode-parents (mode)
-	   (and mode (cons mode (derived-mode-parents
-				 (get mode 'derived-mode-parent)))))
-	 ;; Example :
-	 ;; (derived-mode-parents 'html-mode)
-	 ;; (derived-mode-parents 'ruby-mode)
-	 ;; (derived-mode-parents 'python-mode)
-	 ;; (derived-mode-parents 'lisp-mode)
-	 ;; (derived-mode-parents 'org-mode)
-
-	 ;; increase max-lisp-eval-depth temporarly
-	 ;; (setq max-lisp-eval-depth (* max-lisp-eval-depth 10))
-	 ;; Limit on number of Lisp variable bindings
-	 ;; (setq max-specpdl-size (* max-specpdl-size 10))
-   #+END_SRC
-** try
-   #+BEGIN_SRC
-     ;; (use-package try
-     ;;  :ensure t)
    #+END_SRC
 * modes
-** makefile-mode
+** mode
    #+BEGIN_SRC emacs-lisp
-	 (add-hook
-	  'makefile-mode-hook
-	  (lambda()
-		(setq indent-tabs-mode t
-			  tab-width 4)
-		)
-	  )
-   #+END_SRC
-** dired
-   #+BEGIN_SRC emacs-lisp
-	 (use-package dired
-	   :config
-	   ;; dired - reuse current buffer by pressing 'a'
-	   (put 'dired-find-alternate-file 'disabled nil)
-
-	   ;; always delete and copy recursively
-	   (setq dired-recursive-deletes 'always)
-	   (setq dired-recursive-copies 'always)
-
-	   ;; if there is a dired buffer displayed in the next window, use its
-	   ;; current subdir, instead of the current subdir of this dired buffer
-	   (setq dired-dwim-target t)
-
-	   ;; enable some really cool extensions like C-x C-j(dired-jump)
-	   (require 'dired-x)
-	   )
-   #+END_SRC
-** hippe-expand
-   #+BEGIN_SRC emacs-lisp
-	 ;; hippie expand is dabbrev expand on steroids
-	 (setq hippie-expand-try-functions-list '(try-expand-dabbrev
-											  try-expand-dabbrev-all-buffers
-											  try-expand-dabbrev-from-kill
-											  try-complete-file-name-partially
-											  try-complete-file-name
-											  try-expand-all-abbrevs
-											  try-expand-list
-											  try-expand-line
-											  try-complete-lisp-symbol-partially
-											  try-complete-lisp-symbol))
-
-	 ;; use hippie-expand instead of dabbrev
-	 (global-set-key (kbd "M-/") #'hippie-expand)
-   #+END_SRC
-** hl-line (minor)
-   #+BEGIN_SRC emacs-lisp
-     (use-package hl-line
-       :config
-       (global-hl-line-mode 1)
-       (set-face-background hl-line-face "gray15"))
-   #+END_SRC
-** hl-todo
-   #+BEGIN_SRC emacs-lisp
-	 (use-package hl-todo
-	   :ensure t
-	   :bind (("M-g T" . hl-todo-previous)
-			  ("M-g t" . hl-todo-next)
-			  ("M-g M-t" . hl-todo-occur))
-	   :init
-	   (global-hl-todo-mode)
-	   :config
-	   (setq hl-todo-keyword-faces
-			 '(("TODO"    . "#FF0000")
-			   ("FIXME"   . "#F2AF00")
-			   ("BUG"     . "#A020F0")
-			   ("REFACTO" . "#FF4500")
-			   ("DELETE"  . "#1E90FF")))
-	   ;; (add-hook 'prog-mode-hook #'hl-todo-mode 1)
-	   ;; (add-hook 'text-mode-hook #'hl-todo-mode 1)
-	   )
-   #+END_SRC
-** uniquify
-   #+BEGIN_SRC emacs-lisp
-	 (use-package uniquify
-	   :config
-	   (setq uniquify-buffer-name-style 'forward)
-	   (setq uniquify-separator "/")
-	   ;; rename after killing uniquified
-	   (setq uniquify-after-kill-buffer-p t)
-	   ;; don't muck with special buffers
-	   (setq uniquify-ignore-buffers-re "^\\*"))
-   #+END_SRC
-** abbrev (minor) <C-x a>
-   #+BEGIN_SRC emacs-lisp
-     (use-package abbrev
-       :delight
-       ;; (delight 'abbrev-mode "abv" 'abbrev)
-       :bind (("C-x a TAB" . expand-abbrev)
-              ("C-x a a" . add-mode-abbrev)
-	          ("C-x a e" . edit-abbrevs)
-			  ("C-x a k" . kill-all-abbrevs)
-              ("C-x a l" . list-abbrevs)
-              ("C-x a s" . write-abbrev-file))
-       :config
-       (setq save-abbrevs 'silent)
-       (setq abbrev-file-name (expand-file-name "abbrevs" user-emacs-directory))
-       (setq-default abbrev-mode t)
-       )
    #+END_SRC
 ** recentf (minor) <M-_ e r> <f9>
    #+BEGIN_SRC emacs-lisp
@@ -264,15 +64,6 @@
      (use-package delight
        :ensure t)
    #+END_SRC
-** which-key
-   #+BEGIN_SRC emacs-lisp
-     (use-package which-key
-       :ensure t
-       :delight
-       :config
-       (which-key-mode 1)
-       )
-   #+END_SRC
 ** ace-window
    #+BEGIN_SRC emacs-lisp
 	 (use-package ace-window
@@ -292,33 +83,6 @@
 			  ("M-s J" . ace-jump-mode-pop-mark)
 			  )
 	   )
-   #+END_SRC
-** comment-dwim-2
-   #+BEGIN_SRC emacs-lisp
-     (use-package comment-dwim-2
-       :ensure t
-       :bind (("M-#" . comment-dwim-2)
-	      )
-       )
-   #+END_SRC
-** expand-region
-   #+BEGIN_SRC emacs-lisp
-     (use-package expand-region
-       :ensure t
-       :bind (("M-+" . er/expand-region))
-       )
-   #+END_SRC
-** magit
-   #+BEGIN_SRC emacs-lisp
-     (use-package magit
-       :ensure t
-       :bind (("M-* g g" . magit-status)))
-   #+END_SRC
-** git-timemachine
-   #+BEGIN_SRC emacs-lisp
-     (use-package git-timemachine
-       :ensure t
-       :bind (("M-* g t" . git-timemachine)))
    #+END_SRC
 ** multiple-cursors
    #+BEGIN_SRC emacs-lisp
@@ -351,25 +115,14 @@
    #+END_SRC
 ** yasnippet
    #+BEGIN_SRC emacs-lisp
-     (use-package yasnippet
-       :ensure t
-       :delight yas-minor-mode
-       :bind (("M-_ y n" . yas-new-snippet)
-	      ("M-_ y i" . yas-insert-snippet)
-	      ("M-_ y v" . yas-visit-snippet-file))
-       :config
-       (yas-global-mode 1)
-       )
 
-     (use-package yasnippet-snippets
-       :ensure t
-       )
    #+END_SRC
 
-** iy-go-to-char
-   #+BEGIN_SRC emacs-lisp
+** iy-go-to-char (FIXME)
+   #+BEGIN_SRC
 	 (use-package iy-go-to-char
 	   :ensure t
+       :pin manual
 	   :bind (
 			  ("M-s f" . iy-go-to-char)
 			  ("M-s F" . iy-go-to-or-up-to-continue)
@@ -383,71 +136,7 @@
 	   (add-to-list 'mc/cursor-specific-vars 'iy-go-to-char-start-pos)
 	   )
    #+END_SRC
-** adoc
-   #+BEGIN_SRC emacs-lisp
-     (use-package adoc-mode
-       :ensure t
-       :mode "\\.adoc\\'")
-   #+END_SRC
-** cask
-   #+BEGIN_SRC emacs-lisp
-     (use-package cask-mode
-       :ensure t)
-   #+END_SRC
-** emmet (html)
-   #+BEGIN_SRC emacs-lisp
-     (use-package emmet-mode
-       :ensure t
-       :config
-       (add-hook 'sgml-mode-hook #'emmet-mode)
-       (add-hook 'css-mode-hook  #'emmet-mode)
-       )
-   #+END_SRC
-** groovy
-   #+BEGIN_SRC emacs-lisp
-     (use-package groovy-mode
-       :ensure t)
-   #+END_SRC
-** lua
-   #+BEGIN_SRC emacs-lisp
-     (use-package lua-mode
-       :ensure t)
-   #+END_SRC
-** markdown
-   #+BEGIN_SRC emacs-lisp
-     (use-package markdown-mode
-       :ensure t
-       :mode (("\\.m[k]d\\'" . markdown-mode)
-	      ("\\.markdown\\'" . markdown-mode))
-       :config
-       (setq markdown-fontify-code-blocks-natively t))
-   #+END_SRC
-** tuareg (ocaml)
-   #+BEGIN_SRC emacs-lisp
-     (use-package tuareg
-       :ensure t
-       :mode ("\\.ml[ily]?$" . tuareg-mode))
-   #+END_SRC
-** puppet
-   #+BEGIN_SRC emacs-lisp
-     (use-package puppet-mode
-       :ensure t)
-   #+END_SRC
-** terraform
-   #+BEGIN_SRC emacs-lisp
-     (use-package terraform-mode
-       :ensure t
-       :config
-       (custom-set-variables
-	'(terraform-indent-level 2))
-       )
-   #+END_SRC
 
-** yaml
-   #+BEGIN_SRC emacs-lisp
-     (use-package yaml-mode
-       :ensure t)
-   #+END_SRC
 ** org-mode (org-bullets, ox-md, ox-reveal) <M-_ o>
    #+BEGIN_SRC emacs-lisp
 	 (global-set-key (kbd "M-_ o l") 'org-store-link)
@@ -470,12 +159,12 @@
 
 	 (use-package ox-md)
 
-	 (use-package ox-reveal
-	   :ensure t
-	   :config
-	   (setq org-reveal-root "https://cdn.jsdelivr.net/reveal.js/3.0.0/")
-	   (setq org-reveal-mathjax t)
-	   )
+	 ;; (use-package ox-reveal
+	 ;;   :ensure t
+	 ;;   :config
+	 ;;   (setq org-reveal-root "https://cdn.jsdelivr.net/reveal.js/3.0.0/")
+	 ;;   (setq org-reveal-mathjax t)
+	 ;;   )
    #+END_SRC
 ** prog-mode
    #+BEGIN_SRC emacs-lisp
@@ -662,7 +351,7 @@
 	   (add-hook 'enh-ruby-mode-hook 'robe-mode)
 	   (add-hook 'enh-ruby-mode-hook 'yard-mode)
 	   (add-hook 'enh-ruby-mode-hook 'eldoc-mode)
-	   (add-hook 'enh-ruby-mode-hook 'seeing-is-believing)
+
 	   )
 	 (use-package inf-ruby
 	   :ensure t
@@ -674,24 +363,12 @@
 	   :ensure t
 	   :delight " Y"
 	   )
-	 (use-package seeing-is-believing
-	   :ensure t
-	   :delight (seeing-is-believing " oO")
-	   :config
-	   (setq seeing-is-believing-timeout 10)
-	   )
+
 	 (use-package haml-mode
 	   :ensure t
 	   )
 	 (use-package slim-mode
 	   :ensure t
-	   )
-   #+END_SRC
-** cucumber
-   #+BEGIN_SRC emacs-lisp
-	 (use-package feature-mode
-	   :ensure t
-	   :mode "\\.feature$"
 	   )
    #+END_SRC
 ** rainbow
@@ -719,8 +396,8 @@
 	   (add-hook 'scheme-mode-hook #'paredit-mode)
 	   )
    #+END_SRC
-** grep-a-lot
-   #+BEGIN_SRC emacs-lisp
+** grep-a-lot (FIXME)
+   #+BEGIN_SRC
 	 (use-package grep-a-lot
 	   :ensure t
 	   :config
@@ -801,26 +478,6 @@
 	   :config
 	   (global-anzu-mode))
    #+END_SRC
-* my
-  #+BEGIN_SRC emacs-lisp
-  #+END_SRC
-* themes
-** railscasts-reloaded
-   #+BEGIN_SRC
-	 (use-package railscasts-reloaded-theme
-	   :ensure t
-	   :init
-	   (load-theme 'railscasts-reloaded t)
-	   )
-   #+END_SRC
-*** zenburn
-   #+BEGIN_SRC emacs-lisp
-	 (use-package zenburn-theme
-	   :ensure t
-	   :config
-	   (load-theme 'zenburn t)
-	   )
-   #+END_SRC
 * disabled
 ** auto-complete
    #+BEGIN_SRC
@@ -882,8 +539,8 @@
        (add-hook 'python-mode-hook 'py-autopep8-enable-on-save)
        )
    #+END_SRC
-** turnip (tmux)
-   #+BEGIN_SRC emacs-lisp
+** turnip (tmux) (FIXME)
+   #+BEGIN_SRC
      (use-package turnip
        :ensure t)
    #+END_SRC

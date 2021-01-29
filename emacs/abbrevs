@@ -33,6 +33,7 @@
   '(
     ("bakend" "backend" nil 1)
     ("bakup" "backup" nil 1)
+    ("certifcate" "certificate" nil 4)
     ("teh" "the" nil 1)
    ))
 

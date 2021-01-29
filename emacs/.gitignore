@@ -1,12 +1,12 @@
-/myinit.el
-
 /snippets
 
 *~
 *.elc
 
+/myinit.el
 /auto-save-list
 /elpa
+/packages
 /eshell
 /games
 /ido.last
@@ -15,3 +15,5 @@
 /savefile
 /transient
 /save
+/.mc-lists.el
+/ac-comphist.dat
