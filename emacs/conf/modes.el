@@ -16,6 +16,11 @@
   :mode "\\.feature$"
   )
 
+;;;;;;;;;; docbook
+(use-package docbook
+  :ensure t
+  )
+
 ;;;;;;;;;; emmet
 (use-package emmet-mode
   :ensure t
