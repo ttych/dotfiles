@@ -101,6 +101,7 @@
  '(size-indication-mode t)
  '(tab-always-indent (quote complete))
  '(tab-width 4)
+ '(terraform-indent-level 2)
  '(tool-bar-mode nil)
  '(transient-mark-mode t)
  '(uniquify-buffer-name-style (quote forward) nil (uniquify))

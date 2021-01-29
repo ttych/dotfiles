@@ -39,6 +39,26 @@
                     )
               )))
 
+;;;;;;;;;; flyspell
+(setq ispell-program-name "aspell"
+      ispell-extra-args '("--sug-mode=ultra"))
+(dolist (hook '(text-mode-hook))
+  (add-hook hook (lambda () (flyspell-mode 1))))
+(dolist (hook '(change-log-mode-hook log-edit-mode-hook))
+  (add-hook hook (lambda () (flyspell-mode -1))))
+;; (dolist (hook '(prog-mode-hook))
+;;   (add-hook hook (lambda () (flyspell-prog-mode 1))))
+(dolist (hook '(enh-ruby-mode))
+  (add-hook hook (lambda () (flyspell-prog-mode -1))))
+(defun dictionary-switch()
+  (interactive)
+  (let* ((dic ispell-current-dictionary)
+         (change (if (string= dic "english") "fr_FR" "english")))
+    (ispell-change-dictionary change)
+    (message "Dictionary switched from %s to %s" dic change)
+    ))
+(global-set-key (kbd "M-_ t d") 'dictionary-switch)
+
 ;;;;;;;;;; lisp
 (defun user-visit-ielm ()
   "Switch to default `ielm' buffer.

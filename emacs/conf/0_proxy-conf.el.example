@@ -1,3 +1,5 @@
+;; -*-no-byte-compile: t; -*-
+
 ;; (setq url-proxy-services
 ;;       '(("no_proxy" . "^\\(localhost\\|127\\..*\\|10\\..*\\|192\\.168\\..*\\|work\\.com\\)")
 ;;         ("http" . "127.0.0.1:8080")

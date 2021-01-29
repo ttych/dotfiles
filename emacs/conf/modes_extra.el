@@ -1,3 +1,15 @@
+;;;;;;;;;; ace-jump-mode
+(use-package ace-jump-mode
+  :ensure t
+  :bind (
+         ("M-s j" . ace-jump-mode)
+         ("M-s J" . ace-jump-mode-pop-mark)
+         ("M-s M-j" . ace-jump-mode)
+         ("M-s M-J" . ace-jump-mode-pop-mark)
+         ("M-J" . ace-jump-mode)
+         ("M-K" . ace-jump-mode-pop-mark)
+         )
+  )
 
 ;;;;;;;;;; adoc
 (use-package adoc-mode
@@ -139,11 +151,34 @@
 ;;   )
 
 ;;;;;;;;;; ruby
+
+(use-package enh-ruby-mode
+  :ensure t
+  ;; :mode "\\.rb$" "\\.gemspec$" "Guardfile"
+  :mode "\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'"
+  :interpreter "ruby"
+  :config
+  ;; (remove-hook 'enh-ruby-mode-hook 'erm-define-faces)
+  ;; (add-hook 'enh-ruby-mode-hook 'inf-ruby-minor-mode)
+  ;; (add-hook 'compilation-filter-hook 'inf-ruby-auto-enter)
+  (add-hook 'enh-ruby-mode-hook 'robe-mode)
+  (add-hook 'enh-ruby-mode-hook 'yard-mode)
+  )
+(use-package inf-ruby
+  :ensure t
+  )
+(use-package robe
+  :ensure t
+  )
 (use-package haml-mode
   :ensure t
   )
 (use-package slim-mode
   :ensure t
+  )
+(use-package yard-mode
+  :ensure t
+  :delight " Y"
   )
 
 ;;;;;;;;;; terraform

@@ -10,6 +10,7 @@ http://www.emacswiki.org/emacs/download/grep-a-lot.el
 https://raw.githubusercontent.com/kljohann/turnip.el/master/turnip.el
 http://www.emacswiki.org/emacs/download/dired-details.el
 http://www.emacswiki.org/emacs/download/grep-a-lot.el
+https://raw.githubusercontent.com/lewang/jump-char/master/jump-char.el
 "
 
 for url in $URLS; do
