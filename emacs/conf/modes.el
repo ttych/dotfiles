@@ -10,6 +10,15 @@
   :ensure t
   )
 
+;;;;;;;;;; clojure
+;; (use-package clojure-mode
+;;   :ensure t
+;;   :config
+;;   (add-hook 'clojure-mode-hook #'paredit-mode)
+;;   (add-hook 'clojure-mode-hook #'subword-mode)
+;;   (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode)
+;;   )
+
 ;;;;;;;;;; cucumber
 (use-package feature-mode
   :ensure t
@@ -20,6 +29,12 @@
 (use-package docbook
   :ensure t
   )
+
+;;;;;;;;;; elixir
+;; (use-package elixir-mode
+;;   :ensure t
+;;   :config
+;;   (add-hook 'elixir-mode #'subword-mode))
 
 ;;;;;;;;;; emmet
 (use-package emmet-mode
@@ -42,6 +57,13 @@
 ;;;;;;;;;; groovy
 (use-package groovy-mode
   :ensure t
+  )
+
+;;;;;;;;;; haskel
+(use-package haskell-mode
+  :ensure t
+  :config
+  (add-hook 'haskell-mode #'subword-mode)
   )
 
 ;;;;;;;;;; lua
@@ -71,6 +93,13 @@
 (use-package puppet-mode
   :ensure t
   )
+
+;;;;;;;;;; python
+;; (use-package py-autopep8
+;;   :ensure t
+;;   :config
+;;   (add-hook 'python-mode-hook 'py-autopep8-enable-on-save)
+;;   )
 
 ;;;;;;;;;; terraform
 (use-package terraform-mode

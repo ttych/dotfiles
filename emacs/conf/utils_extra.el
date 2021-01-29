@@ -39,6 +39,15 @@
   ;; (add-hook 'text-mode-hook #'hl-todo-mode 1)
   )
 
+;;;;;;;;;; ace-window
+(use-package ace-window
+  :ensure t
+  :bind ([remap other-window] . ace-window)
+  :config
+  (setq aw-ignore-current t
+        aw-scope 'frame)
+  )
+
 ;;;;;;;;;; comment
 (use-package comment-dwim-2
   :ensure t
@@ -50,6 +59,27 @@
 (use-package expand-region
   :ensure t
   :bind (("M-+" . er/expand-region))
+  )
+
+;;;;;;;;;; htmlize
+(use-package htmlize
+  :ensure t
+  )
+
+;;;;;;;;;; rainbow-mode
+(use-package rainbow-mode
+  :ensure t
+  :delight
+  :config
+  (add-hook 'prog-mode-hook 'rainbow-mode)
+  (add-hook 'text-mode-hook 'rainbow-mode)
+  )
+
+;;;;;;;;;; paren
+(use-package paren
+  :config
+  (show-paren-mode 1)
+  (setq show-paren-delay 0)
   )
 
 ;;;;;;;;;; yasnippet
@@ -64,4 +94,15 @@
   )
 (use-package yasnippet-snippets
   :ensure t
+  )
+
+;;;;;;;;;; zoom-window
+(use-package zoom-window
+  :ensure t
+  :bind (
+         ("M-_ M-z" . zoom-window-zoom)
+         )
+  :config
+  (custom-set-variables
+   '(zoom-window-mode-line-color "DarkGreen"))  ;; Darkblue
   )
