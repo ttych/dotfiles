@@ -48,6 +48,20 @@
         aw-scope 'frame)
   )
 
+;;;;;;;;;; ag
+(use-package ag
+  :ensure t
+  :bind (("M-s a a" . ag)
+         ("M-s a f" . ag-files)
+         ("M-s a r" . ag-regexp)
+         ("M-s a p" . ag-project)
+         ("M-s a F" . ag-project-files)
+         ("M-s a R" . ag-project-regexp))
+  :config
+  (setq ag-highlight-search t)
+  (setq ag-reuse-window 't)
+  )
+
 ;;;;;;;;;; anzu
 (use-package anzu
   :ensure t
@@ -69,6 +83,10 @@
   :ensure t
   :bind (("M-+" . er/expand-region))
   )
+
+;;;;;;;;;; grep-a-lot
+(require 'grep-a-lot)
+(grep-a-lot-setup-keys)
 
 ;;;;;;;;;; htmlize
 (use-package htmlize
