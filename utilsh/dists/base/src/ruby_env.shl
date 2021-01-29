@@ -73,34 +73,43 @@ GEM_PACK_RAILS="rails rails-erb-lint rspec-rails"
 GEM_PACK_RSPEC="rspec"
 GEM_PACK_SINATRA="sinatra"
 GEM_PACK_UTILS="quick_and_ruby"
+GEM_PACK_PUPPET="metadata-json-lint pdk puppet-lint"
 
-gem_pack_1()
+_gem_pack_1()
 {
-    gem_pack_1="$1"
+    _gem_pack_1="$1"
 
-    gem_pack_1__content=
-    if [ "$gem_pack_1" = "all" ]; then
-        for gem_pack_1__pack in `set | egrep '^GEM_PACK_[A-Z]*=' | cut -d '=' -f 1`; do
-            eval gem_pack_1__content="\${gem_pack_1__content:+$gem_pack_1__content }\$$gem_pack_1__pack"
+    _gem_pack_1__content=
+    if [ "$_gem_pack_1" = "all" ]; then
+        for _gem_pack_1__pack in `set | egrep '^GEM_PACK_[A-Z]*=' | cut -d '=' -f 1`; do
+            eval _gem_pack_1__content="\${_gem_pack_1__content:+$_gem_pack_1__content }\$$_gem_pack_1__pack"
         done
     else
-        eval gem_pack_1__content="\${GEM_PACK_`echo $gem_pack | tr '[a-z]' '[A-Z]'`}"
+        eval _gem_pack_1__content="\${GEM_PACK_`echo $gem_pack | tr '[a-z]' '[A-Z]'`}"
     fi
 
-    if [ -z "$gem_pack_1__content" ]; then
+    if [ -z "$_gem_pack_1__content" ]; then
         echo >&2 "gem pack \"$gem_pack\" is empty"
         return 2
     fi
 
-    gem install $gem_pack_1__content
+    gem install $_gem_pack_1__content
     return $?
 }
 
 gem_pack()
 {
+    if [ $# -eq 0 ]; then
+        echo Choose pack in:
+        for gem_pack in $(set | grep '^GEM_PACK_.*=' | sed -e 's/GEM_PACK_\([^=]*\).*/\1/g' | tr '[A-Z]' '[a-z]') ; do
+            echo "  $gem_pack"
+        done
+        return 0
+    fi
+
     gem_pack__ret=0
     for gem_pack; do
-        gem_pack_1 "$gem_pack" ||
+        _gem_pack_1 "$gem_pack" ||
             gem_pack__ret=1
     done
     return $gem_pack__ret
