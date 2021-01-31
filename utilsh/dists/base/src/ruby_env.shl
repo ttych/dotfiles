@@ -74,6 +74,7 @@ GEM_PACK_RSPEC="rspec"
 GEM_PACK_SINATRA="sinatra"
 GEM_PACK_UTILS="quick_and_ruby"
 GEM_PACK_PUPPET="metadata-json-lint pdk puppet-lint"
+GEM_PACK_ASCIIDOC="asciidoctor asciidoctor-pdf asciidoctor-revealjs"
 
 _gem_pack_1()
 {
