@@ -12,6 +12,10 @@ if [ -n "$ESH_SH_CUR_SHORT" ]; then
     export ESHELL
 fi
 
+if [ -n "$EMACS_WORKING_DIR" ] && [ ! -d "$EMACS_WORKING_DIR" ]; then
+    EMACS_WORKING_DIR=
+    unset EMACS_WORKING_DIR 2>/dev/null
+fi
 if [ -d "$HOME_ALT" ] && [ -d "$HOME_ALT/.emacs.d" ]; then
     EMACS_WORKING_DIR="$HOME_ALT/.emacs.d"
     export EMACS_WORKING_DIR
