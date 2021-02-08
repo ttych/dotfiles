@@ -220,6 +220,13 @@ BUILD_TOOLS_GOLANG_PREREQ_UBUNTU=
 BUILD_TOOLS_GOLANG_URL_PATTERN='https://dl.google.com/go/go${version}.${kernel_l}-${arch}.tar.gz'
 BUILD_TOOLS_GOLANG_DEFAULT_VERSION=1.14.3
 
+#> gh - githubcli
+BUILD_TOOLS_GH_ENV=
+BUILD_TOOLS_GH_CONFIG=
+BUILD_TOOLS_GH_PREREQ_REDHAT=
+BUILD_TOOLS_GH_PREREQ_UBUNTU=
+BUILD_TOOLS_GH_URL_PATTERN='https://github.com/cli/cli/releases/download/v${version}/gh_${version}_${kernel_l}_${arch}.tar.gz'
+BUILD_TOOLS_GH_DEFAULT_VERSION=1.5.0
 
 build_tools_env()
 {
@@ -233,7 +240,7 @@ build_tools_env()
     eval build_tools_env__url_header="\"\$BUILD_TOOLS_${build_tools_env__name}_URL_HEADER\""
 
     kernel=`uname -s`
-    kernel_l=`echo $kernel | tr [A-Z] [a-z]`
+    kernel_l=`echo $kernel | tr '[A-Z]' '[a-z]'`
     machine=`uname -m`
     case $machine in
         x86_64) arch=amd64 ;;
