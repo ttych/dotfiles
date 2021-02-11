@@ -36,6 +36,8 @@ autoload_add()
     esac
 }
 
+# esh_autoload
+
 
 ############################################
 # utils
@@ -59,6 +61,3 @@ esh_utils_add path_add_pre utils
 esh_utils_add path_addin_pre tools
 
 ############################################
-
-
-esh_autoload
