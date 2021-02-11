@@ -391,6 +391,7 @@ esh_module_load()
 for esh_module in terminal \
                       host \
                       $ESH_SH_CUR_SHORT \
+                      local \
                       utils \
                       utilsh \
                       tmux \
