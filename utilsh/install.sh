@@ -16,7 +16,6 @@ DISTRIBUTIONS='
 
 AUTOLOADS='
   std.shl
-  local.shl
   goto.shl
   ruby_env.shl
   pyv.sh
