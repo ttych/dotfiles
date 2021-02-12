@@ -121,7 +121,6 @@ gem_pack()
 # ### extra Ruby env
 rubyenv_guess_root()
 {
-    echo 123
     eval rubyenv_guess_root="\$$1"
     if [ -z "$rubyenv_guess_root" ]; then
         rubyenv_guess_root_=
