@@ -72,9 +72,9 @@ GEM_PACK_RACK="rack shotgun"
 GEM_PACK_RAILS="rails rails-erb-lint rspec-rails"
 GEM_PACK_RSPEC="rspec"
 GEM_PACK_SINATRA="sinatra"
-GEM_PACK_UTILS="quick_and_ruby"
+GEM_PACK_UTILS="quick_and_ruby semver"
 GEM_PACK_PUPPET="metadata-json-lint pdk puppet-lint"
-GEM_PACK_ASCIIDOC="asciidoctor asciidoctor-pdf asciidoctor-revealjs"
+GEM_PACK_ASCIIDOC="asciidoctor asciidoctor-pdf asciidoctor-revealjs rouge"
 
 _gem_pack_1()
 {
@@ -115,3 +115,32 @@ gem_pack()
     done
     return $gem_pack__ret
 }
+
+
+
+# ### extra Ruby env
+rubyenv_guess_root()
+{
+    echo 123
+    eval rubyenv_guess_root="\$$1"
+    if [ -z "$rubyenv_guess_root" ]; then
+        rubyenv_guess_root_=
+        # existing ?
+        for rubyenv_guess_root__h in "${HOME_ALT}" "${HOME}"; do
+            [ -z "$rubyenv_guess_root__h" ] && continue
+            [ -z "$rubyenv_guess_root_" ] && rubyenv_guess_root_="${rubyenv_guess_root__h}/${2}"
+            if [ -d "${rubyenv_guess_root__h}/${2}" ]; then
+                rubyenv_guess_root="${rubyenv_guess_root__h}/${2}"
+                break
+            fi
+        done
+        # set default
+        [ -z "$rubyenv_guess_root" ] && rubyenv_guess_root="$rubyenv_guess_root_"
+
+        eval "$1"="$rubyenv_guess_root"
+        export "$1"
+    fi
+}
+
+rubyenv_guess_root RUBY_BUILD_ROOT local/ruby-build
+rubyenv_guess_root RUBY_INSTALL_ROOT local/ruby-install
