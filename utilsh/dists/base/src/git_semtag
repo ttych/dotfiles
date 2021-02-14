@@ -1,0 +1,144 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+
+SEMVER_PATTERN="[0-9]*.[0-9]*.[0-9]*"
+# SEMVER_REGEXP='^([0-9]|[1-9][0-9]*)\.([0-9]|[1-9][0-9]*)\.([0-9]|[1-9][0-9]*)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$'
+
+
+usage()
+{
+    cat <<EOF
+usage is:
+  ${0#*/} prev|previous
+  ${0#*/} cur|current
+  ${0#*/} next [major|minor|patch|pre] [pre_base]
+  ${0#*/} tag|incr|increment [major|minor|patch|pre] [pre_base]
+EOF
+}
+
+
+# ### git
+
+git_branch()
+{
+    git_branch=`git rev-parse --abbrev-ref HEAD`
+}
+
+git_head_id()
+{
+    git_head_id=`git rev-parse HEAD`
+}
+
+
+# ### semver
+
+semver()
+{
+    semver="$1"
+
+    major="${semver%%.*}"
+    semver="${semver#$major.}"
+
+    minor="${semver%%.*}"
+    semver="${semver#$minor.}"
+
+    patch="${semver%%[.-]*}"
+    semver="${semver#$patch}"
+    semver="${semver#[.-]}"
+
+    pre="${semver}"
+}
+
+
+# ### git_semtag
+
+git_semtag_previous()
+{
+    git_semtag_previous=`git describe --tags --match="$SEMVER_PATTERN" --abbrev=0`
+    git_semtag_previous="${git_semtag_previous:-0.0.0}"
+}
+
+git_semtag_current()
+{
+    git_semtag_current=
+    git_head_id || return 1
+    # git_semtag_current=`git tag --points-at "$git_head_id" | egrep "$SEMVER_REGEXP" 2>/dev/null`
+    git_semtag_current=`git describe --contains --match="[0-9]*.[0-9]*.[0-9]*" "$git_head_id"`
+}
+
+git_semtag_next()
+{
+    git_semtag_next=
+    if git_semtag_current; then
+        echo >&2 "current commit $git_head_id is already versionned with $git_semtag_current"
+        return 1
+    fi
+
+    git_semtag_previous || return 1
+    semver "$git_semtag_previous"
+    case $1 in
+        major)
+            major=$(($major + 1))
+            minor=0
+            patch=0
+            pre=
+            ;;
+        minor)
+            minor=$(($minor + 1))
+            patch=0
+            pre=
+            ;;
+        patch)
+            patch=$(($patch + 1))
+            pre=
+            ;;
+        pre)
+            # FIXME: not implemented
+            echo >&2 increasing pre is not implemented
+            ;;
+        *)
+            echo >&2 \"$1\" is not part of semver semantic
+            ;;
+    esac
+    git_semtag_next="$major.$minor.$patch${pre:+-$pre}"
+}
+
+git_semtag_tag()
+{
+    git_semtag_next "$@" || return 1
+    git tag "$git_semtag_next" "$git_head_id"
+
+    # if git remote show origin 2>/dev/null; then
+    #     git push --tags origin
+    # fi
+}
+
+
+# ### main
+
+case "$1" in
+    prev|previous)
+        git_semtag_previous || return 1
+        echo "$git_semtag_previous"
+        ;;
+    ""|cur|current)
+        git_semtag_current || return 1
+        [ -n "$git_semtag_current" ] && echo "$git_semtag_current"
+        ;;
+    next)
+        shift
+        git_semtag_next "$@" || return 1
+        echo "$git_semtag_next"
+        ;;
+    tag|incr|increment)
+        shift
+        git_semtag_tag "$@" || return 1
+        echo "$git_semtag_tag"
+        ;;
+    *)
+        echo >&2 unsupported action \"$1\"
+        usage
+        exit 1
+        ;;
+esac
