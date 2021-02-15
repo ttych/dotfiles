@@ -1,0 +1,112 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+
+SEMVER_PATTERN="[0-9]*.[0-9]*.[0-9]*"
+
+
+usage()
+{
+    cat <<EOF
+usage is:
+  ${0#*/} -t major|minor|patch [commit-id]
+
+  with:
+    -I :         do not show commit id
+
+    major :      increase major
+    minor :      increase minor
+    patch :      increase patch
+    commit-id :  specify commit_id to release (default to HEAD)
+EOF
+}
+
+
+# ### semver
+
+semver_split()
+{
+    semver_split="$1"
+
+    major="${semver_split%%.*}"
+    semver_split="${semver_split#$major.}"
+
+    minor="${semver_split%%.*}"
+    semver_split="${semver_split#$minor.}"
+
+    patch="${semver_split%%[.-]*}"
+    semver_split="${semver_split#$patch}"
+    semver_split="${semver_split#[.-]}"
+
+    pre="${semver_split}"
+}
+
+git_semtag()
+{
+    if [ -n "$2" ]; then
+        git_id="${2}"
+    else
+        git_id=`git rev-parse HEAD` || return 1
+    fi
+    git_semtag_current=`git describe --contains --match="$SEMVER_PATTERN" "$git_id"`
+    if [ -n "$git_semtag_current" ]; then
+        echo >&2 "commit $git_id is already versionned with $git_semtag_current"
+        return 1
+    fi
+
+    git_semtag_previous=`git describe --tags --match="$SEMVER_PATTERN" --abbrev=0`
+    git_semtag_previous="${git_semtag_previous:-0.0.0}"
+
+    semver_split "$git_semtag_previous" || return 1
+    case "$1" in
+        major)
+            major=$(($major + 1))
+            minor=0
+            patch=0
+            pre=
+            ;;
+        minor)
+            minor=$(($minor + 1))
+            patch=0
+            pre=
+            ;;
+        patch)
+            patch=$(($patch + 1))
+            pre=
+            ;;
+        *)
+            echo >&2 "unsupported \"$SEMVER_ACTION\" action"
+            usage
+            return 1
+            ;;
+    esac
+    git_semtag_next="$major.$minor.$patch${pre:+-$pre}"
+
+    git tag "$git_semtag_next" "$git_id" &&
+        echo "${SHOW_ID:+$git_id:}$git_semtag_next"
+}
+
+
+# ### main
+
+SHOW_ID=1
+
+OPTIND=1
+while getopts :hI opt; do
+    case $opt in
+        h) usage; exit 0 ;;
+        I) SHOW_ID= ;;
+    esac
+done
+shift $(($OPTIND - 1))
+
+case "$1" in
+    major|minor|patch)
+        git_semtag "$@"
+        ;;
+    *)
+        echo >&2 "unsupported \"$SEMVER_ACTION\" action"
+        usage
+        exit 1
+        ;;
+esac
