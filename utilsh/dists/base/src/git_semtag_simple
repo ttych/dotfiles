@@ -48,13 +48,13 @@ git_semtag()
     else
         git_id=`git rev-parse HEAD` || return 1
     fi
-    git_semtag_current=`git describe --contains --match="$SEMVER_PATTERN" "$git_id"`
+    git_semtag_current=`git describe --contains --match="$SEMVER_PATTERN" "$git_id" 2>/dev/null`
     if [ -n "$git_semtag_current" ]; then
         echo >&2 "commit $git_id is already versionned with $git_semtag_current"
         return 1
     fi
 
-    git_semtag_previous=`git describe --tags --match="$SEMVER_PATTERN" --abbrev=0`
+    git_semtag_previous=`git describe --tags --match="$SEMVER_PATTERN" --abbrev=0 2>/dev/null`
     git_semtag_previous="${git_semtag_previous:-0.0.0}"
 
     semver_split "$git_semtag_previous" || return 1
