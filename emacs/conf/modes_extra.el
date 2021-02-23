@@ -155,7 +155,7 @@
 (use-package enh-ruby-mode
   :ensure t
   ;; :mode "\\.rb$" "\\.gemspec$" "Guardfile"
-  :mode "\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'"
+  :mode "\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|eye\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'"
   :interpreter "ruby"
   :config
   ;; (remove-hook 'enh-ruby-mode-hook 'erm-define-faces)
