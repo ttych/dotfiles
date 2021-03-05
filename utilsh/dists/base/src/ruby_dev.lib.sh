@@ -632,7 +632,8 @@ ruby_rspec_identify()
             ;;
         *.rb)
             ruby_rspec_identify__file_path_first="${ruby_rspec_identify__file_path%%/*}"
-            ruby_rspec_identify__file_path_sub="${ruby_rspec_identify__file_path#$ruby_rspec_identify__file_path_first/}"
+            ruby_rspec_identify__file_path_sub="${ruby_rspec_identify__file_path#$ruby_rspec_identify__file_path_first}"
+            ruby_rspec_identify__file_path_sub="${ruby_rspec_identify__file_path_sub#/}"
 
             ruby_rspec_identify="$ruby_rspec_identify__dir/$ruby_rspec_identify__file_path/$ruby_rspec_identify__spec_name"
             [ -r "$ruby_rspec_identify" ] && return 0
