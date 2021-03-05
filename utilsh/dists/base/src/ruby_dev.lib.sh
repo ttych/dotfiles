@@ -21,7 +21,7 @@ FALSE()
 RUBY_RGR_SKIP_PATTERN='^db/schema.rb$'
 RUBY_RGR_RUBOCOP_AUTO='-a'
 RUBY_RGR_ERBLINT_AUTO='-a'
-RUBY_TEST_FRAMEWORKS='minitest rspec cucumber'
+RUBY_TEST_FRAMEWORKS='minitest rspec cucumber rubytest'
 RUBY_FEATURE_FRAMEWORKS='cucumber'
 RUBY_MINITEST_DIRS='test tests'
 RUBY_RSPEC_DIR=spec
@@ -128,6 +128,11 @@ ruby_erblint()
 ruby_bundle_install()
 {
     ruby_bundle install
+}
+
+ruby_has_ruby()
+{
+    which ruby 2>/dev/null >/dev/null
 }
 
 
@@ -771,6 +776,47 @@ ruby_cucumber()
 ruby_cucumber_all()
 {
     ruby_cucumber
+}
+
+
+########## rubytest
+
+ruby_has_rubytest()
+{
+    ruby_has_ruby
+}
+
+ruby_rubytest_identify()
+{
+    ruby_rubytest_identify=
+
+    ruby_rubytest_identify__dir="$RUBY_RUBYTEST_DIR"
+    ruby_rubytest_identify__file="$1"
+
+    case "$1" in
+        spec/*)
+            return 1
+            ;;
+        test/*|tests/*)
+            return 1
+            ;;
+        test_*.rb|*/test_*.rb|*_test.rb|*/*_test.rb)
+            ruby_rubytest_identify="$1"
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
+ruby_rubytest()
+{
+    ruby_ruby "$@"
+}
+
+ruby_rubytest_all()
+{
+    :
 }
 
 
