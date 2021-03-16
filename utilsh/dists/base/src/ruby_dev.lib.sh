@@ -111,7 +111,7 @@ ruby_flog_all_rb()
         return 0
     }
     ruby_flog_all_rb=.
-     [ -d "lib" ] && ruby_flog_all_rb=lib
+    [ -d "lib" ] && ruby_flog_all_rb=lib
 
     find "$ruby_flog_all_rb" -name \*.rb | xargs flog
 }
@@ -373,7 +373,7 @@ ruby_rgr_test_v2()
 
     case "$1" in
         db/*)
-            ;;
+        ;;
         # config/*)
         #     ;;
         *)
@@ -392,15 +392,15 @@ ruby_rgr_test_v2()
                             fi
 
                             if [ -r "$ruby_rgr_test_v2__test_file" ]; then
-                            ruby_rgr_test_v2__tested=TRUE
-                            ruby_rgr_test_one "$ruby_rgr_test_v2__framework" "$ruby_rgr_test_v2__test_file" "$2" || return 1
-                            # else
-                            #     echo DBG: $ruby_rgr_test_v2__test_dir
-                            #     echo DBG: $ruby_rgr_test_v2__test_file
+                                ruby_rgr_test_v2__tested=TRUE
+                                ruby_rgr_test_one "$ruby_rgr_test_v2__framework" "$ruby_rgr_test_v2__test_file" "$2" || return 1
+                                # else
+                                #     echo DBG: $ruby_rgr_test_v2__test_dir
+                                #     echo DBG: $ruby_rgr_test_v2__test_file
                             fi
                         fi
-                    # else
-                    #     ruby_rgr_test_dont_know "$1" "$2" || return 1
+                        # else
+                        #     ruby_rgr_test_dont_know "$1" "$2" || return 1
                     fi
                 fi
             done
@@ -614,7 +614,7 @@ ruby_rspec_identify()
 
     case "$1" in
         config/*)
-            ;;
+        ;;
         features/*)
             return 1
             ;;
@@ -824,15 +824,8 @@ ruby_rubytest_all()
 
 rails_bootstrap4()
 {
-    # 0. clean Gemfile
-    if [ -r "Gemfile" ]; then
-        if egrep "^gem ['\"](bootstrap|jquery-rails)['\"]" Gemfile >/dev/null; then
-            egrep -v "^gem ['\"](bootstrap|jquery-rails)['\"]" Gemfile > Gemfile.new &&
-                mv Gemfile.new Gemfile
-
-            bundle
-        fi
-    fi
+    _rails_bootstrap_clean_gemfile || return 1
+    _rails_bootstrap_gem_webpacker || return 1
 
     # 1. yarn install
     yarn add bootstrap@4 jquery popper.js
@@ -866,4 +859,76 @@ environment.plugins.append(
     fi
     grep '^@import "bootstrap/scss/bootstrap";' app/assets/stylesheets/application.scss >/dev/null ||
         echo '@import "bootstrap/scss/bootstrap";' >> app/assets/stylesheets/application.scss
+}
+
+rails_bootstrap5()
+{
+    _rails_bootstrap_clean_gemfile || return 1
+    _rails_bootstrap_gem_webpacker "'~> 5.2', '>= 5.2.1'" || return 1
+
+    yarn add bootstrap@5 @popperjs/core@2
+
+    _rails_bootstrap_files_js || return 1
+    _rails_bootstrap_application_js_with_bootstrap_files_js || return 1
+    _rails_bootstrap_test
+}
+
+_rails_bootstrap_clean_gemfile()
+{
+    # 0. clean Gemfile
+    [ -r "Gemfile" ] || return 1
+
+    if egrep "^gem ['\"](bootstrap|jquery-rails)['\"]" Gemfile >/dev/null; then
+        egrep -v "^gem ['\"](bootstrap|jquery-rails)['\"]" Gemfile > Gemfile.new &&
+            mv Gemfile.new Gemfile
+
+        bundle
+    fi
+}
+
+_rails_bootstrap_gem_webpacker()
+{
+    [ -r "Gemfile" ] || return 1
+    if ! egrep "^gem ['\"]webpacker['\"]" Gemfile >/dev/null; then
+        echo "gem 'webpacker'${1:+.$1}" >> Gemfile
+
+        bundle
+    fi
+}
+
+_rails_bootstrap_files_js()
+{
+    [ -r "app/javascript/packs/bootstrap_files.js" ] && return 0
+    cat <<EOF > "app/javascript/packs/bootstrap_files.js"
+import 'bootstrap/js/src/alert'
+import 'bootstrap/js/src/button'
+// import 'bootstrap/js/src/carousel'
+// import 'bootstrap/js/src/collapse'
+import 'bootstrap/js/src/dropdown'
+// import 'bootstrap/js/src/modal'
+import 'bootstrap/js/src/popover'
+import 'bootstrap/js/src/scrollspy'
+// import 'bootstrap/js/src/tab'
+// import 'bootstrap/js/src/toast'
+import 'bootstrap/js/src/tooltip'
+EOF
+}
+
+_rails_bootstrap_application_js_with_bootstrap_files_js()
+{
+    [ -r "app/assets/stylesheets/application.scss" ] || return 1
+    if ! egrep "^@import ['\"]bootstrap/scss/bootstrap['\"]" "app/assets/stylesheets/application.scss" >/dev/null; then
+        echo "@import \"bootstrap/scss/bootstrap\";" >> "app/assets/stylesheets/application.scss"
+    fi
+}
+
+_rails_bootstrap_test()
+{
+    cat <<EOF
+
+Test with:
+  bin/rails assets:clobber
+  bin/rails webpacker:compile
+  bin/rails server
+EOF
 }
