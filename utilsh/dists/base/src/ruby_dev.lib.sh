@@ -822,7 +822,7 @@ ruby_rubytest_all()
 
 ########## rails
 
-rails_bootstrap()
+rails_bootstrap4()
 {
     # 0. clean Gemfile
     if [ -r "Gemfile" ]; then
@@ -835,7 +835,7 @@ rails_bootstrap()
     fi
 
     # 1. yarn install
-    yarn add bootstrap jquery popper.js
+    yarn add bootstrap@4 jquery popper.js
 
     # 2. config/webpack/environment.js
     if ! grep jQuery config/webpack/environment.js >/dev/null; then
