@@ -870,6 +870,7 @@ rails_bootstrap5()
 
     _rails_bootstrap_files_js || return 1
     _rails_bootstrap_application_js_with_bootstrap_files_js || return 1
+    _rails_bootstrap_style || return 1
     _rails_bootstrap_test
 }
 
@@ -915,6 +916,14 @@ EOF
 }
 
 _rails_bootstrap_application_js_with_bootstrap_files_js()
+{
+    [ -r "app/javascript/packs/application.js" ] || return 1
+    if ! egrep "^import ['\"]./bootstrap_files.js['\"]" "app/javascript/packs/application.js" >/dev/null; then
+        echo "import './bootstrap_files.js'" >> "app/javascript/packs/application.js"
+    fi
+}
+
+_rails_bootstrap_style()
 {
     [ -r "app/assets/stylesheets/application.scss" ] || return 1
     if ! egrep "^@import ['\"]bootstrap/scss/bootstrap['\"]" "app/assets/stylesheets/application.scss" >/dev/null; then
