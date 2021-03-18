@@ -138,7 +138,7 @@ ruby_has_ruby()
 
 ########## rgr
 
-DEVEL_LANG="${DEVEL_LANG:+$DEVEL_LANG }ruby gemfile gemfile_lock embedded_ruby ruby_feature"
+DEVEL_LANG="${DEVEL_LANG:+$DEVEL_LANG }ruby gemfile gemfile_lock embedded_ruby ruby_feature ruby_syntax"
 
 is_ruby_file()
 {
@@ -228,7 +228,7 @@ is_ruby_feature_file()
 
     case "$1" in
         *.feature)
-            return 0
+            return 0 ;;
     esac
     return 1
 }
@@ -259,6 +259,22 @@ ruby_feature_rgr_lint()
 
     # FIXME: find correct gherkin linter
     :
+}
+
+is_ruby_syntax_file()
+{
+    [ -d "$1" ] && return 1
+
+    case "$1" in
+        *.ru|*.rake|*.eye|*.thor|*.jbuilder|*.podspec|Rakefile|Capfile|Thorfile|Vagrantfile|Guardfile|Podfile)
+        return 0 ;;
+    esac
+    return 1
+}
+
+ruby_syntax_rgr()
+{
+    ruby_rgr_rubocop "$@"
 }
 
 ruby_rgr()
