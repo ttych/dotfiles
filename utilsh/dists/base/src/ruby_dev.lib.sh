@@ -266,8 +266,10 @@ is_ruby_syntax_file()
     [ -d "$1" ] && return 1
 
     case "$1" in
-        *.ru|*.rake|*.eye|*.thor|*.jbuilder|*.podspec|Rakefile|Capfile|Thorfile|Vagrantfile|Guardfile|Podfile)
-        return 0 ;;
+        *.ru|*.rake|*.eye|*.thor|*.jbuilder|*.podspec)
+            return 0 ;;
+        Rakefile|*/Rakefile|Capfile|*/Capfile|Thorfile|*/Thorfile|Vagrantfile|*/Vagrantfile|Guardfile|*/Guardfile|Podfile|*/Podfile)
+            return 0 ;;
     esac
     return 1
 }
