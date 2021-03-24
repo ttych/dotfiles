@@ -158,3 +158,22 @@ rgr_stage()
     devel_subtitle "git stage $1"
     git_add "$1"
 }
+
+
+### flag file
+DEVEL_LANG="${DEVEL_LANG:+$DEVEL_LANG } flag"
+is_flag_file()
+{
+    [ -f "$1" ] || return 1
+
+    case "$1" in
+        .keep|*/.keep)
+            return 0 ;;
+    esac
+    return 1
+}
+
+flag_rgr()
+{
+    :
+}
