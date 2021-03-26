@@ -557,6 +557,81 @@ ruby_has_minitest()
     return 1
 }
 
+ruby_minitest_identify()
+{
+    ruby_minitest_identify=
+
+    ruby_minitest_identify__file="$1"
+
+    ruby_minitest_identify__file_name="${1##*/}"
+    ruby_minitest_identify__file_path="${1%$ruby_minitest_identify__file_name}"
+    ruby_minitest_identify__file_path="${ruby_minitest_identify__file_path%/}"
+    ruby_minitest_identify__test_name_1="${ruby_minitest_identify__file_name%.rb}_test.rb"
+    ruby_minitest_identify__test_name_2="test_${ruby_minitest_identify__file_name}"
+
+    # others
+    case "$ruby_minitest_identify__file" in
+        config/*)
+            return 0 ;;
+        features/*)
+            return 1 ;;
+        spec/*)
+            return 1 ;;
+        *.erb)
+            return 0 ;;
+    esac
+
+    # test
+    for ruby_minitest_identify__dir in $RUBY_MINITEST_DIRS; do
+        [ -d "$ruby_minitest_identify__dir" ] || continue
+
+        case "$ruby_minitest_identify__file" in
+            "$ruby_minitest_identify__dir"/helper.rb|"$ruby_minitest_identify__dir"/*_helper.rb)
+                return 0 ;;
+            "$ruby_minitest_identify__dir"/*_test.rb|"$ruby_minitest_identify__dir"/test_*.rb|"$ruby_minitest_identify__dir"/*/test_*.rb)
+                ruby_minitest_identify="$1"
+                return 0 ;;
+            "$ruby_minitest_identify__dir"/*.rb)
+                if [ -r "$ruby_minitest_identify__file_path/$ruby_minitest_identify__test_name_1" ]; then
+                    ruby_minitest_identify="$ruby_minitest_identify__file_path/$ruby_minitest_identify__test_name_1"
+                elif [ -r "$ruby_minitest_identify__file_path/$ruby_minitest_identify__test_name_2" ]; then
+                    ruby_minitest_identify="$ruby_minitest_identify__file_path/$ruby_minitest_identify__test_name_2"
+                else
+                    ruby_minitest_identify="$ruby_minitest_identify__file_path"
+                fi
+                return 0
+                ;;
+        esac
+    done
+
+    # code or ?
+    case "$ruby_minitest_identify__file" in
+        *.rb)
+            ruby_minitest_identify__file_path_first="${ruby_minitest_identify__file_path%%/*}"
+            ruby_minitest_identify__file_path_sub="${ruby_minitest_identify__file_path#$ruby_minitest_identify__file_path_first}"
+            ruby_minitest_identify__file_path_sub="${ruby_minitest_identify__file_path_sub#/}"
+
+            for ruby_minitest_identify__dir in $RUBY_MINITEST_DIRS; do
+                [ -d "$ruby_minitest_identify__dir" ] || continue
+
+                for ruby_minitest_identify__test_name in "$ruby_minitest_identify__test_name_2" "$ruby_minitest_identify__test_name_1"; do
+
+                    ruby_minitest_identify="$ruby_minitest_identify__dir/$ruby_minitest_identify__file_path/$ruby_minitest_identify__test_name"
+                    [ -r "$ruby_minitest_identify" ] && return 0
+
+                    ruby_minitest_identify="$ruby_minitest_identify__dir/$ruby_minitest_identify__file_path_sub/$ruby_minitest_identify__test_name"
+                    [ -r "$ruby_minitest_identify" ] && return 0
+                done
+
+            done
+
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
 ruby_minitest_identify_test()
 {
     ruby_minitest_identify_test=
