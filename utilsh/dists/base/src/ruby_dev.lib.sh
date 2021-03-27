@@ -672,14 +672,18 @@ ruby_minitest_create_test_file()
 
 ruby_minitest()
 {
-    ruby_rake test TEST="$1" ||
+    if [ -r "Rakefile" ]; then
+        ruby_rake test TEST="$1"
+    else
         ruby_ruby "$1"
+    fi
 }
 
 ruby_minitest_all()
 {
-    ruby_rake test ||
-        return 0
+    if [ -r "Rakefile" ]; then
+        ruby_rake test
+    fi
 }
 
 
