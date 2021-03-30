@@ -356,6 +356,9 @@ fi
 # browse
 git config --global alias.browse '!f() { url=$(git config remote.origin.url | sed -e "s/^git@\([a-z.-]*\):\(.*\)$/https:\/\/\1\/\2/") ; xdg-open ${url}; }; f'
 
+# merge limit
+git config merge.renameLimit 999999
+
 
 ###############################################################################
 # trash
