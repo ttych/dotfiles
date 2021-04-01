@@ -19,7 +19,7 @@
 (use-package hl-line
   :config
   (global-hl-line-mode 1)
-  (set-face-background hl-line-face "gray15"))
+  (set-face-background hl-line-face "gray25"))
 
 (use-package hl-todo
   :ensure t
@@ -34,7 +34,7 @@
           ("FIXME"   . "#F2AF00")
           ("BUG"     . "#A020F0")
           ("REFACTO" . "#FF4500")
-          ("DELETE"  . "#1E90FF")))
+          ("DELETE"  . "#C3B091")))
   ;; (add-hook 'prog-mode-hook #'hl-todo-mode 1)
   ;; (add-hook 'text-mode-hook #'hl-todo-mode 1)
   )
