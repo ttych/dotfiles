@@ -359,6 +359,10 @@ git config --global alias.browse '!f() { url=$(git config remote.origin.url | se
 # merge limit
 git config merge.renameLimit 999999
 
+# version-bump
+git config --global alias.vb 'version-bump'
+
+
 
 ###############################################################################
 # trash
