@@ -3,11 +3,11 @@
   :ensure t
   :bind (
          ("M-s j" . ace-jump-mode)
-         ("M-s J" . ace-jump-mode-pop-mark)
+         ("M-s k" . ace-jump-mode)
+         ("M-s l" . ace-jump-mode)
          ("M-s M-j" . ace-jump-mode)
-         ("M-s M-J" . ace-jump-mode-pop-mark)
-         ("M-J" . ace-jump-mode)
-         ("M-K" . ace-jump-mode-pop-mark)
+         ("M-s M-k" . ace-jump-char-mode)
+         ("M-s M-l" . ace-jump-line-mode)
          )
   )
 
