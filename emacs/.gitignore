@@ -1,19 +1,9 @@
-/snippets
-
 *~
 *.elc
 
 /myinit.el
-/auto-save-list
-/elpa
-/packages
-/eshell
-/games
-/ido.last
-/places
-/recentf
-/savefile
-/transient
+/.history
 /save
-/.mc-lists.el
-/ac-comphist.dat
+/elpa
+
+/snippets

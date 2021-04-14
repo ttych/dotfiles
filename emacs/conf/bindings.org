@@ -117,3 +117,40 @@
 | F11           | toggle-frame-fullscreen              |   | ----------------------------- |   |                                  |   |                    |   |
 | F12           | -<F2>------------------------------- |   | ----------------------------- |   |                                  |   |                    |   |
 |---------------+--------------------------------------+---+-------------------------------+---+----------------------------------+---+--------------------+---|
+
+
+* M-]
+** f  (file)
+*** s - bookmark-set
+*** j - bookmark-jump
+*** l - bookmark-bmenu-list
+*** r - recentf-open-files
+** z   - zoom-window-zoom
+** M-z - zoom-window-zoom
+** m  (mode toogle)
+*** f - auto-fill-mode
+*** l - display-line-numbers-mode
+*** w - whitespace-mode
+*** s - auto-save-mode
+** \ - align-regexp
+** <deletechar> - join-line
+** # - comment-region
+** @ - uncomment-region
+** y - (yasnippet)
+*** n - yas-new-snippet
+*** i - yas-insert-snippet
+*** v - yas-visit-snippet-file
+** e  (edit)
+*** d - my/switch-language
+** c  (cursor)
+*** e - mc/edit-lines
+*** n - mc/mark-next-like-this
+*** p - mc/mark-previous-like-this
+*** w - mc/mark-next-like-this-word
+** o  (org)
+*** l - org-store-link
+*** a - org-agenda
+*** c - org-capture
+** g  (git)
+*** s - magit-status
+*** t - git-timemachine
