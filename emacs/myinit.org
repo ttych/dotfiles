@@ -629,7 +629,8 @@
 
     #+BEGIN_SRC emacs-lisp :tangle yes
       (global-set-key (kbd "<f5>") 'revert-buffer)
-      (global-set-key (kbd "<f6>") 'eshell)
+      (global-set-key (kbd "<f6>") 'shell)
+      (global-set-key (kbd "ESC <f6>") 'term)
       (global-set-key (kbd "<f8>") 'magit-file-popup)
       ;; kill-word
       (global-set-key (kbd "M-<deletechar>") 'kill-word)
@@ -905,7 +906,7 @@
          :delight
          :custom
          (company-begin-commands '(self-insert-command))
-         (company-idle-delay 0.1)
+         (company-idle-delay 0.3)
          (company-minimum-prefix-length 2)
          (company-show-numbers t)
          (company-tooltip-align-annotations 't)
@@ -1252,6 +1253,7 @@
          :hook ((python-mode . lsp)
                 (lsp-mode . lsp-enable-which-key-integration))
          ;; ((c-mode c++-mode python-mode ruby-mode xml-mode) . lsp)
+         :commands lsp
          :custom
          (lsp-clients-typescript-server-args '("--stdio" "--tsserver-log-file" "/dev/stderr"))
          (lsp-enable-folding nil)
@@ -1263,6 +1265,7 @@
          (lsp-session-file (expand-file-name (format "%s/lsp-session-v1" save-dir)))
          (lsp-restart 'auto-restart)
          :config
+         ;; (setq lsp-log-io t)
          (lsp-register-custom-settings '(
                                          ("pyls.plugins.pyls_mypy.enabled" t t)
                                          ("pyls.plugins.pyls_mypy.live_mode" nil t)
@@ -1683,45 +1686,51 @@
 # #+END_SRC
 
 **** venv
+***** pyenv
 
-#   (use-package pyenv-mode
-#     :after python
-#     :hook ((python-mode . pyenv-mode)
-#            (projectile-switch-project . projectile-pyenv-mode-set))
-#     :custom (pyenv-mode-set "3.8.5")
-#     :preface
-#     (defun projectile-pyenv-mode-set ()
-#       "Set pyenv version matching project name."
-#       (let ((project (projectile-project-name)))
-#         (if (member project (pyenv-mode-versions))
-#             (pyenv-mode-set project)
-#           (pyenv-mode-unset)))))
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (defvar pyenv-root-dir (getenv "PYENV_ROOT"))
+       (if (string-equal pyenv-root-dir "")
+           (setq pyenv-root-dir (expand-file-name "~/.pyenv")))
+       (setenv "WORKON_HOME" (format "%s/versions" pyenv-root-dir))
 
-#   (use-package pyvenv
-#     :after python
-#     :hook ((python-mode . pyvenv-mode)
-#            (python-mode . (lambda ()
-#                             (if-let ((pyvenv-directory (find-pyvenv-directory (buffer-file-name))))
-#                                 (pyvenv-activate pyvenv-directory))
-#                             (lsp))))
-#     :custom
-#     (pyvenv-default-virtual-env-name "env")
-#     (pyvenv-mode-line-indicator '(pyvenv-virtual-env-name ("[venv:"
-#                                                            pyvenv-virtual-env-name "]")))
-#     :preface
-#     (defun find-pyvenv-directory (path)
-#       "Checks if a pyvenv directory exists."
-#       (cond
-#        ((not path) nil)
-#        ((file-regular-p path) (find-pyvenv-directory (file-name-directory path)))
-#        ((file-directory-p path)
-#         (or
-#          (seq-find
-#           (lambda (path) (file-regular-p (expand-file-name "pyvenv.cfg" path)))
-#           (directory-files path t))
-#          (let ((parent (file-name-directory (directory-file-name path))))
-#            (unless (equal parent path) (find-pyvenv-directory parent))))))))
-# #+end_src
+       (use-package pyenv-mode
+         :ensure t
+         :hook ((python-mode . pyenv-mode)
+                (projectile-after-switch-project . projectile-pyenv-mode-set))
+         :preface
+         (defun projectile-pyenv-mode-set ()
+           "Set pyenv version matching project name."
+           (let ((project (projectile-project-name)))
+             (if (member project (pyenv-mode-versions))
+                 (pyenv-mode-set project)
+               (pyenv-mode-unset))))
+         )
+     #+END_SRC
+
+***** pyvenv
+
+      #+BEGIN_SRC emacs-lisp :tangle yes
+        (use-package pyvenv
+          :ensure t
+          :hook ((python-mode . pyvenv-mode))
+          )
+      #+END_SRC
+
+***** auto-virtualenv
+
+      #+BEGIN_SRC emacs-lisp :tangle yes
+        (use-package auto-virtualenv
+          :ensure t
+          :hook ((python-mode . auto-virtualenv-set-virtualenv))
+          ;; :init
+          ;; ;; Activate on changing buffers
+          ;; (add-hook 'window-configuration-change-hook 'auto-virtualenv-set-virtualenv)
+          ;; ;; Activate on focus in
+          ;; (add-hook 'focus-in-hook 'auto-virtualenv-set-virtualenv)
+          )
+
+      #+END_SRC
 
 *** Puppet
 
