@@ -1,11 +1,15 @@
+# -*- mode: ruby -*-
+
 # Documentation
 # https://github.com/pry/pry/wiki/Customization-and-configuration
 
-
-if ENV["IN_EMACS"]
+if ENV['INSIDE_EMACS']
+  Pry.config.correct_indent = false
   Pry.config.pager = false
-  # pry_instance.config.pager = false
 end
+
+# Pry.config.editor = "emacsclient --tty"
+Pry.config.editor = proc { |file, line| "emacsclient --tty +#{line} #{file}" }
 
 
 # Prompt

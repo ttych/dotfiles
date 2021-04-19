@@ -1,5 +1,7 @@
 # -*- mode: ruby -*-
 
+IRB.conf[:USE_READLINE] = false if ENV['INSIDE_EMACS']
+
 IRB.conf[:PROMPT_MODE] = :SIMPLE
 # IRB.conf[:AUTO_INDENT_MODE] = false
 IRB.conf[:AUTO_INDENT] = true

@@ -1,3 +1,4 @@
-irbrc	 .irbrc
-gemrc	 .gemrc
+irbrc    .irbrc
+gemrc    .gemrc
 guard.rb .guard.rb
+pryrc    .pryrc
