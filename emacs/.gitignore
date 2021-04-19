@@ -7,3 +7,5 @@
 /elpa
 
 /snippets
+
+/conf/proxy.el

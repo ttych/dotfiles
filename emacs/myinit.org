@@ -75,7 +75,7 @@
 ** Proxy
 
    #+BEGIN_SRC emacs-lisp :tangle yes
-     (if (file-exists-p (expand-file-name "proxy.el" user-emacs-directory))
+     (if (file-exists-p (expand-file-name (format "%s/conf/proxy.el" user-emacs-directory)))
 	 (load-file (expand-file-name "proxy.el" user-emacs-directory))
        )
    #+END_SRC
