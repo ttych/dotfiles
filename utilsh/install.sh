@@ -18,6 +18,7 @@ AUTOLOADS='
   std.shl
   goto.shl
   ruby_env.shl
+  python_env.shl
   pyv.sh
   wucp.shl
   myenv.shl

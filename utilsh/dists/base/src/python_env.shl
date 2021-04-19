@@ -1,0 +1,45 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+
+########## pyenv
+pyenv_guess_path()
+{
+    pyenv_guess_path="${1}"
+    pyenv_guess_path="${pyenv_guess_path:-$(pyenv root 2>/dev/null)}"
+    pyenv_guess_path="${pyenv_guess_path:-$PYENV_ROOT}"
+    pyenv_guess_path="${pyenv_guess_path:-$HOME/.pyenv}"
+}
+
+pyenv_load()
+{
+    pyenv_guess_path "$1"
+    PYENV_ROOT="$pyenv_guess_path"
+    export PYENV_ROOT
+    PATH="$PYENV_ROOT/bin:$PATH"
+    export PATH
+    eval "$(pyenv init -)"
+    #[ -r "$PYENV_ROOT/completions/pyenv.${SHELL_SHORT}" ] &&
+    #    . "$PYENV_ROOT/completions/pyenv.${SHELL_SHORT}"
+}
+
+
+########## env
+python_env()
+{
+    [ -n "$python_env" ] && return 0
+
+    for _PYTHON_HOME in "${HOME_ALT}" "${HOME}"; do
+        _PYTHON_PYENV_AVAILABLE=false
+        _PYTHON_PYENV_ROOT="$_PYTHON_HOME/.pyenv"
+        ( cd "$_PYTHON_PYENV_ROOT" 2>/dev/null ) && [ -x "$_PYTHON_PYENV_ROOT/bin/pyenv" ] && _PYTHON_PYENV_AVAILABLE=true
+
+        if $_PYTHON_PYENV_AVAILABLE; then
+            pyenv_load "$_PYTHON_PYENV_ROOT"
+            python_env="pyenv"
+            break
+        fi
+    done
+}
+
+python_env
