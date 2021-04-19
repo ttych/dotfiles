@@ -19,6 +19,7 @@ pyenv_load()
     PATH="$PYENV_ROOT/bin:$PATH"
     export PATH
     eval "$(pyenv init -)"
+    eval "$(pyenv virtualenv-init -)"
     #[ -r "$PYENV_ROOT/completions/pyenv.${SHELL_SHORT}" ] &&
     #    . "$PYENV_ROOT/completions/pyenv.${SHELL_SHORT}"
 }
