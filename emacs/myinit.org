@@ -1247,7 +1247,7 @@
 
      That's where [[https://github.com/emacs-lsp/lsp-mode][lsp-mode]] comes in!
 
-     #+BEGIN_SRC emacs-lisp :tangle yes
+     #+BEGIN_SRC emacs-lisp :tangle no
        (use-package lsp-mode
          :ensure t
          :hook ((python-mode . lsp)
@@ -1295,7 +1295,7 @@
 
 **** eglot
 
-     #+BEGIN_SRC emacs-lisp :tangle no
+     #+BEGIN_SRC emacs-lisp :tangle yes
        (use-package eglot
          :ensure t
          :hook ((c-mode . eglot-ensure)
@@ -1308,6 +1308,17 @@
                 ("C-c f i" . eglot-code-action-organize-imports)
                 ("C-c h" . eldoc))
          )
+
+       (defun eglot-toggle ()
+         "Toggle eglot"
+         (interactive)
+         (if (eglot-managed-p)
+             (progn
+               (eglot--managed-mode-off))
+           (eglot-ensure)
+           )
+         )
+       (global-set-key (kbd "M-] m ;") 'eglot-toggle)
      #+END_SRC
 
 *** Indentation
