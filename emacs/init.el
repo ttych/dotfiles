@@ -26,9 +26,13 @@
 ;; collection.
 (setq gc-cons-threshold (* 50 1000 1000))
 
-(if (file-exists-p (expand-file-name "myinit.el" user-emacs-directory))
-    (load-file (expand-file-name "myinit.el" user-emacs-directory))
-  (org-babel-load-file (expand-file-name "myinit.org" user-emacs-directory)))
+(defvar my-init-el (expand-file-name "myinit.el" user-emacs-directory))
+(defvar my-init-org (expand-file-name "myinit.org" user-emacs-directory))
+(if (and (file-exists-p my-init-el)
+         (time-less-p (nth 5 (file-attributes my-init-org))
+                      (nth 5 (file-attributes my-init-el))))
+    (load-file my-init-el)
+  (org-babel-load-file my-init-org))
 
 ;; Make gc pauses faster by decreasing the threshold.
 (setq gc-cons-threshold (* 10 1000 1000))
