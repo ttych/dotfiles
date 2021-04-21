@@ -4,9 +4,13 @@
 #+STARTUP: content
 
 * ToDo
+*** electric-pair-mode
+    control in mode ?
+    https://www.youtube.com/watch?v=mBvbWSHnQZs
+*** find-file-in-project
+    https://github.com/redguardtoo/find-file-in-project
 *** company
 *** python
-*** high productivity plugins
 *** mastering emacs
 *** diff & merge file
 *** avy
@@ -27,10 +31,12 @@
 *** plantUML
 *** ace-link
 
+
     GNU Emacs package for selecting a link to jump to.
 
     From https://github.com/abo-abo/ace-link.
 
+*** dired
 * About
 
   I use the literal emacs configuration way to have a structured configuration,
@@ -451,6 +457,19 @@
       (run-at-time nil (* 5 60) 'recentf-save-list)
     #+END_SRC
 
+*** Search/Find
+**** standard find
+
+     See Configuration > Commands > Bindings.
+
+**** find-file-in-project
+
+     #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package find-file-in-project
+        :ensure t
+        )
+     #+END_SRC
+
 ** Dired
 
    For those who didn't know, GNU Emacs is also a file explorer.
@@ -638,8 +657,10 @@
       (global-set-key (kbd "M-s r") 'query-replace-regexp)
       (global-set-key (kbd "M-s M-%") 'query-replace-regexp)
       (global-set-key (kbd "M-s O") 'multi-occur)
-      (global-set-key (kbd "M-s d") 'find-dired)
       (global-set-key (kbd "M-s g") 'rgrep)
+      (global-set-key (kbd "M-s f f") 'find-dired)
+      (global-set-key (kbd "M-s f n") 'find-name-dired)
+      (global-set-key (kbd "M-s f r") 'find-lisp-find-dired)
       ;; windmove
       (global-set-key (kbd "C-<up>") 'windmove-up)
       (global-set-key (kbd "M-[ 1 ; 5 a") 'windmove-up)
@@ -943,39 +964,6 @@
       ;; (global-set-key (kbd "<C-S-return>") 'open-line-above)
     #+END_SRC
 
-*** yasnippet
-
-    #+BEGIN_QUOTE
-    YASnippet is a template system for Emacs. It allows you to type an abbreviation
-    and automatically expand it into function templates.
-
-    [[https://github.com/joaotavora/yasnippet][João Távora]]
-    #+END_QUOTE
-
-    #+BEGIN_SRC emacs-lisp :tangle yes
-      (use-package yasnippet
-        :ensure t
-        :delight yas-minor-mode " ϔ"
-        :bind (("M-] y n" . yas-new-snippet)
-               ("M-] y i" . yas-insert-snippet)
-               ("M-] y v" . yas-visit-snippet-file))
-        :init
-        (yas-global-mode 1)
-        )
-
-      (use-package yasnippet-snippets
-        :ensure t
-        :after yasnippet
-        :config
-        (yasnippet-snippets-initialize)
-        )
-
-      (use-package ivy-yasnippet
-        :ensure t
-        :after yasnippet
-        )
-    #+END_SRC
-
 *** Navigation
 **** ace-jump-mode
 
@@ -1231,6 +1219,46 @@
          (add-hook 'text-mode-hook 'rainbow-mode)
          )
      #+END_SRC
+
+*** Auto
+**** electric-pair-mode
+
+    #+BEGIN_SRC emacs-lisp :tangle yes
+    (add-hook 'prog-mode-hook 'electric-pair-local-mode)
+    #+END_SRC
+
+**** yasnippet
+
+    #+BEGIN_QUOTE
+    YASnippet is a template system for Emacs. It allows you to type an abbreviation
+    and automatically expand it into function templates.
+
+    [[https://github.com/joaotavora/yasnippet][João Távora]]
+    #+END_QUOTE
+
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package yasnippet
+        :ensure t
+        :delight yas-minor-mode " ϔ"
+        :bind (("M-] y n" . yas-new-snippet)
+               ("M-] y i" . yas-insert-snippet)
+               ("M-] y v" . yas-visit-snippet-file))
+        :init
+        (yas-global-mode 1)
+        )
+
+      (use-package yasnippet-snippets
+        :ensure t
+        :after yasnippet
+        :config
+        (yasnippet-snippets-initialize)
+        )
+
+      (use-package ivy-yasnippet
+        :ensure t
+        :after yasnippet
+        )
+    #+END_SRC
 
 ** Languages
 *** LSP
