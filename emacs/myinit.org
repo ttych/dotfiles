@@ -462,7 +462,21 @@
 
      See Configuration > Commands > Bindings.
 
+**** grep-a-lot
+
+     Allow multiple grep buffers.
+
+     #+BEGIN_SRC emacs-lisp :tangle no
+       (use-package grep-a-lot
+         :ensure t
+         :config
+         ;; (grep-a-lot-setup-keys)
+         )
+     #+END_SRC
+
 **** find-file-in-project
+
+     From https://github.com/redguardtoo/find-file-in-project.
 
      #+BEGIN_SRC emacs-lisp :tangle yes
       (use-package find-file-in-project
@@ -769,6 +783,11 @@
     #+BEGIN_SRC emacs-lisp :tangle yes
       (setq read-quoted-char-radix 16)
     #+END_SRC
+
+*** M-x set-input-method
+
+    For mathematics, use TeX as input-method.
+    Use describe-input-method to see available chars.
 
 *** tab vs. space
 
@@ -2136,6 +2155,24 @@
     #+BEGIN_SRC emacs-lisp :tangle no
       (autoload 'yang-mode "yang-mode" "Major mode for editing YANG modules." t)
       (add-to-list 'auto-mode-alist '("\\.yang$" . yang-mode))
+    #+END_SRC
+
+** Shell & Term
+
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (defvar emacs-shell-program getenv("ESHELL"))
+     (if (string-equal emacs-shell-program "")
+         (setq emacs-shell-program "/bin/bash"))
+   #+END_SRC
+
+*** multi-term
+
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (use-package
+        :ensure t
+        :config
+        (setq multi-term-program (format "%s -l" emacs-shell-program))
+        )
     #+END_SRC
 
 ** org
