@@ -99,6 +99,8 @@ python_virtualenv_check()
 
 DEVEL_LANG="${DEVEL_LANG:+$DEVEL_LANG }python requirements"
 
+RGR_DEFAULT_PRUNE="-N .mypy_cache ${RGR_DEFAULT_PRUNE}"
+
 PYTHON_LINTER="${PYTHON_LINTER:-flake8}"
 PYTHON_AUTOLINTER="${PYTHON_AUTOLINTER:-black}"
 
