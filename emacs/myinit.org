@@ -2160,7 +2160,7 @@
 ** Shell & Term
 
    #+BEGIN_SRC emacs-lisp :tangle yes
-     (defvar emacs-shell-program getenv("ESHELL"))
+     (defvar emacs-shell-program (getenv "ESHELL"))
      (if (string-equal emacs-shell-program "")
          (setq emacs-shell-program "/bin/bash"))
    #+END_SRC
