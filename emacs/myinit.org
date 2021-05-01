@@ -2418,6 +2418,27 @@
         :custom (nov-text-width 75))
     #+END_SRC
 
+*** ledger
+
+    Use ledger mode.
+
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (use-package ledger-mode
+        :ensure t
+        :mode "\\.ledger\\'"
+        :init
+        (setq ledger-clear-whole-transactions 1)
+        )
+    #+END_SRC
+
+    Then, configure flycheck-ledger.
+
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (use-package flycheck-ledger
+        :ensure t
+        )
+    #+END_SRC
+
 ** Extra
 *** configuration
 
