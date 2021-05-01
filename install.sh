@@ -1,13 +1,11 @@
 #!/bin/sh
 
-SCRIPT="${0}"
-SCRIPT_NAME="${SCRIPT##*/}"
-SCRIPT_PATH="${SCRIPT%$SCRIPT_NAME}"
-case "$SCRIPT_PATH" in
-    /*)  SCRIPT_RPATH="$SCRIPT_PATH" ;;
-    ./*) SCRIPT_RPATH="${PWD}/${SCRIPT_PATH#./}" ;;
-    *)   SCRIPT_RPATH="${PWD}/${SCRIPT_PATH}" ;;
-esac
+set -x
+
+SCRIPT_NAME="${0##*/}"
+SCRIPT_RPATH="${0%$SCRIPT_NAME}"
+SCRIPT_PATH=`cd "${SCRIPT_RPATH:-.}" && pwd`
+
 
 usage()
 {
@@ -47,10 +45,35 @@ conf_install()
             case "$a" in
                 .) a="" ;;
                 "#"*) continue ;;
-                *) a="/$a" ;;
+                *) ;;
             esac
+
+            echo a : $a
+            echo b : $b
+
+            a_rel=""
+            b_tmp="$b"
+            while true; do
+                case $b_tmp in
+                    ./*)
+                        b_tmp="${b_tmp#./}"
+                        ;;
+                    ../*)
+                        echo >&2 "unsupported .. in path"
+                        return 2
+                        ;;
+                    */*)
+                        b_tmp="${b_tmp#*/}"
+                        a_rel="${a_rel}../"
+                        ;;
+                    *)
+                        break
+                        ;;
+                esac
+            done
+
             rm -f "${DOTFILES_INSTALL_DIR}/$b" && \
-                ln -s "${DOTFILES_SOURCE_DIR}/${conf_install__app%/}$a" "${DOTFILES_INSTALL_DIR}/$b"
+                ln -s "${a_rel}${DOTFILES_SOURCE_DIR}/${conf_install__app%/}/$a" "${DOTFILES_INSTALL_DIR}/$b"
         done  < "${conf_install__app}/install.list"
     fi
 
@@ -75,7 +98,9 @@ while getopts :hp: opt; do
 done
 shift $(($OPTIND - 1))
 
-DOTFILES_SOURCE_DIR="${SCRIPT_RPATH#$DOTFILES_INSTALL_DIR/}"
+# DOTFILES_SOURCE_DIR="${SCRIPT_PATH}"
+DOTFILES_SOURCE_DIR="${SCRIPT_PATH#$DOTFILES_INSTALL_DIR/}"
+
 
 export DOTFILES_INSTALL_DIR
 export DOTFILES_SOURCE_DIR
