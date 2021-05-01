@@ -672,20 +672,3 @@ mktouch()
 
     touch "$@"
 }
-
-
-##################################################
-# pass - commont
-##################################################
-cpass()
-{
-    PASSWORD_STORE_DIR=${HOME}/.password-store_common pass "$@" ;
-}
-## bash completion
-# _wpass() {
-#     # trailing / is required for the password-store dir.
-#     PASSWORD_STORE_DIR=~/.wpasswordstore/ _pass
-# }
-# complete -o filenames -o nospace -F _wpass wpass
-## zsh completion
-# compdef -e 'PASSWORD_STORE_DIR=$HOME/.wpasswordstore _pass' wpass
