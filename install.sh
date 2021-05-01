@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -x
+# set -x
 
 SCRIPT_NAME="${0##*/}"
 SCRIPT_RPATH="${0%$SCRIPT_NAME}"
