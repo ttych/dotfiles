@@ -12,7 +12,7 @@ has_openssl()
 
 has_sha384sum()
 {
-    which has_sha384sum >/dev/null 2>/dev/null
+    which sha384sum >/dev/null 2>/dev/null
 }
 
 _sha()
@@ -105,6 +105,22 @@ cert_self_signed()
     openssl req -x509 -nodes -newkey rsa:4096 -keyout "$cert_self_signed.key" -out "$cert_self_signed.pem" -days "${2:-3650}"
 }
 
+cert_is_key_file()
+{
+    [ -n "$1" ] || return 1
+    [ -r "$1" ] || return 1
+    return 0
+}
+
+cert_remove_passphrase()
+{
+    if ! cert_is_key_file "$1"; then
+        echo >&2 "\"$1\" is not a keyfile, please specify a valid keyfile as argument."
+        return 1
+    fi
+
+    openssl rsa -in "$1" -out "${1%.pem}.nopp.pem"
+}
 
 
 # ### digest
