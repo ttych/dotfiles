@@ -285,6 +285,29 @@
    #+END_SRC
 
 ** Buffer
+*** scratch
+
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (use-package scratch
+        :ensure t
+        :bind (("C-x M-s" . scratch)
+               ("C-x S" . scratch))
+        )
+    #+END_SRC
+
+*** new scratch
+
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (defun create-scratch-buffer nil
+        "create a scratch buffer"
+        (interactive)
+        (setq bufname (generate-new-buffer-name "*scratch*"))
+        (switch-to-buffer (get-buffer-create bufname))
+        (org-mode)
+        )
+      (global-set-key (kbd "C-x S") 'create-scratch-buffer)
+    #+END_SRC
+
 *** naming
 
     Buffers can quickly become a mess. For some people, it's not a problem, but I
