@@ -1058,7 +1058,13 @@
          )
      #+END_SRC
 
-*** Selection
+*** region / selection
+**** delete-selection
+
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (delete-selection-mode 1)
+     #+END_SRC
+
 **** expand-region
 
      Increase region by semantic units. It tries to be smart about it and adapt to
