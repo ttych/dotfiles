@@ -4,9 +4,10 @@
 #+STARTUP: content
 
 * ToDo
-*** electric-pair-mode
-    control in mode ?
-    https://www.youtube.com/watch?v=mBvbWSHnQZs
+*** org-mode
+    https://www.youtube.com/watch?v=vCyBu8Az254&list=PLX2044Ew-UVV0CNIrlst0MkKbu85O7_QT
+*** emacs tutorial (Uncle Dave)
+    https://www.youtube.com/watch?v=d6iY_1aMzeg&list=PLX2044Ew-UVVv31a0-Qn3dA6Sd_-NyA1n
 *** find-file-in-project
     https://github.com/redguardtoo/find-file-in-project
 *** company
@@ -1231,9 +1232,12 @@
                ("M-] c p" . mc/mark-previous-like-this)
                ("M-] c w" . mc/mark-next-like-this-word)
                ("M-] c W" . mc/mark-previous-like-this-word)
-               ("M-] c s" . mc/mark-next-like-this-word)
-               ("M-] c S" . mc/mark-previous-like-this-word)
+               ("M-] c s" . mc/mark-next-like-this-symbol)
+               ("M-] c S" . mc/mark-previous-like-this-symbol)
+               ("M-] c c" . mc/mark-all-dwim)
                ("M-] c a" . mc/mark-all-like-this)
+               ("M-] c r" . mc/mark-all-in-region)
+               ("M-] c +" . mc/mark-more-like-this-extended)
                )
         )
     #+END_SRC
@@ -2513,6 +2517,15 @@
    - Magnar Sven;
    - [[https://github.com/angrybacon/dotemacs][Mathieu Marques]] (=angrybacon=);
    - [[https://github.com/rememberYou/.emacs.d][Terencio Agozzino]] (=rememberYou=).
+
+** packages
+*** electric-pair-mode
+    control in mode ?
+    https://www.youtube.com/watch?v=mBvbWSHnQZs
+
+*** multiple-cursors
+    https://github.com/magnars/multiple-cursors.el
+    http://pragmaticemacs.com/emacs/multiple-cursors/
 
 * To filter
 
