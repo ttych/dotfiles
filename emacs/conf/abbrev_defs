@@ -27,6 +27,8 @@
 
 (define-abbrev-table 'css-mode-abbrev-table '())
 
+(define-abbrev-table 'csv-mode-abbrev-table '())
+
 (define-abbrev-table 'diff-mode-abbrev-table '())
 
 (define-abbrev-table 'docbook-mode-abbrev-table '())
@@ -42,6 +44,18 @@
 (define-abbrev-table 'epa-key-list-mode-abbrev-table '())
 
 (define-abbrev-table 'epa-key-mode-abbrev-table '())
+
+(define-abbrev-table 'eshell-mode-abbrev-table '())
+
+(define-abbrev-table 'ffip-diff-mode-abbrev-table '())
+
+(define-abbrev-table 'flycheck-error-list-mode-abbrev-table '())
+
+(define-abbrev-table 'flycheck-error-message-mode-abbrev-table '())
+
+(define-abbrev-table 'flycheck-explain-error-mode-abbrev-table '())
+
+(define-abbrev-table 'flycheck-verify-mode-abbrev-table '())
 
 (define-abbrev-table 'flymake-diagnostics-buffer-mode-abbrev-table '())
 
@@ -88,6 +102,14 @@
 
 (define-abbrev-table 'inferior-emacs-lisp-mode-abbrev-table '())
 
+(define-abbrev-table 'inferior-python-mode-abbrev-table '())
+
+(define-abbrev-table 'ini-mode-abbrev-table '())
+
+(define-abbrev-table 'ivy-occur-grep-mode-abbrev-table '())
+
+(define-abbrev-table 'ivy-occur-mode-abbrev-table '())
+
 (define-abbrev-table 'java-mode-abbrev-table
   '(
    ))
@@ -98,9 +120,7 @@
 
 (define-abbrev-table 'lisp-mode-abbrev-table '())
 
-(define-abbrev-table 'lua-mode-abbrev-table
-  '(
-   ))
+(define-abbrev-table 'lua-mode-abbrev-table '())
 
 (define-abbrev-table 'markdown-mode-abbrev-table '())
 
@@ -136,6 +156,17 @@
 
 (define-abbrev-table 'puppet-mode-abbrev-table '())
 
+(define-abbrev-table 'python-mode-abbrev-table
+  '(
+    ("assetequal" "assertEqual" nil 1)
+   ))
+
+(define-abbrev-table 'python-mode-skeleton-abbrev-table
+  '(
+   ))
+
+(define-abbrev-table 'restclient-mode-abbrev-table '())
+
 (define-abbrev-table 'ruby-mode-abbrev-table '())
 
 (define-abbrev-table 'scss-mode-abbrev-table '())
@@ -143,6 +174,8 @@
 (define-abbrev-table 'select-tags-table-mode-abbrev-table '())
 
 (define-abbrev-table 'sgml-mode-abbrev-table '())
+
+(define-abbrev-table 'shell-mode-abbrev-table '())
 
 (define-abbrev-table 'slim-mode-abbrev-table '())
 
@@ -158,6 +191,8 @@
 
 (define-abbrev-table 'text-mode-abbrev-table '())
 
+(define-abbrev-table 'tsv-mode-abbrev-table '())
+
 (define-abbrev-table 'url-cookie-mode-abbrev-table '())
 
 (define-abbrev-table 'use-package-statistics-mode-abbrev-table '())
@@ -167,6 +202,8 @@
 (define-abbrev-table 'vc-git-log-view-mode-abbrev-table '())
 
 (define-abbrev-table 'vc-git-region-history-mode-abbrev-table '())
+
+(define-abbrev-table 'xref--transient-buffer-mode-abbrev-table '())
 
 (define-abbrev-table 'xref--xref-buffer-mode-abbrev-table '())
 
