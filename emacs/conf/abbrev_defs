@@ -159,6 +159,7 @@
 (define-abbrev-table 'python-mode-abbrev-table
   '(
     ("assetequal" "assertEqual" nil 1)
+    ("flase" "False" nil 1)
    ))
 
 (define-abbrev-table 'python-mode-skeleton-abbrev-table
