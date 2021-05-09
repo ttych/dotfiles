@@ -622,7 +622,7 @@
 
 *** beacon
 
-    #+BEGIN_SRC emacs-lisp :tangle yes
+    #+BEGIN_SRC emacs-lisp :tangle no
       (use-package beacon
 	:ensure t
 	:config
