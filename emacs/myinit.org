@@ -686,7 +686,7 @@
       (global-set-key (kbd "<f5>") 'revert-buffer)
       (global-set-key (kbd "<f6>") 'shell)
       (global-set-key (kbd "ESC <f6>") 'term)
-      (global-set-key (kbd "<f8>") 'magit-file-popup)
+      (global-set-key (kbd "<f9>") 'magit)
       ;; kill-word
       (global-set-key (kbd "M-<deletechar>") 'kill-word)
       ;; Search <M-s>
