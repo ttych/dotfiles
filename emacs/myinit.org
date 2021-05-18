@@ -1092,6 +1092,12 @@
                   (line-beginning-position 2)))))
      #+END_SRC
 
+**** narrow / widen
+
+     #+BEGIN_SRC emacs-lisp :tangle yes
+     (put 'narrow-to-region 'disabled nil)
+     #+END_SRC
+
 *** Spelling
 **** abbrev
 
@@ -1240,6 +1246,15 @@
                ("M-] c +" . mc/mark-more-like-this-extended)
                )
         )
+    #+END_SRC
+
+*** iedit
+
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package iedit
+        :ensure t
+        :bind (("M-I" . iedit-mode))
+         )
     #+END_SRC
 
 *** Structure
