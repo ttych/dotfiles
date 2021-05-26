@@ -19,6 +19,7 @@ AUTOLOADS='
   goto.shl
   ruby_env.shl
   python_env.shl
+  pyv.sh
   wucp.shl
   myenv.shl
   git.lib.sh
