@@ -539,6 +539,13 @@
    #+END_SRC
 
 ** Display
+*** window
+    Tend to favor horizontal split.
+
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      ;; (setq split-height-threshold 80)
+      (setq split-width-threshold 140)
+    #+END_SRC
 *** Visual defaults
 
     Inhibit messages, ...
