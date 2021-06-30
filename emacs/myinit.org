@@ -4,6 +4,10 @@
 #+STARTUP: content
 
 * ToDo
+*** magit
+**** bindings:
+     magit-file-dispatch
+**** bookmark : 4 Interface Concepts
 *** org-mode
     https://www.youtube.com/watch?v=vCyBu8Az254&list=PLX2044Ew-UVV0CNIrlst0MkKbu85O7_QT
 *** emacs tutorial (Uncle Dave)
@@ -18,7 +22,6 @@
 *** ivy
 *** helm
 *** ido
-*** magit
 *** treemacs
 *** auto-complete
 *** ox-reveal
@@ -687,6 +690,7 @@
       (global-set-key (kbd "<f6>") 'shell)
       (global-set-key (kbd "ESC <f6>") 'term)
       (global-set-key (kbd "<f9>") 'magit)
+      (global-set-key (kbd "ESC <f9>") 'magit-file-dispatch)
       ;; kill-word
       (global-set-key (kbd "M-<deletechar>") 'kill-word)
       ;; Search <M-s>
@@ -2360,7 +2364,8 @@
     #+BEGIN_SRC emacs-lisp :tangle yes
       (use-package magit
         :ensure t
-        :bind (("M-] g s" . magit-status))
+        :bind (("M-] g s" . magit-status)
+               ("M-] g f" . magit-file-dispatch))
         )
       (use-package git-timemachine
         :ensure t
