@@ -38,7 +38,7 @@ yaml_inspect()
 xml_inspect()
 {
     has_ruby || return 1
-    ruby -r nokogiri -e "def pp_xml(xml='') doc = Nokogiri.XML(xml) { |config| config.default_xml.noblanks } ; puts doc.to_xml(indent: 2) ; xml ; end ; pp_xml(File.read('$1'))"
+    ruby -r nokogiri -e "def pp_xml(xml='') doc = Nokogiri.XML(xml) { |config| config.default_xml.noblanks } ; puts doc.to_xml(indent: 4) ; xml ; end ; pp_xml(File.read('$1'))"
 }
 
 
