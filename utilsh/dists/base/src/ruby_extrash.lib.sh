@@ -35,6 +35,12 @@ yaml_inspect()
     ruby  -r yaml -e "puts YAML.dump(YAML.load_file('$1'))"
 }
 
+xml_inspect()
+{
+    has_ruby || return 1
+    ruby -r nokogiri -e "def pp_xml(xml='') doc = Nokogiri.XML(xml) { |config| config.default_xml.noblanks } ; puts doc.to_xml(indent: 2) ; xml ; end ; pp_xml(File.read('$1'))"
+}
+
 
 ### main
 
