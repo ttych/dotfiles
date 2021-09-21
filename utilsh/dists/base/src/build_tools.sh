@@ -204,14 +204,6 @@ BUILD_TOOLS_XSEL_PREREQ_UBUNTU=libxt-dev
 BUILD_TOOLS_XSEL_URL_PATTERN='https://github.com/kfish/xsel/archive/${version}.tar.gz'
 BUILD_TOOLS_XSEL_DEFAULT_VERSION='1.2.0'
 
-#> redis - redis
-BUILD_TOOLS_REDIS_ENV=
-BUILD_TOOLS_REDIS_CONFIG=
-BUILD_TOOLS_REDIS_PREREQ_REDHAT=
-BUILD_TOOLS_REDIS_PREREQ_UBUNTU=
-BUILD_TOOLS_REDIS_URL_PATTERN='http://download.redis.io/releases/redis-${version}.tar.gz'
-BUILD_TOOLS_REDIS_DEFAULT_VERSION=5.0.5
-
 #> golang - golang
 BUILD_TOOLS_GOLANG_ENV=
 BUILD_TOOLS_GOLANG_CONFIG=
@@ -227,6 +219,24 @@ BUILD_TOOLS_GH_PREREQ_REDHAT=
 BUILD_TOOLS_GH_PREREQ_UBUNTU=
 BUILD_TOOLS_GH_URL_PATTERN='https://github.com/cli/cli/releases/download/v${version}/gh_${version}_${kernel_l}_${arch}.tar.gz'
 BUILD_TOOLS_GH_DEFAULT_VERSION=1.5.0
+
+#> pass - password store
+BUILD_TOOLS_PASS_ENV=
+BUILD_TOOLS_PASS_CONFIG=
+BUILD_TOOLS_PASS_PREREQ_REDHAT=
+BUILD_TOOLS_PASS_PREREQ_UBUNTU=
+BUILD_TOOLS_PASS_URL_PATTERN='https://git.zx2c4.com/password-store/snapshot/password-store-${version}.tar.xz'
+BUILD_TOOLS_PASS_DEFAULT_VERSION=1.7.4
+
+#> redis - redis
+BUILD_TOOLS_REDIS_ENV=
+BUILD_TOOLS_REDIS_CONFIG=
+BUILD_TOOLS_REDIS_PREREQ_REDHAT=
+BUILD_TOOLS_REDIS_PREREQ_UBUNTU=
+BUILD_TOOLS_REDIS_URL_PATTERN='http://download.redis.io/releases/redis-${version}.tar.gz'
+BUILD_TOOLS_REDIS_DEFAULT_VERSION=5.0.5
+
+
 
 build_tools_env()
 {

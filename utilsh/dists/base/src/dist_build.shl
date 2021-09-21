@@ -99,6 +99,15 @@ dist_build_cmake()
         eval $3 make install
 }
 
+dist_build_makefile()
+{
+    dist_build_prefix "$1" || return 1
+    dist_build_makefile="$dist_build_prefix/${PWD##*/}"
+
+    PREFIX="$dist_build_makefile" make &&
+        PREFIX="$dist_build_makefile" make install
+}
+
 dist_build_copy()
 {
     dist_build_prefix "$1" || return 1
@@ -150,6 +159,7 @@ dist_build()
             dist_build__rename="$extract__file"
         fi
     fi
+
     if [ -x configure ]; then
         dist_build_configure "$dist_build__loc" "$2" "$4"
         dist_build__ret=$?
@@ -159,12 +169,12 @@ dist_build()
     elif [ -r autogen.sh ]; then
         dist_build_autogen "$dist_build__loc" "$2" "$4"
         dist_build__ret=$?
-    elif [ -x Makefile ]; then
-        echo >&2 "Makefile based build not supported"
-        :
+    elif [ -r Makefile ]; then
+        dist_build_makefile "$dist_build__loc" "$2" "$4"
     else
         dist_build_copy "$dist_build__loc" "$2" "$dist_build__rename"
     fi
+
     rm -Rf "$_mktemp_dir"
 
     return $dist_build__ret
