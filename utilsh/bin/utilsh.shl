@@ -154,7 +154,10 @@ utilsh_distribution_build()
             utilsh_distribution_build_file "$utilsh_distribution_build__f"
         done
     else
-        find . -type f | while read utilsh_distribution_build__f; do
+        utilsh_distribution_build__d=.
+        [ -d "bin" ] &&
+            utilsh_distribution_build__d=bin
+        find "$utilsh_distribution_build__d" -type f | while read utilsh_distribution_build__f; do
             utilsh_distribution_build_chmod "$utilsh_distribution_build__f"
         done
     fi
@@ -180,7 +183,8 @@ utilsh_distribution_build_chmod()
 
     utilsh_distribution_build_chmod__right=755
     case "$1" in
-        *.lib|*.shl|*.md|*.txt) utilsh_distribution_build_chmod__right=644 ;;
+        */LICENSE|*.md|*.txt|*.tpl) utilsh_distribution_build_chmod__right=644 ;;
+        *.lib|*.shl) utilsh_distribution_build_chmod__right=644 ;;
     esac
     chmod "$utilsh_distribution_build_chmod__right" "$1"
 }
