@@ -822,6 +822,13 @@
     For mathematics, use TeX as input-method.
     Use describe-input-method to see available chars.
 
+*** movements
+
+    Retaining 1 line of context on page move:
+    #+BEGIN_SRC emacs-lisp :tangle yes
+    (setq next-screen-context-lines 1)
+    #+END_SRC
+
 *** tab vs. space
 
     #+BEGIN_SRC emacs-lisp :tangle yes
