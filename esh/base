@@ -398,7 +398,7 @@ for esh_module in terminal \
                       ssh-agent \
                       interactive
 do
-        esh_module_load "$esh_module"
+    esh_module_load "$esh_module"
 done
 
 
