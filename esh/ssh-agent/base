@@ -31,7 +31,7 @@ keychain()
     "$KEYCHAIN_DIR/keychain" "$@"
 }
 
-keychain_load()
+keychain_load_old()
 {
     [ -d "$HOME/.ssh" ] || return 1
     [ -x "$KEYCHAIN_DIR/keychain" ] || return 1
@@ -66,6 +66,54 @@ keychain_load()
 
     [ -r "$HOME/.ssh/keychain/$HOSTNAME-sh" ] && \
         . "$HOME/.ssh/keychain/$HOSTNAME-sh"
+}
+
+keychain_load_keys()
+{
+    keychain_load_keys=
+    for keyfile in "$HOME/.ssh"/*; do
+        [ -d "$keyfile" ] && continue
+        [ ! -r "$keyfile" ] && continue
+        case "${keyfile##*/}" in
+            id_*.pub) continue ;;
+            id_*) ;;
+            *) case `file -b "$keyfile"` in
+                   *" private key") ;;
+                   *) continue ;;
+               esac
+               ;;
+        esac
+        if [ "$1" != "nopassphrase" ] || ! sshkey_protected "$keyfile"; then
+            keychain_load_keys="${keychain_load_keys:+$keychain_load_keys }$keyfile"
+        fi
+    done
+
+    if [ -n "$keychain_load_keys" ]; then
+        keychain --quiet --attempts 1 --dir "$HOME/.ssh/keychain" $keychain_load_keys
+    fi
+}
+
+keychain_load()
+{
+    keychain_load__login=
+    [ "$1" = "login" ] && keychain_load__login=true
+
+    [ -r "$HOME/.ssh/keychain/$HOSTNAME-sh" ] &&
+        . "$HOME/.ssh/keychain/$HOSTNAME-sh"
+
+    keychain --dir "$HOME/.ssh/keychain" \
+             --quick --quiet --ignore-missing \
+             --noask  --nogui --nocolor || \
+        return 1
+
+    [ -r "$HOME/.ssh/keychain/$HOSTNAME-sh" ] &&
+        . "$HOME/.ssh/keychain/$HOSTNAME-sh"
+
+    if [ -n "$keychain_load__login" ]; then
+        (keychain_load_keys nopassphrase &)
+    else
+        keychain_load_keys
+    fi
 }
 
 if [ -n "$ESH_TRUSTED_HOST" ] && $ESH_TRUSTED_HOST; then
