@@ -1,0 +1,210 @@
+#+TITLE: literal emacs configuration
+#+AUTHOR: ttych
+#+DATE: 2022-02-12
+#+STARTUP: content
+
+* ToDo
+* Internal
+** debug
+   #+begin_src emacs-lisp :tangle no
+     (setq debug-on-error t)
+   #+end_src
+** debug - inheritance
+    #+begin_src emacs-lisp :tangle no
+      (defun derived-mode-parents (mode)
+        (and mode (cons mode (derived-mode-parents
+                              (get mode 'derived-mode-parent)))))
+    #+end_src
+
+    examples:
+    - (derived-mode-parents 'html-mode)
+    - (derived-mode-parents 'ruby-mode)
+    - (derived-mode-parents 'python-mode)
+    - (derived-mode-parents 'lisp-mode)
+    - (derived-mode-parents 'org-mode)
+** warn
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (setq-default
+      ad-redefinition-action (quote warn)
+      )
+   #+END_SRC
+** limits
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (setq-default
+       global-mark-ring-max 32
+       kill-ring-max 120
+       mark-ring-max 32
+       max-lisp-eval-depth 2000
+       ;; large-file-warning-threshold 100000000
+       )
+    #+END_SRC
+** proxy
+   #+begin_src emacs-lisp :tangle yes
+     (if (file-exists-p (expand-file-name (format "%s/conf/proxy.el" user-emacs-directory)))
+         (load-file (expand-file-name (format "%s/conf/proxy.el" user-emacs-directory)))
+       )
+   #+end_src
+** library - load
+   #+begin_src emacs-lisp :tangle yes
+     (setq-default
+      load-prefer-newer t
+      )
+   #+end_src
+** library - local
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (defvar elisp-dir (expand-file-name "elisp" user-emacs-directory)
+       "This directory houses packages that are not yet available in ELPA (or MELPA).")
+     (unless (file-exists-p elisp-dir)
+       (make-directory elisp-dir))
+     (add-to-list 'load-path elisp-dir)
+   #+END_SRC
+** encoding
+   #+begin_src emacs-lisp :tangle no
+     (prefer-coding-system 'utf-8)
+     (set-default-coding-systems 'utf-8)
+     (set-terminal-coding-system 'utf-8)
+     (set-keyboard-coding-system 'utf-8)
+     (set-language-environment 'utf-8)
+   #+end_src
+** packages
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (require 'package)
+     (package-initialize)
+
+     (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
+                              ("melpa" . "https://melpa.org/packages/")
+                              ("org" . "https://orgmode.org/elpa/")))
+
+     (unless package-archive-contents
+       (package-refresh-contents))
+
+     (global-set-key (kbd "C-x P") 'list-packages)
+
+     (unless (package-installed-p 'use-package)
+       (package-refresh-contents)
+       (package-install 'use-package))
+
+     (setq-default use-package-always-ensure t)
+
+     (use-package use-package-ensure-system-package :ensure t)
+   #+END_SRC
+*** delight
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package delight :ensure t)
+    #+END_SRC
+*** try
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (use-package try
+        :ensure t
+        :defer 5
+        )
+    #+END_SRC
+** server
+   #+BEGIN_SRC emacs-lisp :tangle no
+     (server-start)
+   #+END_SRC
+** daemon
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (defun client-save-kill-emacs()
+       " This is a function that can bu used to shutdown save buffers and
+         shutdown the emacs daemon. It should be called using
+         emacsclient -e '(client-save-kill-emacs)'.  This function will
+         check to see if there are any modified buffers or active clients
+         or frame.  If so an x window will be opened and the user will
+         be prompted."
+
+       (let (new-frame modified-buffers active-clients-or-frames)
+
+         ;; Check if there are modified buffers or active clients or frames.
+         (setq modified-buffers (modified-buffers-exist))
+         (setq active-clients-or-frames ( or (> (length server-clients) 1)
+                                             (> (length (frame-list)) 1)
+                                             ))
+
+         ;; When displaying the number of clients and frames:
+         ;; subtract 1 from the clients for this client.
+         ;; subtract 2 from the frames this frame (that we just created) and the default frame.
+         (when ( or (not active-clients-or-frames)
+                    (yes-or-no-p (format "There are currently %d clients and %d frames. Exit anyway?" (- (length server-clients) 1) (- (length (frame-list)) 2))))
+
+           ;; If the user quits during the save dialog then don't exit emacs.
+           ;; Still close the terminal though.
+           (let((inhibit-quit t))
+             ;; Save buffers
+             (with-local-quit
+               (save-some-buffers))
+
+             (if quit-flag
+                 (setq quit-flag nil)
+               ;; Kill all remaining clients
+               (progn
+                 (dolist (client server-clients)
+                   (server-delete-client client))
+                 ;; Exit emacs
+                 (kill-emacs)))
+             ))
+         )
+       )
+
+     (defun modified-buffers-exist()
+       "This function will check to see if there are any buffers
+         that have been modified.  It will return true if there are
+         and nil otherwise. Buffers that have buffer-offer-save set to
+         nil are ignored."
+       (let (modified-found)
+         (dolist (buffer (buffer-list))
+           (when (and (buffer-live-p buffer)
+                      (buffer-modified-p buffer)
+                      (not (buffer-base-buffer buffer))
+                      (or
+                       (buffer-file-name buffer)
+                       (progn
+                         (set-buffer buffer)
+                         (and buffer-offer-save (> (buffer-size) 0))))
+                      )
+             (setq modified-found t)
+             )
+           )
+         modified-found
+         )
+       )
+   #+END_SRC
+* mode - standard
+** buffer
+*** scratch buffer
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (defun create-scratch-buffer nil
+	"create a scratch buffer"
+	(interactive)
+	(setq bufname (generate-new-buffer-name "*scratch*"))
+	(switch-to-buffer (get-buffer-create bufname))
+	(org-mode)
+	)
+      (global-set-key (kbd "M-] b s") 'scratch)
+      (global-set-key (kbd "M-] b S") 'create-scratch-buffer)
+    #+END_SRC
+** history
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (setq-default
+      history-delete-duplicates t
+      history-length 1000
+      savehist-additional-variables '(kill-ring search-ring regexp-search-ring)
+      savehist-file (expand-file-name (format "%s/.history" user-emacs-directory))
+      savehist-save-minibuffer-history 1
+      savehist-autosave-interval (* 5 60)
+      )
+     (savehist-mode 1)
+   #+END_SRC
+** focus
+   #+BEGIN_SRC emacs-lisp :tangle no
+     (setq-default
+      help-window-select nil
+      )
+   #+END_SRC
+** UI
+   Tend to favor horizontal split.
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     ;; (setq split-height-threshold 80)
+     (setq split-width-threshold 140)
+   #+END_SRC
+

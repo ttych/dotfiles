@@ -2,12 +2,16 @@
 *.elc
 
 /myinit.el
+/conf.el
+
 /.history
 /save
 /elpa
 /games
+/eshell
+/.mc-lists.el
+/transient
 
 /snippets
 
 /conf/proxy.el
-

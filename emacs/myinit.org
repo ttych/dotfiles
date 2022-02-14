@@ -1664,6 +1664,17 @@
         :mode ("\\.ini\\'"))
     #+END_SRC
 
+*** Latex
+
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package tex
+        :defer t
+        :ensure auctex
+        :config
+        (setq TeX-auto-save t)
+        )
+    #+END_SRC
+
 *** lua
 
     #+BEGIN_SRC emacs-lisp :tangle yes
