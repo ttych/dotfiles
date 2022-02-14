@@ -44,7 +44,6 @@ GIT_VERSION=${GIT_VERSION##* }
 # git config --global --list
 # git config --system --list
 
-
 # config
 git_current_user_name=`git config --global --get user.name`
 if [ -z "$git_current_user_name" ]; then
@@ -58,6 +57,9 @@ if [ -z "$git_current_user_mail" ]; then
 fi
 
 git config --global alias.conf 'config --global -e'
+
+# default Branch
+git config --global init.defaultBranch master
 
 # color output
 git config --global color.ui true
