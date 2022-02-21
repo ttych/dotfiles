@@ -594,6 +594,7 @@
            (message "Dictionary switched from %s to %s" current-dictionary new-dictionary))
          )
 
+       (global-set-key (kbd "M-] e s") 'ispell-buffer)
        (global-set-key (kbd "M-] e d") 'my/switch-language)
 
        ;; (defun dictionary-switch()
