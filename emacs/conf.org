@@ -525,7 +525,7 @@
      According to a list of misspelled words, =abbrev= auto-correct these words on
      the fly.
 
-     #+BEGIN_SRC emacs-lisp :tangle no
+     #+BEGIN_SRC emacs-lisp :tangle yes
        (setq-default
         abbrev-file-name (expand-file-name (format "%s/conf/abbrev_defs" user-emacs-directory))
         save-abbrevs 'silent
@@ -566,14 +566,11 @@
 
      #+BEGIN_SRC emacs-lisp :tangle yes
        (setq-default
-        ispell-local-dictionary "en_US"
-        ispell-local-dictionary-alist
-        '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)
-          ("fr_FR" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "fr_FR") nil utf-8))
         ispell-dictionary "en_US"
         ispell-dictionary-alist
         '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)
           ("fr_FR" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "fr_FR") nil utf-8))
+        ispell-current-dictionary ispell-dictionary
         ispell-really-hunspell t
         ispell-silently-savep t
         ;;ispell-program-name (executable-find "hunspell")
@@ -586,9 +583,9 @@
          (let* ((current-dictionary ispell-current-dictionary)
                 (new-dictionary (if (string= current-dictionary "fr_FR") "en_US" "fr_FR")))
            (ispell-change-dictionary new-dictionary)
-           (if (string= new-dictionary "fr_FR")
-               (langtool-switch-default-language "fr")
-             (langtool-switch-default-language "en"))
+           ;; (if (string= new-dictionary "fr_FR")
+           ;;     (langtool-switch-default-language "fr")
+           ;;   (langtool-switch-default-language "en"))
 
            ;; Clears all these old errors after switching to the new language
            (if (and (boundp 'flyspell-mode) flyspell-mode)
@@ -612,10 +609,10 @@
      For the other words that would not be in my list of abbreviations, =flyspell=
      enables spell checking on-the-fly in GNU Emacs.
 
-     #+BEGIN_SRC emacs-lisp :tangle no
+     #+BEGIN_SRC emacs-lisp :tangle yes
        (setq-default
         flyspell-abbrev-p t
-        flyspell-default-dictionary "en_US"
+        flyspell-default-dictionary ispell-current-dictionary
         flyspell-issue-message-flag nil
         flyspell-issue-welcome-flag nil
         )
@@ -786,15 +783,16 @@
       ;; kmacro
       (global-set-key (kbd "C-x C-k i") 'insert-kbd-macro)
       ;; comment
+      (global-set-key (kbd "M-;") 'comment-line)
       (global-set-key (kbd "M-#") 'comment-line)
       ;; (global-set-key (kbd "M-#") 'my-comment-dwim)
 
       ;; myMenu
       (global-set-key (kbd "M-] b s") 'scratch)
       (global-set-key (kbd "M-] b S") 'create-scratch-buffer)
-      (global-set-key (kbd "M-] f s") 'bookmark-set)
-      (global-set-key (kbd "M-] f j") 'bookmark-jump)
+      (global-set-key (kbd "M-] f b") 'bookmark-jump)
       (global-set-key (kbd "M-] f l") 'bookmark-bmenu-list)
+      (global-set-key (kbd "M-] f m") 'bookmark-set)
       (global-set-key (kbd "M-] f r") 'recentf-open-files)
 
       (global-set-key (kbd "M-] m f") 'auto-fill-mode)
@@ -1400,7 +1398,9 @@
         :ensure auctex
         :defer t
         :config
-        (setq TeX-auto-save t)
+        (setq TeX-auto-save t
+              reftex-plug-into-AUCTeX t
+              )
         )
     #+END_SRC
 *** Markdown
