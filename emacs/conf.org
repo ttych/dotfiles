@@ -3,13 +3,13 @@
 #+DATE: 2022-02-12
 #+STARTUP: content
 
-* ToDo
-* Internal
-** debug
+* Configuration
+** General
+*** debug
    #+begin_src emacs-lisp :tangle no
      (setq debug-on-error t)
    #+end_src
-** debug - inheritance
+**** inheritance
     #+begin_src emacs-lisp :tangle no
       (defun derived-mode-parents (mode)
         (and mode (cons mode (derived-mode-parents
@@ -22,13 +22,13 @@
     - (derived-mode-parents 'python-mode)
     - (derived-mode-parents 'lisp-mode)
     - (derived-mode-parents 'org-mode)
-** warn
+*** warn
    #+BEGIN_SRC emacs-lisp :tangle yes
      (setq-default
       ad-redefinition-action (quote warn)
       )
    #+END_SRC
-** limits
+*** limits
     #+BEGIN_SRC emacs-lisp :tangle yes
       (setq-default
        global-mark-ring-max 32
@@ -38,19 +38,20 @@
        ;; large-file-warning-threshold 100000000
        )
     #+END_SRC
-** proxy
+*** proxy
    #+begin_src emacs-lisp :tangle yes
      (if (file-exists-p (expand-file-name (format "%s/conf/proxy.el" user-emacs-directory)))
          (load-file (expand-file-name (format "%s/conf/proxy.el" user-emacs-directory)))
        )
    #+end_src
-** library - load
+*** library
+**** load
    #+begin_src emacs-lisp :tangle yes
      (setq-default
       load-prefer-newer t
       )
    #+end_src
-** library - local
+**** local
    #+BEGIN_SRC emacs-lisp :tangle yes
      (defvar elisp-dir (expand-file-name "elisp" user-emacs-directory)
        "This directory houses packages that are not yet available in ELPA (or MELPA).")
@@ -58,7 +59,7 @@
        (make-directory elisp-dir))
      (add-to-list 'load-path elisp-dir)
    #+END_SRC
-** encoding
+*** encoding
    #+begin_src emacs-lisp :tangle no
      (prefer-coding-system 'utf-8)
      (set-default-coding-systems 'utf-8)
@@ -66,7 +67,7 @@
      (set-keyboard-coding-system 'utf-8)
      (set-language-environment 'utf-8)
    #+end_src
-** packages
+*** packages
    #+BEGIN_SRC emacs-lisp :tangle yes
      (require 'package)
      (package-initialize)
@@ -88,22 +89,17 @@
 
      (use-package use-package-ensure-system-package :ensure t)
    #+END_SRC
-*** delight
+*** yes/no
+    Replace yes/no prompts with y/n.
+
     #+BEGIN_SRC emacs-lisp :tangle yes
-      (use-package delight :ensure t)
+      (fset 'yes-or-no-p 'y-or-n-p)
     #+END_SRC
-*** try
-    #+BEGIN_SRC emacs-lisp :tangle no
-      (use-package try
-        :ensure t
-        :defer 5
-        )
-    #+END_SRC
-** server
+*** server
    #+BEGIN_SRC emacs-lisp :tangle no
      (server-start)
    #+END_SRC
-** daemon
+*** daemon
    #+BEGIN_SRC emacs-lisp :tangle yes
      (defun client-save-kill-emacs()
        " This is a function that can bu used to shutdown save buffers and
@@ -169,9 +165,8 @@
          )
        )
    #+END_SRC
-* mode - standard
-** buffer
-*** scratch buffer
+*** buffer
+**** scratch buffer
     #+BEGIN_SRC emacs-lisp :tangle yes
       (defun create-scratch-buffer nil
 	"create a scratch buffer"
@@ -180,10 +175,119 @@
 	(switch-to-buffer (get-buffer-create bufname))
 	(org-mode)
 	)
-      (global-set-key (kbd "M-] b s") 'scratch)
-      (global-set-key (kbd "M-] b S") 'create-scratch-buffer)
     #+END_SRC
-** history
+**** naming
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (setq-default
+       uniquify-buffer-name-style (quote post-forward)
+       uniquify-after-kill-buffer-p t
+       uniquify-ignore-buffers-re "^\\*"
+       ;; uniquify-separator "/"
+       )
+    #+END_SRC
+**** protected
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (defvar *protected-buffers* '("*scratch*" "*Messages*")
+        "Buffers that cannot be killed.")
+
+      (defun my/protected-buffers ()
+        "Protects some buffers from being killed."
+        (dolist (buffer *protected-buffers*)
+          (with-current-buffer buffer
+            (emacs-lock-mode 'kill))))
+
+      (add-hook 'after-init-hook #'my/protected-buffers)
+    #+END_SRC
+**** revert
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (setq-default
+       auto-revert-verbose nil
+       )
+      (global-auto-revert-mode t)
+      ;; FIXME
+      ;;  	  '(global-auto-revert-non-file-buffers t)
+    #+END_SRC
+**** ibuffer
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (setq-default
+       ibuffer-expert t
+       )
+
+      ;;  (defalias 'list-buffers 'ibuffer)
+      (global-set-key (kbd "C-x B") 'ibuffer)
+      ;;  (global-set-key (kbd "C-x B") 'ibuffer-other-window)
+    #+END_SRC    
+*** mini buffer
+**** completion
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (icomplete-mode 1)
+   #+END_SRC
+*** file
+**** auto-save to save-dir
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (defvar save-dir (expand-file-name "save/" user-emacs-directory)
+	"This folder stores all the automatically generated save/history-files.")
+      (unless (file-exists-p save-dir)
+	(make-directory save-dir))
+
+      ;; Save all tempfiles in save-dir
+      (setq-default
+       auto-save-file-name-transforms `((".*" ,save-dir t))
+       auto-save-list-file-prefix save-dir
+       )
+      ;; enable auto-save
+      (setq-default
+       auto-save-default t
+       auto-save-interval 300
+       auto-save-visited-mode nil
+       )
+    #+END_SRC
+**** backup
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (setq-default
+       make-backup-files t            ;; make backup files
+       backup-directory-alist `((".*" . ,save-dir))
+       backup-by-copying t
+       version-control t              ;; make numbered backups
+       kept-new-versions 10           ;; highest-numbered to keep
+       kept-old-versions 2            ;; lowest-numbered to keep
+       delete-old-versions t          ;; delete excess backup silently
+       vc-make-backup-files t         ;; backup also version-controlled files
+       )
+    #+END_SRC
+**** version-controlled
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (setq-default
+       vc-follow-symlinks t
+       )
+    #+END_SRC
+**** save-place
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (setq-default
+       save-place-forget-unreadable-files nil
+       save-place-file (expand-file-name "place" save-dir)
+       )
+      (save-place-mode 1)
+    #+END_SRC
+**** Bookmarks
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (setq bookmark-default-file (expand-file-name "bookmarks" save-dir)
+            bookmark-save-flag 1)
+    #+END_SRC
+**** Recent Files
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (recentf-mode 1)
+      (setq recentf-save-file (expand-file-name "recent-files" save-dir)
+            recentf-max-menu-items 50
+            recentf-max-saved-items 100
+            ;; disable recentf-cleanup on Emacs start, because it can cause
+            ;; problems with remote files
+            recentf-auto-cleanup 'never
+            )
+      ;; update list periodically, every 5 minutes
+      (run-at-time nil (* 5 60) 'recentf-save-list)
+    #+END_SRC
+*** history
    #+BEGIN_SRC emacs-lisp :tangle yes
      (setq-default
       history-delete-duplicates t
@@ -195,16 +299,1281 @@
       )
      (savehist-mode 1)
    #+END_SRC
-** focus
+*** focus
    #+BEGIN_SRC emacs-lisp :tangle no
      (setq-default
       help-window-select nil
       )
    #+END_SRC
-** UI
-   Tend to favor horizontal split.
+*** display
+**** Graphical geometry
+    Geometry in graphical mode.
+
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (setq-default
+       default-frame-alist (quote ((width . 80) (height . 45)))
+       )
+    #+END_SRC
+**** split
+    Tend to favor horizontal split.
+
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      ;; (setq split-height-threshold 80)
+      (setq split-width-threshold 140)
+    #+END_SRC
+**** Visual defaults
+    Inhibit messages, ...
+
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (setq-default
+       inhibit-startup-buffer-menu t
+       inhibit-startup-echo-area-message ""
+       inhibit-startup-screen t
+       initial-frame-alist (quote ((top . 10) (left . 30) (width . 90) (height . 50)))
+       initial-major-mode (quote org-mode)
+       initial-scratch-message nil
+       gnus-inhibit-startup-message t
+       )
+    #+END_SRC
+
+    Remove tool-bar, scroll-bar, ...
+
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (setq-default
+      ;; scroll-bar-mode nil
+       scroll-conservatively 100000
+       scroll-margin 0
+       scroll-preserve-screen-position t
+       menu-bar-mode nil
+       tool-bar-mode nil
+       )
+
+       (menu-bar-mode -1)
+       ;; (scroll-bar-mode -1)
+       (tool-bar-mode -1)
+       (tooltip-mode -1)
+    #+END_SRC
+
+    Edition information:
+
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (setq-default
+       blink-cursor-mode t
+       display-line-numbers-type (quote absolute)
+       cursor-in-non-selected-windows nil
+       global-font-lock-mode t
+       transient-mark-mode t
+       fill-column 80
+       )
+
+      (global-display-line-numbers-mode t)
+      (global-hl-line-mode t)
+      ;; (set-face-background hl-line-face "gray25")
+    #+END_SRC
+**** pagination
+    Retaining 1 line of context on page move:
+    #+BEGIN_SRC emacs-lisp :tangle yes
+    (setq next-screen-context-lines 1)
+    #+END_SRC
+**** mode line
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (setq-default
+       display-time-mode nil
+       line-number-mode t
+       column-number-mode t
+       display-battery-mode nil
+       size-indication-mode t
+       )
+    #+END_SRC
+**** fonts
+    Spending most of our time on GNU Emacs, it is important to use a font that
+    will make our reading easier.
+
+    Source Code Pro is one of the best monospaced font. Installed it with your
+    system manager.
+
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (set-face-attribute 'default nil :font "Source Code Pro Medium")
+      (set-fontset-font t 'latin "Noto Sans")
+    #+END_SRC
+*** editing
+**** input characters
+    Insert characters with C-q.
+    [[http://www.unicode.org/charts/][Unicode charts]].
+
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (setq read-quoted-char-radix 16)
+    #+END_SRC
+**** M-x set-input-method
+    For mathematics, use TeX as input-method.
+    Use describe-input-method to see available chars.
+**** tab vs. space
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (setq-default
+       tab-width 4                    ;; tab width
+       indent-tabs-mode nil           ;; indent use space only
+       backward-delete-char-untabify-method nil  ;; delete 1 char
+       tab-always-indent (quote complete)       ;; indent first, then completion
+       )
+    #+END_SRC
+**** re-enable emacs disabled feature
+    Some functionality are disabled by default. Since I used them, I
+    disable the disabled.
+
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (put 'downcase-region 'disabled nil)
+      (put 'upcase-region 'disabled nil)
+    #+END_SRC
+**** newline
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (setq-default
+       delete-selection-mode t
+       next-line-add-newlines nil
+       require-final-newline t
+       )
+    #+END_SRC
+**** empty line
+    #+BEGIN_SRC emacs-lisp :tangle yes
+    (setq-default
+      indicate-empty-lines nil
+       )
+    #+END_SRC
+**** whitespace
+    It is often annoying to see unnecessary blank spaces at the end of a line or
+    file. Let's get ride of them:
+
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (setq-default
+       whitespace-line-column 80
+       whitespace-style '(face tabs empty trailing lines-tail)
+       show-trailing-whitespace t
+       delete-trailing-lines t
+       )
+      ;; (dolist (hook '(prog-mode-hook text-mode-hook org-mode-hook))
+      ;;  (add-hook hook #'whitespace-mode))
+      (add-hook 'prog-mode-hook 'whitespace-mode)
+      (add-hook 'text-mode-hook 'whitespace-mode)
+
+      (delight 'whitespace-mode " ¬" 'whitespace)
+
+       (add-hook 'before-save-hook 'my/delete-trailing-whitespace)
+       (defun my/delete-trailing-whitespace ()
+         (when (derived-mode-p 'prog-mode)
+           (delete-trailing-whitespace)))
+    #+END_SRC
+**** completion
+***** hippe-expand
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (setq hippie-expand-try-functions-list '(try-expand-dabbrev
+                                                try-expand-dabbrev-all-buffers
+                                                try-expand-dabbrev-from-kill
+                                                try-complete-file-name-partially
+                                                try-complete-file-name
+                                                try-expand-all-abbrevs
+                                                try-expand-list
+                                                try-expand-line
+                                                try-complete-lisp-symbol-partially
+                                                try-complete-lisp-symbol))
+       (global-set-key (kbd "M-/") #'hippie-expand)
+     #+END_SRC
+**** open-line
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (defun open-line-below ()
+	(interactive)
+	(end-of-line)
+	(newline)
+	(indent-for-tab-command))
+
+      (defun open-line-above ()
+	(interactive)
+	(beginning-of-line)
+	(newline)
+	(forward-line -1)
+	(indent-for-tab-command))
+    #+END_SRC
+**** region / selection
+***** kill-region vs. kill-line
+     I find it useful to delete a line and a region with only =C-w=.
+
+     #+BEGIN_SRC emacs-lisp :tangle no
+       (defadvice kill-region (before slick-cut activate compile)
+         "When called interactively with no active region, kill a single line instead."
+         (interactive
+          (if mark-active (list (region-beginning) (region-end))
+            (list (line-beginning-position)
+                  (line-beginning-position 2)))))
+     #+END_SRC
+***** narrow / widen
+     #+BEGIN_SRC emacs-lisp :tangle no
+       (put 'narrow-to-region 'disabled nil)
+     #+END_SRC
+**** structure
+***** paren
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (setq-default
+        show-paren-delay 0
+        )
+       (show-paren-mode 1)
+     #+END_SRC
+**** auto
+***** electric-pair-mode
+    #+BEGIN_SRC emacs-lisp :tangle no
+    (add-hook 'prog-mode-hook 'electric-pair-local-mode)
+    #+END_SRC
+**** spelling
+***** abbrev
+     According to a list of misspelled words, =abbrev= auto-correct these words on
+     the fly.
+
+     #+BEGIN_SRC emacs-lisp :tangle no
+       (setq-default
+        abbrev-file-name (expand-file-name (format "%s/conf/abbrev_defs" user-emacs-directory))
+        save-abbrevs 'silent
+        abbrev-mode t
+        )
+       (if (file-exists-p abbrev-file-name)
+           (quietly-read-abbrev-file))
+
+       (global-set-key (kbd "C-x a TAB") 'expand-abbrev)
+       (global-set-key (kbd "C-x a a")   'add-mode-abbrev)
+       (global-set-key (kbd "C-x a e")   'edit-abbrevs)
+       (global-set-key (kbd "C-x a k")   'kill-all-abbrevs)
+       (global-set-key (kbd "C-x a l")   'list-abbrevs)
+       (global-set-key (kbd "C-x a s")   'write-abbrev-file)
+
+       ;; (dolist (hook '(erc-mode-hook
+       ;;                 emacs-lisp-mode-hook
+       ;;                 text-mode-hook))
+       ;; (add-hook hook #'abbrev-mode))
+
+       (delight 'abbrev-mode nil 'abbrev)
+     #+END_SRC
+***** dictionnary
+     No one is immune to spelling mistakes. So I like to check the spelling of the
+     document once it has been written. To do this, I use =hunspell=, the modern
+     spell checker.
+
+     *NOTE:* the reason I prefer =hunspell= to =aspell= is that according to the
+     latest news, hunspell has made it possible to be more consistent on fly
+     spells. However, most people still use =aspell= because it allows you to spot
+     errors in camelCase, convenient for when you program. Personally, I just want to
+     check the spelling in the comments and not in the whole document, so =hunspell= is
+     perfect for me.
+
+     To use =hunspell= and the desired dictionaries on GNU Emacs, you must first
+     install them (e.g. =hunspell-en_US=, =hunspell-fr=) with the package manager of
+     your operating system.
+
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (setq-default
+        ispell-local-dictionary "en_US"
+        ispell-local-dictionary-alist
+        '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)
+          ("fr_FR" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "fr_FR") nil utf-8))
+        ispell-dictionary "en_US"
+        ispell-dictionary-alist
+        '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)
+          ("fr_FR" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "fr_FR") nil utf-8))
+        ispell-really-hunspell t
+        ispell-silently-savep t
+        ;;ispell-program-name (executable-find "hunspell")
+        ispell-extra-args '("--sug-mode=ultra")
+        )
+
+       (defun my/switch-language ()
+         "Switches between the English and French language."
+         (interactive)
+         (let* ((current-dictionary ispell-current-dictionary)
+                (new-dictionary (if (string= current-dictionary "fr_FR") "en_US" "fr_FR")))
+           (ispell-change-dictionary new-dictionary)
+           (if (string= new-dictionary "fr_FR")
+               (langtool-switch-default-language "fr")
+             (langtool-switch-default-language "en"))
+
+           ;; Clears all these old errors after switching to the new language
+           (if (and (boundp 'flyspell-mode) flyspell-mode)
+               (flyspell-mode 0)
+             (flyspell-mode 1))
+           (message "Dictionary switched from %s to %s" current-dictionary new-dictionary))
+         )
+
+       (global-set-key (kbd "M-] e d") 'my/switch-language)
+
+       ;; (defun dictionary-switch()
+       ;;   (interactive)
+       ;;   (let* ((dic ispell-current-dictionary)
+       ;; 		 (change (if (string= dic "english") "fr_FR" "english")))
+       ;; 	(ispell-change-dictionary change)
+       ;; 	(message "Dictionary switched from %s to %s" dic change)
+       ;; 	))
+       ;; (global-set-key (kbd "M-] s d") 'dictionary-switch)
+     #+END_SRC
+***** flyspell
+     For the other words that would not be in my list of abbreviations, =flyspell=
+     enables spell checking on-the-fly in GNU Emacs.
+
+     #+BEGIN_SRC emacs-lisp :tangle no
+       (setq-default
+        flyspell-abbrev-p t
+        flyspell-default-dictionary "en_US"
+        flyspell-issue-message-flag nil
+        flyspell-issue-welcome-flag nil
+        )
+
+       ;; (dolist (hook '(text-mode-hook org-mode markdown-mode))
+       ;;   (add-hook hook (lambda () (flyspell-mode 1))))
+       ;; (dolist (hook '(change-log-mode-hook log-edit-mode-hook))
+       ;;   (add-hook hook (lambda () (flyspell-mode -1))))
+
+       ;; (dolist (hook '(prog-mode-hook))
+       ;;   (add-hook hook (lambda () (flyspell-prog-mode 1))))
+       ;; (dolist (hook '(enh-ruby-mode))
+       ;;   (add-hook hook (lambda () (flyspell-prog-mode -1))))
+
+       (add-hook 'text-mode-hook 'flyspell-mode)
+       (add-hook 'prog-mode-hook 'flyspell-prog-mode)
+
+       ;; (delight 'flyspell-mode " ϝ" 'flyspell)
+       (delight 'flyspell-mode nil 'flyspell)
+     #+END_SRC
+*** Indentation
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      ;; 2 SPACES - INDENTED - MODES
+      (defvar 2-spaces-indented-modes
+        '(ruby-mode
+          html-mode
+          yaml-mode
+          ))
+      (dolist (mode 2-spaces-indented-modes)
+        (add-hook (intern (format "%s-hook" mode))
+                  (lambda ()
+                    (setq indent-tabs-mode nil
+                          tab-width 2
+                          )
+                    )))
+
+      ;; 4 SPACES - INDENTED - MODES
+      (defvar 4-spaces-indented-modes
+        '(python-mode
+          groovy-mode
+          markdown-mode
+          ))
+      (dolist (mode 4-spaces-indented-modes)
+        (add-hook (intern (format "%s-hook" mode))
+                  (lambda ()
+                    (setq indent-tabs-mode nil
+                          tab-width 4
+                          )
+                    )))
+
+      ;; TAB 4 - INDENTED - MODES
+      (defvar tab-indented-modes
+        '(makefile-mode
+          ))
+      (dolist (mode tab-indented-modes)
+        (add-hook (intern (format "%s-hook" mode))
+                  (lambda ()
+                    (setq indent-tabs-mode t
+                          tab-width 4
+                          )
+                    )))
+    #+END_SRC
+*** dired
+   For those who didn't know, GNU Emacs is also a file explorer.
+
    #+BEGIN_SRC emacs-lisp :tangle yes
-     ;; (setq split-height-threshold 80)
-     (setq split-width-threshold 140)
+     (setq-default
+      dired-auto-revert-buffer (quote dired-directory-changed-p)
+      ;; dired-auto-revert-buffer t
+      dired-dwim-target t
+      dired-hide-details-hide-symlink-targets nil
+      dired-listing-switches "-alh"
+      dired-ls-F-marks-symlinks nil
+      dired-recursive-copies 'always
+      dired-recursive-deletes 'always
+      )
+
+     (require 'dired-x)
+
+     ;; (use-package dired-narrow
+     ;;   :bind (("C-c C-n" . dired-narrow)
+     ;;          ("C-c C-f" . dired-narrow-fuzzy)
+     ;;          ("C-c C-r" . dired-narrow-regexp)))
+
+     ;; (use-package dired-subtree
+     ;;   :bind (:map dired-mode-map
+     ;;               ("<backtab>" . dired-subtree-cycle)
+     ;;               ("<tab>" . dired-subtree-toggle)))
+   #+END_SRC
+*** midnight
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (require 'midnight)
+     (setq midnight-period 21600) ;; (eq (* 6 60 60) "6 hours")
+
+     (setq-default
+      clean-buffer-list-delay-general 2
+      clean-buffer-list-delay-special (* 24 3600)
+      clean-buffer-list-kill-buffer-names (nconc clean-buffer-list-kill-buffer-names
+						 '("*buffer-selection*"
+						   "*Finder*"
+						   "*Finder Category*"
+						   "*Finder-package*"
+						   "*RE-Builder*"
+						   "*vc-change-log*"))
+      clean-buffer-list-kill-regexps (nconc clean-buffer-list-kill-regexps
+					    '("\\`\\*Customize .*\\*\\'"
+					      "\\`\\*\\(Wo\\)?Man .*\\*\\'"))
+      clean-buffer-list-kill-never-buffer-names (nconc clean-buffer-list-kill-never-buffer-names
+						       '("*eshell*"
+							 "*ielm*"
+							 "*mail*"
+							 "*w3m*"
+							 "*w3m-cache*"))
+      clean-buffer-list-kill-never-regexps (nconc clean-buffer-list-kill-never-regexps
+						  '("\\`\\*tramp/.*\\*\\`"
+						    "\\`\\*ftp .*\\*\\`"))
+      )
+   #+END_SRC       
+*** completion
+***** ido (d) FIXME
+     #+BEGIN_SRC emacs-lisp :tangle no
+       (setq ido-everywhere t
+             ido-create-new-buffer 'always
+             ido-enable-flex-matching t
+             ido-max-window-height 1
+             ido-use-faces t
+             )
+       (ido-mode 1)
+     #+END_SRC
+*** commands
+**** macros
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (defvar macros_el
+        (expand-file-name "macros" elisp-dir))
+      (if (file-exists-p macros_el)
+          (load-file macros_el))
+    #+END_SRC
+**** bindings
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (global-set-key (kbd "<f5>") 'revert-buffer)
+      (global-set-key (kbd "<f6>") 'shell)
+      (global-set-key (kbd "ESC <f6>") 'term)
+      (global-set-key (kbd "<f8>") 'magit)
+      (global-set-key (kbd "ESC <f8>") 'magit-file-dispatch)
+      (global-set-key (kbd "<f9>") 'recentf-open-files)
+      ;; kill-word
+      (global-set-key (kbd "M-<deletechar>") 'kill-word)
+      ;; Search <M-s>
+      (global-set-key (kbd "M-s r") 'query-replace-regexp)
+      (global-set-key (kbd "M-s M-%") 'query-replace-regexp)
+      (global-set-key (kbd "M-s O") 'multi-occur)
+      (global-set-key (kbd "M-s g") 'rgrep)
+      (global-set-key (kbd "M-s f f") 'find-dired)
+      (global-set-key (kbd "M-s f n") 'find-name-dired)
+      (global-set-key (kbd "M-s f r") 'find-lisp-find-dired)
+      ;; windmove
+      (global-set-key (kbd "C-<up>") 'windmove-up)
+      (global-set-key (kbd "M-[ 1 ; 5 a") 'windmove-up)
+      (global-set-key (kbd "C-<down>") 'windmove-down)
+      (global-set-key (kbd "M-[ 1 ; 5 b") 'windmove-down)
+      (global-set-key (kbd "C-<left>") 'windmove-left)
+      (global-set-key (kbd "M-[ 1 ; 5 d") 'windmove-left)
+      (global-set-key (kbd "C-<right>") 'windmove-right)
+      (global-set-key (kbd "M-[ 1 ; 5 c") 'windmove-right)
+      ;; window
+      (global-set-key (kbd "C-x 9") 'delete-windows-on)
+      (global-set-key (kbd "C-x C-^") 'shrink-window)
+      ;; kmacro
+      (global-set-key (kbd "C-x C-k i") 'insert-kbd-macro)
+      ;; comment
+      (global-set-key (kbd "M-#") 'comment-line)
+      ;; (global-set-key (kbd "M-#") 'my-comment-dwim)
+
+      ;; myMenu
+      (global-set-key (kbd "M-] b s") 'scratch)
+      (global-set-key (kbd "M-] b S") 'create-scratch-buffer)
+      (global-set-key (kbd "M-] f s") 'bookmark-set)
+      (global-set-key (kbd "M-] f j") 'bookmark-jump)
+      (global-set-key (kbd "M-] f l") 'bookmark-bmenu-list)
+      (global-set-key (kbd "M-] f r") 'recentf-open-files)
+
+      (global-set-key (kbd "M-] m f") 'auto-fill-mode)
+      (global-set-key (kbd "M-] m l") 'display-line-numbers-mode)
+      (global-set-key (kbd "M-] m w") 'whitespace-mode)
+      (global-set-key (kbd "M-] m S") 'auto-save-mode)
+
+      (global-set-key (kbd "M-] \\") 'align-regexp)
+
+      (global-set-key (kbd "M-] <deletechar>")
+              (lambda ()
+            (interactive)
+            (join-line -1)))
+      (global-set-key (kbd "M-] M-o") 'open-line-below)
+      (global-set-key (kbd "M-] M-O") 'open-line-above)
+
+      ;; (define-key key-translation-map (kbd "M-]") (kbd "M-_"))
+    #+END_SRC
+*** local environment
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (defun load-directory (dir)
+        (let ((load-it
+               (lambda (f)
+                 (load-file (concat (file-name-as-directory dir) f)))
+               ))
+          (mapc load-it (directory-files dir nil "\\.el$"))))
+      (defvar conf-dir (expand-file-name "conf/" user-emacs-directory)
+        "conf-dir for emacs configuration directory")
+      (load-directory conf-dir)
+
+      (defvar users-settings-dir (expand-file-name "users/" conf-dir)
+        "This folder stores user specific setting.")
+      (defvar user-settings-file
+        (expand-file-name (concat user-login-name ".el")
+                          users-settings-dir))
+      (if (file-exists-p user-settings-file)
+          (load user-settings-file))
+    #+END_SRC
+*** web utils
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (setq-default
+       browse-url-browser-function 'browse-url-xdg-open
+       request-storage-directory (expand-file-name (format "%s/request/" save-dir))
+       url-cookie-file (expand-file-name (format "%s/url/cookies/" save-dir))
+       )
+    #+END_SRC
+*** calendar
+    Remembering all the dates is not obvious, especially since some varies every
+    year. In order to remember each important date, I recorded the list of important
+    dates according to my country, France. It is very likely that some dates are
+    different in your country, therefore, adapt the configuration below accordingly.
+
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (setq-default
+       calendar-week-start-day 1
+       calendar-mark-holidays-flag t
+       )
+      (setq-default
+       holiday-bahai-holidays nil
+       holiday-hebrew-holidays nil
+       holiday-islamic-holidays nil
+       holiday-oriental-holidays nil
+
+       holiday-christian-holidays
+       '((holiday-fixed 1 6 "Epiphany")
+         (holiday-fixed 2 2 "Candlemas")
+         (holiday-easter-etc -47 "Mardi Gras")
+         (holiday-easter-etc 0 "Easter Day")
+         (holiday-easter-etc 1 "Easter Monday")
+         (holiday-easter-etc 39 "Ascension")
+         (holiday-easter-etc 49 "Pentecost")
+         (holiday-fixed 8 15 "Assumption")
+         (holiday-fixed 11 1 "All Saints' Day")
+         (holiday-fixed 11 2 "Day of the Dead")
+         (holiday-fixed 12 6 "Saint Nicholas Day")
+         (holiday-fixed 12 25 "Christmas"))
+       holiday-general-holidays
+       '((holiday-fixed 1 1 "New Year's Day")
+         (holiday-fixed 2 14 "Valentine's Day")
+         (holiday-fixed 3 8 "International Women's Day")
+         (holiday-fixed 10 31 "Halloween")
+         (holiday-fixed 11 11 "Armistice of 1918"))
+       holiday-local-holidays
+       '((holiday-fixed 5 1 "Labor Day")
+         (holiday-float 3 0 0 "Grandmothers' Day")
+         (holiday-float 5 0 2 "Mother's Day")
+         (holiday-float 6 0 3 "Father's Day"))
+       )
+    #+END_SRC
+** extra
+*** delight
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package delight :ensure t)
+    #+END_SRC
+*** try (d)
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (use-package try
+        :ensure t
+        :defer 5
+        )
+    #+END_SRC
+*** which-key
+    It's difficult to remember all the keyboard shortcuts. The =which-key= package
+    helps to solve this.
+
+    I used =guide-key= in my past days, but =which-key= is a good replacement.
+
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package which-key
+        :ensure t
+        :defer 0.2
+        :delight
+        :config
+        (setq which-key-idle-delay 0.5
+              which-key-popup-type 'minibuffer
+              )
+        (which-key-mode 1)
+        ;; (which-key-setup-minibuffer)
+        )
+    #+END_SRC
+*** highlight-todo
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package hl-todo
+        :ensure t
+        :bind (("M-g T" . hl-todo-previous)
+               ("M-g t" . hl-todo-next)
+               ("M-g M-t" . hl-todo-occur))
+        :init
+        (global-hl-todo-mode)
+        :config
+        (setq hl-todo-keyword-faces
+              '(
+                ("BUG"     . "#FF0000")
+                ("TODO"    . "#FFD700")
+                ("FIXME"   . "#F2AF00")  ;; #FF4500
+                ("REFACTO" . "#0000FF")
+                ("DELETE"  . "#A020F0")
+                ("REMOVE"  . "#A020F0")
+                ))
+        ;; (add-hook 'prog-mode-hook #'hl-todo-mode 1)
+        ;; (add-hook 'text-mode-hook #'hl-todo-mode 1)
+        )
+    #+END_SRC
+*** expand-region
+     Increase region by semantic units. It tries to be smart about it and adapt to
+     the structure of the current major mode.
+
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (use-package expand-region
+         :ensure t
+         :bind (("M-_" . er/contract-region)
+                ("M-+" . er/expand-region))
+         )
+     #+END_SRC
+*** yasnippet
+    #+BEGIN_QUOTE
+    YASnippet is a template system for Emacs. It allows you to type an abbreviation
+    and automatically expand it into function templates.
+
+    [[https://github.com/joaotavora/yasnippet][João Távora]]
+    #+END_QUOTE
+
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package yasnippet
+        :ensure t
+        :delight yas-minor-mode " ϔ"
+        :bind (("M-] y n" . yas-new-snippet)
+               ("M-] y i" . yas-insert-snippet)
+               ("M-] y v" . yas-visit-snippet-file))
+        :init
+        (yas-global-mode 1)
+        )
+
+      (use-package yasnippet-snippets
+        :ensure t
+        :after yasnippet
+        :config
+        (yasnippet-snippets-initialize)
+        )
+    #+END_SRC
+*** rainbow-mode
+     Colorize colors as text with their value.
+
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (use-package rainbow-mode
+         :ensure t
+         :delight
+         :config
+         (add-hook 'prog-mode-hook 'rainbow-mode)
+         (add-hook 'text-mode-hook 'rainbow-mode)
+         )
+     #+END_SRC
+*** ace-window
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (use-package ace-window
+        :ensure t
+        :bind ([remap other-window] . ace-window)
+        :config
+        (setq aw-ignore-current t
+              aw-scope 'frame)
+        )
+    #+END_SRC
+*** htmlize
+    Save buffer in html format.
+
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package htmlize
+        :ensure t
+        )
+    #+END_SRC
+*** comment-dwim-2 (d)
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (use-package comment-dwim-2
+        :ensure t
+        :bind (("M-#" . comment-dwim-2)
+               )
+        )
+    #+END_SRC
+*** multiple-cursors (d)
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (use-package multiple-cursors
+        :ensure t
+        :bind (
+               ("M-] c e" . mc/edit-lines)
+               ("M-] c n" . mc/mark-next-like-this)
+               ("M-] c p" . mc/mark-previous-like-this)
+               ("M-] c w" . mc/mark-next-like-this-word)
+               ("M-] c W" . mc/mark-previous-like-this-word)
+               ("M-] c s" . mc/mark-next-like-this-symbol)
+               ("M-] c S" . mc/mark-previous-like-this-symbol)
+               ("M-] c c" . mc/mark-all-dwim)
+               ("M-] c a" . mc/mark-all-like-this)
+               ("M-] c r" . mc/mark-all-in-region)
+               ("M-] c +" . mc/mark-more-like-this-extended)
+               )
+        )
+    #+END_SRC
+*** grep-a-lot (d)
+     Allow multiple grep buffers.
+
+     #+BEGIN_SRC emacs-lisp :tangle no
+       (use-package grep-a-lot
+         :ensure t
+         :config
+         ;; (grep-a-lot-setup-keys)
+         )
+     #+END_SRC
+*** find-file-in-project (d)
+     From https://github.com/redguardtoo/find-file-in-project.
+
+     #+BEGIN_SRC emacs-lisp :tangle no
+      (use-package find-file-in-project
+        :ensure t
+        )
+     #+END_SRC
+
+*** beacon (d)
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (use-package beacon
+	:ensure t
+	:config
+	(beacon-mode 1)
+	)
+    #+END_SRC
+*** zoom-window (d)
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (use-package zoom-window
+        :ensure t
+        :bind (
+               ("M-] z" . zoom-window-zoom)
+               ("M-] M-z" . zoom-window-zoom)
+               )
+        :config
+        (custom-set-variables
+         '(zoom-window-mode-line-color "DarkGreen"))  ;; Darkblue
+        )
+    #+END_SRC
+*** all-the-icons (d)
+    To integrate icons with =doom-modeline=, =switch-to-buffer=, =counsel-find-file=
+    and many other functions; [[https://github.com/domtronn/all-the-icons.el/][all-the-icons]] is just the best package that you can
+    find.
+
+    *NOTE:* if it's the first time that you install the package, you must run
+    =M-x all-the-icons-install-fonts=.
+
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (use-package all-the-icons
+        :if (display-graphic-p)
+        :config (unless (find-font (font-spec :name "all-the-icons"))
+                  (all-the-icons-install-fonts t)))
+    #+END_SRC
+*** smex (d)
+     #+BEGIN_SRC emacs-lisp :tangle no
+       (use-package smex
+         :ensure t
+         :init (smex-initialize)
+         :bind (
+                ("M-x" . smex)
+                )
+         )
+     #+END_SRC
+*** helm (d)
+     #+BEGIN_SRC emacs-lisp :tangle no
+       (use-package helm
+         :ensure t
+         :init
+         (require 'helm-config)
+         (setq helm-split-window-in-side-p t
+               helm-move-to-line-cycle-in-source t)
+         :config
+         (helm-mode 1) ;; Most of Emacs prompts become helm-enabled
+         (helm-autoresize-mode 1) ;; Helm resizes according to the number of candidates
+         ;; (define-key evil-ex-map "b" 'helm-buffers-list) ;; List buffers ( Vim way )
+         ;; (global-set-key (kbd "C-x b") 'helm-buffers-list) ;; List buffers ( Emacs way )
+         ;; (global-set-key (kbd "C-x r b") 'helm-bookmarks) ;; Bookmarks menu
+         ;; (global-set-key (kbd "C-x C-f") 'helm-find-files) ;; Finding files with Helm
+         ;; (global-set-key (kbd "M-] M-c") 'helm-calcul-expression) ;; Use Helm for calculations
+         ;; (global-set-key (kbd "C-s") 'helm-occur)  ;; Replaces the default isearch keybinding
+         ;; (global-set-key (kbd "C-h a") 'helm-apropos)  ;; Helmized apropos interface
+         ;; (global-set-key (kbd "M-x") 'helm-M-x)  ;; Improved M-x menu
+         ;; (global-set-key (kbd "M-y") 'helm-show-kill-ring)  ;; Show kill ring, pick something to paste
+         :bind (
+                ("C-x b" . helm-buffers-list)
+                ("C-x r b" . helm-bookmarks)
+                ("C-x C-f" . helm-find-files)
+                ("M-] M-c" . helm-calcul-expression)
+                ("C-s"   . helm-occur)
+                ("C-h a" . helm-apropos)
+                ("M-x" . helm-M-x)
+                ("M-y" . helm-show-kill-ring)
+                )
+         )
+     #+END_SRC
+*** hungry-delete (d)
+     Deleting a whitespace character will delete all whitespace until the next
+     non-whitespace character.
+
+     [[https://github.com/nflath/hungry-delete][Nathaniel Flath]]
+
+     #+BEGIN_SRC emacs-lisp :tangle no
+       (use-package hungry-delete
+         :defer 0.7
+         :delight
+         :config (global-hungry-delete-mode))
+     #+END_SRC
+
+*** company (d)
+     =company= provides auto-completion at point and displays a small pop-in
+     containing the candidates.
+
+     #+BEGIN_QUOTE
+     Company is a text completion framework for Emacs. The name stands for "complete
+     anything". It uses pluggable back-ends and front-ends to retrieve and display
+     completion candidates.
+
+     [[http://company-mode.github.io/][Dmitry Gutov]]
+     #+END_QUOTE
+
+     #+BEGIN_SRC emacs-lisp :tangle no
+       (use-package company
+         :defer 0.5
+         :delight
+         :custom
+         (company-begin-commands '(self-insert-command))
+         (company-idle-delay 0.3)
+         (company-minimum-prefix-length 2)
+         (company-show-numbers t)
+         (company-tooltip-align-annotations 't)
+         (global-company-mode t)
+         )
+     #+END_SRC
+
+     I use =company= with =company-box= that allows a company front-end with icons.
+
+     #+BEGIN_SRC emacs-lisp :tangle no
+       (use-package company-box
+         :after company
+         :delight
+         :hook (company-mode . company-box-mode))
+     #+END_SRC
+*** iedit (d)
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (use-package iedit
+        :ensure t
+        :bind (("M-I" . iedit-mode))
+         )
+    #+END_SRC
+*** ace-jump-mode
+     #+BEGIN_SRC emacs-lisp :tangle no
+       (use-package ace-jump-mode
+         :ensure t
+         :bind (
+                ("M-s j" . ace-jump-mode)
+                ("M-s k" . ace-jump-char-mode)
+                ("M-s l" . ace-jump-line-mode)
+                ("M-s M-j" . ace-jump-mode)
+                ("M-s M-k" . ace-jump-char-mode)
+                ("M-s M-l" . ace-jump-line-mode)
+                )
+         )
+     #+END_SRC
+*** anzu
+     #+BEGIN_SRC emacs-lisp :tangle no
+       (use-package anzu
+         :ensure t
+         :delight
+         :bind (("M-%" . anzu-query-replace)
+                ("C-M-%" . anzu-query-replace-regexp))
+         :config
+         (global-anzu-mode 1)
+         )
+     #+END_SRC
+*** avy
+     #+BEGIN_SRC emacs-lisp :tangle no
+       (use-package avy
+         :ensure t
+         :bind (("M-g j" . avy-goto-char)
+                ("M-g M-j" . avy-goto-char-timer)
+                ("M-g k" . avy-goto-word-1)
+                ("M-g l" . avy-goto-line))
+         )
+     #+END_SRC
+*** highlight-indent-guides (d)
+     Highlight the indentation is a feature that visually pleases me. Indeed, without
+     having to count the spaces, I can see that the code is well indented.
+
+     #+BEGIN_SRC emacs-lisp :tangle no
+       (use-package highlight-indent-guides
+         :defer 0.3
+         :delight
+         :hook
+         (prog-mode . highlight-indent-guides-mode)
+         :custom
+         (highlight-indent-guides-method 'character)
+         )
+     #+END_SRC
+
+*** ivy (d)
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (use-package ivy-yasnippet
+        :ensure t
+        :after yasnippet
+        )
+
+       (use-package flyspell-correct-ivy
+         :ensure t
+         :after (flyspell ivy)
+         :init
+         (setq flyspell-correct-interface #'flyspell-correct-ivy)
+         )
+    #+END_SRC
+** mode - base
+*** Makefile
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (add-hook
+       'makefile-mode-hook
+       (lambda()
+         (setq indent-tabs-mode t
+               tab-width 4)
+         )
+       )
+    #+END_SRC
+*** Shell
+    Define emacs shell program from environment.
+
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (defvar emacs-shell-program (getenv "ESHELL"))
+     (if (string-equal emacs-shell-program "")
+         (setq emacs-shell-program "/bin/bash"))
    #+END_SRC
 
+    The snippet below ensures that the execution right is automatically granted to
+    save a shell script file that begins with a =#!= shebang:
+
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (defun shell-hook-common()
+        (setq-local show-trailing-whitespace nil)
+        (hl-line-mode nil)
+        (display-line-numbers-mode -1)
+        (linum-mode -1)
+        )
+
+      (add-hook 'term-mode-hook 'shell-hook-common)
+      (add-hook 'eshell-mode-hook 'shell-hook-common)
+      (add-hook 'shell-mode-hook 'shell-hook-common)
+
+      (add-to-list 'auto-mode-alist '("\\.shl\\'" . shell-script-mode))
+
+      (add-hook 'comint-output-filter-functions
+                'comint-watch-for-password-prompt)
+
+      (add-hook 'after-save-hook
+                'executable-make-buffer-file-executable-if-script-p)
+    #+END_SRC
+**** multi-term (d)
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (use-package
+        :ensure t
+        :config
+        (setq multi-term-program (format "%s -l" emacs-shell-program))
+        )
+    #+END_SRC
+*** XML
+    Associate wsdl and xsd extension with xml-mode (append at the end of the list).
+
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (setq auto-mode-alist
+            (append auto-mode-alist
+                    '(("\\.wsdl\\'" . xml-mode)
+                      ("\\.xsd\\'"  . xml-mode)))
+            )
+    #+END_SRC
+** mode - extra
+*** adoc
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package adoc-mode
+        :ensure t
+        :mode "\\.adoc\\'"
+        )
+    #+END_SRC
+
+*** CSS
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package css-mode
+        :custom (css-indent-offset 2)
+        :mode "\\.css\\'"
+        )
+
+      (use-package less-css-mode
+        :mode "\\.less\\'")
+
+      (use-package scss-mode
+        :mode "\\.scss\\'")
+    #+END_SRC
+*** CSV
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package csv-mode :ensure t)
+    #+END_SRC
+*** cucumber
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package feature-mode
+        :ensure t
+        :mode "\\.feature$"
+        )
+    #+END_SRC
+*** docbook (d)
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (use-package docbook
+        :ensure t
+        )
+    #+END_SRC
+*** dockerfile
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package dockerfile-mode
+        :delight "Dck"
+        :mode "Dockerfile\\'")
+    #+END_SRC
+*** elisp
+**** cask (d)
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (use-package cask-mode
+        :ensure t
+        :defer t
+        )
+    #+END_SRC
+*** groovy (d)
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (use-package groovy-mode
+        :ensure t
+        :mode "Jenkinsfile\\'"
+        )
+    #+END_SRC
+*** html
+**** emmet
+     Let's configure =emmet-mode=, to produce HTML from CSS-like selector:
+
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (use-package emmet-mode
+         :ensure t
+         :defer t
+         :delight
+         :hook (css-mode sgml-mode web-mode)
+         ;; :config
+         ;; (add-hook 'sgml-mode-hook #'emmet-mode) ;; on any markup modes
+         ;; (add-hook 'css-mode-hook  #'emmet-mode) ;; css abbreviation
+         )
+       ;; (use-package ac-emmet
+       ;;   :ensure t
+       ;;   :config
+       ;;   (add-hook 'sgml-mode-hook 'ac-emmet-html-setup)
+       ;;   (add-hook 'css-mode-hook 'ac-emmet-css-setup)
+       ;;   )
+     #+END_SRC
+*** INI
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package ini-mode
+        :ensure t
+        :mode ("\\.ini\\'"))
+    #+END_SRC
+*** LateX
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package tex
+        :ensure auctex
+        :defer t
+        :config
+        (setq TeX-auto-save t)
+        )
+    #+END_SRC
+*** Markdown
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package markdown-mode
+        :ensure t
+        :delight "Md"
+        :commands (markdown-mode gfm-mode)
+        :mode (("README\\.md\\'" . gfm-mode)
+               ("\\.m[k]d\\'" . markdown-mode)
+               ("\\.markdown\\'" . markdown-mode))
+        ;; :init (setq markdown-command "pandoc")
+        :custom (markdown-command "pandoc")
+        ;; :config
+        ;; (setq markdown-fontify-code-blocks-natively t)
+        )
+    #+END_SRC
+*** Puppet
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package puppet-mode
+        :ensure t
+        )
+    #+END_SRC
+*** terraform
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package terraform-mode
+        :ensure t
+        :config
+        (custom-set-variables
+         '(terraform-indent-level 2))
+        )
+    #+END_SRC
+*** YAML
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package yaml-mode
+        :ensure t
+        )
+    #+END_SRC
+** org
+   #+BEGIN_QUOTE
+   Org mode is for keeping notes, maintaining TODO lists, planning projects, and
+   authoring documents with a fast and effective plain-text system.
+
+   [[http://orgmode.org/][Carsten Dominik]]
+   #+END_QUOTE
+
+   #+BEGIN_SRC emacs-lisp :tangle yes
+  (setq-default
+   org-confirm-babel-evaluate nil
+   ;; org-startup-indented t
+   ;; org-startup-with-inline-images t
+   )
+
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '(
+     (emacs-lisp . t)
+     (python . t)
+     (ruby . t)
+     )
+   )
+
+  ;; adding special markers ‘!’ (for a timestamp) and ‘@’ (for a note) in parentheses after each keyword
+  (setq org-todo-keywords
+        '((sequence "TODO(t)" "|" "DONE(d!)")
+          (sequence "BACKLOG(b!)" "READY(r!)" "WIP(w!)" "BLOCKED(B@)" "|" "DONE(d!)" "CANCELLED(c@)"))
+        )
+  ;; (setq org-log-done 'time)
+  ;; (setq org-log-done 'note)
+
+  ;; (setq org-agenda-custom-commands
+  ;;    '(("h" "Daily habits"
+  ;;       ((agenda ""))
+  ;;       ((org-agenda-show-log t)
+  ;;        (org-agenda-ndays 7)
+  ;;        (org-agenda-log-mode-items '(state))
+  ;;        (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp ":DAILY:"))))))
+
+  (global-set-key (kbd "M-] o l") 'org-store-link)
+  (global-set-key (kbd "M-] o a") 'org-agenda)
+  (global-set-key (kbd "M-] o c") 'org-capture)
+   #+END_SRC
+*** export
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (setq
+       org-export-backends
+       (quote
+        (ascii beamer html icalendar latex man md odt org texinfo))
+       )
+    #+END_SRC
+*** org-bullets
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package org-bullets
+	:ensure t
+	:config
+	(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+	)
+    #+END_SRC
+*** org-superstar
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (use-package org-superstar
+	:ensure t
+	:config
+	(add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
+	)
+    #+END_SRC
+** utilities
+*** git
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package magit
+        :ensure t
+        :bind (("M-] g s" . magit-status)
+               ("M-] g f" . magit-file-dispatch))
+        )
+      (use-package git-timemachine
+        :ensure t
+        :bind (("M-] g t" . git-timemachine))
+        )
+    #+END_SRC
+*** ag - The Silver Searcher (d)
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (use-package ag
+	:ensure t
+	:bind (("M-s a a" . ag)
+	       ("M-s a f" . ag-files)
+	       ("M-s a r" . ag-regexp)
+	       ("M-s a p" . ag-project)
+	       ("M-s a F" . ag-project-files)
+	       ("M-s a R" . ag-project-regexp))
+	:config
+	(setq ag-highlight-search t)
+	(setq ag-reuse-window 't)
+	)
+    #+END_SRC
+** Themes
+*** railscasts-reloaded
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package railscasts-reloaded-theme
+        :ensure t
+        :init
+        (load-theme 'railscasts-reloaded t)
+        )
+    #+END_SRC
+*** zenburn
+
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (use-package zenburn-theme
+	:ensure t
+	:config
+	(load-theme 'zenburn t)
+	)
+    #+END_SRC
+
+*** dracula
+
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (use-package dracula-theme
+	:config
+	(load-theme 'dracula)
+	:ensure t
+	)
+    #+END_SRC
+
+*** doom & modeline
+
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (use-package doom-themes
+	:config (load-theme 'doom-nord t))
+
+      (use-package doom-modeline
+	:defer 0.1
+	:config (doom-modeline-mode))
+    #+END_SRC
+
+* documentation
+* ToDo
