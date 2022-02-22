@@ -634,7 +634,7 @@
        ;; (delight 'flyspell-mode " ϝ" 'flyspell)
        (delight 'flyspell-mode nil 'flyspell)
      #+END_SRC
-*** Indentation
+*** indentation
     #+BEGIN_SRC emacs-lisp :tangle yes
       ;; 2 SPACES - INDENTED - MODES
       (defvar 2-spaces-indented-modes
@@ -883,7 +883,7 @@
          (holiday-float 6 0 3 "Father's Day"))
        )
     #+END_SRC
-** extra
+** minor - extra
 *** delight
     #+BEGIN_SRC emacs-lisp :tangle yes
       (use-package delight :ensure t)
@@ -1245,7 +1245,7 @@
          (setq flyspell-correct-interface #'flyspell-correct-ivy)
          )
     #+END_SRC
-** mode - base
+** major - base
 *** Makefile
     #+BEGIN_SRC emacs-lisp :tangle yes
       (add-hook
@@ -1306,7 +1306,7 @@
                       ("\\.xsd\\'"  . xml-mode)))
             )
     #+END_SRC
-** mode - extra
+** major - extra
 *** adoc
     #+BEGIN_SRC emacs-lisp :tangle yes
       (use-package adoc-mode
