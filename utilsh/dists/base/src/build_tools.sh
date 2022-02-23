@@ -236,6 +236,13 @@ BUILD_TOOLS_REDIS_PREREQ_UBUNTU=
 BUILD_TOOLS_REDIS_URL_PATTERN='http://download.redis.io/releases/redis-${version}.tar.gz'
 BUILD_TOOLS_REDIS_DEFAULT_VERSION=5.0.5
 
+#> rg - ripgrep
+BUILD_TOOLS_RG_ENV=
+BUILD_TOOLS_RG_CONFIG=
+BUILD_TOOLS_RG_PREREQ_REDHAT=
+BUILD_TOOLS_RG_PREREQ_UBUNTU=
+BUILD_TOOLS_RG_URL_PATTERN='https://github.com/BurntSushi/ripgrep/archive/refs/tags/${version}.tar.gz'
+BUILD_TOOLS_RG_DEFAULT_VERSION=13.0.0
 
 
 build_tools_env()
