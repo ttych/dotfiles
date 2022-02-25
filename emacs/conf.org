@@ -28,6 +28,17 @@
       ad-redefinition-action (quote warn)
       )
    #+END_SRC
+*** help
+    Sort apropos by relevancy.
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (setq apropos-sort-by-score t)
+    #+END_SRC
+
+   #+begin_SRC emacs-lisp :tangle no
+     (setq-default
+      help-window-select nil
+      )
+   #+END_SRC
 *** limits
     #+BEGIN_SRC emacs-lisp :tangle yes
       (setq-default
@@ -298,12 +309,6 @@
       savehist-autosave-interval (* 5 60)
       )
      (savehist-mode 1)
-   #+END_SRC
-*** focus
-   #+BEGIN_SRC emacs-lisp :tangle no
-     (setq-default
-      help-window-select nil
-      )
    #+END_SRC
 *** display
 **** Graphical geometry
@@ -1577,4 +1582,37 @@
     #+END_SRC
 
 * documentation
+** Help
+*** Info
+    M-x info or press C-h i
+
+    | Key     | Purpose                                   |
+    |---------+-------------------------------------------|
+    | [ and ] | Previous / next node                      |
+    | l and r | Go back / forward in history              |
+    | n and p | Previous / next sibling node              |
+    | u       | Goes up one level to a parent node        |
+    | SPC     | Scroll one screen at a time               |
+    | TAB     | Cycles through cross-references and links |
+    | RET     | Opens the active link                     |
+    | m       | Prompts for a menu item name and opens it |
+    | q       | Closes the info browser                   |
+
+    look up the documentation for a command by typing C-h F
+*** Apropos
+    | Command               | Key   | Purpose                                                       |
+    |-----------------------+-------+---------------------------------------------------------------|
+    | apropos               |       | display all symbols that match a given pattern                |
+    | apropos-command       | C-h a | shows all commands that match a given pattern                 |
+    | apropos-documentation | C-h d | searches just the docstring with which you can supply symbols |
+    | apropos-library       |       | lists all variables and functions defined in a library        |
+    | apropos-user-option   |       | shows user options available through the Customize interface  |
+    | apropos-value         |       | sarches all symbols with a particular value                   |
+*** Describe
+    | Command           | Key   | Purpose                                       |
+    |-------------------+-------+-----------------------------------------------|
+    | describe-mode     | C-h m | displays the documentation for the major mode |
+    | describe-function | C-h f | describes a function (and command)            |
+    | describe-variable | C-h v | describes a variable                          |
+    | describe-key      | C-h k | describes what a key binding does             |
 * ToDo
