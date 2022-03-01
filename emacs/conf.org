@@ -401,6 +401,31 @@
       (set-face-attribute 'default nil :font "Source Code Pro Medium")
       (set-fontset-font t 'latin "Noto Sans")
     #+END_SRC
+*** movement
+    available movement
+    - s-exp      C-M- + f/b
+    - list       C-M- + u/d/n/p
+    - paragraph  M-   + {/}
+    - sentence   M-   + a/e
+    - defun      C-M- + a/e
+    - page       C-x  + [/]
+    - scrolling  C-v / M-v / C-M-v / C-M-S-v
+**** visual-line / logical-line
+     global move by visual-line (t) or by logical-line (-1)
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (global-visual-line-mode -1)
+     #+END_SRC
+
+     truncate lines
+     #+BEGIN_SRC emacs-lisp :tangle no
+       (setq-default truncate-lines nil
+             word-wrap nil)
+     #+END_SRC
+**** sentence
+     nil means a single space ends a sentence.
+     #+BEGIN_SRC emacs-lisp :tangle yes
+     (setq-default sentence-end-double-space nil)
+     #+END_SRC
 *** editing
 **** input characters
     Insert characters with C-q.
@@ -757,6 +782,8 @@
           (load-file macros_el))
     #+END_SRC
 **** bindings
+     https://www.masteringemacs.org/article/mastering-key-bindings-emacs
+
     #+BEGIN_SRC emacs-lisp :tangle yes
       (global-set-key (kbd "<f5>") 'revert-buffer)
       (global-set-key (kbd "<f6>") 'shell)
@@ -774,7 +801,10 @@
       (global-set-key (kbd "M-s f f") 'find-dired)
       (global-set-key (kbd "M-s f n") 'find-name-dired)
       (global-set-key (kbd "M-s f r") 'find-lisp-find-dired)
+      ;; window
+      ;; (global-set-key (kbd "M-o") 'other-window)
       ;; windmove
+      ;; (windmove-default-keybindings)
       (global-set-key (kbd "C-<up>") 'windmove-up)
       (global-set-key (kbd "M-[ 1 ; 5 a") 'windmove-up)
       (global-set-key (kbd "C-<down>") 'windmove-down)
@@ -796,6 +826,7 @@
       ;; myMenu
       (global-set-key (kbd "M-] b s") 'scratch)
       (global-set-key (kbd "M-] b S") 'create-scratch-buffer)
+      (global-set-key (kbd "M-] e t") 'toggle-truncate-lines)
       (global-set-key (kbd "M-] f b") 'bookmark-jump)
       (global-set-key (kbd "M-] f l") 'bookmark-bmenu-list)
       (global-set-key (kbd "M-] f m") 'bookmark-set)
@@ -1615,4 +1646,15 @@
     | describe-function | C-h f | describes a function (and command)            |
     | describe-variable | C-h v | describes a variable                          |
     | describe-key      | C-h k | describes what a key binding does             |
+** file-local variables
+   #+BEGIN_SRC
+   # / - * - mode: mode-name-here; my-variable: value - * -
+
+   or footers:
+
+   # / Local Variables :
+   # / mode : mode-name-here
+   # / my - variable : value
+   # / End :
+   #+END_SRC
 * ToDo
