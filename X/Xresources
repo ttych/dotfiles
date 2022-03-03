@@ -930,12 +930,11 @@ URxvt.perl-ext-common:          default,matcher,font-size
 ! URxvt.perl-ext-common:        ...,tabbed,...
 URxvt.urlLauncher:              xdg-open
 URxvt.matcher.button:           3
-! URxvt.keysym.Control-0x2b:      builtin-string:
-! URxvt.keysym.Control-0x2d:      builtin-string:
-! URxvt.keysym.Control-0x2d:      command:\000
-! URxvt.keysym.Control-Meta-0x2d:      perl:font-size:decrease
+URxvt.keysym.Control-0x2b:      builtin-string:
+URxvt.keysym.Control-0x2d:      builtin-string:
 URxvt.keysym.Control-Meta-0x2b:      perl:font-size:increase
 URxvt.keysym.Control-Meta-0x5f:      perl:font-size:decrease
+! URxvt.keysym.Control-Meta-0x2d:      perl:font-size:decrease
 URxvt.font:                     xft:DejaVu Sans Mono:pixelsize=10
 URxvt.boldFont:                 xft:DejaVu Sans Mono:pixelsize=10:weight=bold
 URxvt.loginShell:               True
