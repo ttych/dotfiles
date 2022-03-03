@@ -82,7 +82,7 @@ _gem_pack_1()
 
     _gem_pack_1__content=
     if [ "$_gem_pack_1" = "all" ]; then
-        for _gem_pack_1__pack in `set | egrep '^GEM_PACK_[A-Z]*=' | cut -d '=' -f 1`; do
+        for _gem_pack_1__pack in `set | egrep -a '^GEM_PACK_[A-Z]*=' | cut -d '=' -f 1`; do
             eval _gem_pack_1__content="\${_gem_pack_1__content:+$_gem_pack_1__content }\$$_gem_pack_1__pack"
         done
     else
