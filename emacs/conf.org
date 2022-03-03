@@ -49,6 +49,19 @@
        ;; large-file-warning-threshold 100000000
        )
     #+END_SRC
+*** message
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (defun no-msg (function)
+        "Prevent FUNCTION from showing `Wrote <FILE>' messages.
+         (The messages are still logged to `*Messages*'.)"
+        (let ((inhibit-message  t))
+          (funcall function)))
+    #+END_SRC
+    To add:
+    (advice-add 'recentf-save-list :around 'no-msg)
+
+    To remove:
+    (advice-remove 'recentf-save-list 'no-msg)
 *** proxy
    #+begin_src emacs-lisp :tangle yes
      (if (file-exists-p (expand-file-name (format "%s/conf/proxy.el" user-emacs-directory)))
@@ -286,18 +299,25 @@
             bookmark-save-flag 1)
     #+END_SRC
 **** Recent Files
-    #+BEGIN_SRC emacs-lisp :tangle yes
-      (recentf-mode 1)
-      (setq recentf-save-file (expand-file-name "recent-files" save-dir)
-            recentf-max-menu-items 50
-            recentf-max-saved-items 100
-            ;; disable recentf-cleanup on Emacs start, because it can cause
-            ;; problems with remote files
-            recentf-auto-cleanup 'never
-            )
-      ;; update list periodically, every 5 minutes
-      (run-at-time nil (* 5 60) 'recentf-save-list)
-    #+END_SRC
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (setq recentf-save-file (expand-file-name "recent-files" save-dir)
+             recentf-max-menu-items 50
+             recentf-max-saved-items 100
+             ;; disable recentf-cleanup on Emacs start, because it can cause
+             ;; problems with remote files
+             ;; recentf-auto-cleanup 'never
+             recentf-auto-cleanup 10
+             recentf-exclude '("^/var/folders\\.*"
+                               "[/\\]\\.elpa/"
+                               "COMMIT_EDITMSG\\'"
+                               "\\TODO_archive\\'")
+             )
+       (recentf-mode 1)
+       ;; update list periodically, every 5 minutes
+       (run-at-time nil (* 5 60) 'recentf-save-list)
+       (advice-add 'recentf-save-list :around 'no-msg)
+       (advice-add 'recentf-cleanup :around 'no-msg)
+     #+END_SRC
 *** history
    #+BEGIN_SRC emacs-lisp :tangle yes
      (setq-default
@@ -425,6 +445,10 @@
      nil means a single space ends a sentence.
      #+BEGIN_SRC emacs-lisp :tangle yes
      (setq-default sentence-end-double-space nil)
+     #+END_SRC
+**** scoll left/right
+     #+BEGIN_SRC emacs-lisp :tangle yes
+     (put 'scroll-left 'disabled nil)
      #+END_SRC
 *** editing
 **** input characters
@@ -826,7 +850,7 @@
       ;; myMenu
       (global-set-key (kbd "M-] b s") 'scratch)
       (global-set-key (kbd "M-] b S") 'create-scratch-buffer)
-      (global-set-key (kbd "M-] e t") 'toggle-truncate-lines)
+      (global-set-key (kbd "M-] b c") 'scratch)
       (global-set-key (kbd "M-] f b") 'bookmark-jump)
       (global-set-key (kbd "M-] f l") 'bookmark-bmenu-list)
       (global-set-key (kbd "M-] f m") 'bookmark-set)
@@ -836,6 +860,7 @@
       (global-set-key (kbd "M-] m l") 'display-line-numbers-mode)
       (global-set-key (kbd "M-] m w") 'whitespace-mode)
       (global-set-key (kbd "M-] m S") 'auto-save-mode)
+      (global-set-key (kbd "M-] m t") 'toggle-truncate-lines)
 
       (global-set-key (kbd "M-] \\") 'align-regexp)
 
