@@ -183,8 +183,9 @@ utilsh_distribution_build_chmod()
 
     utilsh_distribution_build_chmod__right=755
     case "$1" in
-        */LICENSE|*.md|*.txt|*.tpl) utilsh_distribution_build_chmod__right=644 ;;
-        *.lib|*.shl) utilsh_distribution_build_chmod__right=644 ;;
+        */LICENSE|*.md|*.txt|*.tpl|*.org) utilsh_distribution_build_chmod__right=644 ;;
+        *.lib) utilsh_distribution_build_chmod__right=644 ;;
+        *.sh|*.shl) utilsh_distribution_build_chmod__right=755 ;;
     esac
     chmod "$utilsh_distribution_build_chmod__right" "$1"
 }
