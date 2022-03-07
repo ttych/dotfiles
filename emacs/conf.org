@@ -450,6 +450,37 @@
      #+BEGIN_SRC emacs-lisp :tangle yes
      (put 'scroll-left 'disabled nil)
      #+END_SRC
+**** mark
+     | Key               | Purpose                     |
+     |-------------------+-----------------------------|
+     | M-h               | Marks the next paragraph    |
+     | C-x h             | Marks the whole buffer      |
+     | C-M-h             | Marks the next defun        |
+     | C-x C-p           | Marks the next page         |
+     | M-@               | Marks the next word         |
+     | C-M-<SPC> , C-M-@ | Marks the next s-expression |
+     | C-<SPC> , C-g     | Deactivates the region      |
+***** selection compatibility
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (setq-default
+        delete-selection-mode t
+        shift-select-mode t
+        )
+     #+END_SRC
+***** Common User Access
+      #+BEGIN_SRC emacs-lisp :tangle no
+        (setq-default
+         cua-mode t
+         )
+      #+END_SRC
+**** search
+     | Key   | Purpose                            |
+     |-------+------------------------------------|
+     | C-s   | incremental search                 |
+     | C-r   | backward incremental search        |
+     | C-M-s | regexp incremental search          |
+     | C-M-r | regexp backward incremental search |
+     | RET   | pick the selected match            |
 *** editing
 **** input characters
     Insert characters with C-q.
@@ -481,7 +512,6 @@
 **** newline
     #+BEGIN_SRC emacs-lisp :tangle yes
       (setq-default
-       delete-selection-mode t
        next-line-add-newlines nil
        require-final-newline t
        )
