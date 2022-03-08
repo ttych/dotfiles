@@ -1,0 +1,6 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+ps_forest() {
+    ps --forest -o pid,tty,stat,time,cmd -T -g $(ps -o sid= -p "$1")
+}
