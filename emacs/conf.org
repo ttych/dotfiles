@@ -474,13 +474,40 @@
          )
       #+END_SRC
 **** search
-     | Key   | Purpose                            |
-     |-------+------------------------------------|
-     | C-s   | incremental search                 |
-     | C-r   | backward incremental search        |
-     | C-M-s | regexp incremental search          |
-     | C-M-r | regexp backward incremental search |
-     | RET   | pick the selected match            |
+     | Key   | Purpose                             |
+     |-------+-------------------------------------|
+     | C-s   | incremental search                  |
+     | C-r   | backward incremental search         |
+     | C-M-s | regexp incremental search           |
+     | C-M-r | regexp backward incremental search  |
+     | RET   | pick the selected match             |
+     | M-s w | Isearch forward for word            |
+     | M-s _ | Isearch forward for symbol          |
+     | M-s . | Isearch forward for symbol at point |
+     |-------+-------------------------------------|
+     | M-s o | occur                               |
+
+     | Isearch Key | Purpose                                                |
+     |-------------+--------------------------------------------------------|
+     | M-n         | Move to next item in search history                    |
+     | M-p         | Move to previous item in search history                |
+     | C-M-i       | “TAB”-complete search string                           |
+     | C-s C-s     | Begins Isearch against last search string              |
+     | C-r C-r     | Begins backward Isearch against last search string     |
+     |-------------+--------------------------------------------------------|
+     | C-w         | Add word at point to search string                     |
+     | C-M-y       | Add character at point to search string                |
+     | M-s C-e     | Add rest of line at point to search string             |
+     | C-y         | Yank from clipboard to search string                   |
+     |-------------+--------------------------------------------------------|
+     | M-s c       | Toggles case-sensitivity                               |
+     | M-s r       | Toggles regular-expression mode                        |
+     | M-s w       | Toggles word mode                                      |
+     | M-s _       | Toggles symbol mode                                    |
+     | M-s <SPC>   | Toggles lax whitespace matching                        |
+     | M-s '       | Toggles character folding                              |
+     |-------------+--------------------------------------------------------|
+     | M-s o       | Activate occur on current search string inside Isearch |
 *** editing
 **** input characters
     Insert characters with C-q.
