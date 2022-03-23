@@ -78,7 +78,7 @@ default_dark.*.color15:      #f5f5f5
 ! ---------- 3024_dark
 3024_dark.*.title: term
 ! special
-3024_dark.*.foreground:   #d0d0d0
+3024_dark.*.foreground:   #a5a2a2
 3024_dark.*.background:   #090300
 3024_dark.*.cursorColor:  #a5a2a2
 ! black
