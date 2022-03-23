@@ -17,7 +17,7 @@
 *.scrollBar:                    false
 *.scrollbar.width:              8
 *.jumpScroll:                   true
-*.geometry:                     84x24
+! *.geometry:                     84x24
 *.cursorBlink:                  false
 
 
@@ -44,6 +44,7 @@
 ! - twilight_dark
 
 ! ---------- default_dark (+)
+default_dark.*.title: term
 ! special
 default_dark.*.foreground:   #d0d0d0
 default_dark.*.background:   #151515
@@ -74,6 +75,7 @@ default_dark.*.color7:       #d0d0d0
 default_dark.*.color15:      #f5f5f5
 
 ! ---------- 3024_dark
+3024_dark.*.title: term
 ! special
 3024_dark.*.foreground:   #d0d0d0
 3024_dark.*.background:   #090300
@@ -812,6 +814,7 @@ xclock*twentyfour:			true
 
 ! ---------- xterm
 ! - https://aduros.com/blog/xterm-its-better-than-you-thought
+! - https://invisible-island.net/xterm/xterm.faq.html#tiny_menus
 xterm*name:                     xTerm
 xterm*cutNewline:               false
 xterm*colorMode:                true
@@ -857,7 +860,7 @@ XTerm.vt100.locale:             true
 XTerm.vt100.metaSendsEscape:    true
 XTerm.vt100.backarrowKey:       false
 XTerm.ttyModes:                 erase ^?
-XTerm.vt100.geometry:           80x24
+XTerm*vt100.geometry:           80x24
 ! XTerm.vt100.bellIsUrgent:       true
 XTerm*faceSize: 8
 XTerm*renderFont: true
