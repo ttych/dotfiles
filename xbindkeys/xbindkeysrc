@@ -35,7 +35,7 @@
 
 
 
-#xbindkeys show 
+#xbindkeys show
 "xbindkeys_show"
     m:0x41 + c:45
     Shift+Mod4 + k 
@@ -71,12 +71,12 @@
     Shift+Mod4 + l 
 
 #xterm1
-"xterm -name 3024_dark"
+"xterm -name default_dark"
     m:0x40 + c:53
     Mod4 + x 
 
 #xterm2
-"xterm -name default_dark"
+"xterm -name 3024_dark"
     m:0x41 + c:53
     Shift+Mod4 + x 
 
