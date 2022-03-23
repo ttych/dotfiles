@@ -294,6 +294,12 @@
       (save-place-mode 1)
     #+END_SRC
 **** Bookmarks
+     | Key     | Purpose          |
+     |---------+------------------|
+     | C-x r m | Set a bookmark   |
+     | C-x r l | List bookmarks   |
+     | C-x r b | Jump to bookmark |
+
     #+BEGIN_SRC emacs-lisp :tangle yes
       (setq bookmark-default-file (expand-file-name "bookmarks" save-dir)
             bookmark-save-flag 1)
@@ -330,6 +336,17 @@
       )
      (savehist-mode 1)
    #+END_SRC
+*** register
+    | Key       | Purpose                                |
+    |-----------+----------------------------------------|
+    | C-x r n   | Store number in register               |
+    | C-x r s   | Store region in register               |
+    | C-x r SPC | Store point in register                |
+    | C-x r +   | Increment number in register           |
+    | C-x r j   | Jump to register                       |
+    | C-x r i   | Insert content of register             |
+    | C-x r w   | Store window configuration in register |
+    | C-x r f   | Store frameset in register             |
 *** display
 **** Graphical geometry
     Geometry in graphical mode.
@@ -422,14 +439,40 @@
       (set-fontset-font t 'latin "Noto Sans")
     #+END_SRC
 *** movement
-    available movement
-    - s-exp      C-M- + f/b
-    - list       C-M- + u/d/n/p
-    - paragraph  M-   + {/}
-    - sentence   M-   + a/e
-    - defun      C-M- + a/e
-    - page       C-x  + [/]
-    - scrolling  C-v / M-v / C-M-v / C-M-S-v
+    | Key     | Purpose                             |
+    |---------+-------------------------------------|
+    | C-M-f   | Move forward by s-expression        |
+    | C-M-b   | Move backward by s-expression       |
+    | C-M-k   | kill-sexp                           |
+    |---------+-------------------------------------|
+    | C-M-d   | Move down into a list               |
+    | C-M-u   | Move up out of a list               |
+    | C-M-n   | Move forward to the next list       |
+    | C-M-p   | Move backward to the previous list  |
+    |---------+-------------------------------------|
+    | M-}     | Move forward to end of paragraph    |
+    | M-{     | Move backward to start of paragraph |
+    |---------+-------------------------------------|
+    | M-a     | Move to beginning of sentence       |
+    | M-e     | Move to end of sentence             |
+    |---------+-------------------------------------|
+    | C-M-a   | Move to beginning of defun          |
+    | C-M-e   | Move to end of defun                |
+    |---------+-------------------------------------|
+    | C-x ]   | Moves forward one page              |
+    | C-x [   | Moves backward one page             |
+    |---------+-------------------------------------|
+
+    | Key         | Purpose                                                               |
+    |-------------+-----------------------------------------------------------------------|
+    | M-r         | Re-positions the point to the top left, middle left, or bottom left   |
+    | C-l         | Re-centers the point to the middle, top, or bottom in the buffer      |
+    | C-M-l       | Re-positions the comment or definition so it is in view in the buffer |
+    | C-x C-n     | Sets the goal column, the horizontal position for the point           |
+    | C-u C-x C-n | Resets the goal column, the horizontal position for the point         |
+    | M-g M-g     | Go to line                                                            |
+    | M-g TAB     | Go to column                                                          |
+    | M-g c       | Go to character position                                              |
 **** visual-line / logical-line
      global move by visual-line (t) or by logical-line (-1)
      #+BEGIN_SRC emacs-lisp :tangle yes
@@ -437,16 +480,35 @@
      #+END_SRC
 
      truncate lines
-     #+BEGIN_SRC emacs-lisp :tangle no
-       (setq-default truncate-lines nil
-             word-wrap nil)
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (setq-default
+        truncate-lines nil
+        word-wrap nil)
      #+END_SRC
+**** subword / superword
+     (global-)subword-mode: Minor mode that treats CamelCase as distinct words
+     (global-)superword-mode: Minor mode that treats snake_case as one word
 **** sentence
      nil means a single space ends a sentence.
      #+BEGIN_SRC emacs-lisp :tangle yes
      (setq-default sentence-end-double-space nil)
      #+END_SRC
-**** scoll left/right
+**** scoll
+     | Key       | Purpose                             |
+     |-----------+-------------------------------------|
+     | C-v       | Scroll down a near full screen      |
+     | M-v       | Scroll up a near full screen        |
+     | C-M-v     | Scroll down the other window        |
+     | C-M-S-v   | Scroll up the other window          |
+     |-----------+-------------------------------------|
+     | C-x <     | Scroll left                         |
+     | C-<next>  | Scroll left                         |
+     | C-<prior> | Scroll right                        |
+     | C-x >     | Scroll right                        |
+     |-----------+-------------------------------------|
+     | M-<       | Move to the beginning of the buffer |
+     | M->       | Move to the end of the buffer       |
+
      #+BEGIN_SRC emacs-lisp :tangle yes
      (put 'scroll-left 'disabled nil)
      #+END_SRC
@@ -481,11 +543,11 @@
      | C-M-s | regexp incremental search           |
      | C-M-r | regexp backward incremental search  |
      | RET   | pick the selected match             |
+     |-------+-------------------------------------|
      | M-s w | Isearch forward for word            |
      | M-s _ | Isearch forward for symbol          |
      | M-s . | Isearch forward for symbol at point |
      |-------+-------------------------------------|
-     | M-s o | occur                               |
 
      | Isearch Key | Purpose                                                |
      |-------------+--------------------------------------------------------|
@@ -508,6 +570,42 @@
      | M-s '       | Toggles character folding                              |
      |-------------+--------------------------------------------------------|
      | M-s o       | Activate occur on current search string inside Isearch |
+
+***** occur
+      | Key   | Purpose |
+      |-------+---------|
+      | M-s o | occur   |
+
+      | Occur Key | Purpose                                          |
+      |-----------+--------------------------------------------------|
+      | M-n , M-p | Go to next and previous occurrence               |
+      | < , >     | Go to beginning and end of buffer                |
+      | g         | Revert the buffer, refreshing the search results |
+      | q         | Quits occur mode                                 |
+      | e         | Switches to occur edit mode                      |
+      | C-c C-c   | Exits occur edit mode and applies changes        |
+***** character folding
+      enable character folding by default or use (M-s ')
+
+     #+BEGIN_SRC emacs-lisp :tangle no
+       (setq-default
+        search-default-mode 'char-fold-to-regexp)
+     #+END_SRC
+**** grep
+     | Command       | Purpose                                                                         |
+     |---------------+---------------------------------------------------------------------------------|
+     | M-x grep      | Prompts for arguments to pass to grep                                           |
+     | M-x grep-find | Prompts for arguments to pass to grep and find                                  |
+     | M-x lgrep     | Prompts for query and glob pattern to search for with grep                      |
+     | M-x rgrep     | Prompts for query and glob pattern then recursively searches with grep and find |
+     | M-x rzgrep    | Like M-x rgrep but searches compressed gzip files                               |
+
+     Key Binding Purpose
+M-g M-n
+M-g M-p
+Jump to next match
+Jump to previous match
+
 *** editing
 **** input characters
     Insert characters with C-q.
@@ -844,8 +942,18 @@
       )
    #+END_SRC       
 *** completion
-***** ido (d) FIXME
-     #+BEGIN_SRC emacs-lisp :tangle no
+***** ido
+      | ido Key   | Purpose                                    |
+      |-----------+--------------------------------------------|
+      | C-s , C-r | Move to the next and previous match        |
+      | TAB       | Traditional non-IDO TAB-completion         |
+      | RET       | Open selected match                        |
+      | C-d       | Open M-x dired buffer in current directory |
+      | //        | Go to root directory /                     |
+      | ~/        | Go to home directory ~                     |
+      | Backspace | Delete a character or go up one directory  |
+
+      #+BEGIN_SRC emacs-lisp :tangle no
        (setq ido-everywhere t
              ido-create-new-buffer 'always
              ido-enable-flex-matching t
@@ -872,28 +980,32 @@
       (global-set-key (kbd "<f8>") 'magit)
       (global-set-key (kbd "ESC <f8>") 'magit-file-dispatch)
       (global-set-key (kbd "<f9>") 'recentf-open-files)
+      (global-set-key (kbd "M-i") 'imenu)
       ;; kill-word
       (global-set-key (kbd "M-<deletechar>") 'kill-word)
       ;; Search <M-s>
       (global-set-key (kbd "M-s r") 'query-replace-regexp)
       (global-set-key (kbd "M-s M-%") 'query-replace-regexp)
-      (global-set-key (kbd "M-s O") 'multi-occur)
+      ;; (global-set-key (kbd "M-s O") 'multi-occur)
+      (global-set-key (kbd "M-s O") 'multi-occur-in-matching-buffers)
       (global-set-key (kbd "M-s g") 'rgrep)
       (global-set-key (kbd "M-s f f") 'find-dired)
       (global-set-key (kbd "M-s f n") 'find-name-dired)
       (global-set-key (kbd "M-s f r") 'find-lisp-find-dired)
       ;; window
-      ;; (global-set-key (kbd "M-o") 'other-window)
+      (global-set-key (kbd "M-o") 'other-window)
       ;; windmove
-      ;; (windmove-default-keybindings)
-      (global-set-key (kbd "C-<up>") 'windmove-up)
-      (global-set-key (kbd "M-[ 1 ; 5 a") 'windmove-up)
-      (global-set-key (kbd "C-<down>") 'windmove-down)
-      (global-set-key (kbd "M-[ 1 ; 5 b") 'windmove-down)
-      (global-set-key (kbd "C-<left>") 'windmove-left)
-      (global-set-key (kbd "M-[ 1 ; 5 d") 'windmove-left)
-      (global-set-key (kbd "C-<right>") 'windmove-right)
-      (global-set-key (kbd "M-[ 1 ; 5 c") 'windmove-right)
+      (windmove-default-keybindings)
+      (global-set-key (kbd "M-[ 1 ; 2 A") 'windmove-up)
+      (global-set-key (kbd "M-[ 1 ; 2 B") 'windmove-down)
+      ;; (global-set-key (kbd "C-<up>") 'windmove-up)
+      ;; (global-set-key (kbd "M-[ 1 ; 5 a") 'windmove-up)
+      ;; (global-set-key (kbd "C-<down>") 'windmove-down)
+      ;; (global-set-key (kbd "M-[ 1 ; 5 b") 'windmove-down)
+      ;; (global-set-key (kbd "C-<left>") 'windmove-left)
+      ;; (global-set-key (kbd "M-[ 1 ; 5 d") 'windmove-left)
+      ;; (global-set-key (kbd "C-<right>") 'windmove-right)
+      ;; (global-set-key (kbd "M-[ 1 ; 5 c") 'windmove-right)
       ;; window
       (global-set-key (kbd "C-x 9") 'delete-windows-on)
       (global-set-key (kbd "C-x C-^") 'shrink-window)
@@ -922,9 +1034,9 @@
       (global-set-key (kbd "M-] \\") 'align-regexp)
 
       (global-set-key (kbd "M-] <deletechar>")
-              (lambda ()
-            (interactive)
-            (join-line -1)))
+                      (lambda ()
+                        (interactive)
+                        (join-line -1)))
       (global-set-key (kbd "M-] M-o") 'open-line-below)
       (global-set-key (kbd "M-] M-O") 'open-line-above)
 
@@ -1114,6 +1226,30 @@
               aw-scope 'frame)
         )
     #+END_SRC
+*** ace-jump-mode
+     #+BEGIN_SRC emacs-lisp :tangle no
+       (use-package ace-jump-mode
+         :ensure t
+         :bind (
+                ("M-s j" . ace-jump-mode)
+                ("M-s k" . ace-jump-char-mode)
+                ("M-s l" . ace-jump-line-mode)
+                ("M-s M-j" . ace-jump-mode)
+                ("M-s M-k" . ace-jump-char-mode)
+                ("M-s M-l" . ace-jump-line-mode)
+                )
+         )
+     #+END_SRC
+*** avy
+     #+BEGIN_SRC emacs-lisp :tangle no
+       (use-package avy
+         :ensure t
+         :bind (("M-g j" . avy-goto-char)
+                ("M-g M-j" . avy-goto-char-timer)
+                ("M-g k" . avy-goto-word-1)
+                ("M-g l" . avy-goto-line))
+         )
+     #+END_SRC
 *** htmlize
     Save buffer in html format.
 
@@ -1122,6 +1258,71 @@
         :ensure t
         )
     #+END_SRC
+*** anzu
+     #+BEGIN_SRC emacs-lisp :tangle no
+       (use-package anzu
+         :ensure t
+         :delight
+         :bind (("M-%" . anzu-query-replace)
+                ("C-M-%" . anzu-query-replace-regexp))
+         :config
+         (global-anzu-mode 1)
+         )
+     #+END_SRC
+*** helm
+    | Helm Key  | Purpose                              |
+    |-----------+--------------------------------------|
+    | RET       | Primary action                       |
+    | C-e       | Secondary action                     |
+    | C-j       | Tertiary action                      |
+    | TAB       | Switch to action selector            |
+    | C-n , C-p | Next and previous candidate          |
+    | M-< , M-> | Beginning and end of completion list |
+
+    | Key         | Purpose                                                                        |
+    |-------------+--------------------------------------------------------------------------------|
+    | C-x c b     | Resumes last Helm command                                                      |
+    | C-x c /     | Invokes the command line utility find on the active buffer’s current directory |
+    | C-x c a     | Completes M-x apropos results                                                  |
+    | C-x c m     | Completion engine for the man page program                                     |
+    | C-x c i     | Lists completions sourced from M-x imenu or Semantic                           |
+    | C-x c r     | Interactive regular expression builder                                         |
+    | C-x c h r   | Search Emacs topics in M-x info                                                |
+    | C-x c M-x   | List completions sourced from M-x                                              |
+    | C-x c M-s o | Use Helm to match M-x occur patterns                                           |
+    | C-x c C-c g | Show matches from Google Suggest                                               |
+
+     #+BEGIN_SRC emacs-lisp :tangle no
+       (use-package helm
+         :ensure t
+         :init
+         (require 'helm-config)
+         (setq helm-split-window-in-side-p t
+               helm-move-to-line-cycle-in-source t)
+         :config
+         (helm-mode 1) ;; Most of Emacs prompts become helm-enabled
+         (helm-autoresize-mode 1) ;; Helm resizes according to the number of candidates
+         ;; (define-key evil-ex-map "b" 'helm-buffers-list) ;; List buffers ( Vim way )
+         ;; (global-set-key (kbd "C-x b") 'helm-buffers-list) ;; List buffers ( Emacs way )
+         ;; (global-set-key (kbd "C-x r b") 'helm-bookmarks) ;; Bookmarks menu
+         ;; (global-set-key (kbd "C-x C-f") 'helm-find-files) ;; Finding files with Helm
+         ;; (global-set-key (kbd "M-] M-c") 'helm-calcul-expression) ;; Use Helm for calculations
+         ;; (global-set-key (kbd "C-s") 'helm-occur)  ;; Replaces the default isearch keybinding
+         ;; (global-set-key (kbd "C-h a") 'helm-apropos)  ;; Helmized apropos interface
+         ;; (global-set-key (kbd "M-x") 'helm-M-x)  ;; Improved M-x menu
+         ;; (global-set-key (kbd "M-y") 'helm-show-kill-ring)  ;; Show kill ring, pick something to paste
+         :bind (
+                ("C-x b" . helm-buffers-list)
+                ("C-x r b" . helm-bookmarks)
+                ("C-x C-f" . helm-find-files)
+                ("M-] M-c" . helm-calcul-expression)
+                ("C-s"   . helm-occur)
+                ("C-h a" . helm-apropos)
+                ("M-x" . helm-M-x)
+                ("M-y" . helm-show-kill-ring)
+                )
+         )
+     #+END_SRC
 *** comment-dwim-2 (d)
     #+BEGIN_SRC emacs-lisp :tangle no
       (use-package comment-dwim-2
@@ -1213,38 +1414,6 @@
                 )
          )
      #+END_SRC
-*** helm (d)
-     #+BEGIN_SRC emacs-lisp :tangle no
-       (use-package helm
-         :ensure t
-         :init
-         (require 'helm-config)
-         (setq helm-split-window-in-side-p t
-               helm-move-to-line-cycle-in-source t)
-         :config
-         (helm-mode 1) ;; Most of Emacs prompts become helm-enabled
-         (helm-autoresize-mode 1) ;; Helm resizes according to the number of candidates
-         ;; (define-key evil-ex-map "b" 'helm-buffers-list) ;; List buffers ( Vim way )
-         ;; (global-set-key (kbd "C-x b") 'helm-buffers-list) ;; List buffers ( Emacs way )
-         ;; (global-set-key (kbd "C-x r b") 'helm-bookmarks) ;; Bookmarks menu
-         ;; (global-set-key (kbd "C-x C-f") 'helm-find-files) ;; Finding files with Helm
-         ;; (global-set-key (kbd "M-] M-c") 'helm-calcul-expression) ;; Use Helm for calculations
-         ;; (global-set-key (kbd "C-s") 'helm-occur)  ;; Replaces the default isearch keybinding
-         ;; (global-set-key (kbd "C-h a") 'helm-apropos)  ;; Helmized apropos interface
-         ;; (global-set-key (kbd "M-x") 'helm-M-x)  ;; Improved M-x menu
-         ;; (global-set-key (kbd "M-y") 'helm-show-kill-ring)  ;; Show kill ring, pick something to paste
-         :bind (
-                ("C-x b" . helm-buffers-list)
-                ("C-x r b" . helm-bookmarks)
-                ("C-x C-f" . helm-find-files)
-                ("M-] M-c" . helm-calcul-expression)
-                ("C-s"   . helm-occur)
-                ("C-h a" . helm-apropos)
-                ("M-x" . helm-M-x)
-                ("M-y" . helm-show-kill-ring)
-                )
-         )
-     #+END_SRC
 *** hungry-delete (d)
      Deleting a whitespace character will delete all whitespace until the next
      non-whitespace character.
@@ -1299,41 +1468,6 @@
         :bind (("M-I" . iedit-mode))
          )
     #+END_SRC
-*** ace-jump-mode
-     #+BEGIN_SRC emacs-lisp :tangle no
-       (use-package ace-jump-mode
-         :ensure t
-         :bind (
-                ("M-s j" . ace-jump-mode)
-                ("M-s k" . ace-jump-char-mode)
-                ("M-s l" . ace-jump-line-mode)
-                ("M-s M-j" . ace-jump-mode)
-                ("M-s M-k" . ace-jump-char-mode)
-                ("M-s M-l" . ace-jump-line-mode)
-                )
-         )
-     #+END_SRC
-*** anzu
-     #+BEGIN_SRC emacs-lisp :tangle no
-       (use-package anzu
-         :ensure t
-         :delight
-         :bind (("M-%" . anzu-query-replace)
-                ("C-M-%" . anzu-query-replace-regexp))
-         :config
-         (global-anzu-mode 1)
-         )
-     #+END_SRC
-*** avy
-     #+BEGIN_SRC emacs-lisp :tangle no
-       (use-package avy
-         :ensure t
-         :bind (("M-g j" . avy-goto-char)
-                ("M-g M-j" . avy-goto-char-timer)
-                ("M-g k" . avy-goto-word-1)
-                ("M-g l" . avy-goto-line))
-         )
-     #+END_SRC
 *** highlight-indent-guides (d)
      Highlight the indentation is a feature that visually pleases me. Indeed, without
      having to count the spaces, I can see that the code is well indented.
@@ -1602,6 +1736,13 @@
   (global-set-key (kbd "M-] o a") 'org-agenda)
   (global-set-key (kbd "M-] o c") 'org-capture)
    #+END_SRC
+*** truncate
+    Non-nil means entering Org-mode will set `truncate-lines'.
+    This is useful since some lines containing links can be very long and
+    uninteresting.  Also tables look terrible when wrapped.
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (setq org-startup-truncated nil)
+    #+END_SRC
 *** export
     #+BEGIN_SRC emacs-lisp :tangle yes
       (setq
@@ -1740,3 +1881,13 @@
    # / End :
    #+END_SRC
 * ToDo
+** imenu
+   M-i => imenu
+** helm
+** ido / fido
+** grep vs. ack
+** tab-bar mode vs tab-line mode
+** DONE toggle-truncate-lines in org / txt ?
+   - State "DONE"       from              [2022-03-22 mar. 13:19]
+   https://emacs.stackexchange.com/questions/5607/how-to-fill-wrap-an-org-mode-heading
+** isearch: word vs symbol
