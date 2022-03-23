@@ -75,7 +75,7 @@ default_dark.*.color15:      #f5f5f5
 
 ! ---------- 3024_dark
 ! special
-3024_dark.*.foreground:   #a5a2a2
+3024_dark.*.foreground:   #d0d0d0
 3024_dark.*.background:   #090300
 3024_dark.*.cursorColor:  #a5a2a2
 ! black
@@ -811,6 +811,7 @@ xclock*twentyfour:			true
 
 
 ! ---------- xterm
+! - https://aduros.com/blog/xterm-its-better-than-you-thought
 xterm*name:                     xTerm
 xterm*cutNewline:               false
 xterm*colorMode:                true
@@ -844,14 +845,22 @@ xterm*termName:                 xterm-256color
 !# xterm*TextUnderIcon:			true
 !# xterm*reverseVideo:			false
 !# xterm*reverseWrap:			false
-XTerm.vt100.font:               6x13
+! XTerm.vt100.font:               5x10
+! XTerm.vt100*faceName: Noto Mono
+XTerm.vt100.faceName: DejaVu Sans Mono
+! XTerm.vt100.boldMode: false
+! XTerm.vt100.internalBorder: 16
+! XTerm.borderWidth: 0
 XTerm.vt100.encodingMode:	locale
+! XTerm.vt100.utf8: true
 XTerm.vt100.locale:             true
 XTerm.vt100.metaSendsEscape:    true
 XTerm.vt100.backarrowKey:       false
 XTerm.ttyModes:                 erase ^?
 XTerm.vt100.geometry:           80x24
 ! XTerm.vt100.bellIsUrgent:       true
+XTerm*faceSize: 8
+XTerm*renderFont: true
 
 
 ! ---------- myTerm
@@ -930,11 +939,11 @@ URxvt.perl-ext-common:          default,matcher,font-size
 ! URxvt.perl-ext-common:        ...,tabbed,...
 URxvt.urlLauncher:              xdg-open
 URxvt.matcher.button:           3
-URxvt.keysym.Control-0x2b:      builtin-string:
-URxvt.keysym.Control-0x2d:      builtin-string:
-URxvt.keysym.Control-Meta-0x2b:      perl:font-size:increase
-URxvt.keysym.Control-Meta-0x5f:      perl:font-size:decrease
-! URxvt.keysym.Control-Meta-0x2d:      perl:font-size:decrease
+! URxvt.keysym.Control-plus:      builtin-string:
+! URxvt.keysym.Control-minus:     builtin-string:
+URxvt.keysym.Control-Meta-S-plus:            perl:font-size:increase
+URxvt.keysym.Control-Meta-S-underscore:      perl:font-size:decrease
+URxvt.font-size.step:           4
 URxvt.font:                     xft:DejaVu Sans Mono:pixelsize=10
 URxvt.boldFont:                 xft:DejaVu Sans Mono:pixelsize=10:weight=bold
 URxvt.loginShell:               True
@@ -948,7 +957,7 @@ URxvt.cutchars:                 " \\`\"'&()*,;<=>?@[]^{|}:│"
 ! Disable ISO 14755 unicode input so we can use Ctrl-Shift bindings
 URxvt.iso14755:                 false
 URxvt.iso14755_52:              false
-URxvt.searchable-scrollback:    Meta-Shift-S
+! URxvt.searchable-scrollback:    Meta-Shift-S
 ! URxvt.keysym.Meta-S:            builtin-string:
 ! URxvt.keysym.Meta-Shift-S:      searchable-scrollback:start
 
