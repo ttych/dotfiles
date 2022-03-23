@@ -35,18 +35,18 @@
 
 
 
-#xbindkeys show
+#xbindkeys show 
 "xbindkeys_show"
     m:0x41 + c:45
     Shift+Mod4 + k 
 
 #terminal
-"xterm -name myTerm"
+"rxvt -name default_dark"
     m:0x40 + c:28
     Mod4 + t 
 
 #terminal2
-"xterm -name xtermadm"
+"rxvt -name 3024_dark"
     m:0x41 + c:28
     Shift+Mod4 + t 
 
@@ -71,12 +71,12 @@
     Shift+Mod4 + l 
 
 #xterm1
-"rxvt -name default_dark"
+"xterm -name 3024_dark"
     m:0x40 + c:53
     Mod4 + x 
 
 #xterm2
-"rxvt -name 3024_dark"
+"xterm -name default_dark"
     m:0x41 + c:53
     Shift+Mod4 + x 
 
