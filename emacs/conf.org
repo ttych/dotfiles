@@ -463,6 +463,8 @@
     | C-x [   | Moves backward one page             |
     |---------+-------------------------------------|
 
+    Other movement commands
+
     | Key         | Purpose                                                               |
     |-------------+-----------------------------------------------------------------------|
     | M-r         | Re-positions the point to the top left, middle left, or bottom left   |
@@ -594,18 +596,16 @@
 **** grep
      | Command       | Purpose                                                                         |
      |---------------+---------------------------------------------------------------------------------|
-     | M-x grep      | Prompts for arguments to pass to grep                                           |
-     | M-x grep-find | Prompts for arguments to pass to grep and find                                  |
+     | M-x grep      | Prompts for arguments to pass to grep (low-level)                               |
+     | M-x grep-find | Prompts for arguments to pass to grep and find (low-level)                      |
      | M-x lgrep     | Prompts for query and glob pattern to search for with grep                      |
      | M-x rgrep     | Prompts for query and glob pattern then recursively searches with grep and find |
      | M-x rzgrep    | Like M-x rgrep but searches compressed gzip files                               |
 
-     Key Binding Purpose
-M-g M-n
-M-g M-p
-Jump to next match
-Jump to previous match
-
+     | grep Key | Purpose                |
+     |----------+------------------------|
+     | M-g M-n  | Jump to next match     |
+     | M-g M-p  | Jump to previous match |
 *** editing
 **** input characters
     Insert characters with C-q.
@@ -1062,6 +1062,11 @@ Jump to previous match
       (if (file-exists-p user-settings-file)
           (load user-settings-file))
     #+END_SRC
+*** tramp
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (setq-default
+       tramp-default-method "ssh")
+    #+END_SRC
 *** web utils
     #+BEGIN_SRC emacs-lisp :tangle yes
       (setq-default
@@ -1148,9 +1153,9 @@ Jump to previous match
     #+BEGIN_SRC emacs-lisp :tangle yes
       (use-package hl-todo
         :ensure t
-        :bind (("M-g T" . hl-todo-previous)
-               ("M-g t" . hl-todo-next)
-               ("M-g M-t" . hl-todo-occur))
+        :bind (("M-g M-T" . hl-todo-previous)
+               ("M-g M-t" . hl-todo-next)
+               ("M-g T" . hl-todo-occur))
         :init
         (global-hl-todo-mode)
         :config
@@ -1548,6 +1553,11 @@ Jump to previous match
         (setq multi-term-program (format "%s -l" emacs-shell-program))
         )
     #+END_SRC
+*** TeX
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (add-hook 'tex-mode-hook
+                #'(lambda () (setq ispell-parser 'tex)))
+    #+END_SRC
 *** XML
     Associate wsdl and xsd extension with xml-mode (append at the end of the list).
 
@@ -1838,9 +1848,12 @@ Jump to previous match
 * documentation
 ** Help
 *** Info
-    M-x info or press C-h i
+    | Key / Command    | Purpose |
+    |------------------+---------|
+    | C-h i / M-x info |         |
+    | M-x info-apropos |         |
 
-    | Key     | Purpose                                   |
+    | Info Key | Purpose                                   |
     |---------+-------------------------------------------|
     | [ and ] | Previous / next node                      |
     | l and r | Go back / forward in history              |
@@ -1880,7 +1893,405 @@ Jump to previous match
    # / my - variable : value
    # / End :
    #+END_SRC
+** movement
+** editing
+*** transpose
+    | Key                      | Purpose                 |
+    |--------------------------+-------------------------|
+    | C-t                      | Transpose characters    |
+    | M-t                      | Transpose words         |
+    | C-M-t                    | Transpose s-expressions |
+    | C-x C-t                  | Transpose lines         |
+    | M-x transpose-paragraphs | Transpose paragraphs    |
+    | M-x transpose-sentences  | Transpose sentences     |
+*** fill
+    | Key                | Purpose                           |
+    |--------------------+-----------------------------------|
+    | M-q                | Refills the paragraph point is in |
+    | C-x f              | Sets the fill column width        |
+    | C-x .              | Sets the fill prefix              |
+    | M-x auto-fill-mode | Toggles auto-filling              |
+*** comment
+    | Key             | Purpose                                                   |
+    |-----------------+-----------------------------------------------------------|
+    | M-;             | Comment or uncomment DWIM                                 |
+    | C-x C-;         | Comment or uncomment line                                 |
+    | M-x comment-box | Comments the region but as a box                          |
+    | M-j, C-M-j      | Inserts new line and continues with comment on a new line |
+
+    | Variable        | Purpose                                                                  |
+    |-----------------+--------------------------------------------------------------------------|
+    | comment-style   | Style of comment to use                                                  |
+    | comment-styles  | Association list of available comment styles                             |
+    | comment-start   | Character(s) to mark start of comment                                    |
+    | comment-end     | Character(s) to mark end of comment                                      |
+    | comment-padding | Padding used (usually a space) between comment character(s) and the text |
+*** replace
+    | key                | Purpose                         |
+    |--------------------+---------------------------------|
+    | C-M-%              | Query regexp search and replace |
+    | M-%                | Query search and replace        |
+    | M-x replace-string | Search and replace              |
+    | M-x replace-regexp | Regexp search and replace       |
+
+    | Isearch Key | Purpose                         |
+    |-------------+---------------------------------|
+    | C-M-%       | Query regexp search and replace |
+    | M-%         | Query search and replace        |
+
+    | Query Key | Purpose                            |
+    |-----------+------------------------------------|
+    | SPC, y    | Replaces one match, then continues |
+    | .         | Replaces one match, then exits     |
+    | ,         | Replace, but stay at current match |
+    | RET, q    | Exits without replacing match      |
+    | !         | Replaces all matches in buffer     |
+    | ^         | Moves point back to previous match |
+    | u, U      | Undo last / all replacement(s)     |
+
+    Regular expressions
+
+    | Constructs            | Description                                                               |
+    |-----------------------+---------------------------------------------------------------------------|
+    | \                     | Alternative                                                               |
+    | \(, \)                | Capturing group                                                           |
+    | \{, \}                | Repetition                                                                |
+    |-----------------------+---------------------------------------------------------------------------|
+    | \<, \>                | Matches beginning and end of word                                         |
+    | \_<, \_>              | Matches beginning and end of symbol                                       |
+    | \scode                | Matches any character whose syntax table code is code                     |
+    | \Scode                | Matches any character whose syntax table code is not code                 |
+    |-----------------------+---------------------------------------------------------------------------|
+    | \1 to \9              | Inserts text from group \N                                                |
+    | \#1 to \#9            | Inserts text from group \N but cast as an integer                         |
+    | \?                    | Prompts for text input from user                                          |
+    | \#                    | Inserts a number incremented from 0                                       |
+    | \&                    | Inserts whole match string                                                |
+    |-----------------------+---------------------------------------------------------------------------|
+    | \,(form ...)          | Invoking Elisp                                                            |
+    | \,(upcase \N)         | Uppercases capturing group \N                                             |
+    | \,(format "%.2f" \#N) | Casts \#N to a number and formats it as a decimal with two decimal points |
+*** case
+    | Commands                   | Purpose                   |
+    |----------------------------+---------------------------|
+    | C-x C-u                    | Uppercases the region     |
+    | C-x C-l                    | Lowercases the region     |
+    | M-x upcase-initials-region | Capitalizes the region    |
+    |----------------------------+---------------------------|
+    | M-c                        | Capitalizes the next word |
+    | M-u                        | Uppercases the next word  |
+    | M-l                        | Lowercases the next word  |
+*** counting
+    | Commands                    | Purpose                                                        |
+    |-----------------------------+----------------------------------------------------------------|
+    | M-x count-lines-region      | Counts number of lines in the region (before Emacs 24.1)       |
+    | M-x count-matches           | Counts number of patterns that match in a region               |
+    | M-x count-words             | Counts words, lines and chars in the buffer (after Emacs 24.1) |
+    | M-x count-words-region, M-= | Counts words, lines and chars in the region (after Emacs 24.1) |
+*** deleting duplicates
+    M-x delete-duplicate-lines
+
+    | Argument    | Description                          |
+    |-------------+--------------------------------------|
+    | Without     | Deletes first duplicate line         |
+    | C-u         | Start from botton                    |
+    | C-u C-u     | Deletes only adjacent duplicates     |
+    | C-u C-u C-u | Does not delete adjacent blank lines |
+*** flushing and keeping
+    | Command         | Description                                                                  |
+    |-----------------+------------------------------------------------------------------------------|
+    | M-x flush-lines | Flushes (deletes) all lines in a region that match a pattern                 |
+    | M-x keep-lines  | Keeps all lines in a region that match a pattern and removes all non-matches |
+*** joining and splitting lines
+    | Key     | Description                                        |
+    |---------+----------------------------------------------------|
+    | C-o     | Inserts a blank line after point                   |
+    | C-x C-o | Deletes all blank lines after point                |
+    | C-M-o   | Splits a line after point, keeping the indentation |
+    | M-^     | Joins the line the point is on with the one above  |
+*** whitespace
+    | Command                        | Description                                                       |
+    |--------------------------------+-------------------------------------------------------------------|
+    | M-x delete-trailing-whitespace | Deletes all trailing whitespace                                   |
+    | M-SPC                          | Deletes all but 1 space or tab to the left and right of the point |
+    | M-x cycle-spacing              | As above but cycles through all but one, all, and undo            |
+    | M-\                            | Deletes whitespace around point                                   |
+**** whitespace minor mode
+     | Command                       | Description                                           |
+     |-------------------------------+-------------------------------------------------------|
+     | M-x whitespace-mode           | Minor mode that highlights all whitespace characters  |
+     | M-x whitespace-newline-mode   | Minor mode that displays newline characters with a $  |
+     | M-x whitespace-toggle-options | Displays a toggle menu of all whitespace-mode options |
+
+     Whitespace mode tracks the following:
+     - trailing spaces,
+     - tabs,
+     - spaces,
+     - lines that are longer than whitespace-line-column (typically 80 characters),
+     - newline characters,
+     - empty lines,
+     - indentation (both tabs and spaces),
+     - spaces after tabs and spaces before tabs.
+
+***** reporting and cleanup
+      | Command                   | Description                 |
+      |---------------------------+-----------------------------|
+      | whitespace-report         | Shows whitespace issues     |
+      | whitespace-report-region  | As above but for the region |
+      | whitespace-cleanup        | Attempts automatic cleanup  |
+      | whitespace-cleanup-region | As above but for the region |
+*** macro
+    | Key             | Description                                     |
+    |-----------------+-------------------------------------------------|
+    | F3              | Starts macro recording or inserts counter value |
+    | F4              | Stops macro recording or plays last macro       |
+    | C-x ( and C-x ) | arts and stops macro recording                  |
+    | C-x e           | Plays last macro                                |
+    |-----------------+-------------------------------------------------|
+    | C-u F3          | Starts recording but appends to the last macro  |
+    | C-u F4          | Plays the second macro in the ring              |
+    | numeric F3      | Starts recording but sets counter to numeric    |
+    | numeric F4      | Plays last macro numeric times                  |
+    |-----------------+-------------------------------------------------|
+    | C-x C-k         | kmacro prefix                                   |
+    |-----------------+-------------------------------------------------|
+
+**** Counters
+    | Key             | Description                              |
+    |-----------------+------------------------------------------|
+    | C-x C-k C-a     | Adds to counter                          |
+    | C-x C-k TAB, F3 | Inserts counter (with C-u, no increment) |
+    | C-x C-k C-c     | Sets counter                             |
+    | C-x C-k C-f     | Sets format counter                      |
+    | C-x C-k q       | Queries for user input while recording   |
+
+**** Query
+    | Query Key | Description                 |
+    |-----------+-----------------------------|
+    | Y         | Continues as normal         |
+    | N         | Skips the rest of the macro |
+    | RET       | Stops the macro entirely    |
+    | C-l       | Recenters the screen        |
+    | C-r       | Enters recursive edit       |
+    | C-M-c     | Exits recursive edit        |
+
+**** Saving and Recalling
+     | Key                  | Description                   |
+     |----------------------+-------------------------------|
+     | C-x C-k C-n          | Cycles macro ring to next     |
+     | C-x C-k C-p          | Cycles macro ring to previous |
+     | C-x C-k n            | Names the last macro          |
+     | C-x C-k b            | Binds the last macro to a key |
+     | C-x C-k e            | Edits last macro              |
+     | C-x C-k l            | Edits the last 300 keystrokes |
+     | M-x insert-kbd-macro | Inserts macro as elisp        |
+     |                      |                               |
+*** Abbrev
+    | Key       | Description                       |
+    |-----------+-----------------------------------|
+    | C-x a l   | Adds mode-specific abbrev         |
+    | C-x a g   | Adds global abbrev                |
+    | C-x a i l | Adds mode-specific inverse abbrev |
+    | C-x a i g | Adds global inverse abbrev        |
+*** DAbbrev
+    | Key   | Description                   |
+    |-------+-------------------------------|
+    | M-/   | Expands word at the point     |
+    | C-M-/ | Expand, then show completions |
+*** Hippie Expand
+    (global-set-key [remap dabbrev-expand] 'hippie-expand)
+
+    - Read the commentary in the source (M-x find-library, then enter hippie-exp and read the documentation).
+    - Use Apropos. Look at the names of the try functions and search for likely functions using M-x apropos-function.
+*** indenting
+    | Key                | Description                                         |
+    |--------------------+-----------------------------------------------------|
+    | TAB                | Indents line using major mode’s indentation command |
+    | M-i                | Inserts spaces or tabs to next tab stop             |
+    | M-x edit-tab-stops | Edits tab stops                                     |
+
+    Configuration:
+    - indent-tabs-mode: use of tab characters or use of space
+    - tab-always-indent
+    - tab-width: controls how many characters of spacing each tab uses
+**** region
+     | Key     | Description                                      |
+     |---------+--------------------------------------------------|
+     | TAB     | Indents a line or region as per the major mode   |
+     | C-M-\   | Indents using major mode’s region indent command |
+     | C-x TAB | Rigidly indents                                  |
+*** sorting
+    | Command                 | Description                                      | Modifier                |
+    |-------------------------+--------------------------------------------------+-------------------------|
+    | M-x sort-lines          | Sorts alphabetically                             | C-u => reverse          |
+    | M-x sort-fields         | Sorts field(s) lexicographically                 | numeric => field column |
+    | M-x sort-numeric-fields | Sorts field(s) numerically                       | numeric => field column |
+    | M-x sort-columns        | Sorts column(s) alphabetically                   |                         |
+    | M-x sort-paragraphs     | Sorts paragraphs alphabetically                  |                         |
+    | M-x sort-regexp-fields  | Sorts by regexp-defined fields lexicographically |                         |
+*** aligning
+    | Command              | Description                             |
+    |----------------------+-----------------------------------------|
+    | M-x align            | Aligns region based on align rules      |
+    | M-x align-current    | Aligns section based on align rules     |
+    | M-x align-regexp     | Aligns region based on regexp (simple)  |
+    | C-u M-x align-regexp | Aligns region based on regexp (Complex) |
+*** zapping
+    | Command | Description                                                      | Modifier |
+    |---------+------------------------------------------------------------------+----------|
+    | M-z     | zap-to-char, kills up to (and including) the character you typed | numeric  |
+*** spelling
+    | Key / Command          | Description                                                     |
+    |------------------------+-----------------------------------------------------------------|
+    | M-$                    | Spell checks word at the point                                  |
+    | M-x flyspell-mode      | Minor mode that highlights spelling errors                      |
+    | M-x flyspell-prog-mode | As above, but only highlights strings and doc strings in code   |
+    | M-x ispell-buffer      | Runs spell check on buffer                                      |
+    | M-x ispell-region      | Runs spell check on region                                      |
+    |------------------------+-----------------------------------------------------------------|
+    | C-M-i / C-.            | Cycle through likely matches, and correct the word at the point |
+
+    flyspell-mode: for text
+    flyspell-prog-mode: for prog mode, as it limits spell checking to just your comments, strings and doc strings
+*** quoted insert
+    | Key / Command | Description                  |
+    |---------------+------------------------------|
+    | C-q           | quoted insert                |
+    | C-q C-j       | insert LINE FEED symbol      |
+    | C-q ESC       | insert ASCII control code ^[ |
+*** lossage
+    | Key                   | Description                    |
+    |-----------------------+--------------------------------|
+    | C-h l                 | view lossage                   |
+    | M-x open-dribble-file | save every keystroke to a file |
+** Practicals
+*** version control (vc)
+    | Keys / Commands             | Description                      |
+    |-----------------------------+----------------------------------|
+    | C-x v                       | Prefix key for vc-               |
+    | M-x vc-dir, C-x v d         | Shows VC status for current dir  |
+    | M-x vc-diff, C-x v =        | Displays diffs between file revs |
+    | M-x vc-annotate, C-x v g    | Blames/annotates current file    |
+    | M-x vc-next-action, C-x v v | Does next logical action         |
+    | M-x vc-print-log, C-x v l   | Prints commit log                |
+*** project management
+    | Keys    | Description                     |
+    |---------+---------------------------------|
+    | C-x p p | Switch to other known projects  |
+    | C-x p b | Switch to buffer                |
+    | C-x p f | Find file in project            |
+    | C-x p k | Kill project buffers            |
+    | C-x p g | Search by regexp                |
+    | C-x p r | Query regexp search and replace |
+    | C-x p c | Compile project                 |
+    | C-x p v | Open VC Dialog                  |
+    | C-x p s | Open a Shell                    |
+    | C-x p d | Open a Dired buffer             |
+*** xref
+    | Keys  | Description                        |
+    |-------+------------------------------------|
+    | M-.   | Find definitions at point          |
+    | M-,   | Pop marker4 and return             |
+    | M-?   | Find references matching a pattern |
+    | C-M-. | Find symbols matching a pattern    |
+
+    | Xref Buffer Keys | Description                       |
+    |------------------+-----------------------------------|
+    | RET              | Jump to definition                |
+    | TAB              | Jump to definition, and hide xref |
+    | C-o              | Show definition                   |
+    | . and ,          | Navigate up or down               |
+    | r                | Query search and replace regexp   |
+*** log files
+    | Keys            | Description                         |
+    |-----------------+-------------------------------------|
+    | C-x C-f         | Finds a file                        |
+    | C-x C-r         | Finds a file in read only mode      |
+    | C-x C-q         | Toggles read only mode              |
+    |-----------------+-------------------------------------|
+    | M-x flush-lines | Flushes lines matching a pattern    |
+    | M-x keep-lines  | Keeps only lines matching a pattern |
+    | M-s o           | List lines matching a pattern       |
+*** highlighters
+    start with highlight-
+
+    | Keys    | Description                          |
+    |---------+--------------------------------------|
+    | M-s h p | Highlights a phrase                  |
+    | M-s h r | Highlights a regular expression      |
+    | M-s h . | Highlights symbol at the point       |
+    | M-s h u | Removes highlighting under the point |
+*** auto-revert
+    | Keys                      | Description                       |
+    |---------------------------+-----------------------------------|
+    | M-x auto-revert-mode      | Reverts buffer when file changes  |
+    | M-x auto-revert-tail-mode | Appends changes when file changes |
+*** image
+    | Image Keys | Description            |
+    |------------+------------------------|
+    | q          | Quit                   |
+    | s          | Resize image to window |
+    | f          | Show in full size      |
+*** doc-view
+    | Keys            | Description                          |
+    |-----------------+--------------------------------------|
+    | n, p            | Page up / page down                  |
+    | <prior>, <next> | Page up / page down                  |
+    | SPC             | Scroll down                          |
+    | S-SPC           | Scroll up                            |
+    | M-<, M->        | Jump to first / last page            |
+    | +, -, 0         | Enlarge, shrink or reset             |
+    | W, H, P, F      | Fit to width, height, page or window |
+    | q               | Quit                                 |
+
+    Increase DPI with:
+    (setq doc-view-resolution 400)
+
+    Slide show with:
+    M-x doc-view-presentation
+*** TRAMP
+    - set tramp-default-method to ssh
+*** EWW
+*** dired
+**** thumbnail image browser
+     | Thumbnail Keys | Description                            |
+     |----------------+----------------------------------------|
+     | C-f, C-b       | Move to the next or previous thumbnail |
+     | C-p, C-n       | Move up or down a row of thumbnails    |
+     | d, m, u        | Delete, mark, or unmark (like Dired)   |
+     | t t, t u       | Tag or untag image                     |
+     | RET            | Open image                             |
+     | l, r           | Rotate thumbnail left or right         |
+*** shell commands
+*** shell in emacs
+
+** Blogs
+*** Planet Emacs aggregator:
+    https://planet.emacsen.org/
+*** Mastering emacs
+    https://www.masteringemacs.org/
+*** Sacha Chua
+    https://sachachua.com/blog/
+*** Irreal’s Emacs blog
+    https://irreal.org/blog/
+*** Artur Malabarba
+    https://endlessparentheses.com/
+*** Bozhidar Batzov
+    https://batsov.com/
+*** John Kitchin
+    https://kitchingroup.cheme.cmu.edu/blog/
+** Communities
+*** Reddit
+   Reddit There is a lively community of Emacs users on the
+   subreddit /r/emacs. Since I wrote the book in 2015,
+   the community has grown tremendously.
+   You can also find specialized subreddits for particular
+   areas of Emacs. /r/orgmode is also worth visiting.
+*** StacjExchange
+   StackExchange Emacs now has its own site on StackExchange:
+   https://emacs.stackexchange.com/
 * ToDo
+** isearch: word vs symbol
 ** imenu
    M-i => imenu
 ** helm
@@ -1890,4 +2301,26 @@ Jump to previous match
 ** DONE toggle-truncate-lines in org / txt ?
    - State "DONE"       from              [2022-03-22 mar. 13:19]
    https://emacs.stackexchange.com/questions/5607/how-to-fill-wrap-an-org-mode-heading
-** isearch: word vs symbol
+
+** [expansion] Abbrev / DAbbrev / hippie-expand
+** [expansion] skeletons / Tempo
+** [expansion] Autoinsert
+** electric indent mode
+** Magit
+   https://www.magit.vc
+** Multiple Cursors
+   https://github.com/magnars/multiple-cursors.el
+** LSP mode / EGlot
+   https://github.com/emacs-lsp/lsp-mode
+   https://github.com/joaotavora/eglot
+** Helm
+   https://emacs-helm.github.io/helm/
+** Flycheck
+   https://www.flycheck.org/en/latest/
+** Hydra
+   https://github.com/abo-abo/hydra
+** dumb-jump
+   https://github.com/jacktasia/dumb-jump
+** mark the next s-exp
+** project management
+** xref
