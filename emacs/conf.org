@@ -1066,6 +1066,14 @@
     #+BEGIN_SRC emacs-lisp :tangle yes
       (setq-default
        tramp-default-method "ssh")
+
+      (defun sudo ()
+        "Use TRAMP to `sudo' the current buffer"
+        (interactive)
+        (when buffer-file-name
+          (find-alternate-file
+           (concat "/sudo:root@localhost:"
+                   buffer-file-name))))
     #+END_SRC
 *** web utils
     #+BEGIN_SRC emacs-lisp :tangle yes
@@ -2250,7 +2258,17 @@
     Slide show with:
     M-x doc-view-presentation
 *** TRAMP
+    tramp connection syntax:
+    /protocol:[user@]hostname[#port]:
+    /-:[user@]hostname[#port]:  (using tramp-default-method)
+
     - set tramp-default-method to ssh
+
+    tramp user switching syntax:
+    /sudo:root@localhost:/etc/fstab
+
+    tramp mutli-hopping syntax:
+    /ssh:homer@powerplant|sudo:powerplant:/root/salary.txt
 *** EWW
 *** dired
 **** thumbnail image browser
