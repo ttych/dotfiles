@@ -2240,6 +2240,15 @@
     | q          | Quit                   |
     | s          | Resize image to window |
     | f          | Show in full size      |
+**** thumbnail image browser
+     | Thumbnail Keys | Description                            |
+     |----------------+----------------------------------------|
+     | C-f, C-b       | Move to the next or previous thumbnail |
+     | C-p, C-n       | Move up or down a row of thumbnails    |
+     | d, m, u        | Delete, mark, or unmark (like Dired)   |
+     | t t, t u       | Tag or untag image                     |
+     | RET            | Open image                             |
+     | l, r           | Rotate thumbnail left or right         |
 *** doc-view
     | Keys            | Description                          |
     |-----------------+--------------------------------------|
@@ -2269,20 +2278,162 @@
 
     tramp mutli-hopping syntax:
     /ssh:homer@powerplant|sudo:powerplant:/root/salary.txt
-*** EWW
-*** dired
-**** thumbnail image browser
-     | Thumbnail Keys | Description                            |
-     |----------------+----------------------------------------|
-     | C-f, C-b       | Move to the next or previous thumbnail |
-     | C-p, C-n       | Move up or down a row of thumbnails    |
-     | d, m, u        | Delete, mark, or unmark (like Dired)   |
-     | t t, t u       | Tag or untag image                     |
-     | RET            | Open image                             |
-     | l, r           | Rotate thumbnail left or right         |
-*** shell commands
-*** shell in emacs
+*** browse-url & EWW
+    | Keys           | Description             |
+    |----------------+-------------------------|
+    | M-x eww        | use EWW                 |
+    | C-u M-x eww    | create a new EWW buffer |
+    |----------------+-------------------------|
+    | M-x browse-url | web browser             |
 
+    | Variable                   | Description     |
+    |----------------------------+-----------------|
+    | eww-search-prefix          | default URL     |
+    |----------------------------+-----------------|
+    | browse-url-default-browser | default browser |
+
+    | EWW Keys   | Description                             |
+    |------------+-----------------------------------------|
+    | TAB, S-TAB | Cycle to next/prev hyperlink            |
+    | q          | Quit EWW                                |
+    | &          | Open page in with M-x browse-url        |
+    | B          | Show bookmarks                          |
+    | b          | Add bookmark                            |
+    | H          | Show browser history                    |
+    | l, r       | Browse backward / forward in history    |
+    | p, n, u, t | Semantic web navigation aids            |
+    | R          | Enable Reader mode                      |
+    | RET        | Browse link                             |
+    | C-u RET    | Open link in external browser           |
+    | M-s M-w    | Searches for point in EWW               |
+    | M-RET      | Open link in new buffer (Emacs 26)      |
+    | s          | Switch to another EWW buffer (Emacs 26) |
+    | w          | Copy link at point (Emacs 26)           |
+*** dired
+**** to dired mode
+     | Key / Command | Description                                                |
+     |---------------+------------------------------------------------------------|
+     | M-x dired     | prompt for the dired location to open                      |
+     | C-x d         | prompt for the dired location to open                      |
+     | C-x 4 d       | prompt for the dired location to open, in the other window |
+     | C-d           | from IDO mode, to dired                                    |
+**** customize
+     | Variable               | Description                      |
+     |------------------------+----------------------------------|
+     | dired-listing-switches | customize ls options for listing |
+**** navigation
+     | Key            | Description                       |
+     |----------------+-----------------------------------|
+     | RET            | Visits the file or directory      |
+     | ^              | Goes up one directory             |
+     | q              | Quits dired                       |
+     | n, p, C-n, C-p | Moves the point up/down a listing |
+**** mark
+     | Key    | Description              |
+     |--------+--------------------------|
+     | m      | Marks active             |
+     | u      | Unmarks active           |
+     | U      | Unmarks everything       |
+     | d      | Flags for deletion       |
+     |--------+--------------------------|
+     | * m    | Marks region             |
+     | * u    | Unmarks region           |
+     | * %    | Marks files by regexp    |
+     | * .    | Marks files by extension |
+     | t, * t | Toggles marking          |
+     | * c    | Changes mark             |
+**** marked operations
+     | (marked) Key | Description                                   |
+     |--------------+-----------------------------------------------|
+     | C            | Copy files                                    |
+     | R            | Rename or move files                          |
+     | O            | Change owner                                  |
+     | G            | Change group                                  |
+     | M            | Change permissions                            |
+     | D            | Deletes marked (shown as *)                   |
+     | x            | Deletes flagged (shown as D)                  |
+     | F            | Visit files (requires dired-x)                |
+     | c            | Compress marked to a file (Emacs 25 or later) |
+     |--------------+-----------------------------------------------|
+     | M-s a C-s    | Begin isearch                                 |
+     | Q            | Xref Query replace regexp                     |
+     | A            | Xref Search by regexp                         |
+     | !            | Synchronous shell command                     |
+     | &            | Asynchronous shell command                    |
+
+     Configure dired-guess-shell-alist-default,
+     for defining default action.
+**** shell commad
+     * : 1 execution with all marked as n arguments
+     ? : n execution with all marked as 1 argument
+**** operations
+     | Key  | Description                  |
+     |------+------------------------------|
+     | g    | Refreshes dired buffer       |
+     | +    | Creates a sub-directory      |
+     | s    | Toggles sorting by name/date |
+     | <, > | Jump to prev/next directory  |
+     | j    | Jumps to file                |
+**** across directories
+     | Key                  | Description                                                    |
+     |----------------------+----------------------------------------------------------------|
+     | i                    | insert dired output for the directory in the same dired buffer |
+     | $                    | toggle expand/collapse dired listing                           |
+     |----------------------+----------------------------------------------------------------|
+     | find-dired           | Calls find with a pattern                                      |
+     | find-name-dired      | Calls find with -name                                          |
+     | find-grep-dired      | Calls find and grep                                            |
+     | find-lisp-find-dired | Uses Emacs and regexp to find files                            |
+*** shell commands
+    | Keys    | Description                           |
+    |---------+---------------------------------------+
+    | M-!     | Calls shell command and prints output |
+    | C-u M-! | As above, but inserts into buffer     |
+    | M-&     | Like M-! but asynchronous             |
+    | C-u M-& | Like C-u M-! but asynchronous         |
+    | M-\vert     | Pipes region to shell command         |
+    | C-u M-\vert | Likes M-\vert but replaces region         |
+*** compiling
+    | Commands         | Description                           |
+    |------------------+---------------------------------------|
+    | M-x compile      | Runs a command, and tracks errors     |
+    | M-x recompile    | Re-runs last command                  |
+    | M-g M-n, M-g M-p | Jumps to next/previous error (global) |
+    | g                | Re-runs last command                  |
+    | C-x p c          | Compile in the current project        |
+*** shell in emacs
+**** M-x shell : Shell mode
+     | Keys             | Description                       |
+     |------------------+-----------------------------------|
+     | M-p, M-n         | Cycles through command history    |
+     | C-<up>, C-<down> | Cycles through command history    |
+     | M-r              | ISearches history backward        |
+     | C-c C-p, C-c C-n | Jumps to previous / next prompt   |
+     | C-c C-s          | Saves command output to file      |
+     | C-c C-o          | Kills command output to kill ring |
+     | C-c C-l          | Lists command history             |
+     | C-d              | Deletes forward char or sends ^D  |
+     | C-c C-z          | Sends stop sub job                |
+     | TAB              | Completes at the point            |
+**** M-x ansi-term : Terminal emulator
+     | Keys    | Description                                                |
+     |---------+------------------------------------------------------------|
+     | C-c     | Escape character                                           |
+     |---------+------------------------------------------------------------|
+     | C-c C-j | Switches to line mode (like emacs buffer)                  |
+     | C-c C-k | Switches to character mode (like normal terminal emulator) |
+     |---------+------------------------------------------------------------|
+     | C-c C-c | Send C-c to the sub-process                                |
+**** M-x eshell : Emacs shell
+     Eshell is an elisp shell,
+     as every command you type into Eshell,
+     - is first filtered through Eshell’s own emulation layer,
+     - then through Emacs’s own interactive commands,
+     - and then finally through programs in your $PATH or in the current directory.
+
+     You can type :
+     - dired . to open a M-x dired session in the current directory,
+     - find-file todo.org to open todo.org in your currently-running Emacs.
 ** Blogs
 *** Planet Emacs aggregator:
     https://planet.emacsen.org/
