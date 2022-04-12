@@ -8,9 +8,10 @@
 /save
 /elpa
 /games
-/eshell
+/eshell/history
 /.mc-lists.el
 /transient
+/url
 
 /snippets
 

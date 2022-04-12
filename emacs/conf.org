@@ -39,6 +39,11 @@
       help-window-select nil
       )
    #+END_SRC
+**** tooltip
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (tooltip-mode -1)
+       (setq tooltip-use-echo-area t)
+     #+END_SRC
 *** limits
     #+BEGIN_SRC emacs-lisp :tangle yes
       (setq-default
@@ -113,12 +118,23 @@
 
      (use-package use-package-ensure-system-package :ensure t)
    #+END_SRC
-*** yes/no
+*** prompt
+**** yes or no
     Replace yes/no prompts with y/n.
-
     #+BEGIN_SRC emacs-lisp :tangle yes
       (fset 'yes-or-no-p 'y-or-n-p)
     #+END_SRC
+**** non existant buffer/file
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (setq confirm-nonexistent-file-or-buffer nil)
+    #+END_SRC
+**** buffer with attached process
+     remove prompt for killing a buffer with a live process attached to it
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (setq kill-buffer-query-functions
+             (remq 'process-kill-buffer-query-function
+                   kill-buffer-query-functions))
+     #+END_SRC
 *** server
    #+BEGIN_SRC emacs-lisp :tangle no
      (server-start)
@@ -369,7 +385,8 @@
     #+BEGIN_SRC emacs-lisp :tangle yes
       (setq-default
        inhibit-startup-buffer-menu t
-       inhibit-startup-echo-area-message ""
+       inhibit-startup-message t
+       inhibit-startup-echo-area-message t
        inhibit-startup-screen t
        initial-frame-alist (quote ((top . 10) (left . 30) (width . 90) (height . 50)))
        initial-major-mode (quote org-mode)
@@ -393,7 +410,6 @@
        (menu-bar-mode -1)
        ;; (scroll-bar-mode -1)
        (tool-bar-mode -1)
-       (tooltip-mode -1)
     #+END_SRC
 
     Edition information:
@@ -438,6 +454,15 @@
       (set-face-attribute 'default nil :font "Source Code Pro Medium")
       (set-fontset-font t 'latin "Noto Sans")
     #+END_SRC
+**** performance
+     Set to t will cause Emacs to fully redraw the display before it processes
+     queued input events.
+
+     Set to nil, the obvious benefit here is that the user will get a smoother
+     typing experience.
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (setq redisplay-dont-pause t)
+     #+END_SRC
 *** movement
     | Key     | Purpose                             |
     |---------+-------------------------------------|
@@ -536,6 +561,31 @@
         (setq-default
          cua-mode t
          )
+      #+END_SRC
+***** mark only
+      #+BEGIN_SRC emacs-lisp :tangle no
+        (defun push-mark-no-activate ()
+          "Pushes `point' to `mark-ring' and does not activate the region
+                           Equivalent to \\[set-mark-command] when \\[transient-mark-mode] is disabled"
+          (interactive)
+          (push-mark (point) t nil)
+          (message "Pushed mark to ring"))
+
+        (global-set-key (kbd "C-`") 'push-mark-no-activate)
+
+        (defun jump-to-mark ()
+          "Jumps to the local mark, respecting the `mark-ring' order.
+                  This is the same as using \\[set-mark-command] with the prefix argument."
+          (interactive)
+          (set-mark-command 1))
+        (global-set-key (kbd "M-`") 'jump-to-mark)
+
+        (defun exchange-point-and-mark-no-activate ()
+          "Identical to \\[exchange-point-and-mark] but will not activate the region."
+          (interactive)
+          (exchange-point-and-mark)
+          (deactivate-mark nil))
+        (define-key global-map [remap exchange-point-and-mark] 'exchange-point-and-mark-no-activate)
       #+END_SRC
 **** search
      | Key   | Purpose                             |
@@ -942,26 +992,73 @@
       )
    #+END_SRC       
 *** completion
-***** ido
-      | ido Key   | Purpose                                    |
-      |-----------+--------------------------------------------|
-      | C-s , C-r | Move to the next and previous match        |
-      | TAB       | Traditional non-IDO TAB-completion         |
-      | RET       | Open selected match                        |
-      | C-d       | Open M-x dired buffer in current directory |
-      | //        | Go to root directory /                     |
-      | ~/        | Go to home directory ~                     |
-      | Backspace | Delete a character or go up one directory  |
+**** ido
+      | ido Key     | Purpose                                                                 | Where                  |
+      |-------------+-------------------------------------------------------------------------+------------------------|
+      | C-s / C-r   | Move to the next and previous match                                     | All                    |
+      | TAB         | Traditional non-IDO TAB-completion                                      | Dirs / Files / Buffers |
+      | RET         | Open selected match                                                     |                        |
+      | C-d         | Open M-x dired buffer in current directory                              | Dirs / Files           |
+      | //          | Go to root directory /                                                  | Files                  |
+      | ~/          | Go to home directory ~                                                  | Dirs / Files           |
+      | Backspace   | Delete a character or go up one directory                               | All                    |
+      | C-SPC / C-@ | Restricts completion list to anything that matches the current input    | All                    |
+      | M-d         | Searches for the input in all sub-directories                           | Files                  |
+      | C-k         | Kills the currently focused buffer / deletes the file                   | Files / Buffers        |
+      | M-m         | Creates a new sub-directory to the directory you’re in                  | Files                  |
+      |-------------+-------------------------------------------------------------------------+------------------------|
+      | C-a         | Toggles showing ignored files (ido-ignore-files)                        | Files / Buffers        |
+      | C-c         | Toggles if searching buffer/file should ignore case (ido-case-fold)     | Dirs / Files / Buffers |
+      | C-t         | Toggles matching by Emacs regular expression                            | All                    |
+      | C-p         | Toggles prefix matching, match only beginning instead of any part of it | Files                  |
+      |-------------+-------------------------------------------------------------------------+------------------------|
+      | C-f         | Reverts to the old find-file completion engine                          | Files                  |
+      | C-b         | Reverts to the old switch-buffer completion engine                      | Buffers                |
 
       #+BEGIN_SRC emacs-lisp :tangle no
-       (setq ido-everywhere t
-             ido-create-new-buffer 'always
-             ido-enable-flex-matching t
-             ido-max-window-height 1
-             ido-use-faces t
-             )
-       (ido-mode 1)
+        (setq ido-everywhere t
+              ido-create-new-buffer 'always
+              ido-enable-flex-matching t
+              ido-max-window-height 1
+              ido-use-faces t
+              ido-file-extensions-order '(".org" ".txt" ".py" ".rb" ".json" ".yml")
+              )
+        (ido-mode 1)
+
+        (defun ido-recentf-open ()
+          "Use `ido-completing-read' to \\[find-file] a recent file"
+          (interactive)
+          (if (find-file (ido-completing-read "Find recent file: " recentf-list))
+              (message "Opening file...")
+            (message "Aborting")))
      #+END_SRC
+***** ignore
+      | Variables              | Description                                                |
+      |------------------------+------------------------------------------------------------|
+      | ido-ignore-buffers     | Takes a list of buffers to ignore in C-x b                 |
+      | ido-ignore-directories | Takes a list of directories to ignore in C-x d and C-x C-f |
+      | ido-ignore-files       | Takes a list of files to ignore in C-x C-f                 |
+
+      To ignore some extensions:
+      (setq ido-ignore-extensions t)
+
+      To configure extensions to ignore:
+      variable: completion-ignored-extensions
+***** work directory
+      Work directories are recently used directories that Ido caches.
+
+      | Variable                               | Description                                                             |
+      |----------------------------------------+-------------------------------------------------------------------------|
+      | ido-work-directory-list                | cached directory list                                                   |
+      | ido-work-directory-list-ignore-regexps | prevent ido from caching matching                                       |
+      | ido-work-directory-match-only          | force Ido to disregard directories that do not match your current input |
+      | ido-auto-merge-delay-time              | work directory merge delay                                              |
+
+      | Key       | Description                                                                  |
+      |-----------+------------------------------------------------------------------------------|
+      | M-n / M-p | Cycles through the next or previous work directories.                        |
+      | M-k       | Kills (removes) the active work directory from the list.                     |
+      | M-s       | M-s forces ido to search the list of work directories for the current input. |
 *** commands
 **** macros
     #+BEGIN_SRC emacs-lisp :tangle yes
@@ -974,12 +1071,14 @@
      https://www.masteringemacs.org/article/mastering-key-bindings-emacs
 
     #+BEGIN_SRC emacs-lisp :tangle yes
+      ;; (global-set-key [f1] 'shell)
       (global-set-key (kbd "<f5>") 'revert-buffer)
       (global-set-key (kbd "<f6>") 'shell)
       (global-set-key (kbd "ESC <f6>") 'term)
       (global-set-key (kbd "<f8>") 'magit)
       (global-set-key (kbd "ESC <f8>") 'magit-file-dispatch)
       (global-set-key (kbd "<f9>") 'recentf-open-files)
+      ;; (global-set-key (kbd "<f9>") 'ido-recentf-open)
       (global-set-key (kbd "M-i") 'imenu)
       ;; kill-word
       (global-set-key (kbd "M-<deletechar>") 'kill-word)
@@ -1553,7 +1652,15 @@
       (add-hook 'after-save-hook
                 'executable-make-buffer-file-executable-if-script-p)
     #+END_SRC
-**** multi-term (d)
+**** eshell
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (require 'eshell)
+       (require 'em-smart)
+       (setq eshell-where-to-jump 'begin)
+       (setq eshell-review-quick-commands nil)
+       (setq eshell-smart-space-goes-to-end t)
+     #+END_SRC
+*** multi-term (d)
     #+BEGIN_SRC emacs-lisp :tangle no
       (use-package
         :ensure t
@@ -1890,6 +1997,192 @@
     | describe-function | C-h f | describes a function (and command)            |
     | describe-variable | C-h v | describes a variable                          |
     | describe-key      | C-h k | describes what a key binding does             |
+*** toolbar
+    | Key   | Purpose                                  |
+    |-------+------------------------------------------|
+    | M-`   | Activate text-mode menubar (tmm-menubar) |
+    | <f10> | Activate menu-bar-open                   |
+** evaluating code
+   | Key / Command       | Description                                     |
+   |---------------------+-------------------------------------------------|
+   | M-x eval-buffer     | execute everything in the current buffer        |
+   | M-x eval-region     | execute selected region only                    |
+   | M-x eval-last-sexp  | execute previous sexp only                      |
+   | C-x C-e             | bound to eval-last-sexp                         |
+   | M-x eval-defun      | valuate the outer-most form                     |
+   | C-M-x               | bound to eval-defun                             |
+   | C-u C-M-x           | evaluate with edebug activated                  |
+   | M-x eval-expression | evaluate an expression                          |
+   | M-:                 | bound to eval-expression                        |
+   | C-u M-:             | evaluate an expression and insert in the buffer |
+   | C-x M-:             | redo the previous command                       |
+
+   Invoke multiple expressions:
+   (progn (command1) (command2) (commandn))
+*** repeat
+    | Key / Command              | Description                     |
+    |----------------------------+---------------------------------|
+    | M-x repeat                 | repeat simple command           |
+    | C-x z                      | bound to repeat                 |
+    | M-x repeat-complex-command | repeat complex command          |
+    | C-x M-:                    | bound to repeat-complex-command |
+*** ielm : Interactive Emacs-Lisp Mode
+    ielm support in auto complete
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (defun ielm-auto-complete ()
+        "Enables `auto-complete' support in \\[ielm]."
+        (setq ac-sources '(ac-source-functions
+                           ac-source-variables
+                           ac-source-features
+                           ac-source-symbols
+                           ac-source-words-in-same-mode-buffers))
+        (add-to-list 'ac-modes 'inferior-emacs-lisp-mode)
+        (auto-complete-mode 1))
+      (add-hook 'ielm-mode-hook 'ielm-auto-complete)
+    #+END_SRC
+** key bindings
+*** commands
+    - (define-key KEYMAP KEY DEF)
+      Defines a key against a keyboard map. Use this if you want to change
+      a keymap that isn’t the current buffer map.
+    - (local-set-key KEY COMMAND)
+      Binds a key to the local keymap used by the active buffer, unlike
+       define-key which takes an explicit keymap to bind a key against.
+    - (global-set-key KEY COMMAND)
+      Binds a key to the global keymap, making it available in all buffers
+      (with a caveat – see below.)
+    - (global-unset-key KEY)
+      Removes KEY from the global keymap
+    - (local-unset-key KEY)
+      Removes KEY from the active, local keymap.
+*** remapping comands
+    (define-key (current-global-map) [remap old-command] 'new-command)
+*** keymap lookup order
+    1. overriding-terminal-local-map for terminal-specific key binds.
+    2. overriding-local-map for keys that should override all other local keymaps.
+    3. Keymap char property at point for keymaps that are local to the character point is at.
+    4. emulation-mode-map-alists for advanced multi-mode keymap management.
+    5. minor-mode-overriding-map-alist for overriding the keymaps used by minor modes in major modes.
+    6. minor-mode-map-alist is exactly like the overriding version above, but the preferred means of specifying the keymaps for minor modes.
+    7. Keymap text property at point is like the one above for char properties but is for text properties only.
+    8. current-local-map for keymaps defined in the buffers’ current local map.
+    9. current-global-map is the last place Emacs will look for key binds and it is for the global ones.
+
+    => minor mode keys come before local keys, that come before global keys.
+*** extract complex command
+    C-x ESC ESC
+
+    =>
+
+    (query-replace-regexp "foo" "bar" nil
+   (if (and transient-mark-mode mark-active)
+       (region-beginning))
+   (if (and transient-mark-mode mark-active)
+       (region-end)))
+
+    or
+
+    (switch-to-buffer "*scratch*")
+*** example: global key bind
+    => Creates a global key bind available to all buffers.
+
+    (global-set-key (kbd "key-bind-here") 'interactive-command-here)
+
+    as in
+
+    (global-set-key (kbd "<f1>") 'shell)
+*** example: add key to a keymap
+    => Adds a key and its associated command to a local keymap. Useful for
+       extending major modes with your own custom key binds.
+
+    (define-key KEYMAP (kbd "key-bind-here") 'interactive-command-here)
+
+    as in
+
+    (define-key python-mode-map (kbd "C-c p") 'python-switch-to-python)
+*** example: complex command key bind
+    => Creates a global key bind that invokes multiple commands in a row. Use
+       this to create compound keys or invoke commands that take parameters. Uses
+       code from the Function Template.
+
+    (defun name-of-interactive-command-here ()
+      (interactive)
+      ;;; Insert your compound commands below
+    )
+    (global-set-key (kbd "key-bind-here") 'name-of-interactive-command-here)
+
+    as in
+
+    (defun switch-to-scratch-and-insert-text ()
+      (interactive)
+      (save-excursion
+      (set-buffer "*scratch*")
+      (insert "Hello, World")))
+    (global-set-key (kbd "C-c i") 'switch-to-scratch-and-insert-text)
+*** example binding keys with a mode hook
+    => Use this mode hook template to bind keys that won’t work with a standard
+       define-key template or that require local binding for other reasons. The
+       advantage of a mode hook is that it also gives you the opportunity to set
+       mode-specific settings like indentation, etc.
+
+    (defun my-hook-function ()
+      ;; add your code here. it will be called every
+      ;; time the major mode is run.
+    )
+    (add-hook 'my-mode-hook 'my-hook-function)
+
+    as in
+
+    (defun enable-my-elisp-settings ()
+      (turn-on-eldoc-mode)
+      (local-set-key (kbd "C-m") 'newline-and-indent))
+    (add-hook 'emacs-lisp-mode-hook 'enable-my-elisp-settings)
+*** example: remapping a function
+    => This template will remap all keys that point to a specific function; say
+       you want to rebind kill-line which is bound to C-k but you want your code to
+       only override the key binds that kill-line is actually bound to. Use this
+       template to replace existing commands with those of your own, without
+       worrying about explicitly rebinding each key.
+
+    (define-key keymap [remap original-function] 'my-own-function)
+
+    as in
+
+    (defun exchange-point-and-mark-no-activate ()
+      "Identical to \\[exchange-point-and-mark] but will not activate the region."
+      (interactive)
+      (exchange-point-and-mark)
+      (deactivate-mark nil))
+    (define-key global-map [remap exchange-point-and-mark] 'exchange-point-and-mark-no-activate)
+*** example: custom prefixes
+    => Creating a prefix is easy nowadays as you don’t have to explicitly create
+       your own prefix keymaps, provided you use local-set-key or global-set-key.
+       Use custom prefixes to group or categorize your commands.
+
+    (global-set-key (kbd "subkey_1 ... endkey_1") 'my-command-1)
+    (global-set-key (kbd "subkey_1 ... endkey_2") 'my-command-2)
+
+    as in
+
+    (defun mp-insert-date ()
+      (interactive)
+      (insert (format-time-string "%x")))
+    (defun mp-insert-time ()
+      (interactive)
+      (insert (format-time-string "%X")))
+    (global-set-key (kbd "C-c i d") 'mp-insert-date)
+    (global-set-key (kbd "C-c i t") 'mp-insert-time)
+** function & command
+*** command template
+    (defun my-function-name-here ()
+      (interactive)
+      ;;; Place your code below this line, but inside the bracket.
+    )
+*** command template : example : hello world
+    (defun message-hello-world ()
+      (interactive)
+      (message "Hello, World")
+    )
 ** file-local variables
    #+BEGIN_SRC
    # / - * - mode: mode-name-here; my-variable: value - * -
@@ -2137,6 +2430,10 @@
     | M-x sort-columns        | Sorts column(s) alphabetically                   |                         |
     | M-x sort-paragraphs     | Sorts paragraphs alphabetically                  |                         |
     | M-x sort-regexp-fields  | Sorts by regexp-defined fields lexicographically |                         |
+    | M-x sort-pages          | Sort pages alphabetically                        |                         |
+
+    variable:
+    - sort-fold-case : set it to t to force Emacs to ignore case differences when sorting
 *** aligning
     | Command              | Description                             |
     |----------------------+-----------------------------------------|
@@ -2431,9 +2728,75 @@
      - then through Emacs’s own interactive commands,
      - and then finally through programs in your $PATH or in the current directory.
 
+     Configure evaluation priority with:
+     eshell-prefer-lisp-functions
+
      You can type :
      - dired . to open a M-x dired session in the current directory,
      - find-file todo.org to open todo.org in your currently-running Emacs.
+
+    | Key               | Description                                                                            |
+    |-------------------+----------------------------------------------------------------------------------------|
+    | M-r / M-s         | Search backwards or forwards for a command by regexp                                   |
+    | M-p / M-n         | Goes backwards or forwards in the command history list                                 |
+    | C-p / C-n         | Jump to the previous or next command position in Eshell                                |
+    | C-c M-r / C-c M-s | Jumps to the previous or next command that shares the command currently used as input. |
+    |-------------------+----------------------------------------------------------------------------------------|
+    | C-c M-b           | Inserts the printed buffer name at point                                               |
+    | C-c M-i           | Inserts the printed process name at point                                              |
+    | C-c M-v           | Inserts an environment variable name at point                                          |
+    | C-c M-d           | Toggles between direct input and delayed input (send on RET).                          |
+
+    | History Keys | Description                                                                                            |
+    |--------------+--------------------------------------------------------------------------------------------------------|
+    | !!           | Repeats the last command                                                                               |
+    | !ls          | Repeats the last command beginning with ls                                                             |
+    | !?ls         | Repeats the last command containing ls                                                                 |
+    | !ls:n        | Extract the nth argument from the last command beginning with ls                                       |
+    | !ls<tab>     | Using pcomplete, show completion results matches ls                                                    |
+    | ^old^new     | Quick substitution. Using the last command, replaceold with new and run it again. Appears to be buggy. |
+    | $_           | Returns the last parameter in the last executed command.                                               |
+***** startup scripts
+      stored in the variables:
+      - eshell-login-script
+      - eshell-rc-script
+
+      by default:
+      - <eshell dir>/login
+      - <eshell dir>/profile
+***** useful elisp commands
+      - listify ARGS
+        Parses an argument string into elisp list notation and
+        prints it to the screen. It’s clever enough to handle both
+        MS-DOS/Windows and POSIX-style argument syntax.
+      - addpath PATH
+        Adds the argument, which must be a path, to the $PATH
+        environment variable. If no argument is specified the existing paths are
+        pretty-printed to the screen.
+      - unset ENV-VAR
+        Unsets an existing environment variable
+      - find-file FILE
+        Finds the file FILE and opens it in Emacs. This function is TRAMP aware
+        and will therefore work remotely.
+      - dired DIRECTORY
+        Opens a dired buffer in DIRECTORY.
+      - calc-eval EXPR
+        Runs EXPR through the Emacs calculator.
+      - upcase STR/downcase STR
+        Converts STR to upper- or lowercase.
+      - vc-dir DIRECTORY
+        Reports the status of a version controlled directory (equivalent to the
+        status command in most VCS)
+      - ediff-files FILE1 FILE2
+        Diffs FILE1 and FILE2 using ediff, Emacs’ diff engine.
+***** prompt
+      modify :
+      - eshell-prompt-function
+      - eshell-prompt-regexp
+***** argument predicates
+      get help :
+      - eshell-display-predicate-help
+      - eshell-display-modifier-help
 ** Blogs
 *** Planet Emacs aggregator:
     https://planet.emacsen.org/
@@ -2460,6 +2823,9 @@
    StackExchange Emacs now has its own site on StackExchange:
    https://emacs.stackexchange.com/
 * ToDo
+** DONE toggle-truncate-lines in org / txt ?
+   - State "DONE"       from              [2022-03-22 mar. 13:19]
+   https://emacs.stackexchange.com/questions/5607/how-to-fill-wrap-an-org-mode-heading
 ** isearch: word vs symbol
 ** imenu
    M-i => imenu
@@ -2467,10 +2833,6 @@
 ** ido / fido
 ** grep vs. ack
 ** tab-bar mode vs tab-line mode
-** DONE toggle-truncate-lines in org / txt ?
-   - State "DONE"       from              [2022-03-22 mar. 13:19]
-   https://emacs.stackexchange.com/questions/5607/how-to-fill-wrap-an-org-mode-heading
-
 ** [expansion] Abbrev / DAbbrev / hippie-expand
 ** [expansion] skeletons / Tempo
 ** [expansion] Autoinsert
@@ -2485,7 +2847,47 @@
 ** Helm
    https://emacs-helm.github.io/helm/
 ** Flycheck
-   https://www.flycheck.org/en/latest/
+   #+BEGIN_SRC emacs-lisp :tangle no
+     (use-package flycheck
+       :ensure t
+       :init (global-flycheck-mode)
+       )
+   #+END_SRC
+
+   flycheck keybinding: C-c !
+
+   | Key       | Description                          |
+   |-----------+--------------------------------------|
+   | C-c ! ?   | Describe a Flycheck Checker          |
+   | C-c ! C-c | Compile using checker                |
+   | C-c ! C-w | Copy error point is on to kill ring  |
+   | C-c ! C   | Clear all highlights from buffer     |
+   | C-c ! V   | Report Flycheck version              |
+   | C-c ! c   | Start syntax checking current buffer |
+   | C-c ! e   | Change Flycheck executable           |
+   | C-c ! i   | Open Flycheck info manual            |
+   | C-c ! l   | List all Flycheck errors             |
+   | C-c ! n   | Jump to next error                   |
+   | C-c ! p   | Jump to previous error               |
+   | C-c ! s   | Change Flycheck checker              |
+   | C-c ! v   | Verifies the Flycheck checker works  |
+   | C-c ! x   | Disable Flycheck checker in buffer   |
+*** checker
+**** xml
+     #+BEGIN_SRC emacs-lisp :tangle no
+       (flycheck-define-checker xml-xmllint
+         "A XML syntax checker and validator using the xmllint utility.
+
+       The xmllint is part of libxml2, see URL
+       `http://www.xmlsoft.org/'."
+         :command ("xmllint" "--noout" source)
+         :error-patterns
+         ((error line-start (file-name) ":" line ": " (message) line-end))
+         :modes (xml-mode nxml-mode)
+         )
+     #+END_SRC
+*** references
+    URL: https://www.flycheck.org/en/latest/
 ** Hydra
    https://github.com/abo-abo/hydra
 ** dumb-jump
@@ -2493,3 +2895,6 @@
 ** mark the next s-exp
 ** project management
 ** xref
+** format-time-string vs iso8601
+** multi-term
+   https://www.emacswiki.org/emacs/MultiTerm
