@@ -2830,11 +2830,12 @@
 ** DONE toggle-truncate-lines in org / txt ?
    - State "DONE"       from              [2022-03-22 mar. 13:19]
    https://emacs.stackexchange.com/questions/5607/how-to-fill-wrap-an-org-mode-heading
+** DONE ido / fido
+   - State "DONE"       from              [2022-04-13 mer. 13:11]
 ** isearch: word vs symbol
 ** imenu
    M-i => imenu
 ** helm
-** ido / fido
 ** grep vs. ack
 ** tab-bar mode vs tab-line mode
 ** [expansion] Abbrev / DAbbrev / hippie-expand
