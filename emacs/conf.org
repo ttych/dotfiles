@@ -258,10 +258,14 @@
       ;;  (global-set-key (kbd "C-x B") 'ibuffer-other-window)
     #+END_SRC    
 *** mini buffer
-**** completion
+**** icomplete
    #+BEGIN_SRC emacs-lisp :tangle yes
      (icomplete-mode 1)
+     (unless (version< emacs-version "28.1")
+       (fido-mode 1))
    #+END_SRC
+***** fido
+      fido-mode or fido-vertical-mode
 *** file
 **** auto-save to save-dir
     #+BEGIN_SRC emacs-lisp :tangle yes
