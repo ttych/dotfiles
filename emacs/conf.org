@@ -1234,8 +1234,10 @@
     #+BEGIN_SRC emacs-lisp :tangle yes
       (use-package delight :ensure t)
 
-      (delight 'whitespace-mode " ¬" 'whitespace)
-      (delight 'abbrev-mode " '" 'abbrev)
+      ;; (delight 'whitespace-mode " ¬" 'whitespace)
+      (delight 'whitespace-mode nil 'whitespace)
+      ;; (delight 'abbrev-mode " '" 'abbrev)
+      (delight 'abbrev-mode nil 'abbrev)
       ;; (delight 'flyspell-mode " ϝ" 'flyspell)
       (delight 'flyspell-mode nil 'flyspell)
     #+END_SRC
