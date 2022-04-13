@@ -1236,7 +1236,8 @@
 
       (delight 'whitespace-mode " ¬" 'whitespace)
       (delight 'abbrev-mode " '" 'abbrev)
-      (delight 'flyspell-mode " ϝ" 'flyspell)
+      ;; (delight 'flyspell-mode " ϝ" 'flyspell)
+      (delight 'flyspell-mode nil 'flyspell)
     #+END_SRC
 *** try (d)
     #+BEGIN_SRC emacs-lisp :tangle no
