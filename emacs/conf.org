@@ -895,7 +895,7 @@
        (add-hook 'prog-mode-hook 'flyspell-prog-mode)
 
        ;; (delight 'flyspell-mode " ϝ" 'flyspell)
-       (delight 'flyspell-mode nil 'flyspell)
+       ;; (delight 'flyspell-mode nil 'flyspell)
      #+END_SRC
 *** indentation
     #+BEGIN_SRC emacs-lisp :tangle yes
