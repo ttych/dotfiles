@@ -717,7 +717,7 @@
       (add-hook 'prog-mode-hook 'whitespace-mode)
       (add-hook 'text-mode-hook 'whitespace-mode)
 
-      (delight 'whitespace-mode " ¬" 'whitespace)
+      ;; (delight 'whitespace-mode " ¬" 'whitespace)
 
        (add-hook 'before-save-hook 'my/delete-trailing-whitespace)
        (defun my/delete-trailing-whitespace ()
@@ -809,7 +809,7 @@
        ;;                 text-mode-hook))
        ;; (add-hook hook #'abbrev-mode))
 
-       (delight 'abbrev-mode nil 'abbrev)
+       ;; (delight 'abbrev-mode nil 'abbrev)
      #+END_SRC
 ***** dictionnary
      No one is immune to spelling mistakes. So I like to check the spelling of the
@@ -1233,6 +1233,10 @@
 *** delight
     #+BEGIN_SRC emacs-lisp :tangle yes
       (use-package delight :ensure t)
+
+      (delight 'whitespace-mode " ¬" 'whitespace)
+      (delight 'abbrev-mode " '" 'abbrev)
+      (delight 'flyspell-mode " ϝ" 'flyspell)
     #+END_SRC
 *** try (d)
     #+BEGIN_SRC emacs-lisp :tangle no
