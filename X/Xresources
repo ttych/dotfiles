@@ -45,7 +45,6 @@
 ! - twilight_dark
 
 ! ---------- default_dark (+)
-default_dark.*.title: term
 ! special
 default_dark.*.foreground:   #d0d0d0
 default_dark.*.background:   #151515
@@ -76,7 +75,6 @@ default_dark.*.color7:       #d0d0d0
 default_dark.*.color15:      #f5f5f5
 
 ! ---------- 3024_dark
-3024_dark.*.title: term
 ! special
 ! 3024_dark.*.foreground:   #a5a2a2
 3024_dark.*.foreground:   #d0d0d0
@@ -817,6 +815,7 @@ xclock*twentyfour:			true
 ! ---------- xterm
 ! - https://aduros.com/blog/xterm-its-better-than-you-thought
 ! - https://invisible-island.net/xterm/xterm.faq.html#tiny_menus
+XTerm.title:                    xTerm
 xterm*name:                     xTerm
 xterm*cutNewline:               false
 xterm*colorMode:                true
@@ -860,6 +859,7 @@ XTerm.vt100.encodingMode:	locale
 ! XTerm.vt100.utf8: true
 XTerm.vt100.locale:             true
 XTerm.vt100.metaSendsEscape:    true
+! XTerm.*.modifier:               meta
 XTerm.vt100.backarrowKey:       false
 XTerm.ttyModes:                 erase ^?
 XTerm*vt100.geometry:           80x24
@@ -940,14 +940,18 @@ URxvt.letterSpace:              -1
 URxvt.lineSpace:                0
 URxvt.cursorBlink:              true
 URxvt.cursorUnderline:          true
-URxvt.perl-ext-common:          default,matcher,font-size
+URxvt.perl-ext-common:          default,font-size
+! URxvt.perl-ext-common:        ...,font-size,...
+! URxvt.perl-ext-common:        ...,matcher,...
 ! URxvt.perl-ext-common:        ...,tabbed,...
 URxvt.urlLauncher:              xdg-open
 URxvt.matcher.button:           3
-! URxvt.keysym.Control-plus:      builtin-string:
-! URxvt.keysym.Control-minus:     builtin-string:
-URxvt.keysym.Control-Meta-S-plus:            perl:font-size:increase
-URxvt.keysym.Control-Meta-S-underscore:      perl:font-size:decrease
+URxvt.keysym.Control-Meta-plus:      perl:font-size:increase
+URxvt.keysym.Control-Meta-underscore:  perl:font-size:decrease
+URxvt.keysym.C-0x2b:            builtin-string:
+URxvt.keysym.C-0x2d:            builtin-string:
+URxvt.keysym.C-0x1f:            builtin-string:
+URxvt.keysym.C-0x5f:            builtin-string:
 URxvt.font-size.step:           4
 URxvt.font:                     xft:DejaVu Sans Mono:pixelsize=10
 URxvt.boldFont:                 xft:DejaVu Sans Mono:pixelsize=10:weight=bold
