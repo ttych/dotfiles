@@ -1926,6 +1926,7 @@
     | ?         |             |
 **** references
      https://www.magit.vc
+     https://emacsair.me/2017/09/01/magit-walk-through/
 *** ag - The Silver Searcher (d)
     #+BEGIN_SRC emacs-lisp :tangle no
       (use-package ag
@@ -2377,7 +2378,6 @@
     |-----------------+-------------------------------------------------|
     | C-x C-k         | kmacro prefix                                   |
     |-----------------+-------------------------------------------------|
-
 **** Counters
     | Key             | Description                              |
     |-----------------+------------------------------------------|
@@ -2386,7 +2386,6 @@
     | C-x C-k C-c     | Sets counter                             |
     | C-x C-k C-f     | Sets format counter                      |
     | C-x C-k q       | Queries for user input while recording   |
-
 **** Query
     | Query Key | Description                 |
     |-----------+-----------------------------|
@@ -2396,7 +2395,6 @@
     | C-l       | Recenters the screen        |
     | C-r       | Enters recursive edit       |
     | C-M-c     | Exits recursive edit        |
-
 **** Saving and Recalling
      | Key                  | Description                   |
      |----------------------+-------------------------------|
@@ -2407,7 +2405,6 @@
      | C-x C-k e            | Edits last macro              |
      | C-x C-k l            | Edits the last 300 keystrokes |
      | M-x insert-kbd-macro | Inserts macro as elisp        |
-     |                      |                               |
 *** Abbrev
     | Key       | Description                       |
     |-----------+-----------------------------------|
