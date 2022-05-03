@@ -51,6 +51,27 @@ httpd_ruby()
     ruby -run -ehttpd . -p "${1:-8000}"
 }
 
+httpd_ruby_debug()
+{
+    case $# in
+        0|1)
+            httpd_ruby_debug__host="127.0.0.1"
+            httpd_ruby_debug__port="${1:-8000}"
+            ;;
+        2)
+            httpd_ruby_debug__host="${1:-127.0.0.1}"
+            httpd_ruby_debug__port="${2:-8000}"
+            ;;
+        *)
+            echo >&2 "usage is: httpd_ruby_debug [[host] port]"
+            return 1
+            ;;
+    esac
+
+    echo "> listen on $httpd_ruby_debug__host:$httpd_ruby_debug__port"
+    ruby -rsocket -e "trap('SIGINT') { exit }; Socket.tcp_server_loop(host=\"$httpd_ruby_debug__host\", port=$httpd_ruby_debug__port) { |s,_| puts s.readpartial(1024); puts; s.puts 'HTTP/1.1 200'; s.close }"
+}
+
 # from https://gist.github.com/willurd/5720255/#comment-841393
 httpd_adsf()
 {
@@ -123,9 +144,14 @@ httpd_webfs()
 
 whttpd()
 {
-    httpd_ruby ||
-        httpd_python_3 ||
-        httpd_python_2
+    httpd_ruby "$@" ||
+        httpd_python_3 "$@" ||
+        httpd_python_2 "$@"
+}
+
+whttpd_debug()
+{
+    httpd_ruby_debug "$@"
 }
 
 
