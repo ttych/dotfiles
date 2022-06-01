@@ -104,8 +104,18 @@ dist_build_makefile()
     dist_build_prefix "$1" || return 1
     dist_build_makefile="$dist_build_prefix/${PWD##*/}"
 
-    PREFIX="$dist_build_makefile" make &&
-        PREFIX="$dist_build_makefile" make install
+    eval dist_build_makefile__pre_build="\"$4\""
+    eval dist_build_makefile__build_arg="\"$5\""
+    eval dist_build_makefile__install_arg="\"$6\""
+
+    $dist_build_makefile__pre_build ||
+        return $?
+    PREFIX="$dist_build_makefile" make $dist_build_makefile__build_arg ||
+        return $?
+    PREFIX="$dist_build_makefile" make install $dist_build_makefile__install_arg ||
+        return $?
+
+    exit 1
 }
 
 dist_build_copy()
@@ -170,7 +180,7 @@ dist_build()
         dist_build_autogen "$dist_build__loc" "$2" "$4"
         dist_build__ret=$?
     elif [ -r Makefile ]; then
-        dist_build_makefile "$dist_build__loc" "$2" "$4"
+        dist_build_makefile "$dist_build__loc" "$2" "$4" "$5" "$6" "$7"
     else
         dist_build_copy "$dist_build__loc" "$2" "$dist_build__rename"
     fi

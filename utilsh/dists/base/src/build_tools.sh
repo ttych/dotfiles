@@ -244,6 +244,20 @@ BUILD_TOOLS_RG_PREREQ_UBUNTU=
 BUILD_TOOLS_RG_URL_PATTERN='https://github.com/BurntSushi/ripgrep/archive/refs/tags/${version}.tar.gz'
 BUILD_TOOLS_RG_DEFAULT_VERSION=13.0.0
 
+#> apg - apg
+BUILD_TOOLS_APG_ENV=
+BUILD_TOOLS_APG_CONFIG=
+BUILD_TOOLS_APG_PRE_BUILD='sed -i -e "s/root/$(whoami)/g" Makefile'
+BUILD_TOOLS_APG_BUILD_ARG='standalone'
+BUILD_TOOLS_APG_INSTALL_ARG='INSTALL_PREFIX="$dist_build_makefile"'
+BUILD_TOOLS_APG_PREREQ_REDHAT=
+BUILD_TOOLS_APG_PREREQ_UBUNTU=
+BUILD_TOOLS_APG_URL_PATTERN='https://github.com/jabenninghoff/apg/archive/refs/tags/v${version}.tar.gz'
+BUILD_TOOLS_APG_DEFAULT_VERSION=2.2.3
+
+
+#
+
 
 build_tools_env()
 {
@@ -271,6 +285,9 @@ build_tools_env()
 
     eval build_tools_env__config="\"\$BUILD_TOOLS_${build_tools_env__name}_CONFIG\""
     eval build_tools_env__env="\"\$BUILD_TOOLS_${build_tools_env__name}_ENV\""
+    eval build_tools_env__pre_build="\"\$BUILD_TOOLS_${build_tools_env__name}_PRE_BUILD\""
+    eval build_tools_env__build_arg="\"\$BUILD_TOOLS_${build_tools_env__name}_BUILD_ARG\""
+    eval build_tools_env__install_arg="\"\$BUILD_TOOLS_${build_tools_env__name}_INSTALL_ARG\""
 }
 
 build_tools()
@@ -282,7 +299,7 @@ build_tools()
     build_tools_env "$1" "$2" || return 1
 
     os_install $build_tools_env__prereq || return 1
-    dist_build $build_tools__loc "$build_tools_env__url" "$build_tools_env__config" "$build_tools_env__url_header" "$build_tools_env__env"
+    dist_build $build_tools__loc "$build_tools_env__url" "$build_tools_env__config" "$build_tools_env__url_header" "$build_tools_env__env" "$build_tools_env__pre_build" "$build_tools_env__build_arg" "$build_tools_env__install_arg"
 }
 
 download_tools_to_build()
