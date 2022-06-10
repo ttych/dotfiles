@@ -59,20 +59,22 @@ export ESH_OS ESH_OS_ARCH HOSTNAME
 ### PATH
 PATH_BASE=/usr/local/bin:/usr/local/sbin:/bin:/usr/bin:/sbin:/usr/sbin
 MANPATH_BASE=/usr/local/man:/usr/local/share/man:/usr/man:/usr/share/man
+INFOPATH_BASE=/usr/local/share/info:/usr/local/share/doc/info:/usr/share/info:/usr/share/doc/info
 LD_LIBRARY_PATH_BASE=/usr/local/lib:/lib:/usr/lib
 
 _path_clear()
 {
     PATH="$PATH_BASE"
     MANPATH="$MANPATH_BASE"
+    INFOPATH="$INFOPATH_BASE"
     LD_LIBRARY_PATH="$LD_LIBRARY_PATH_BASE"
-    export PATH MANPATH LD_LIBRARY_PATH
+    export PATH MANPATH INFOPATH LD_LIBRARY_PATH
 }
 _path_clear
 
 _path_splitter()
 {
-    for _path_splitter__var in PATH MANPATH LD_LIBRARY_PATH; do
+    for _path_splitter__var in PATH MANPATH INFOPATH LD_LIBRARY_PATH; do
         eval _path_splitter__content=\"\$${_path_splitter__var}\"
         eval _path_splitter__base=\"\$${_path_splitter__var}_BASE\"
 
@@ -88,7 +90,7 @@ _path_splitter()
 
 _path_merger()
 {
-    for _path_merger__var in PATH MANPATH LD_LIBRARY_PATH; do
+    for _path_merger__var in PATH MANPATH INFOPATH LD_LIBRARY_PATH; do
         _path_merger__merge=
         for _path_merger__part in FRONT BASE BACK; do
             eval _path_merger__cur=\"\$${_path_merger__var}_${_path_merger__part}\"
@@ -97,7 +99,7 @@ _path_merger()
         done
         eval $_path_merger__var="$_path_merger__merge"
     done
-    export PATH MANPATH LD_LIBRARY_PATH
+    export PATH MANPATH INFOPATH LD_LIBRARY_PATH
 }
 
 
@@ -137,6 +139,10 @@ _path_add()
                     _path_add_var MANPATH "$_path_add__loc1" "$_path_add__loc2" "$_path_add__p/man"
                 [ -d "$_path_add__p/share/man" ] &&
                     _path_add_var MANPATH "$_path_add__loc1" "$_path_add__loc2" "$_path_add__p/share/man"
+                [ -d "$_path_add__p/info" ] &&
+                    _path_add_var INFOPATH "$_path_add__loc1" "$_path_add__loc2" "$_path_add__p/man"
+                [ -d "$_path_add__p/share/info" ] &&
+                    _path_add_var INFOPATH "$_path_add__loc1" "$_path_add__loc2" "$_path_add__p/share/man"
                 [ -d "$_path_add__p/sbin" ] &&
                     _path_add_var PATH "$_path_add__loc1" "$_path_add__loc2" "$_path_add__p/sbin"
                 _path_activate && [ -r "$_path_add__p/bin/$_path_activate" ] &&
@@ -182,7 +188,7 @@ _path_purge()
     _path_splitter
     for _path_purge__path; do
         for _path_purge__loc1 in FRONT BACK; do
-            for _path_purge__loc2 in PATH LD_LIBRARY_PATH MANPATH; do
+            for _path_purge__loc2 in PATH LD_LIBRARY_PATH MANPATH INFOPATH; do
                 _path_purge_var "$_path_purge__loc2" "$_path_purge__loc1" "$_path_purge__path"
             done
         done
