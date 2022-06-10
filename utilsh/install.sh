@@ -24,6 +24,7 @@ AUTOLOADS='
   myenv.shl
   git.lib.sh
   editors.lib.sh
+  texlive.lib.sh
 '
 
 if [ -z "$UTILSH_DIR" ]; then
