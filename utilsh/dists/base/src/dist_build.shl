@@ -114,8 +114,6 @@ dist_build_makefile()
         return $?
     PREFIX="$dist_build_makefile" make install $dist_build_makefile__install_arg ||
         return $?
-
-    exit 1
 }
 
 dist_build_copy()
@@ -172,18 +170,16 @@ dist_build()
 
     if [ -x configure ]; then
         dist_build_configure "$dist_build__loc" "$2" "$4"
-        dist_build__ret=$?
     elif [ -r CMakeLists.txt ]; then
         dist_build_cmake "$dist_build__loc" "$2" "$4"
-        dist_build__ret=$?
     elif [ -r autogen.sh ]; then
         dist_build_autogen "$dist_build__loc" "$2" "$4"
-        dist_build__ret=$?
     elif [ -r Makefile ]; then
         dist_build_makefile "$dist_build__loc" "$2" "$4" "$5" "$6" "$7"
     else
         dist_build_copy "$dist_build__loc" "$2" "$dist_build__rename"
     fi
+    dist_build__ret=$?
 
     rm -Rf "$_mktemp_dir"
 
