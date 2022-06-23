@@ -20,7 +20,7 @@ uuid_gen()
 file_inspect()
 {
     has_ruby || return 1
-    ruby -r pp -e "pp File.read('$1')"
+    ruby -r pp -e "puts File.read('$1').inspect"
 }
 
 json_inspect()
