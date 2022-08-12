@@ -340,20 +340,39 @@ freebsd_bootcode()
     mount_devfs || return 1
 
     for freebsd_bootcode__d; do
-        freebsd_bootcode__entry=$(gpart show | grep " efi ")
+        freebsd_bootcode__entry=$(gpart show "$freebsd_bootcode__d" | grep " efi ")
+        # if [ -n "$freebsd_bootcode__entry" ]; then
+        #     freebsd_bootcode__i=${freebsd_bootcode__entry% * efi *}
+        #     freebsd_bootcode__i=${freebsd_bootcode__i##* }
+
+        #     freebsd_bootcode__cmd="gpart bootcode -p /boot/boot1.efifat -i $freebsd_bootcode__i $freebsd_bootcode__d"
+        #     echo >&2 "execute: \"$freebsd_bootcode__cmd\" ? (y/N)"
+        #     read answer
+        #     case $answer in
+        #         [Yy]|[Yy][Ee][Ss]) $freebsd_bootcode__cmd ;;
+        #     esac
+        # fi
+
         if [ -n "$freebsd_bootcode__entry" ]; then
             freebsd_bootcode__i=${freebsd_bootcode__entry% * efi *}
             freebsd_bootcode__i=${freebsd_bootcode__i##* }
 
-            freebsd_bootcode__cmd="gpart bootcode -p /boot/boot1.efifat -i $freebsd_bootcode__i $freebsd_bootcode__d"
-            echo >&2 "execute: \"$freebsd_bootcode__cmd\" ? (y/N)"
+            echo >&2 "execute: newfs, ... on /dev/${freebsd_bootcode__d}p${$freebsd_bootcode__i} ? (y/N)"
             read answer
             case $answer in
-                [Yy]|[Yy][Ee][Ss]) $freebsd_bootcode__cmd ;;
+                [Yy]|[Yy][Ee][Ss])
+                    newfs_msdos -F 32 -c 1 "/dev/${freebsd_bootcode__d}p${$freebsd_bootcode__i}" &&
+                        mkdir -p "/boot/boot__${freebsd_bootcode__d}p${$freebsd_bootcode__i}" &&
+                        mount -t msdosfs -o longnames "/dev/${freebsd_bootcode__d}p${$freebsd_bootcode__i}" "/boot/boot__${freebsd_bootcode__d}p${$freebsd_bootcode__i}" &&
+                        mkdir -p "/boot/boot__${freebsd_bootcode__d}p${$freebsd_bootcode__i}/EFI/BOOT" &&
+                        cp /boot/loader.efi "/boot/boot__${freebsd_bootcode__d}p${$freebsd_bootcode__i}/EFI/BOOT/BOOTX64.efi" &&
+                        umount "/boot/boot__${freebsd_bootcode__d}p${$freebsd_bootcode__i}" &&
+                        rmdir "/boot/boot__${freebsd_bootcode__d}p${$freebsd_bootcode__i}"
+                    ;;
             esac
         fi
 
-        freebsd_bootcode__entry=$(gpart show | grep " freebsd-boot ")
+        freebsd_bootcode__entry=$(gpart show "$freebsd_bootcode__d" | grep " freebsd-boot ")
         if [ -n "$freebsd_bootcode__entry" ]; then
             freebsd_bootcode__i=${freebsd_bootcode__entry% * freebsd-boot *}
             freebsd_bootcode__i=${freebsd_bootcode__i##* }
