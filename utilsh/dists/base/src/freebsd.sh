@@ -2,7 +2,10 @@
 
 
 ### documentation
+## Boot
 # - https://wiki.freebsd.org/RootOnZFS/GPTZFSBoot
+# - https://cgit.freebsd.org/src/tree/usr.sbin/bsdinstall/scripts/zfsboot?h=stable/13#n843
+# - https://cgit.freebsd.org/src/tree/usr.sbin/bsdinstall/scripts/bootconfig?h=stable/13#n49
 
 
 ###
