@@ -1,5 +1,12 @@
 #!/bin/sh
 
+
+### documentation
+# - https://wiki.freebsd.org/RootOnZFS/GPTZFSBoot
+
+
+###
+
 SCRIPT_NAME="${0##*/}"
 SCRIPT_RPATH="${0%$SCRIPT_NAME}"
 SCRIPT_PATH=`cd "${SCRIPT_RPATH:-.}" && pwd`
