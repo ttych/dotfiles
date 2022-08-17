@@ -75,6 +75,7 @@ GEM_PACK_SINATRA="sinatra"
 GEM_PACK_UTILS="quick_and_ruby semver"
 GEM_PACK_PUPPET="metadata-json-lint pdk puppet-lint"
 GEM_PACK_ASCIIDOC="asciidoctor asciidoctor-pdf asciidoctor-revealjs rouge"
+GEM_PACK_WWW="nanoc middleman puma webrick"
 
 _gem_pack_1()
 {
