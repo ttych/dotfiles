@@ -137,37 +137,42 @@ tailf()
 ### ruby
 bundle_exec()
 {
-  bundle exec "$@"
+    bundle exec "$@"
 }
 
 Bexec()
 {
-  bundle_exec "$@"
+    bundle_exec "$@"
 }
 
 Brake()
 {
-  bundle_exec rake "$@"
+    bundle_exec rake "$@"
 }
 
 Bruby()
 {
-  bundle_exec ruby "$@"
+    bundle_exec ruby "$@"
 }
 
 Brails()
 {
-  bundle_exec rails "$@"
+    bundle_exec rails "$@"
 }
 
 Bconsole()
 {
-  bundle_exec console "$@"
+    bundle_exec console "$@"
 }
 
 Birb()
 {
-  bundle_exec irb "$@"
+    bundle_exec irb "$@"
+}
+
+Brubocop()
+{
+    bundle_exec rubocop "$@"
 }
 
 Brspec()
@@ -178,24 +183,6 @@ Brspec()
 Bguard()
 {
     bundle_exec guard "$@"
-}
-
-Bcap()
-{
-    bundle_exec cap "$@"
-}
-
-Bjekyll()
-{
-    bundle_exec jekyll "$@"
-}
-Bjekylls()
-{
-    bundle_exec jekyll serve --drafts --livereload --watch "$@"
-}
-Bjekylls2()
-{
-    bundle_exec jekyll serve --port 4001 --drafts --livereload --livereload-port 4011 --watch "$@"
 }
 
 
