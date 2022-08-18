@@ -1837,45 +1837,47 @@
    #+END_QUOTE
 
    #+BEGIN_SRC emacs-lisp :tangle yes
-  (setq-default
-   org-confirm-babel-evaluate nil
-   ;; org-startup-indented t
-   ;; org-startup-with-inline-images t
-   )
+     (setq-default
+      org-confirm-babel-evaluate nil
+      ;; org-startup-indented t
+      ;; org-startup-with-inline-images t
+      )
 
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '(
-     (emacs-lisp . t)
-     (python . t)
-     (ruby . t)
-     )
-   )
-
-  ;; adding special markers ‘!’ (for a timestamp) and ‘@’ (for a note) in parentheses after each keyword
-  (setq org-todo-keywords
-        '((sequence "TODO(t)" "|" "DONE(d!)")
-          (sequence "BACKLOG(b!)" "READY(r!)" "WIP(w!)" "BLOCKED(B@)" "|" "DONE(d!)" "CANCELLED(c@)"))
+     (org-babel-do-load-languages
+      'org-babel-load-languages
+      '(
+        (emacs-lisp . t)
+        (python . t)
+        (ruby . t)
+        (shell . t)
+        (awk . t)
         )
-  ;; (setq org-log-done 'time)
-  ;; (setq org-log-done 'note)
+      )
 
-  ;; (setq org-agenda-custom-commands
-  ;;    '(("h" "Daily habits"
-  ;;       ((agenda ""))
-  ;;       ((org-agenda-show-log t)
-  ;;        (org-agenda-ndays 7)
-  ;;        (org-agenda-log-mode-items '(state))
-  ;;        (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp ":DAILY:"))))))
+     ;; adding special markers ‘!’ (for a timestamp) and ‘@’ (for a note) in parentheses after each keyword
+     (setq org-todo-keywords
+           '((sequence "TODO(t)" "|" "DONE(d!)")
+             (sequence "BACKLOG(b!)" "READY(r!)" "WIP(w!)" "BLOCKED(B@)" "|" "DONE(d!)" "CANCELLED(c@)"))
+           )
+     ;; (setq org-log-done 'time)
+     ;; (setq org-log-done 'note)
 
-  (global-set-key (kbd "M-] o l") 'org-store-link)
-  (global-set-key (kbd "M-] o a") 'org-agenda)
-  (global-set-key (kbd "M-] o c") 'org-capture)
+     ;; (setq org-agenda-custom-commands
+     ;;    '(("h" "Daily habits"
+     ;;       ((agenda ""))
+     ;;       ((org-agenda-show-log t)
+     ;;        (org-agenda-ndays 7)
+     ;;        (org-agenda-log-mode-items '(state))
+     ;;        (org-agenda-skip-function '(org-agenda-skip-entry-if 'notregexp ":DAILY:"))))))
+
+     (global-set-key (kbd "M-] o l") 'org-store-link)
+     (global-set-key (kbd "M-] o a") 'org-agenda)
+     (global-set-key (kbd "M-] o c") 'org-capture)
    #+END_SRC
 *** truncate
     Non-nil means entering Org-mode will set `truncate-lines'.
     This is useful since some lines containing links can be very long and
-    uninteresting.  Also tables look terrible when wrapped.
+    uninteresting. Also tables look terrible when wrapped.
     #+BEGIN_SRC emacs-lisp :tangle no
       (setq org-startup-truncated nil)
     #+END_SRC
@@ -1903,6 +1905,19 @@
 	(add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
 	)
     #+END_SRC
+*** ob-http
+    #+begin_src emacs-lisp :tangle yes
+      (use-package ob-http
+        :ensure t
+        :config
+        (org-babel-do-load-languages
+         'org-babel-load-languages
+         '(
+           (http . t)
+           )
+         )
+        )
+    #+end_src
 ** utilities
 *** magit
     #+BEGIN_SRC emacs-lisp :tangle yes
