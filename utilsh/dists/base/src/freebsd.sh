@@ -404,6 +404,136 @@ freebsd_bootstrap()
         pkg_install_minimum
 }
 
+freebsd_update()
+{
+    # REFERENCE:
+    # https://www.cyberciti.biz/open-source/freebsd-13-released-how-to-update-upgrade-freebsd-12-to-13/
+
+    freebsd_update__state_requested="$1"
+    freebsd_update__state_file="/var/tmp/update_state"
+    if [ -r "$freebsd_update__state_file" ]; then
+        freebsd_update__state=$(cat "$freebsd_update__state_file")
+    fi
+
+    echo ">>> INFO"
+    echo "> freebsd-version -r: $(freebsd-version -r)"
+    echo "> freebsd-version -k: $(freebsd-version -k)"
+    echo "> freebsd-version -u: $(freebsd-version -u)"
+    echo "> uname -srm: $(uname -srm)"
+
+    if [ -n "$freebsd_update__state_requested" ]; then
+        freebsd_update__state="$freebsd_update__state_requested"
+    else
+        if [ -n "$freebsd_update__state" ]; then
+            echo "> RESUME STEP FROM $freebsd_update__state [Y/n] ? "
+            read answer
+            case ${answer:-y} in
+                [Yy]|[Yy][Ee][Ss])
+                    freebsd_update__state=$(($freebsd_update__state + 1))
+                    ;;
+                *)
+                    echo "> CHOOSE ANOTHER STATE TO RUN THEN ..."
+                    return 1
+                    ;;
+            esac
+        else
+            freebsd_update__state=1
+        fi
+    fi
+
+    echo ">>> RUNNING STEP $freebsd_update__state"
+
+    case $freebsd_update__state in
+        1)
+            rm -f "$freebsd_update__state_file"
+
+            echo "> UP2DATE"
+            echo "> freebsd-update fetch"
+            freebsd-update fetch
+            echo "> $?"
+            echo "> freebsd-update install"
+            freebsd-update install
+            echo "> $?"
+            echo "> pkg upgrade"
+            pkg upgrade
+            echo "> $?"
+
+            echo "1" > "$freebsd_update__state_file"
+            echo "> REBOOT with shutdown -r now / reboot"
+            ;;
+
+        2)
+            echo "> TARGET version (ex: 13.0-RELEASE) ? "
+            read freebsd_update__target
+            if [ -z "$freebsd_update__target" ]; then
+                echo "> NO TARGET ... ABORTING"
+                return 1
+            fi
+            freebsd-update -r "$freebsd_update__target" upgrade
+            echo "> $?"
+            echo "> APPLY"
+            freebsd-update install
+            echo "> $?"
+
+            echo "2" > "$freebsd_update__state_file"
+            echo "> REBOOT with shutdown -r now / reboot"
+            ;;
+
+        3)
+            echo "> APPLY (2)"
+            freebsd-update install
+            echo "> $?"
+
+            echo "> UPDATE PACKAGES"
+            echo "> pkg-static install -f pkg"
+            pkg-static install -f pkg
+            echo "> $?"
+            echo "> pkg bootstrap -f"
+            pkg bootstrap -f
+            echo "> $?"
+            echo "> pkg update"
+            pkg update
+            echo "> $?"
+            echo "> pkg upgrade"
+            pkg upgrade
+            echo "> $?"
+
+            echo "> APPLY (3)"
+            freebsd-update install
+            echo "> $?"
+
+            echo "3" > "$freebsd_update__state_file"
+            echo "> REBOOT with shutdown -r now / reboot"
+            ;;
+
+        4)
+            echo "> APPLY latest small patches (3)"
+            echo "> freebsd-update fetch install"
+            freebsd-update fetch install
+            echo "> $?"
+
+            echo "> PACKAGES: CLEAN"
+            echo "> pkg autoremove"
+            pkg autoremove
+            echo "> $?"
+
+            echo "> ZFS: UPGRADE"
+            echo "> zpool upgrade -a"
+            zpool upgrade -a
+            echo "> $?"
+
+            echo "> ZFS: UPGRADE BOOTCODE !!!!!!!!"
+
+            echo "4" > "$freebsd_update__state_file"
+            echo "> REBOOT with shutdown -r now / reboot"
+            ;;
+    esac
+
+    if [ "$freebsd_update__state" = 4 ]; then
+        rm -f "$freebsd_update__state_file"
+    fi
+}
+
 freebsd()
 {
     freebsd__action="$1"
@@ -413,6 +543,7 @@ freebsd()
         root)      freebsd_root "$@" ;;
         bootcode)  freebsd_bootcode "$@" ;;
         bootstrap) freebsd_bootstrap "$@" ;;
+        update) freebsd_update "$@" ;;
         *)
             echo >&2 "unsupported freebsd action \"$freebsd_action\""
             return 1
