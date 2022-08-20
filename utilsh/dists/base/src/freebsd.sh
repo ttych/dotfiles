@@ -367,17 +367,17 @@ freebsd_bootcode()
             freebsd_bootcode__i=${freebsd_bootcode__entry% * efi *}
             freebsd_bootcode__i=${freebsd_bootcode__i##* }
 
-            echo >&2 "execute: newfs, ... on /dev/${freebsd_bootcode__d}p${$freebsd_bootcode__i} ? (y/N)"
+            echo >&2 "execute: newfs, ... on /dev/${freebsd_bootcode__d}p${freebsd_bootcode__i} ? (y/N)"
             read answer
             case $answer in
                 [Yy]|[Yy][Ee][Ss])
-                    newfs_msdos -F 32 -c 1 "/dev/${freebsd_bootcode__d}p${$freebsd_bootcode__i}" &&
-                        mkdir -p "/boot/boot__${freebsd_bootcode__d}p${$freebsd_bootcode__i}" &&
-                        mount -t msdosfs -o longnames "/dev/${freebsd_bootcode__d}p${$freebsd_bootcode__i}" "/boot/boot__${freebsd_bootcode__d}p${$freebsd_bootcode__i}" &&
-                        mkdir -p "/boot/boot__${freebsd_bootcode__d}p${$freebsd_bootcode__i}/EFI/BOOT" &&
-                        cp /boot/loader.efi "/boot/boot__${freebsd_bootcode__d}p${$freebsd_bootcode__i}/EFI/BOOT/BOOTX64.efi" &&
-                        umount "/boot/boot__${freebsd_bootcode__d}p${$freebsd_bootcode__i}" &&
-                        rmdir "/boot/boot__${freebsd_bootcode__d}p${$freebsd_bootcode__i}"
+                    newfs_msdos -F 32 -c 1 "/dev/${freebsd_bootcode__d}p${freebsd_bootcode__i}" &&
+                        mkdir -p "/boot/boot__${freebsd_bootcode__d}p${freebsd_bootcode__i}" &&
+                        mount -t msdosfs -o longnames "/dev/${freebsd_bootcode__d}p${freebsd_bootcode__i}" "/boot/boot__${freebsd_bootcode__d}p${freebsd_bootcode__i}" &&
+                        mkdir -p "/boot/boot__${freebsd_bootcode__d}p${freebsd_bootcode__i}/EFI/BOOT" &&
+                        cp /boot/loader.efi "/boot/boot__${freebsd_bootcode__d}p${freebsd_bootcode__i}/EFI/BOOT/BOOTX64.efi" &&
+                        umount "/boot/boot__${freebsd_bootcode__d}p${freebsd_bootcode__i}" &&
+                        rmdir "/boot/boot__${freebsd_bootcode__d}p${freebsd_bootcode__i}"
                     ;;
             esac
         fi
