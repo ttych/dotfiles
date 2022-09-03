@@ -62,7 +62,11 @@ git config --global alias.conf 'config --global -e'
 git config --global init.defaultBranch master
 
 # color output
-git config --global color.ui true
+git config --global color.ui auto
+git config --global color.branch auto
+git config --global color.diff auto
+git config --global color.interactive auto
+git config --global color.status auto
 
 # editor set to emacs if available
 for editor in e et emacs vim vi; do
@@ -182,8 +186,9 @@ git config --global alias.difftext 'diff --word-diff --unified=10'
 git config --global alias.difft 'diff --word-diff --unified=10'
 
 # log
-git config --global alias.ll 'log --pretty=fuller'
+git config --global alias.lf 'log --pretty=fuller'
 #git config --global alias.l1 'log --oneline --decorate --abbrev-commit --all'
+# git config --global alias.l1 "log --pretty='%C(yellow)%h %Cred%cr %Cblue(%an)%C(white)%d%Creset %s'"
 git config --global alias.l1 "log --pretty='%C(yellow)%h%Creset %C(red)%d%Creset %s %Cgreen(%cr)%Creset %C(cyan)[%an]%Creset'"
 git config --global alias.l1g '!git l1 --graph'
 git config --global alias.lg '!git l1 --graph'
@@ -191,6 +196,8 @@ git config --global alias.la '!git l1 --all'
 git config --global alias.lag '!git la --graph'
 ## path from branch A to branch B (ancestor A / decendent B)
 ## git lg --ancestry-path B..A
+git config --global alias.lol 'log --graph --decorate --pretty=oneline --abbrev-commit'
+git config --global alias.lola 'log --graph --decorate --pretty=oneline --abbrev-commit --all'
 
 # show-branch
 git config --global alias.sb 'show-branch'
