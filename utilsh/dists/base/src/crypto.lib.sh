@@ -359,3 +359,35 @@ case ${0##*/} in
         ${0##*/} "$@"
         ;;
 esac
+
+
+
+### ToDo
+
+# Contrôler si un certificat, une demande de certificat et une clé ont la même clé publique:
+
+# openssl x509 -noout -modulus www.server.com.crt | openssl sha256
+# openssl req -noout -modulus www.server.com.csr | openssl sha256
+# openssl rsa -noout -modulus www.server.com.key | openssl sha256
+
+# Convertir des certificats
+
+# Conversion d'un fichier PKCS#12 ( .pfx .p12, typiquement utulisé sur Microsoft Windows) contenant clé privée et certificat vers le format PEM (utilisé sur Linux):
+
+# openssl pkcs12 -nodes -in www.server.com.pfx -out www.server.com.crt
+
+# Conversion du format PEM vers le format PKCS#12:
+
+# openssl pkcs12 -export -in www.server.com.crt -inkey www.server.com.key -out www.server.com.pfx
+
+# Conversion du format PKCS#7 ( .p7b .p7c ) vers le format PEM:
+
+# openssl pkcs7 -print_certs -in www.server.com.p7b -out www.server.com.crt
+
+# Conversion du format PEM vers le format PKCS#7:
+
+# openssl crl2pkcs7 -nocrl -certfile www.server.com.crt -out www.server.com.p7b
+
+# Conversion du format DER (.crt .cer ou .der) vers le format PEM:
+
+# openssl x509 -inform der -in certificate.cer -out certificate.pem
