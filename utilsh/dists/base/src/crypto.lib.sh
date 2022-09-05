@@ -12,6 +12,11 @@ has_openssl()
     which openssl >/dev/null 2>/dev/null
 }
 
+has_keytool()
+{
+    which keytool >/dev/null 2>/dev/null
+}
+
 has_sha384sum()
 {
     which sha384sum >/dev/null 2>/dev/null
@@ -85,14 +90,92 @@ cert_get_o()
     openssl s_client -showcerts -connect "$1" ${2:+-servername "$2"} -prexit </dev/null
 }
 
-cert_to_pem()
-{
-    openssl x509 -outform pem ${1:+-out "$1"}
-}
 
 cert_verify()
 {
     openssl verify ${2:+-untrusted "$2"} "$@"
+}
+
+# DELETE
+# cert_connect_o()
+# {
+#     cert_connect_o__c="$1" ; shift 2>/dev/null
+#     cert_connect_o__s="$1" ; shift 2>/dev/null
+#     openssl s_client -connect "$1" ${2:+-servername "$2"} "$@" </dev/null
+# }
+
+# protocols:
+# -ssl2, -ssl3, -tls1, -tls1_1, -tls1_2, and -tls1_3
+# -no_ssl2, -no_ssl3, -no_tls1, -no_tls1_1, -no_tls1_2, and -no_tls1_3
+cert_client()
+(
+    cert_client__args=
+    cert_client__c=
+    cert_client__s=
+    OPTIND=1
+    while getopts :hxc:s:C:K:P: opt; do
+         case $opt in
+            h) echo >&2 "cert_client* [-h] [-x (debug)] -c <host:port> -s <hostname> -C <cert> -K <key> -P <pass>" ;;
+            x) cert_client__args="$cert_client__args -tlsextdebug" ;;
+            c) cert_client__c="$OPTARG" ;;
+            s) cert_client__s="-servername \"$OPTARG\"" ;;
+            C) cert_client__C="-cert \"$OPTARG\"" ;;
+            K) cert_client__K="-key \"$OPTARG\"" ;;
+            P) cert_client__P="-pass \"$OPTARG\"" ;;
+
+            # I) exec 0</dev/null ;;
+        esac
+    done
+    shift $(($OPTIND - 1))
+
+    [ -z "$cert_client__c" ] && echo >&2 "missing client" && return 1
+
+    openssl s_client -connect "$cert_client__c" \
+            $cert_client__s \
+            $cert_client__C $cert_client__K $cert_client__P \
+            $cert_client__args \
+            "$@"
+)
+
+cert_client_showcerts()
+{
+    cert_client "$@" -- -showcerts </dev/null
+}
+
+cert_pipe_to_x509()
+{
+    cat - | openssl x509 -noout -text
+}
+
+cert_pipe_extract_pem()
+{
+    cat - | sed --quiet '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p'
+}
+
+cert_client_verify()
+{
+    [ $# -ne 1 ] && echo >&2 "cert_client_verify <host:port>" && return 1
+
+    cert_client -c "$1" -- -verify_return_error
+}
+
+cert_client_verify_hostname()
+{
+    [ $# -ne 2 ] && echo >&2 "cert_client_verify_hostname <host:port> <hostname>" && return 1
+
+    cert_client -c "$1" -- -verify_hostname "$2"
+}
+
+cert_client_auth()
+{
+    cert_client "$@"
+}
+
+
+
+cert_to_pem()
+{
+    openssl x509 -outform pem ${1:+-out "$1"}
 }
 
 cert_self_signed()
