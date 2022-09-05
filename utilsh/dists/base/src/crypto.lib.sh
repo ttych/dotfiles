@@ -96,6 +96,8 @@ cert_verify()
     openssl verify ${2:+-untrusted "$2"} "$@"
 }
 
+
+
 # DELETE
 # cert_connect_o()
 # {
@@ -151,6 +153,18 @@ cert_pipe_extract_pem()
 {
     cat - | sed --quiet '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p'
 }
+
+cert_pipe_extract_dates()
+{
+    cat - | openssl x509 -noout -dates
+}
+
+cert_pipe_extract_subject()
+{
+    cat - | openssl x509 -noout -subject
+}
+
+
 
 cert_client_verify()
 {
