@@ -229,6 +229,8 @@ cert_is_key_file()
 
 cert_check_match_cert_key()
 {
+    [ $# -ne 2 ] && echo >&2 "cert_check_match_cert_key <cert> <key>" && return 1
+
     modulus_a=`openssl x509 -noout -modulus -in "$1" | openssl md5`
     modulus_b=`openssl rsa -noout -modulus -in "$2" | openssl md5`
 
@@ -237,6 +239,8 @@ cert_check_match_cert_key()
 
 cert_check_match_req_key()
 {
+    [ $# -ne 2 ] && echo >&2 "cert_check_match_cert_key <req> <key>" && return 1
+
     modulus_a=`openssl req -noout -modulus -in "$1" | openssl md5`
     modulus_b=`openssl rsa -noout -modulus -in "$2" | openssl md5`
 
@@ -253,6 +257,10 @@ cert_remove_passphrase()
     openssl rsa -in "$1" -out "${1%.pem}.nopp.pem"
 }
 
+
+
+### pkcs12 (.p12, .pfx)
+
 cert_pkcs12_to_pem()
 {
     [ $# -ne 1 ] || {
@@ -260,8 +268,23 @@ cert_pkcs12_to_pem()
 	return 1
     }
     openssl pkcs12 -in "$1" -out "${1%.p12}.crt.pem" -clcerts -nokeys && \
-	openssl pkcs12 -in "$1" -out "${1%.p12}.key.pem" -nocerts -nodes
+	    openssl pkcs12 -in "$1" -out "${1%.p12}.key.pem" -nocerts -nodes
+
+    # openssl pkcs12 -in "$1" -out "${1%.p12}.pem" -nodes
 }
+
+cert_pkcs12_info()
+{
+    openssl pkcs12 -in "$1" -info
+}
+
+cert_pem_to_pkcs12()
+{
+    [ $# -ne 2 ] && echo  >&2 "cert_pem_to_pkcs12 <pem> <key>" && return 1
+
+    openssl pkcs12 -export -in "$1" -inkey "$2" -out "${1%.pem}".p12
+}
+
 
 cert_jks_to_pkcs12()
 {
@@ -302,7 +325,40 @@ cert_pkcs12_to_jks()
 }
 
 
-# ### digest
+
+### der
+
+cert_der_to_pem()
+{
+    openssl x509 -inform der -in "$1" -out "${2%.der}.pem"
+}
+
+
+
+### pkcs7 (.p7b, .p7c)
+
+cert_pkcs7_info()
+{
+    openssl pkcs7 -in "$1" -print_certs
+}
+
+cert_pkcs7_to_pem()
+{
+    [ $# -ne 1 ] && echo >&2 "cert_pkcs7_to_pem <pkcs7>" && return 1
+
+    openssl pkcs7 -print_certs -in "$1" -out "${1%.p7b}.pem"
+}
+
+cert_pem_to_pkcs7()
+{
+    [ $# -ne 1 ] && echo >&2 "cert_pem_to_pkcs7 <pem>" && return 1
+
+    openssl crl2pkcs7 -nocrl -certfile "$1" -out "${1%.pem}.p7b"
+}
+
+
+
+### digest
 
 digest_integrity()
 {
@@ -352,42 +408,10 @@ _digest_integrity_s()
 
 
 
-# ### Main
+### Main
 
 case ${0##*/} in
     cert_*|digest_*)
         ${0##*/} "$@"
         ;;
 esac
-
-
-
-### ToDo
-
-# Contrôler si un certificat, une demande de certificat et une clé ont la même clé publique:
-
-# openssl x509 -noout -modulus www.server.com.crt | openssl sha256
-# openssl req -noout -modulus www.server.com.csr | openssl sha256
-# openssl rsa -noout -modulus www.server.com.key | openssl sha256
-
-# Convertir des certificats
-
-# Conversion d'un fichier PKCS#12 ( .pfx .p12, typiquement utulisé sur Microsoft Windows) contenant clé privée et certificat vers le format PEM (utilisé sur Linux):
-
-# openssl pkcs12 -nodes -in www.server.com.pfx -out www.server.com.crt
-
-# Conversion du format PEM vers le format PKCS#12:
-
-# openssl pkcs12 -export -in www.server.com.crt -inkey www.server.com.key -out www.server.com.pfx
-
-# Conversion du format PKCS#7 ( .p7b .p7c ) vers le format PEM:
-
-# openssl pkcs7 -print_certs -in www.server.com.p7b -out www.server.com.crt
-
-# Conversion du format PEM vers le format PKCS#7:
-
-# openssl crl2pkcs7 -nocrl -certfile www.server.com.crt -out www.server.com.p7b
-
-# Conversion du format DER (.crt .cer ou .der) vers le format PEM:
-
-# openssl x509 -inform der -in certificate.cer -out certificate.pem
