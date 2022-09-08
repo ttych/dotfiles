@@ -56,10 +56,11 @@ if [ -z "$git_current_user_mail" ]; then
         git config --global user.email "$USER_MAIL"
 fi
 
-git config --global alias.conf 'config --global -e'
+git config --global alias.confe 'config --global -e'
 
 # default Branch
 git config --global init.defaultBranch master
+# git config --global init.defaultBranch main
 
 # color output
 git config --global color.ui auto
@@ -88,6 +89,10 @@ fi
 if [ -r "$HOME/.gitmessage.txt" ]; then
     git config --global commit.template "$HOME/.gitmessage.txt"
 fi
+
+# config
+git config --global alias.configl 'config --list --show-origin'
+git config --global alias.confl 'config --list --show-origin'
 
 # algorithm : patience / histogram / <default>
 git config --global diff.algorithm histogram
@@ -153,6 +158,7 @@ git config --global alias.cim "commit -m"
 git config --global alias.cam "commit --all -m"
 git config --global alias.amend 'commit --amend'
 git config --global alias.amendc 'commit --amend -C HEAD'
+git config --global alias.amendh 'commit --amend -C HEAD'
 git config --global alias.fixup 'commit --fixup'
 git config --global alias.squash 'commit --squash'
 
@@ -186,7 +192,9 @@ git config --global alias.difftext 'diff --word-diff --unified=10'
 git config --global alias.difft 'diff --word-diff --unified=10'
 
 # log
+git config --global alias.last 'log -1 HEAD'
 git config --global alias.lf 'log --pretty=fuller'
+git config --global alias.lp 'log --patch'
 #git config --global alias.l1 'log --oneline --decorate --abbrev-commit --all'
 # git config --global alias.l1 "log --pretty='%C(yellow)%h %Cred%cr %Cblue(%an)%C(white)%d%Creset %s'"
 git config --global alias.l1 "log --pretty='%C(yellow)%h%Creset %C(red)%d%Creset %s %Cgreen(%cr)%Creset %C(cyan)[%an]%Creset'"
@@ -229,11 +237,15 @@ git config --global alias.pushf 'push --force-with-lease'
 # tag
 git config --global alias.rtag 'describe --exact-match --tags'
 
+# restore
+git config --global alias.unstage 'restore --staged --'
+git config --global alias.unmodify 'restore --'
+
 # reset
 ## --hard / update : HEAD + index + workspace (destructive)
 ## --mixed (default) / update : HEAD + index
 ## --soft / update : HEAD
-git config --global alias.unstage 'reset HEAD --'
+git config --global alias.unstage- 'reset HEAD --'
 git config --global alias.resetto '!f() { branch=$(git rev-parse --abbrev-ref HEAD); git reset --hard "${1:-$branch}"; }; f'
 git config --global alias.resetfile '!f() { git reset @~ "$@" && git commit --amend --no-edit }; f'
 
@@ -369,8 +381,23 @@ git config --global alias.browse '!f() { url=$(git config remote.origin.url | se
 git config merge.renameLimit 999999
 
 # version-bump
-git config --global alias.vb 'version-bump'
+# git config --global alias.vb 'version-bump'
 
+# gpg
+#git config --global user.signingKey <gpg-keyid>
+git config --global commit.gpgSign true
+git config --global tag.gpgSign true
+
+# visual
+git config --global alias.visual '!gitk'
+
+
+######################################### doc
+
+### tag
+## delete remote tag
+# git push origin :refs/tags/<tagname>
+# git push origin --delete <tagname>
 
 
 ###############################################################################
