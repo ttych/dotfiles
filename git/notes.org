@@ -1,0 +1,281 @@
+#+TITLE: 
+#+AUTHOR: 
+#+DATE: 
+#+STARTUP: content
+
+* Git
+** Basic
+*** branch
+**** delete
+*** tag
+*** log
+**** nicely-formatted project-commit history
+     #+begin_src shell
+       git log --no-merges
+     #+end_src
+**** log filter
+     #+begin_src shell
+       git log --no-merges not-in-this-branch..but-in-this-branch
+       
+       git log --no-merges feature123..origin/master
+     #+end_src
+
+*** rebase
+**** onto
+     Take the client branch, figure out the patches since it diverged from the
+     server branch, and replay these patches in the client branch as if it was
+     based directly off the master branch instead.
+     #+begin_src shell
+       git rebase --onto master server client
+     #+end_src
+*** public over email
+**** prepare patches
+    generate patch
+    #+begin_src shell
+      git format-patch -M origin/master
+    #+end_src
+**** through gmail
+    configure gmail in gitconfig
+    #+begin_src ini
+      [imap]
+      folder = "[Gmail]/Drafts"
+      host = imaps://imap.gmail.com
+      user = user@gmail.com
+      pass = YX]8g76G_2^sFbd
+      port = 993
+      sslverify = false
+    #+end_src
+
+    send by mail through git
+    #+begin_src shell
+      cat *.patch |git imap-send
+    #+end_src
+
+    then edit from draft in gmail
+**** through smtp
+     configure smtp in gitconfig
+     #+begin_src ini
+       [sendemail]
+       smtpencryption = tls
+       smtpserver = smtp.gmail.com
+       smtpuser = user@gmail.com
+       smtpserverport = 587
+     #+end_src
+
+     then send with
+     #+begin_src shell
+       git send-email *.patch
+     #+end_src
+**** refrences
+     - https://git-send-email.io
+** Server
+*** shared repository
+    #+begin_src shell
+      cd <repository_dir>
+      git init --bare --shared
+    #+end_src
+*** ssh
+*** http
+**** dumb protocol
+     setup git server through http dumb protocol with:
+     #+begin_src shell
+       cd /var/www/htdocs/
+       git clone --bare /path/to/git_project gitproject.git
+       cd gitproject.git
+       mv hooks/post-update.sample hooks/post-update
+       chmod a+x hooks/post-update
+     #+end_src
+**** smart http
+***** prepare apache
+      #+begin_src shell
+        sudo apt-get install apache2 apache2-utils
+        a2enmod cgi alias env
+
+        chgrp -R www-data /srv/git
+      #+end_src
+***** apache configuration
+      #+begin_src conf
+        SetEnv GIT_PROJECT_ROOT /srv/git
+        SetEnv GIT_HTTP_EXPORT_ALL
+        ScriptAlias /git/ /usr/lib/git-core/git-http-backend/
+      #+end_src
+
+      #+begin_src conf
+        <Files "git-http-backend">
+          AuthType Basic
+          AuthName "Git Access"
+          AuthUserFile /srv/git/.htpasswd
+          Require expr !(%{QUERY_STRING} -strmatch '*service=git-receive-pack*' ||
+          %{REQUEST_URI} =~ m#/git-receive-pack$#)
+          Require valid-user
+        </Files>
+      #+end_src
+
+      #+begin_src shell
+        htpasswd -c /srv/git/.htpasswd schacon
+      #+end_src
+*** git daemon
+**** command
+     #+begin_src shell
+       git daemon --reuseaddr --base-path=<directory> <directory>
+     #+end_src
+**** systemctl
+     #+begin_src ini
+       [Unit]
+       Description=Start Git Daemon
+
+       [Service]
+       ExecStart=/usr/bin/git daemon --reuseaddr --base-path=/srv/git/ /srv/git/
+       Restart=always
+       RestartSec=500ms
+       StandardOutput=syslog
+       StandardError=syslog
+       SyslogIdentifier=git-daemon
+       User=git
+       Group=git
+
+       [Install]
+       WantedBy=multi-user.target
+     #+end_src
+**** allow access
+     #+begin_src shell
+       cd /path/to/project.git
+       touch git-daemon-export-ok
+     #+end_src
+*** gitweb
+**** start with webrick
+     #+begin_src shell
+       git instaweb --httpd=webrick
+     #+end_src
+**** stop
+     #+begin_src shell
+       git instaweb --httpd=webrick --stop
+     #+end_src
+**** build gitweb
+     #+begin_src shell
+       git clone git://git.kernel.org/pub/scm/git/git.git
+       cd git/
+       make GITWEB_PROJECTROOT="/srv/git" prefix=/usr gitweb
+         SUBDIR gitweb
+         SUBDIR ../
+       make[2]: `GIT-VERSION-FILE' is up to date.
+         GEN gitweb.cgi
+         GEN static/gitweb.js
+       sudo cp -Rf gitweb /var/www/
+     #+end_src
+**** with Apache and SCGI
+     #+begin_src conf
+       <VirtualHost *:80>
+         ServerName gitserver
+         DocumentRoot /var/www/gitweb
+         <Directory /var/www/gitweb>
+           Options +ExecCGI +FollowSymLinks +SymLinksIfOwnerMatch
+           AllowOverride All
+           order allow,deny
+           Allow from all
+           AddHandler cgi-script cgi
+           DirectoryIndex gitweb.cgi
+         </Directory>
+       </VirtualHost>
+     #+end_src
+*** gitlab
+*** public git hosting sites
+    https://git.wiki.kernel.org/index.php/GitHosting
+** Branching patterns
+*** base patterns (integration + path to production)
+**** source branching
+     Create a copy and record all changes to that copy.
+
+     - codeline
+     - branch
+     - clone
+     - fork
+     =>  illusion of frozen time
+         the only ones changing the system
+**** mainline
+     A single, shared, branch that acts as the current state of the product.
+**** healthy branch
+     On each commit, perform automated checks, usually building and running
+     tests, to ensure there are no defects on the branch
+*** integration patterns
+    Thinking about branching strategies is really all about deciding how and
+    when we integrate.
+**** mainline integration
+     Developers integrate their work by pulling from mainline, merging, and - if
+     healthy - pushing back into mainline.
+**** feature branching
+     Put all work for a feature on its own branch, integrate into mainline when
+     the feature is complete.
+**** integration frequency
+     - integration complexity, risk
+     - integration fear
+***** low-frequency
+***** high-frequency
+**** continuous integration
+     Developers do mainline integration as soon as they have a healthy commit
+     they can share, usually less than a day's work.
+**** feature branching vs. continuous integration
+**** pre-integration review
+     Every commit to mainline is peer-reviewed before the commit is accepted.
+
+     "Many teams that use pre-integration reviews don't do them quickly enough.
+      The valuable feedback that they can offer then comes too late to be useful.
+      At that point there's an awkward choice between a lot of rework, or
+      accepting something that may work, but undermines the quality of the
+      code-base."
+
+     Refinement Code Review ?
+**** integration friction
+**** modularity
+*** the path from mainline to production release
+**** release branch
+     A branch that only accepts commits accepted to stabilize a version of the
+     product ready for release.
+**** maturity branch
+     A branch whose head marks the latest version of a level of maturity of the
+     code base.
+**** long lived release branch
+     a release branch pattern, combined with a maturity branch for a release
+     candidate
+
+     = release branch + maturity branch
+**** environment branch
+     Configure a product to run in a new environment by applying a source code
+     commit.
+**** hotfix branch
+     A branch to capture work to fix an urgent production defect.
+**** release train
+     Release on a set interval of time, like trains departing on a regular
+     schedule. Developers choose which train to catch when they have completed
+     their feature.
+**** release-ready mainline
+     Keep mainline sufficiently healthy that the head of mainline can always be
+     put directly into production.
+**** experimental branch
+     Collects together experimental work on a code base, that's not expected to
+     be merged directly into the product.
+**** future branch
+     A single branch used for changes that are too invasive to be handled with
+     other approaches.
+**** collaboration branch
+     A branch created for a developer to share work with other members of the
+     team without formal integration.
+**** team integration branch
+     Allow a sub-team to integrate with each other, before integrating with
+     mainline.
+*** branching policies
+**** git-flow
+**** github flow
+**** trunk-based development
+*** wording
+**** branch
+**** codeline
+**** textual conflict
+**** semantic conflict
+     https://martinfowler.com/bliki/SemanticConflict.html
+**** pull requests = feature branching + pre-integration review
+**** continuous integration
+**** integration fear
+*** branching strategy
+**** Ship / Show / Ask
+     https://martinfowler.com/articles/ship-show-ask.html

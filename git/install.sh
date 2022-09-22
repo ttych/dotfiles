@@ -44,7 +44,7 @@ GIT_VERSION=${GIT_VERSION##* }
 # git config --global --list
 # git config --system --list
 
-# config
+### config
 git_current_user_name=`git config --global --get user.name`
 if [ -z "$git_current_user_name" ]; then
     [ -n "$USER_NAME" ] &&
@@ -58,11 +58,19 @@ fi
 
 git config --global alias.confe 'config --global -e'
 
-# default Branch
+### default Branch
 git config --global init.defaultBranch master
 # git config --global init.defaultBranch main
 
-# color output
+### global gitignore
+if [ -r "$HOME/.gitignore_global" ]; then
+    git config --global core.excludesfile "$HOME/.gitignore_global"
+fi
+
+### credentials
+# git config --global credential.helper cache
+
+### color output
 git config --global color.ui auto
 git config --global color.branch auto
 git config --global color.diff auto
@@ -76,11 +84,6 @@ for editor in e et emacs vim vi; do
         break
     fi
 done
-
-# global gitignore
-if [ -r "$HOME/.gitignore_global" ]; then
-    git config --global core.excludesfile "$HOME/.gitignore_global"
-fi
 
 # autocorrect
 # git config --global help.autocorrect 20
@@ -121,35 +124,40 @@ git config --global rebase.autosquash true
 ## 90 days reachable / gc.reflogExpire
 ## 30 days unreachable / gc.reflogExpireUnreachable
 
-# merge
+## merge
 git config --global merge.conflictStyle diff3
 
-# init
+## init
 git config --global alias.i init
 
-# status
+## status
 git config --global alias.st status
 git config --global alias.s "status --short --branch"
-#git config --global advice.statusuoption false
+# git config --global advice.statusuoption false
 
-# clone
+## clone
 git config --global alias.cl clone
 
-# checkout
+## checkout
 git config --global alias.co checkout
 git config --global alias.cob 'checkout -b'
 git config --global alias.com 'checkout master'
 git config --global alias.cor 'checkout --track'
 
-# branch
+## branch
 git config --global alias.br branch
+git config --global alias.brv 'branch -v'
+git config --global alias.brvv 'branch -vv'
+git config --global alias.bra 'branch --all -v'
+git config --global alias.brav 'branch --all -vv'
 git config --global alias.merged 'branch --merged'
-git config --global alias.unmerged 'branch --no-merge'
-#git config --global alias.cleanmerged '!f() { git branch --merged ${1:-master} | grep -v " ${1:-master}$" | xargs git branch -d; }; f
+git config --global alias.unmerged 'branch --no-merged'
+# git config --global alias.cleanmerged '!f() { git branch --merged ${1:-master} | grep -v " ${1:-master}$" | xargs git branch -d; }; f
 git config --global alias.cleanmerged '!f() { for br in $(git branch --merged ${1:-master} | grep -v " ${1:-master}$"); do git branch -d "$br"; done; }; f'
 ## git show-branch <br1> <br2>
+git config --global alias.bru 'branch -u'
 
-# add
+## add
 git config --global alias.a add
 
 # commit
@@ -162,23 +170,25 @@ git config --global alias.amendh 'commit --amend -C HEAD'
 git config --global alias.fixup 'commit --fixup'
 git config --global alias.squash 'commit --squash'
 
-# rebase
+### rebase
 git config --global alias.rb 'rebase'
 git config --global alias.irb 'rebase -i'
 git config --global alias.irbf 'rebase -i --fork-point'
 # equivalent to
 # git rebase -i $(git merge-base --fork-point <branch>)
 
-# rm
+### rm
 git config --global alias.untrack 'rm --cache --'
 
-# remote
+### remote
 git config --global alias.rem 'remote -v'
+git config --global alias.remshow 'remote -v show'
+git config --global alias.remref 'ls-remote'
 
-# fetch
+### fetch
 git config --global alias.fe fetch
 
-# diff
+### diff
 git config --global alias.di diff
 git config --global alias.dc 'diff --check'
 git config --global alias.diffcached 'diff --cached'
@@ -191,65 +201,74 @@ git config --global alias.diffw 'diff --word-diff'
 git config --global alias.difftext 'diff --word-diff --unified=10'
 git config --global alias.difft 'diff --word-diff --unified=10'
 
-# log
+### log
 git config --global alias.last 'log -1 HEAD'
-git config --global alias.lf 'log --pretty=fuller'
-git config --global alias.lp 'log --patch'
-#git config --global alias.l1 'log --oneline --decorate --abbrev-commit --all'
+git config --global alias.lf  'log --pretty=fuller'
+git config --global alias.lp  'log --patch'
+git config --global alias.lg  'log --decorate --graph'
+git config --global alias.la  'log --decorate --all'
+git config --global alias.lag 'log --decorate --all --graph'
+git config --global alias.l   'log --oneline --decorate --abbrev-commit'
+git config --global alias.ll  'log --oneline --decorate --abbrev-commit --graph'
+git config --global alias.lla 'log --oneline --decorate --abbrev-commit --graph --all'
 # git config --global alias.l1 "log --pretty='%C(yellow)%h %Cred%cr %Cblue(%an)%C(white)%d%Creset %s'"
 git config --global alias.l1 "log --pretty='%C(yellow)%h%Creset %C(red)%d%Creset %s %Cgreen(%cr)%Creset %C(cyan)[%an]%Creset'"
-git config --global alias.l1g '!git l1 --graph'
-git config --global alias.lg '!git l1 --graph'
-git config --global alias.la '!git l1 --all'
-git config --global alias.lag '!git la --graph'
 ## path from branch A to branch B (ancestor A / decendent B)
 ## git lg --ancestry-path B..A
-git config --global alias.lol 'log --graph --decorate --pretty=oneline --abbrev-commit'
-git config --global alias.lola 'log --graph --decorate --pretty=oneline --abbrev-commit --all'
+git config --global alias.lo   'log --oneline --decorate'
+git config --global alias.lol  'log --oneline --decorate --graph'
+git config --global alias.lola 'log --oneline --decorate --graph --all'
 
-# show-branch
+### show-branch
 git config --global alias.sb 'show-branch'
 git config --global alias.sbt '!f() { bt="$1"; [ $# -gt 0 ] && shift ; [ -z "$bt" ] && bt=$(git rev-parse --abbrev-ref HEAD); git show-branch --topic $bt "$@"; }; f'
 
-# show
+### show
 git config --global alias.so "show --pretty='parent %C(yellow)%p%Creset commit %C(yellow)%h%Creset%Cred%d%Creset%n%n%w(72,2,2)%s%n%n%w(72,0,0)%C(cyan)%an%Creset %Cgreen%ar%Creset'"
 
-# plumb
+### plumb
 git config --global alias.plumb 'cat-file -p'
 
-# merge
+### merge
 git config --global alias.mergeto '!git checkout $1 && git merge @{-1}'
 git config --global alias.truemerge "merge --no-ff"
 git config --global alias.ffmerge "merge --ff-only"
 
-# pull
+### pull
 git config --global alias.ffpull "pull --no-rebase --ff-only"
 git config --global alias.repull "pull --rebase"
 git config --global alias.up '!git pull --rebase $@ && git submodule update --init --recursive'
 
-# push
+### push
 git config --global alias.pushall "push --recurse-submodules=on-demand"
 git config --global alias.push2all '!f() { for remote in `git remote`; do git push $remote "$@"; done }; f'
 # push : nothing | matching | simple | current
 git config --global push.default current
 git config --global alias.pushf 'push --force-with-lease'
+git config --global alias.rm-remote-ref '!f() { [ $# -ge 2 ] && rem="$1" && shift ; git push "${rem:-origin}" --delete "$@"; }; f'
+# alternativ is: git push <origin> :refs/tags/<v1.4-lw>
 
-# tag
+### tag
 git config --global alias.rtag 'describe --exact-match --tags'
 
-# restore
-git config --global alias.unstage 'restore --staged --'
+### restore
+git config --global alias.unstage- 'restore --staged --'
 git config --global alias.unmodify 'restore --'
 
-# reset
+### switch
+git config --global alias.sw 'switch'
+git config --global alias.swc 'switch -c'
+git config --global alias.swb 'switch -'
+
+### reset
 ## --hard / update : HEAD + index + workspace (destructive)
 ## --mixed (default) / update : HEAD + index
 ## --soft / update : HEAD
-git config --global alias.unstage- 'reset HEAD --'
+git config --global alias.unstage 'reset HEAD --'
 git config --global alias.resetto '!f() { branch=$(git rev-parse --abbrev-ref HEAD); git reset --hard "${1:-$branch}"; }; f'
 git config --global alias.resetfile '!f() { git reset @~ "$@" && git commit --amend --no-edit }; f'
 
-# whitespace
+### whitespace
 ## defaults: blank-at-eol,blank-at-eof,space-before-ta
 ## additional: cr-at-eol,tab-in-indent,indent-with-non-tab
 ## trailing-space = both blank-at-eol + blank-at-eof
@@ -365,6 +384,9 @@ fi
 ## diff
 #  diff HEAD~2:Readme.md..HEAD:Readme.md
 
+## branch track
+# @{upstream} or @{u} shorthand references its upstream branch
+# example: git merge @{u} instead of git merge origin/master
 
 # dot Notation
 ## diff
@@ -378,7 +400,7 @@ fi
 git config --global alias.browse '!f() { url=$(git config remote.origin.url | sed -e "s/^git@\([a-z.-]*\):\(.*\)$/https:\/\/\1\/\2/") ; xdg-open ${url}; }; f'
 
 # merge limit
-git config merge.renameLimit 999999
+git config --global merge.renameLimit 999999
 
 # version-bump
 # git config --global alias.vb 'version-bump'
@@ -391,6 +413,8 @@ git config --global tag.gpgSign true
 # visual
 git config --global alias.visual '!gitk'
 
+## mergetool
+#  - git mergetool --tool-help
 
 ######################################### doc
 
