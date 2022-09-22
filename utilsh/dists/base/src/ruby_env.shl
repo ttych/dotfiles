@@ -189,6 +189,11 @@ Brubocop()
     bundle_exec rubocop "$@"
 }
 
+Brcop()
+{
+    bundle_exec rubocop "$@"
+}
+
 Brspec()
 {
     bundle_exec rspec "$@"
