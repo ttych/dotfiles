@@ -20,6 +20,22 @@
        git log --no-merges feature123..origin/master
      #+end_src
 
+**** introduced by a branch
+     commit in branch <branch>, but not present in master branch
+     #+begin_src shell
+       git log <branch> --not master
+     #+end_src
+*** diff
+**** branch
+     compare current branch with another branch
+     #+begin_src shell
+       git diff master
+     #+end_src
+**** introduced since its common ancestors
+     introduced by <contrib> and not in master
+     #+begin_src shell
+       git diff master...<contrib>
+     #+end_src
 *** rebase
 **** onto
      Take the client branch, figure out the patches since it diverged from the
@@ -28,7 +44,12 @@
      #+begin_src shell
        git rebase --onto master server client
      #+end_src
-*** public over email
+*** merge-base
+**** common ancestor
+     #+begin_src shell
+       git merge-base <contrib> master
+     #+end_src
+*** publish over email
 **** prepare patches
     generate patch
     #+begin_src shell
@@ -66,8 +87,98 @@
      #+begin_src shell
        git send-email *.patch
      #+end_src
+**** apply patch
+***** git apply
+      #+begin_src shell
+        git apply /tmp/patch-ruby-client.patch
+      #+end_src
+
+      - for a patch generated with git diff or diff
+      - similar to running a patch -p1 command
+      - behavior is: "apply all or abort all"
+
+      check apply with:
+      #+begin_src shell
+        git apply --check 0001-see-if-this-helps-the-gem.patch
+      #+end_src
+***** git am
+      #+begin_src shell
+        git am 0001-limit-log-function.patch
+      #+end_src
+
+      - for a patch generated with git format-patch
+      - for a patch sent with git send-email
+      - "am" for "apply from a mailbox"
+      - read/process a mbox file (plain-text)
+
+      a 3-way merge:
+      #+begin_src shell
+        git am -3 0001-see-if-this-helps-the-gem.patch
+      #+end_src
+
+      a mbox file in interactive mode:
+      #+begin_src shell
+        git am -3 -i mbox
+      #+end_src
+
+      or from pull request url as a patch:
+      #+begin_src shell
+        curl https://github.com/tonychacon/fade/pull/1.patch | git am
+      #+end_src
 **** refrences
      - https://git-send-email.io
+*** archive
+    tar.gz format:
+    #+begin_src shell
+      git archive master --prefix='<project_name>/' | gzip > `git describe master`.tar.gz
+    #+end_src
+
+    zip format:
+    #+begin_src shell
+      git archive master --prefix='project/' --format=zip > `git describe master`.zip
+    #+end_src
+** pull request
+*** fetch manually
+    use `git ls-remote` to list all remote references
+
+    refs/pull/#/head: is the last commit in the branch/pr
+    refs/pull/#/merge: is the resulting merge that would result
+
+    then:
+    #+begin_src shell
+      git fetch origin refs/pull/958/head
+    #+end_src
+*** fetch server ref
+    pull request ref are store in refs/pull
+
+    add refspec to fetch server pull request reference
+    #+begin_src conf
+      [remote "origin"]
+        url = https://github.com/libgit2/libgit2.git
+        fetch = +refs/heads/*:refs/remotes/origin/*
+        fetch = +refs/pull/*/head:refs/remotes/origin/pr/*
+    #+end_src
+** Sign
+*** share pub key
+    list keys:
+    #+begin_src shell
+      gpg --list-keys
+    #+end_src
+
+    export pub to git blob:
+    #+begin_src shell
+      gpg -a --export F721C45A | git hash-object -w --stdin
+    #+end_src
+
+    add annoted tag, to identify it:
+    #+begin_src shell
+      git tag -a gpg-pub-maintainer <git blob sha id>
+    #+end_src
+
+    import pub key from git to gpg
+    #+begin_src shell
+      git show gpg-pub-maintainer | gpg --import
+    #+end_src
 ** Server
 *** shared repository
     #+begin_src shell
@@ -278,4 +389,92 @@
 **** integration fear
 *** branching strategy
 **** Ship / Show / Ask
-     https://martinfowler.com/articles/ship-show-ask.html
+     from: https://martinfowler.com/articles/ship-show-ask.html
+***** ship
+      like Continuous Integration
+      when:
+      - I added a feature using an established pattern
+      - I fixed an unremarkable bug
+      - I updated documentation
+      - I improved my code based on your feedback
+***** show
+      open a Pull Request, then you merge it without waiting for anyone
+      code review after merge
+
+      when:
+      - I would love your feedback on how this code could be better
+      - Look at this new approach or pattern I used
+      - I refactored X so now it looks like this
+      - What an interesting bug! Look how I fixed it
+***** ask
+      open a Pull Request, and we wait for feedback before merging
+      discussion & feedback before merge
+
+      when:
+      - Will this work?
+      - How do we feel about this new approach?
+      - I need help to make this better please
+      - I'm done for today, will merge tomorrow
+***** the rules
+      - Code review, or “Approval”, should not be a requirement for a Pull
+        Request to be merged.
+      - People get to merge their own Pull Requests. This way they’re in control
+        of whether their change is a “Show” or an “Ask”, and they can decide
+        when it goes live.
+      - We’ve got to use all the great Continuous Integration and Continuous
+        Delivery techniques that help keep the mainline releasable. Take Feature
+        Toggles as one example.
+      - Our branches should not live long, and we should rebase them on the
+        mainline often.
+** github
+*** markdown
+**** emoji
+    https://www.webfx.com/tools/emoji-cheat-sheet/
+*** special files
+**** README
+     could be README, README.md, README.asciidoc, ...
+
+     generally contains
+     - What the project is for
+     - How to configure and install it
+     - An example of how to use it or get it running
+     - The license that the project is offered under
+     - How to contribute to it
+**** CONTRIBUTING
+     provides guidelines for contributing
+*** hook
+**** webhooks documentation
+     https://developer.github.com/webhooks/
+**** example service
+     #+begin_src ruby
+       require 'sinatra'
+       require 'json'
+       require 'mail'
+
+       post '/payload' do
+         push = JSON.parse(request.body.read) # parse the JSON
+
+         # gather the data we're looking for
+         pusher = push["pusher"]["name"]
+         branch = push["ref"]
+
+         # get a list of all the files touched
+         files = push["commits"].map do |commit|
+           commit['added'] + commit['modified'] + commit['removed']
+         end
+         files = files.flatten.uniq
+
+         # check for our criteria
+         if pusher == 'schacon' &&
+            branch == 'ref/heads/special-branch' &&
+            files.include?('special-file.txt')
+
+           Mail.deliver do
+             from     'tchacon@example.com'
+             to       'tchacon@example.com'
+             subject  'Scott Changed the File'
+             body     'ALARM'
+           end
+         end
+       end
+     #+end_src
