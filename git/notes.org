@@ -1,10 +1,11 @@
 #+TITLE: 
 #+AUTHOR: 
 #+DATE: 
-#+STARTUP: content
+#+STARTUP: show3levels
+ 
 
-* Git
-** Basic
+* git
+** basic
 *** branch
 **** delete
 *** tag
@@ -137,6 +138,219 @@
     #+begin_src shell
       git archive master --prefix='project/' --format=zip > `git describe master`.zip
     #+end_src
+*** stash
+**** basic
+    - git stash (git stash push)
+    - git stash list
+    - git stash apply (git stash apply stash@{x})
+    - git stash drop
+    - git stash pop (apply + drop)
+**** extra options
+     - --keep-index
+     - --include-untracked / -u
+     - --all / -a
+     - --patch  (interactive)
+**** to branch
+     #+begin_src emacs-lisp
+       git stash branch <new branchname>
+     #+end_src
+*** clean
+    no retrieving with clean action
+    a safer option is to run git stash --all
+
+    -n / --dry-run
+    -f : force
+    -d : remove files and empty directories
+    -x : also consider files covered by .gitignore
+    -i : interactive
+** searching
+*** grep
+    #+begin_src shell
+      git grep --help
+    #+end_src
+
+    example of complex search
+    #+begin_src shell
+      git grep --break --heading \
+          -n -e '#define' --and \( -e LINK -e BUF_MAX \) v1.8.0
+    #+end_src
+*** log - pickaxe
+    search for commit that changed the number of occurrences of that string
+    #+begin_src shell
+      git log -S ZLIB_BUF_MAX --oneline
+    #+end_src
+*** line log search
+    search commit related to a specific function change
+
+    every change made to the function git_deflate_bound in the zlib.c
+    #+begin_src shell
+      git log -L :git_deflate_bound:zlib.c
+    #+end_src
+
+    search in a block code defined by regexp
+    #+begin_src shell
+      git log -L '/unsigned long git_deflate_bound/',/^}/:zlib.c
+    #+end_src
+** revision selection
+*** SHA-1 hash
+    40-character
+    will move to SHA256
+**** short SHA-1
+    as long as:
+    - at least four characters long
+    - unambiguous
+**** branch reference
+    commit associated to branch:
+    #+begin_src shell
+      git rev-parse
+    #+end_src
+    will return the <commit-id>
+*** reflog
+    reflog information is strictly local !
+    => a log only of what you’ve done in your repository
+**** reflog shortnames
+    reflog is a log of HEAD and branch references
+    #+begin_src shell
+      git reflog
+    #+end_src
+
+    can show the prior value of HEAD
+    #+begin_src shell
+      git reflog HEAD@{5}
+    #+end_src
+
+    can show the priori value of a <branch>
+    #+begin_src shell
+      git reflog <branch>@{6}
+    #+end_src
+**** reflog formatted like git log
+    #+begin_src shell
+      git log -g <branch>
+    #+end_src
+*** ancestry references
+**** ~ (tilde)
+     The “Specifying Revisions” section of the git rev-parse documentation
+     defines ~ as:
+
+     <rev>~<n>, e.g. master~3.
+     A suffix ~<n> to a revision parameter means the commit object that is the
+     nth generation ancestor of the named commit object, following only the
+     first parents. For example, <rev>~3 is equivalent to <rev>^^^ which is
+     equivalent to <rev>^1^1^1 …
+
+     You can get to parents of any commit, not just HEAD. You can also move back
+     through generations: for example, master~2 means the grandparent of the tip
+     of the master branch, favoring the first parent on merge commits.
+
+     Usage:
+     - Use ~ most of the time — to go back a number of generations, usually what you want
+
+     Mnemonics:
+     - Tilde ~ is almost linear in appearance and wants to go backward in a straight line
+**** ^ (caret)
+     Git history is nonlinear: a directed acyclic graph (DAG) or tree. For a
+     commit with only one parent, rev~ and rev^ mean the same thing. The caret
+     selector becomes useful with merge commits because each one is the child of
+     two or more parents — and strains language borrowed from biology.
+
+     HEAD^ means the first immediate parent of the tip of the current branch.
+     HEAD^ is short for HEAD^1, and you can also address HEAD^2 and so on as
+     appropriate. The same section of the git rev-parse documentation defines it
+     as:
+
+     <rev>^, e.g. HEAD^, v1.5.1^0
+     A suffix ^ to a revision parameter means the first parent of that commit
+     object. ^<n> means the nth parent ([e.g.] <rev>^ is equivalent to <rev>^1).
+     As a special rule, <rev>^0 means the commit itself and is used when <rev>
+     is the object name of a tag object that refers to a commit object.
+
+     Usage:
+     - Use ^ on merge commits — because they have two or more (immediate) parents
+
+     Mnemonics:
+     - Caret ^ suggests an interesting segment of a tree or a fork in the road
+**** ~  vs.  ^
+     From: https://stackoverflow.com/questions/2221658/whats-the-difference-between-head-and-head-in-git
+***** rules of thumb
+      Use ~ most of the time — to go back a number of generations, usually what you want
+      Use ^ on merge commits — because they have two or more (immediate) parents
+***** mnemonics
+      Tilde ~ is almost linear in appearance and wants to go backward in a straight line
+      Caret ^ suggests an interesting segment of a tree or a fork in the road
+***** examples
+      These specifiers or selectors can be chained arbitrarily, e.g., topic~3^2
+      in English is the second parent of the merge commit that is the
+      great-grandparent (three generations back) of the current tip of the
+      branch topic.
+
+      The aforementioned section of the git rev-parse documentation traces many
+      paths through a notional git history. Time flows generally downward.
+      Commits D, F, B, and A are merge commits.
+
+      Here is an illustration, by Jon Loeliger. Both commit nodes B and C are
+      parents of commit node A. Parent commits are ordered left-to-right. (N.B.
+      The git log --graph command displays history in the opposite order.)
+
+      G   H   I   J
+       \ /     \ /
+        D   E   F
+         \  |  / \
+          \ | /   |
+           \|/    |
+            B     C
+             \   /
+              \ /
+               A
+
+      A =      = A^0
+      B = A^   = A^1     = A~1
+      C = A^2
+      D = A^^  = A^1^1   = A~2
+      E = B^2  = A^^2
+      F = B^3  = A^^3
+      G = A^^^ = A^1^1^1 = A~3
+      H = D^2  = B^^2    = A^^^2  = A~2^2
+      I = F^   = B^3^    = A^^3^
+      J = F^2  = B^3^2   = A^^3^2
+*** commit ranges
+**** double dot (..)
+     asks to resolve a range of commits that are reachable from one commit
+     but aren’t reachable from another
+
+     #+begin_src shell
+       git log master..experiment
+       git log origin/master..HEAD
+       git log origin/master..
+     #+end_src
+
+     git substitutes HEAD if one side is missing
+**** multiple points
+     equivalent:
+     #+begin_src shell
+       git log refA..refB
+       git log ^refA refB
+       git log refB --not refA
+     #+end_src
+
+     allow multiple references,
+     see all commits that are reachable from refA or refB but not from refC:
+     #+begin_src shell
+       git log refA refB ^refC
+       git log refA refB --not refC
+     #+end_src
+**** triple dot (...)
+     asks to resolve all the commits that are reachable by either of two
+     references but not by both of them
+
+     a common switch to use with the log command in this case is --left-right,
+     which shows you which side of the range each commit is in
+     #+begin_src shell
+       git log --left-right master...experiment
+       < F
+       < E
+       > D
+       > C
+     #+end_src
 ** pull request
 *** fetch manually
     use `git ls-remote` to list all remote references
@@ -158,7 +372,367 @@
         fetch = +refs/heads/*:refs/remotes/origin/*
         fetch = +refs/pull/*/head:refs/remotes/origin/pr/*
     #+end_src
+** rewriting history
+*** amend
+    #+begin_src shell
+      git commit --amend
+      git commit --amend --no-edit
+    #+end_src
+*** rebase
+**** hands-on
+     https://git-rebase.io/
+*** filter-branch
+**** remove a file from entire history
+     --tree-filter option runs the specified command after each checkout of the
+     project and then recommits the results
+     #+begin_src shell
+       git filter-branch --tree-filter 'rm -f passwords.txt' HEAD
+     #+end_src
+     or
+     #+begin_src shell
+       git filter-branch --tree-filter 'rm -f *~' HEAD
+     #+end_src
+
+     to run filter-branch on all your branches, you can pass --all to the
+     command
+**** making a subdirectory the new root
+     project root is what was in the trunk subdirectory
+     #+begin_src shell
+       git filter-branch --subdirectory-filter trunk HEAD
+     #+end_src
+**** changing email addresses globally
+     #+begin_src shell
+       git filter-branch --commit-filter '
+       if [ "$GIT_AUTHOR_EMAIL" = "schacon@localhost" ];
+       then
+         GIT_AUTHOR_NAME="Scott Chacon";
+         GIT_AUTHOR_EMAIL="schacon@example.com";
+         git commit-tree "$@";
+       else
+         git commit-tree "$@";
+       fi' HEAD
+     #+end_src
+** advanced
+*** plumbing
+    #+begin_src shell
+      git cat-file -p HEAD
+      git ls-tree -r HEAD
+      git ls-files -s
+    #+end_src
+*** reset
+    does:
+**** 1. move the branch that HEAD is pointing to (--soft)
+
+        with HEAD pointing to master,
+        git reset a1b2c3d4, make master point to a1b2c3d4
+
+        with "reset --soft", it will stop there !!!
+
+        revert git commit
+**** 2. updating the index ([--mixed])
+        update the index with the contents of whatever snapshot HEAD now points
+        to
+
+        with "reset --mixed", it will stop there !!!
+
+        the default behavior
+
+        revert git add
+**** 3. updating the working directory (--hard)
+        make the working directory look like the index
+**** recap
+     1. Move the branch HEAD points to (stop here if --soft).
+     2. Make the index look like HEAD (stop here unless --hard).
+     3. Make the working directory look like the index.
+*** reset a path
+**** unstage a file
+    1. Move the branch HEAD points to (skipped).
+    2. Make the index look like the HEAD (stop here).
+    #+begin_src shell
+      git reset file.txt
+      git reset --mixed HEAD file.txt
+    #+end_src
+**** pull specific file version
+     make the index look like the specific commit, for the file
+     #+begin_src shell
+      git reset eb43bf -- file.txt
+     #+end_src
+**** work by hunk
+     accept a --patch option to unstage content on a hunk-by-hunk basis
+     can selectively unstage or revert content
+**** squashing
+     squashing the 2 last commit with:
+     #+begin_src shell
+       git reset --soft HEAD~2
+       git commit
+     #+end_src
+*** checkout
+**** without path
+     #+begin_src shell
+       git checkout [branch]
+     #+end_src
+     is similar to
+     #+begin_src shell
+       git reset --hard [branch]
+     #+end_src
+
+     with 2 major differences:
+     - checkout is working-directory safe (no destroy)
+     - checkout updates HEAD
+     while:
+     - reset will simply replace everything without checking
+     - reset will move the branch that HEAD points to
+**** with path
+    #+begin_src shell
+      git checkout -- file
+    #+end_src
+    like
+    #+begin_src shell
+      git reset --hard [branch] file
+    #+end_src
+
+    - it’s not working-directory safe
+    - it does not move HEAD
+
+    accept a --patch option to allow you to selectively revert file contents on
+    a hunk-by-hunk basis
+*** reset vs. checkout summary
+    |                           | HEAD | Index | Workdir | WD Safe ? |
+    |---------------------------+------+-------+---------+-----------|
+    | Commit Level              |      |       |         |           |
+    | reset --soft [commit]     | REF  | NO    | NO      | YES       |
+    | reset [--mixed] [commit]  | REF  | YES   | NO      | YES       |
+    | reset --hard [commit]     | REF  | YES   | YES     | NO        |
+    | checkout <commit>         | HEAD | YES   | YES     | YES       |
+    |---------------------------+------+-------+---------+-----------|
+    | File Level                |      |       |         |           |
+    | reset [commit] <paths>    | NO   | YES   | NO      | YES       |
+    | checkout [commit] <paths> | NO   | YES   | YES     | NO        |
+    |---------------------------+------+-------+---------+-----------|
+*** merging
+**** ignoring whitesapce
+     a lifesaver if you have someone on your team who likes to occasionally
+     reformat everything from spaces to tabs or vice-versa
+
+     add -Xignore-all-space or -Xignore-space-change
+
+     #+begin_src shell
+       git merge -Xignore-space-change whitespace
+     #+end_src
+**** in a merge conflict
+     browse the 3 file versions
+     - stage 1 is the common ancestor
+     - stage 2 is your version ("ours")
+     - stage 3 is from the MERGE_HEAD, the version you’re merging in ("theirs")
+
+     #+begin_src shell
+       git show :1:hello.rb > hello.common.rb
+       git show :2:hello.rb > hello.ours.rb
+       git show :3:hello.rb > hello.theirs.rb
+     #+end_src
+
+     #+begin_src shell
+       git ls-files -u
+       100755 ac51efdc3df4f4fd328d1a02ad05331d8e2c9111 1 hello.rb
+       100755 36c06c8752c78d2aff89571132f3bf7841a7b5c3 2 hello.rb
+       100755 e85207e04dfdd5eb0a1e9febbc67fd837c44a1cd 3 hello.rb
+     #+end_src
+
+     #+begin_src shell
+       git merge-file -p \
+           hello.ours.rb hello.common.rb hello.theirs.rb > hello.rb
+     #+end_src
+
+     before commit, can check diff status,
+
+     to see what the merge introduced:
+     #+begin_src shell
+       git diff --ours
+     #+end_src
+
+     to see how the result of the merge differed from what was on their side
+     #+begin_src shell
+       git diff --theirs
+     #+end_src
+
+     to see how the file has changed from both sides
+     #+begin_src shell
+       git diff --base
+     #+end_src
+
+     then before commit, clean
+     #+begin_src shell
+       git clean -f
+     #+end_src
+**** checkout conflict
+     checkout conflict context
+     #+begin_src shell
+       git checkout --conflict=diff3 hello.rb
+     #+end_src
+
+     checkout "ours" version
+     #+begin_src shell
+       git checkout --ours hello.rb
+     #+end_src
+
+     checkout "theirs" version
+     #+begin_src shell
+       git checkout --theirs hello.rb
+     #+end_src
+**** log to get merge context
+     to get a full list of all of the unique commits that were included in
+     either branch involved in this merge, we can use the "..." syntax
+     #+begin_src shell
+       git log --oneline --left-right HEAD...MERGE_HEAD
+     #+end_src
+
+     we add the --merge option to git log, it will only show the commits in
+     either side of the merge that touch a file that’s currently conflicted
+     #+begin_src shell
+       git log --oneline --left-right --merge [-p]
+     #+end_src
+     with the -p option, you get just the diffs to the file that ended up in
+     conflict
+**** combined diff
+     before the resolution :
+     - the first column shows you if that line is different (added or removed)
+       between the “ours” branch and the file in your working directory
+     - the second column does the same between the “theirs” branch and your
+       working directory copy
+     #+begin_src shell
+       git diff
+     #+end_src
+
+     after the resolution:
+     #+begin_src shell
+       git log --cc -p -1
+     #+end_src
+*** undoing merges
+**** git reset
+     #+begin_src shell
+       git reset --hard HEAD~
+     #+end_src
+
+     to avoid if :
+     - published
+     - any other commits have been created since the merge
+**** reverse
+     #+begin_src shell
+       git revert -m 1 HEAD
+     #+end_src
+
+     if trying to remerge:
+     - git will get confused if you try to merge topic into master again
+       there’s nothing in topic that isn’t already reachable from master
+     - if you add work to topic and merge again, Git will only bring in the
+       changes since the reverted merge
+     finaly the best way around this is to un-revert the original merge
+     #+begin_src shell
+       git revert ^M
+       git merge topic  # to have additionnal work
+     #+end_src
+*** merge
+**** preferences
+     prefer git to simply choose a specific side and ignore the other side
+     instead of letting you manually resolve the conflict:
+     - -Xours
+     - -Xtheirs
+
+     prefer "ours" in case of conflict:
+     #+begin_src shell
+       git merge -Xours feature-branch
+     #+end_src
+**** strategy
+     specify a strategy:
+     - -s ours
+     - -s theirs
+
+     This will basically do a fake merge. It will record a new merge commit with
+     both branches as parents, but it will not even look at the branch you’re
+     merging in. It will simply record as the result of the merge the exact code
+     in your current branch.
+     #+begin_src shell
+       git merge -s ours feature-branch
+     #+end_src
+*** rerere
+**** usage
+     - with rerere enabled, you can attempt the occasional merge, resolve the
+       conflicts, then back out of the merge
+     - if you want to keep a branch rebased so you don’t have to deal with the
+       same rebasing conflicts each time you do it
+**** enable
+     #+begin_src shell
+       git config --global rerere.enabled true
+     #+end_src
+
+     or by creating: .git/rr-cache
+**** flow
+     to show pre-merge state:
+     #+begin_src shell
+       git rerere status
+     #+end_src
+
+     to show the current state of the resolution:
+     (what you started with to resolve and what you’ve resolved it to)
+     #+begin_src shell
+       git rerere diff
+     #+end_src
+
+     try to run pre-recorded:
+     #+begin_src shell
+       git rerere
+     #+end_src
 ** Sign
+*** introduction
+    use an existing key
+    #+begin_src shell
+      gpg --list-keys
+    #+end_src
+
+    or create a new key
+    #+begin_src shell
+      gpg --gen-key
+    #+end_src
+
+    configure git to use this key
+    #+begin_src shell
+      git config --global user.signingkey <0A12345!>
+    #+end_src
+*** tags
+    signed tag: -s instead of -a
+    #+begin_src shell
+      git tag -s v1.5 -m 'my signed 1.5 tag'
+    #+end_src
+
+    verify with
+    #+begin_src shell
+      git tag -v v1.5
+    #+end_src
+*** commit
+    sign with -S
+    #+begin_src shell
+      git commit -a -S -m 'Signed commit'
+    #+end_src
+
+    browse commit with signature
+    #+begin_src shell
+      git log --show-signature -1
+    #+end_src
+
+    show commit with signature
+    #+begin_src shell
+      git show --show-signature 5c3386cf
+    #+end_src
+
+    merge and pull verifying
+    #+begin_src shell
+      git merge --verify-signatures <branch>
+    #+end_src
+
+    merge verifying and sign
+    #+begin_src shell
+      git merge --verify-signatures -S <branch>
+    #+end_src
 *** share pub key
     list keys:
     #+begin_src shell
@@ -179,6 +753,290 @@
     #+begin_src shell
       git show gpg-pub-maintainer | gpg --import
     #+end_src
+** submodules
+*** basic
+    init with
+    #+begin_src shell
+      git submodule add https://github.com/.../project_a
+    #+end_src
+
+    check status from root repository:
+    #+begin_src shell
+      git diff --cached project_a
+      git diff --cached --submodule
+    #+end_src
+
+    then commit
+*** config
+**** diff display submodule info by default
+     #+begin_src shell
+       git config --global diff.submodule log
+     #+end_src
+**** submodule remote branch
+     change in .gitmodules (global)
+     #+begin_src shell
+       git config -f .gitmodules submodule.<submodule>.branch <branch>
+     #+end_src
+
+     or in .git/config (local)
+     #+begin_src shell
+       git config submodule.<submodule>.branch <branch>
+     #+end_src
+**** submodule summary in git status
+     #+begin_src shell
+       git config status.submodulesummary 1
+     #+end_src
+**** always pull with --recurse-submodules
+     #+begin_src shell
+       git config submodule.recurse true
+     #+end_src
+     will make Git use the --recurse-submodules flag for all commands that
+     support it (except clone)
+**** push with submodule check
+     #+begin_src shell
+       git config push.recurseSubmodules check
+     #+end_src
+     check option will make push simply fail if any of the committed submodule
+     changes haven’t been pushed
+
+     can be changed to on-demand to push submodules automatically
+*** cloning project with submodules
+    simple cloning does not checkout submodules
+
+    to have submodules:
+    - init local config files
+    - fetch and checkout submodules to the appropriate commit
+    #+begin_src shell
+      git submodule init
+      git submodule update
+    #+end_src
+    or
+    #+begin_src shell
+      git submodule update --init
+    #+end_src
+
+    to allow recursive submodules:
+    #+begin_src shell
+      git submodule update --init --recursive
+    #+end_src
+
+    or clone with:
+    #+begin_src shell
+        git clone --recurse-submodules https://github.com/.../project_a
+    #+end_src
+*** working on project with submodules
+**** status
+     #+begin_src shell
+       git diff --submodule
+     #+end_src
+**** pulling update on submodule
+     do it manually by sumodule,
+     or let git do it
+     #+begin_src shell
+       git submodule update --remote [submodule]
+     #+end_src
+**** pulling project with submodule
+     git pull will not update submodule by default,
+     also use:
+     #+begin_src shell
+       git submodule update --init --recursive
+     #+end_src
+
+     or use:
+     #+begin_src shell
+       git pull --recurse-submodules
+     #+end_src
+**** changes in submodule reference
+     after a change in submodule reference (.gitmodules)
+     if git pull --recurse-submodules, or git submodule update, fail
+     #+begin_src shell
+       # copy the new URL to your local config
+       git submodule sync --recursive
+       # update the submodule from the new URL
+       git submodule update --init --recursive
+     #+end_src
+**** working in submodule
+     change submodule branch
+     #+begin_src shell
+       cd <submodule>
+       git checkout stable
+     #+end_src
+
+     merge a change from remote
+     #+begin_src shell
+       git submodule update --remote --merge
+     #+end_src
+
+     rebase on remote updates
+     #+begin_src shell
+       git submodule update --remote --rebase
+     #+end_src
+
+     without --rebase or --merge, Git will just update the submodule to whatever
+     is on the server and reset your project to a detached HEAD state
+     #+begin_src shell
+       checkout git submodule update --remote
+     #+end_src
+**** publishing submodule changes
+     push root repository, without pushing submodules can lead to trouble, since
+     theere will be no way to get the submodule changes that are depended on
+
+     push from root in check mode:
+     #+begin_src shell
+       git push --recurse-submodules=check
+     #+end_src
+
+     or push in on-demand mode, so git will try to do this for you
+     #+begin_src shell
+       git push --recurse-submodules=on-demand
+     #+end_src
+**** merging submodule changes
+     use git diff to understand the conflict
+     #+begin_src shell
+       git diff
+       diff --cc DbConnector
+       index eb41d76,c771610..0000000
+       --- a/DbConnector
+       +++ b/DbConnector
+     #+end_src
+     conflict between commit id eb41d76 and c771610
+
+     solve it:
+     #+begin_src shell
+       cd <submodule>
+
+       git rev-parse HEAD
+       eb41d764bccf88be77aced643c13a7fa86714135
+
+       git branch try-merge c771610
+
+       git merge try-merge
+
+       cd ..
+
+       git diff
+
+       git add <submodule>
+
+       git commit ...
+     #+end_src
+*** tips
+**** submodule foreach
+     run a command in all submodules
+     #+begin_src shell
+       git submodule foreach 'git stash'
+
+       git submodule foreach 'git checkout -b featureA'
+     #+end_src
+
+     for example, generate a unified diff
+     #+begin_src shell
+       git diff; git submodule foreach 'git diff'
+     #+end_src
+
+** commands
+*** bisect
+    does a binary search through your commit history to help you identify as
+    quickly as possible which commit introduced an issue
+
+**** manual flow
+     1. start
+     2. tell the current commit is broken / bad
+     3. tell the last good known state
+     #+begin_src shell
+       git bisect start
+       git bisect bad
+       git bisect good v1.0
+     #+end_src
+
+     4. run the binary search
+        either state is good
+        either state is bad
+     #+begin_src shell
+       git bisect good
+       git bisect bad
+     #+end_src
+
+     5. until the last remaining commit
+
+     6. reset HEAD to where it was before start
+     #+begin_src shell
+       git bisect reset
+     #+end_src
+**** auto flow
+     if you have a script that will exit 0 if the project is good or non-0 if
+     the project is bad, you can fully automate git bisect
+
+     1. start by providing the known bad and good commits
+     2. run the test script
+     #+begin_src shell
+       git bisect start HEAD v1.0
+       git bisect run test-error.sh
+     #+end_src
+*** blame
+    determine which commit and committer was responsible for lines 69 to 82
+    #+begin_src shell
+    git blame -L 69,82 Makefile
+    #+end_src
+
+    can detect code move, copy, ...
+    with -C option
+*** bundle
+**** create
+     #+begin_src shell
+       git bundle create repo.bundle HEAD master
+     #+end_src
+
+     add HEAD as a reference of the default branch to checkout
+**** clone
+     #+begin_src shell
+       git clone repo.bundle repo
+     #+end_src
+**** commit range
+     determine the commit range with git log
+     #+begin_src shell
+       git log --oneline master ^origin/master
+       git log --oneline origin/master..master
+     #+end_src
+
+     use the range to create bundle
+     #+begin_src shell
+       git bundle create commits.bundle master ^9a466c5
+     #+end_src
+**** verify status
+     #+begin_src shell
+       git bundle verify ../commits.bundle
+     #+end_src
+
+     inform if it can be integrated in the current repo
+**** import content
+     list referenreces
+     #+begin_src shell
+       git bundle list-heads ../commits.bundle
+     #+end_src
+
+     fetch reference
+     #+begin_src shell
+       git fetch ../commits.bundle master:other-master
+     #+end_src
+*** config
+**** help
+     - man git-config
+     - https://git-scm.com/docs/git-config
+*** diff-tree
+    to compare what is in your subdirectory with what the branch on the remote
+    server was the last time you fetched, you can run:
+    #+begin_src shell
+      git diff-tree -p branch
+      git diff-tree -p remote/branch
+    #+end_src
+*** ls-files
+    list conflicted files:
+    #+begin_src shell
+      git ls-files -u
+    #+end_src
+*** replace
+    to pretend to replace objects in the git database with other objects
 ** Server
 *** shared repository
     #+begin_src shell
@@ -292,6 +1150,148 @@
 *** gitlab
 *** public git hosting sites
     https://git.wiki.kernel.org/index.php/GitHosting
+*** config
+**** receive.fsckObjects
+**** receive.denyNonFastForwards
+**** receive.denyDeletes
+** credentials
+*** storage
+    to configure with
+    #+begin_src shell
+      git config --global credential.helper cache
+    #+end_src
+
+    storage type are:
+    - (default) no cache at all
+    - "cache" mode keeps credentials in memory for a certain period of time (15 minutes)
+    - "store" mode aves the credentials to a plain-text file on disk, and they never expire
+
+    a helper called "Git Credential Manager", this uses platform-native data
+    stores to control sensitive information
+    (https://github.com/GitCredentialManager/git-credential-manager)
+
+    example:
+    #+begin_src shell
+      git config --global credential.helper 'store --file ~/.my-credentials'
+    #+end_src
+    or
+    #+begin_src shell
+      git config --global credential.helper 'cache --timeout 900'
+    #+end_src
+*** protocol
+    #+begin_src shell
+      git credential fill
+      protocol=https
+      host=mygithost
+
+      protocol=https
+      host=mygithost
+      username=bob
+      password=s3cre7
+
+      git credential fill
+      protocol=https
+      host=unknownhost
+      Username for 'https://unknownhost': bob
+      Password for 'https://bob@unknownhost':
+      protocol=https
+      host=unknownhost
+      username=bob
+      password=s3cre7
+    #+end_src
+
+    The credential system is actually invoking a program that’s separate from
+    Git itself; which one and how depends on the credential.helper configuration
+    value.
+
+    | Configuration Value                 | Behavior                             |
+    |-------------------------------------+--------------------------------------|
+    | foo                                 | Runs git-credential-foo              |
+    | foo -a --opt=bcd                    | Runs git-credential-foo -a --opt=bcd |
+    | /absolute/path/foo -xyz             | Runs /absolute/path/foo -xyz         |
+    | !f() { echo "password=s3cre7"; }; f | Code after ! evaluated in shell      |
+
+    the general form for this is "git-credential-foo [args] <action>"
+
+    the stdin/stdout protocol is the same as git-credential, but they use a
+    slightly different set of actions:
+    - get is a request for a username/password pair.
+    - store is a request to save a set of credentials in this helper’s memory.
+    - erase purge the credentials for the given properties from this helper’s memory.
+
+    #+begin_src shell
+      git credential-store --file ~/git.store store
+      protocol=https
+      host=mygithost
+      username=bob
+      password=s3cre7
+
+      git credential-store --file ~/git.store get
+      protocol=https
+      host=mygithost
+      username=bob
+      password=s3cre7
+    #+end_src
+*** custom
+    action to implement:
+    - get
+    - store
+    - erase
+
+    create git-credential-read-only :
+    #+begin_src ruby
+      #!/usr/bin/env ruby
+
+      require 'optparse'
+
+      path = File.expand_path '~/.git-credentials'
+      OptionParser.new do |opts|
+        opts.banner = 'USAGE: git-credential-read-only [options] <action>'
+        opts.on('-f', '--file PATH', 'Specify path for backing store') do |argpath|
+          path = File.expand_path argpath
+        end
+      end.parse!
+
+      exit(0) unless ARGV[0].downcase == 'get'
+      exit(0) unless File.exists? path
+
+      known = {}
+      while line = STDIN.gets
+        break if line.strip == ''
+        k,v = line.strip.split '=', 2
+        known[k] = v
+      end
+
+      File.readlines(path).each do |fileline| ④
+        prot,user,pass,host = fileline.scan(/^(.*?):\/\/(.*?):(.*?)@(.*)$/).first
+        if prot == known['protocol'] and host == known['host'] and user == known['username'] then
+          puts "protocol=#{prot}"
+          puts "host=#{host}"
+          puts "username=#{user}"
+          puts "password=#{pass}"
+          exit(0)
+        end
+      end
+    #+end_src
+    put it somewhere in our PATH and mark it executable
+
+    test it:
+    #+begin_src shell
+      git credential-read-only --file=/mnt/shared/creds get
+      protocol=https
+      host=mygithost
+      username=bob
+
+      protocol=https
+      host=mygithost
+      username=bob
+      password=s3cre7
+    #+end_src
+
+    configure helper:
+    #+begin_src shell
+      git config --global credential.helper 'read-only --file /mnt/shared/creds'
+    #+end_src
 ** Branching patterns
 *** base patterns (integration + path to production)
 **** source branching
@@ -478,3 +1478,72 @@
          end
        end
      #+end_src
+**** API
+***** example: check status of PR
+      #+begin_src ruby
+        require 'httparty'
+        require 'sinatra'
+        require 'json'
+
+        post '/payload' do
+          push = JSON.parse(request.body.read) # parse the JSON
+          repo_name = push['repository']['full_name']
+          # look through each commit message
+          push["commits"].each do |commit|
+            # look for a Signed-off-by string
+            if /Signed-off-by/.match commit['message']
+              state = 'success'
+              description = 'Successfully signed off!'
+            else
+              state = 'failure'
+              description = 'No signoff found.'
+            end
+            # post status to GitHub
+            sha = commit["id"]
+            status_url = "https://api.github.com/repos/#{repo_name}/statuses/#{sha}"
+            status = {
+              "state"
+              => state,
+              "description" => description,
+              "target_url" => "http://example.com/how-to-signoff",
+              "context"
+              => "validate/signoff"
+            }
+            HTTParty.post(status_url,
+                          :body => status.to_json,
+                          :headers => {
+                            'Content-Type' => 'application/json',
+                            'User-Agent'
+                            => 'tonychacon/signoff',
+                            'Authorization' => "token #{ENV['TOKEN']}" }
+                         )
+          end
+        end
+      #+end_src
+***** API client: octokit
+      https://github.com/octokit
+
+** arround
+*** p4merge as a diff & merge tool
+    - install the script
+    - create a wrapper script: /usr/local/bin/extMerge
+      #+begin_src shell
+        #!/bin/sh
+        /Applications/p4merge.app/Contents/MacOS/p4merge $*
+      #+end_src
+    - by default, Git passes the following arguments to the diff program:
+      #+begin_src shell
+        path old-file old-hex old-mode new-file new-hex new-mode
+      #+end_src
+    - generic extDiff wrapper: /usr/local/bin/extDiff
+      #+begin_src shell
+        #!/bin/sh
+        [ $# -eq 7 ] && /usr/local/bin/extMerge "$2" "$5"
+      #+end_src
+    - configure your custom merge resolution and diff tools
+      #+begin_src shell
+        git config --global merge.tool extMerge
+        git config --global mergetool.extMerge.cmd 'extMerge "$BASE" "$LOCAL" "$REMOTE" "$MERGED"'
+        git config --global mergetool.extMerge.trustExitCode false
+        git config --global diff.external extDiff
+      #+end_src

@@ -57,6 +57,8 @@ if [ -z "$git_current_user_mail" ]; then
 fi
 
 git config --global alias.confe 'config --global -e'
+git config --global alias.configl 'config --list --show-origin'
+git config --global alias.confl 'config --list --show-origin'
 
 ### default Branch
 git config --global init.defaultBranch master
@@ -67,6 +69,9 @@ if [ -r "$HOME/.gitignore_global" ]; then
     git config --global core.excludesfile "$HOME/.gitignore_global"
 fi
 
+### autocorrect command
+# git config --global help.autocorrect 1  # number of 1/10 seconds before doing
+
 ### credentials
 # git config --global credential.helper cache
 
@@ -76,6 +81,9 @@ git config --global color.branch auto
 git config --global color.diff auto
 git config --global color.interactive auto
 git config --global color.status auto
+# blue foreground / black background / bold text
+# git config --global color.diff.meta "blue black bold"
+# text properties: bold, dim, ul (underline), blink, reverse
 
 # editor set to emacs if available
 for editor in e et emacs vim vi; do
@@ -93,22 +101,19 @@ if [ -r "$HOME/.gitmessage.txt" ]; then
     git config --global commit.template "$HOME/.gitmessage.txt"
 fi
 
-# config
-git config --global alias.configl 'config --list --show-origin'
-git config --global alias.confl 'config --list --show-origin'
-
 # algorithm : patience / histogram / <default>
 git config --global diff.algorithm histogram
 
 # pager
 git config --global core.pager 'less -RFX'
+# git config --global core.pager ''
 
 # newline
-## To configure line endings correctly on Linux/Mac:
+## (linux) to convert CRLF to LF on commit but not the other way around
 git config --global core.autocrlf input
-## To configure line endings correctly on Linux/Windows:
+## (windows) converts LF endings into CRLF when you check-out code
 # git config --global core.autocrlf true
-## To configure line endings correctly on Windows only:
+## (windows-only)
 # git config --global core.autocrlf false
 
 # ReReRe : Reuse Recorded Resolution
@@ -165,17 +170,20 @@ git config --global alias.ci commit
 git config --global alias.cim "commit -m"
 git config --global alias.cam "commit --all -m"
 git config --global alias.amend 'commit --amend'
-git config --global alias.amendc 'commit --amend -C HEAD'
 git config --global alias.amendh 'commit --amend -C HEAD'
+git config --global alias.amendn 'commit --amend --no-edit'
 git config --global alias.fixup 'commit --fixup'
 git config --global alias.squash 'commit --squash'
 
 ### rebase
 git config --global alias.rb 'rebase'
+git config --global alias.rbi 'rebase -i'
+git config --global alias.rbif 'rebase -i --fork-point'
 git config --global alias.irb 'rebase -i'
 git config --global alias.irbf 'rebase -i --fork-point'
 # equivalent to
 # git rebase -i $(git merge-base --fork-point <branch>)
+git config --global alias.rbpreview '!f() { git log --reverse --pretty=format:"%h %s" ${1}..HEAD; }; f'
 
 ### rm
 git config --global alias.untrack 'rm --cache --'
@@ -240,13 +248,24 @@ git config --global alias.repull "pull --rebase"
 git config --global alias.up '!git pull --rebase $@ && git submodule update --init --recursive'
 
 ### push
-git config --global alias.pushall "push --recurse-submodules=on-demand"
 git config --global alias.push2all '!f() { for remote in `git remote`; do git push $remote "$@"; done }; f'
 # push : nothing | matching | simple | current
 git config --global push.default current
 git config --global alias.pushf 'push --force-with-lease'
 git config --global alias.rm-remote-ref '!f() { [ $# -ge 2 ] && rem="$1" && shift ; git push "${rem:-origin}" --delete "$@"; }; f'
 # alternativ is: git push <origin> :refs/tags/<v1.4-lw>
+
+### submodules
+git config --global submodule.recurse true
+git config --global diff.submodule log
+git config --global status.submodulesummary 1
+git config --global push.recurseSubmodules check
+
+git config --global alias.sinit 'submodule update --init --recursive'
+git config --global alias.sco 'checkout --recurse-submodules'
+git config --global alias.sdiff '!'"git diff && git submodule foreach 'git diff'"
+git config --global alias.spush 'push --recurse-submodules=on-demand'
+git config --global alias.supdate 'submodule update --remote --merge'
 
 ### tag
 git config --global alias.rtag 'describe --exact-match --tags'
@@ -269,7 +288,8 @@ git config --global alias.resetto '!f() { branch=$(git rev-parse --abbrev-ref HE
 git config --global alias.resetfile '!f() { git reset @~ "$@" && git commit --amend --no-edit }; f'
 
 ### whitespace
-## defaults: blank-at-eol,blank-at-eof,space-before-ta
+## 6 whitespace issues
+## 3 defaults: blank-at-eol,blank-at-eof,space-before-tab
 ## additional: cr-at-eol,tab-in-indent,indent-with-non-tab
 ## trailing-space = both blank-at-eol + blank-at-eof
 git config --global core.whitespace 'trailing-space,space-before-tab'
@@ -278,6 +298,8 @@ git config --global alias.cleanwhitespace '!f() {git rebase HEAD~${1:-1} --white
 # stash = index + workspace (default)
 git config --global alias.saveall 'stash save --include-untracked "SAVE ALL"'
 git config --global alias.savewip 'stash save --keep-index --include-untracked "SAVE WIP"'
+git config --global alias.savefull 'stash save --include-untracked --all "SAVE FULL"'
+git config --global alias.st2br 'stash branch'
 
 # references
 git config --global alias.references 'show-ref'
@@ -318,7 +340,9 @@ git config --global alias.unmergedc '!f() { brs="$1" ; [ -z "$brs" ] && brs=$(gi
 
 # merge conflict
 git config --global alias.mergecontext 'lg --merge --name-only'
-git config --global alias.cod3 'checkout --conflict=diff3'
+git config --global alias.coco 'checkout --ours'
+git config --global alias.coct 'checkout --theirs'
+git config --global alias.cocd3 'checkout --conflict=diff3'
 
 # reflog navigation
 git config --global alias.undo '!f() { git reset --hard $(git rev-parse --abbrev-ref HEAD)@{${1:-1}}; }; f'
@@ -414,7 +438,7 @@ git config --global tag.gpgSign true
 git config --global alias.visual '!gitk'
 
 ## mergetool
-#  - git mergetool --tool-help
+# list supported with: git mergetool --tool-help
 
 ######################################### doc
 
