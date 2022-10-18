@@ -267,6 +267,7 @@ BUILD_TOOLS_PERFTOOLS_URL_PATTERN='https://github.com/brendangregg/perf-tools/ar
 BUILD_TOOLS_PERFTOOLS_DEFAULT_VERSION=master
 
 #> p4merge - Perforce P4Merge
+# https://www.perforce.com/product/components/perforce-visual-merge-and-diff-tools
 BUILD_TOOLS_P4MERGE_ENV=
 BUILD_TOOLS_P4MERGE_CONFIG=
 BUILD_TOOLS_P4MERGE_PRE_BUILD=
