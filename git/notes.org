@@ -1152,8 +1152,26 @@
     https://git.wiki.kernel.org/index.php/GitHosting
 *** config
 **** receive.fsckObjects
+     Git is capable of making sure every object received during a push still
+     matches its SHA-1 checksum and points to valid objects. However, it doesn’t
+     do this by default; it’s a fairly expensive operation, and might slow down
+     the operation, especially on large repositories or pushes.
+     #+begin_src shell
+       git config --system receive.fsckObjects true
+     #+end_src
 **** receive.denyNonFastForwards
+     To tell Git to refuse force-pushes.
+     #+begin_src shell
+       git config --system receive.denyNonFastForwards true
+     #+end_src
+     The other way you can do this is via server-side receive hooks.
 **** receive.denyDeletes
+     One of the workarounds to the denyNonFastForwards policy is for the user to
+     delete the branch and then push it back up with the new reference. To avoid
+     this, set receive.denyDeletes to true.
+     #+begin_src shell
+       git config --system receive.denyDeletes true
+     #+end_src
 ** credentials
 *** storage
     to configure with
