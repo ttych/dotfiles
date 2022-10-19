@@ -1,17 +1,16 @@
 #!/bin/sh
 # -*- mode: sh -*-
 
-ESH_TRUSTED_HOST=false
 ESH_TRUSTED_CONF="$ESH_DIR/conf/trusted_host"
-if [ -r "$ESH_TRUSTED_CONF" ]; then
-    for h in `cat "$ESH_TRUSTED_CONF"`; do
-        if [ "$h" = "$HOSTNAME" ] || [ "$h" = "$SHORT_HOSTNAME" ]; then
-            ESH_TRUSTED_HOST=true
-            break
-        fi
-    done
-fi
-export ESH_TRUSTED_HOST
+_want_ssh_agent()
+{
+    [ -r "$ESH_TRUSTED_CONF" ] || return 1
+
+    if grep "^${HOSTNAME}$" "$ESH_TRUSTED_CONF" >/dev/null 2>&1 || grep "^${SHORT_HOSTNAME}$" "$ESH_TRUSTED_CONF" >/dev/null 2>&1; then
+        return 0
+    fi
+    return 1
+}
 
 # DISPLAY= ssh-keygen -q -y -f id_ed25519 </dev/null
 # DISPLAY= ssh-keygen -q -y -f id_rsa_test </dev/null
@@ -115,7 +114,3 @@ keychain_load()
         keychain_load_keys
     fi
 }
-
-if [ -n "$ESH_TRUSTED_HOST" ] && $ESH_TRUSTED_HOST; then
-    keychain_load login
-fi

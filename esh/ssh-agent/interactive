@@ -1,0 +1,6 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+if _want_ssh_agent; then
+    keychain_load login
+fi
