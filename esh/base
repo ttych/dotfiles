@@ -388,14 +388,18 @@ esh_module_load()
            esh_module_load__m_alt="$ESH_DIR/$1"
            ;;
     esac
-    if [ -r "$esh_module_load__m" ]; then
-        ESH_MODULE_DIR="${esh_module_load__m%/?*}" . "$esh_module_load__m"
-    elif [ -d "$esh_module_load__m_alt" ]; then
-        [ -r "$esh_module_load__m_alt/base" ] &&
-            ESH_MODULE_DIR="${esh_module_load__m_alt}" . "$esh_module_load__m_alt/base"
-        esh_interactive && [ -r "$esh_module_load__m_alt/interactive" ] &&
-            ESH_MODULE_DIR="${esh_module_load__m_alt}" . "$esh_module_load__m_alt/interactive"
-    fi
+    for esh_module_load__try in "$esh_module_load__m" "$esh_module_load__m_alt"; do
+        [ -r "$esh_module_load__try" ] || continue
+
+        if [ -d "$esh_module_load__try" ]; then
+            [ -r "$esh_module_load__try/base" ] &&
+                ESH_MODULE_DIR="${esh_module_load__try}" . "$esh_module_load__try/base"
+            esh_interactive && [ -r "$esh_module_load__try/interactive" ] &&
+                ESH_MODULE_DIR="${esh_module_load__try}" . "$esh_module_load__try/interactive"
+        elif [ -r "$esh_module_load__try" ]; then
+            ESH_MODULE_DIR="${esh_module_load__try%/?*}" . "$esh_module_load__try"
+        fi
+    done
 }
 
 for esh_module in terminal \
@@ -406,7 +410,8 @@ for esh_module in terminal \
                       utilsh \
                       tmux \
                       ssh-agent \
-                      interactive
+                      interactive \
+                      git
 do
     esh_module_load "$esh_module"
 done
