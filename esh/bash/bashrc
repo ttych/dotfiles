@@ -20,7 +20,7 @@
 # ignorespace : ignore commands that start with spaces
 # ignoredups : ignore duplicates
 # ignoreboth : ignorespace:ignoredups
-HISTCONTROL=ignoreboth
+HISTCONTROL=ignoredups
 export HISTCONTROL
 
 
