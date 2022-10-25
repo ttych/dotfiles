@@ -1310,6 +1310,1096 @@
     #+begin_src shell
       git config --global credential.helper 'read-only --file /mnt/shared/creds'
     #+end_src
+** gitattributes
+*** location
+    - .gitattributes
+    - .git/info/attributes
+*** binary file
+    inform git that *.pbxproj are binary
+    #+begin_src conf
+      *.pbxproj binary
+    #+end_src
+*** diff docx file
+    ask git to use word diff filter when trying to view change
+    #+begin_src conf
+      ,*.docx diff=word
+    #+end_src
+
+    then create the filter script
+    #+begin_src shell
+      #!/bin/bash
+      docx2txt.pl "$1" -
+    #+end_src
+
+    then configure git word filter
+    #+begin_src shell
+      git config diff.word.textconv docx2txt
+    #+end_src
+
+    git diff will now try to display a diff status
+*** diff of png file
+    define gitattributes
+    #+begin_src conf
+      ,*.png diff=exif
+    #+end_src
+
+    configure git exif filter
+    #+begin_src shell
+      git config diff.exif.textconv exiftool
+    #+end_src
+
+    now git diff display exif changes
+*** smudge and clean
+    - smudge filter is run on checkout (to workdir)
+    - clean filter is run when files are staged (to index)
+
+    the .gitattributes file is committed and passed around with the project
+    but the filter isn't, so it won't work everywhere
+**** example on C source
+     define filter indent on *.c source code
+     #+begin_src conf
+       ,*.c filter=indent
+     #+end_src
+
+     define git filter
+     #+begin_src shell
+       git config --global filter.indent.clean indent
+       git config --global filter.indent.smudge cat
+     #+end_src
+**** expand last commit date
+     will replace $Date$ placeholder with last commit date
+
+     create expand_date script
+     #+begin_src ruby
+       #! /usr/bin/env ruby
+       data = STDIN.read
+       last_date = `git log --pretty=format:"%ad" -1`
+       puts data.gsub('$Date$', '$Date: ' + last_date.to_s + '$')
+     #+end_src
+
+     define git filter
+     #+begin_src shell
+       git config filter.dater.smudge expand_date
+       git config filter.dater.clean 'perl -pe "s/\\\$Date[^\\\$]*\\\$/\\\$Date\\\$/"'
+     #+end_src
+
+     define git attribute
+     #+begin_src conf
+       date*.txt filter=dater
+     #+end_src
+*** export-ignore for archive
+    tell Git not to export certain files or directories when generating an archive
+
+    to exclude test/ directory, add in .gitattributes
+    #+begin_src conf
+      test/ export-ignore
+    #+end_src
+
+    now, when running git archive, test will not be included in the archive
+*** export-subst for archive
+    to apply git log’s formatting and keyword-expansion processing to selected
+    portions of files marked with the export-subst attribute
+
+    to have metadata about the last commit automatically injected into it when
+    git archive runs
+
+    define .gitattributes
+    #+begin_src conf
+      LAST_COMMIT export-subst
+    #+end_src
+
+    init LAST_COMMIT content (following log format)
+    #+begin_src shell
+      echo 'Last commit date: $Format:%cd by %aN$' > LAST_COMMIT
+    #+end_src
+    then add and commit.
+
+    now, when running git archive, LAST_COMMIT will look like
+    #+begin_src text
+      Last commit date: Tue Apr 21 08:38:48 2009 -0700 by Scott Chacon
+    #+end_src
+
+    with a more complex example:
+    #+begin_src shell
+      echo '$Format:Last commit: %h by %aN at %cd%n%+w(76,6,9)%B$' > LAST_COMMIT
+    #+end_src
+*** merge strategies
+    define merge strategies in gitattributes
+    to protect a file content
+
+    define git attribute:
+    #+begin_src conf
+      database.xml merge=ours
+    #+end_src
+
+    define the dummy ours merge strategy
+    #+begin_src shell
+      git config --global merge.ours.driver true
+    #+end_src
+** hooks
+*** location
+    the hooks are all stored in the hooks subdirectory of the Git directory
+    - .git/hooks
+
+    generally populated at init time with sample
+
+    a valid hooks should be:
+    - in .git/hooks directory
+    - named correctly
+    - executable
+*** client-side
+    triggered by operations such as committing and merging
+
+    client-side hooks are not copied when you clone a repository !
+**** committing-workflow hooks
+***** pre-commit
+      - run first
+      - before you even type in a commit message
+      - used to inspect the snapshot to be committed
+      - for example, check linter
+      - for example, to make sure tests run
+      - for example, to inspect the code
+      - for example, check for trailing whitespace (default example)
+      - exiting non-zero from this hook aborts the commit
+      - can be bypassed with "git commit --no-verify"
+***** prepare-commit-msg
+      - after the default commit message is created
+      - run before the commit message editor is fired up
+      - lets you edit the default message before the commit author
+      - takes parameters
+        - path to the file that holds the commit message
+        - type of commit
+        - commit SHA-1 (if is an amended commit)
+      - for example, to auto-generate message content
+      - for example, to programmatically insert information
+***** commit-msg
+      - takes parameters
+        - the path to a temporary file that contains the commit message written by the developer
+      - on non-zero exit, aborts the commit process
+      - for example, to validate your project state
+      - for example, to validate commit message
+***** post-commit
+      - takes 0 parameter
+      - can't stop the patching process
+      - for example, allow to get last commit, by running git log -1 HEAD
+      - for example, to notify
+**** email workflow hooks
+     all invoked by the git am command
+***** applypatch-msg
+      - takes 1 parameter
+        - path of the temporary file that contains the proposed commit message
+      - on non-zero exit, aborts the process
+      - for example, to validate commit message
+      - for example, to normalize commit message
+***** pre-applypatch
+      - run after the patch is applied
+      - run before a commit is made
+      - on non-zero exit, aborts the process
+      - for example, to inspect snapshot/working tree
+      - for example, to apply lint, run test
+***** post-applypatch
+      - run after the commit is made
+      - can't stop the patching process
+      - for example, to notify
+**** other
+***** pre-rebase
+      - by git rebase
+      - before you rebase anything
+      - on non-zero exit, aborts the process
+      - for example, to disallow rebasing any commits that have already been pushed
+***** post-rewrite
+      - by git commit --amend / git rebase, but not git filter-branch
+      - takes 1 parameter
+        - command that triggered the rewrite
+      - stdin: receives a list of rewrites
+      - for example, to notify
+***** post-checkout
+      - by git checkout
+      - for example, to setup working directory
+      - for example, to generate documentation
+***** post-merge
+      - by git merge
+      - after a successful merge
+      - for example, to notify
+      - for example, to restore permission
+      - for example, to validate presence of file external to git control
+***** pre-push
+      - by git push
+      - after the remote refs have been updated
+      - before any objects have been transferred
+      - takes 2 parameters
+        - name of the remote
+        - location of the remote
+      - stdin: list of to-be-updated refs
+      - on non-zero exit, aborts the process
+      - for example, to validate a set of ref updates before a push occurs
+***** pre-auto-gc
+      - by git gc --auto
+      - git runs garbage collection as part of its normal operation
+      - before the garbage collection takes place
+      - on non-zero exit, aborts the process
+      - for example, to notify about garbage collection running
+      - for example, to block garbage collection
+*** server-side
+    triggered by network operations such as receiving pushed commits
+    run before and after pushes to the server
+
+    to enforce nearly any kind of policy for your project
+**** pre-receive
+     - run first
+     - run when handling a push from a client
+     - run only once, even if trying to push to multiple branches
+     - stdin: list of references that are being pushed
+     - on non-zero exit, aborts the process
+     - for example, to be sure none of the updated references are non-fast-forwards
+     - for example, to do access control for all the refs and files that will be modified
+**** update
+     - run once for each branch the pusher is trying to update
+     - takes 3 parameters
+       - the name of the reference (branch)
+       - the SHA-1 that reference pointed to before the push
+       - the SHA-1 the user is trying to push
+     - on non-zero exit, aborts the process for the current reference
+**** post-receive
+     - runs after the entire process is completed
+     - for example, to notify
+       - mailing list
+       - continuous integration server
+       - ticket-tracking system
+     - can’t stop the push process
+     - the client doesn’t disconnect until it has completed, so be careful if
+       you try to do anything that may take a long time
+*** git enforced policy - server-side
+**** update hook
+     The update hook runs once per branch being pushed and takes three arguments:
+     - the name of the reference being pushed to
+     - the old revision where that branch was
+     - the new revision being pushed
+
+     You also have access to the user doing the pushing if the push is being run
+     over SSH.
+     If everyone connect with a single user (git) via public-key
+     authentication, you may have to give that user a shell wrapper that
+     determines which user is connecting based on the public key.
+
+     script head
+     #+begin_src ruby
+       #!/usr/bin/env ruby
+
+       $refname = ARGV[0]
+       $oldrev = ARGV[1]
+       $newrev = ARGV[2]
+       $user = ENV['USER']
+
+       puts "Enforcing Policies..."
+       puts "(#{$refname}) (#{$oldrev[0,6]}) (#{$newrev[0,6]})"
+     #+end_src
+**** enforcing a specific commit-message format
+     verify that commit message contains a ref
+     #+begin_src ruby
+       #!/usr/bin/env ruby
+
+       $refname = ARGV[0]
+       $oldrev = ARGV[1]
+       $newrev = ARGV[2]
+       $user = ENV['USER']
+
+       puts "Enforcing Policies..."
+       puts "(#{$refname}) (#{$oldrev[0,6]}) (#{$newrev[0,6]})"
+
+       $regex = /\[ref: (\d+)\]/
+
+       # enforced custom commit message format
+       def check_message_format
+         missed_revs = `git rev-list #{$oldrev}..#{$newrev}`.split("\n")
+         missed_revs.each do |rev|
+           message = `git cat-file commit #{rev} | sed '1,/^$/d'`
+           if !$regex.match(message)
+             puts "[POLICY] Your message is not formatted correctly"
+             exit 1
+           end
+         end
+       end
+       check_message_format
+     #+end_src
+**** enforcing a user-based acl system
+     create an acl file in the repository:
+     #+begin_src text
+       avail|nickh,pjhyett,defunkt,tpw
+       avail|usinclair,cdickens,ebronte|doc
+       avail|schacon|lib
+       avail|schacon|tests
+     #+end_src
+
+     update hook:
+     #+begin_src ruby
+       #!/usr/bin/env ruby
+
+       $refname = ARGV[0]
+       $oldrev = ARGV[1]
+       $newrev = ARGV[2]
+       $user = ENV['USER']
+
+       puts "Enforcing Policies..."
+       puts "(#{$refname}) (#{$oldrev[0,6]}) (#{$newrev[0,6]})"
+
+       def get_acl_access_data(acl_file)
+         # read in ACL data
+         acl_file = File.read(acl_file).split("\n").reject { |line| line == '' }
+         access = {}
+         acl_file.each do |line|
+           avail, users, path = line.split('|')
+           next unless avail == 'avail'
+           users.split(',').each do |user|
+             access[user] ||= []
+             access[user] << path
+           end
+         end
+         access
+       end
+
+       # only allows certain users to modify certain subdirectories in a project
+       def check_directory_perms
+         access = get_acl_access_data('acl')
+
+         # see if anyone is trying to push something they can't
+         new_commits = `git rev-list #{$oldrev}..#{$newrev}`.split("\n")
+         new_commits.each do |rev|
+           files_modified = `git log -1 --name-only --pretty=format:'' #{rev}`.split("\n")
+           files_modified.each do |path|
+             next if path.size == 0
+             has_file_access = false
+             access[$user].each do |access_path|
+               if !access_path # user has access to everything
+                 || (path.start_with? access_path) # access to this path
+                 has_file_access = true
+               end
+             end
+             if !has_file_access
+               puts "[POLICY] You do not have access to push to #{path}"
+               exit 1
+             end
+           end
+         end
+       end
+
+       check_directory_perms
+     #+end_src
+
+*** git enforced policy - client-side
+    enforce/test policy on client-side before being rejected at push time
+**** commit-msg for commit message ref check
+     #+begin_src ruby
+       #!/usr/bin/env ruby
+       message_file = ARGV[0]
+       message = File.read(message_file)
+       $regex = /\[ref: (\d+)\]/
+       if !$regex.match(message)
+         puts "[POLICY] Your message is not formatted correctly"
+         exit 1
+       end
+     #+end_src
+**** pre-commit for ACL check
+     #+begin_src ruby
+       #!/usr/bin/env ruby
+
+       $user = ENV['USER']
+
+       # [ insert acl_access_data method from above ]
+       # only allows certain users to modify certain subdirectories in a project
+       def check_directory_perms
+         access = get_acl_access_data('.git/acl')
+
+         files_modified = `git diff-index --cached --name-only HEAD`.split("\n")
+         files_modified.each do |path|
+           next if path.size == 0
+           has_file_access = false
+           access[$user].each do |access_path|
+             if !access_path || (path.index(access_path) == 0)
+               has_file_access = true
+             end
+             if !has_file_access
+               puts "[POLICY] You do not have access to push to #{path}"
+               exit 1
+             end
+           end
+         end
+       end
+
+       check_directory_perms
+     #+end_src
+** internals
+*** .git content
+    - description
+      used only by the GitWeb program
+    - config
+      project-specific configuration options
+    - info/
+      directory keeps a global exclude file for ignored patterns
+    - hooks/
+      contains your client- or server-side hook scripts
+    - HEAD
+      points to the branch you currently have checked out
+    - index
+      stores your staging area information
+    - objects/
+      stores all the content for your database
+    - refs/
+      stores pointers into commit objects in that data (branches, tags, remotes and more)
+*** objects
+    Git is a content-addressable filesystem.
+    The core of Git is a simple key-value data store.
+
+    "git hash-object" takes some data, stores it in your .git/objects directory
+    (the object database), and gives you back the unique key that now refers to
+    that data object.
+
+    #+begin_src shell
+      echo 'test content' | git hash-object -w --stdin
+      d670460b4b4aece5915caf5c68d12f560a9fe3e4
+    #+end_src
+
+    it created in the objects:
+    .git/objects/d6/70460b4b4aece5915caf5c68d12f560a9fe3e4
+
+    display object content with:
+    #+begin_src shell
+      git cat-file -p d670460b4b4aece5915caf5c68d12f560a9fe3e4
+      test content
+    #+end_src
+
+    create object from file
+    #+begin_src shell
+      echo 'version 1' > test.txt
+
+      git hash-object -w test.txt
+      83baae61804e65cc73a7201a7252750c76066a30
+    #+end_src
+
+    display object type with:
+    #+begin_src shell
+      git cat-file -t d670460b4b4aece5915caf5c68d12f560a9fe3e4
+      blob
+    #+end_src
+**** tree objects
+     store the filename and also allows you to store a group of files together
+
+     print more recent tree
+     #+begin_src shell
+       git cat-file -p master^{tree}
+     #+end_src
+     show a group of blob and tree
+
+     prepare a tree object
+     #+begin_src shell
+       git update-index --add --cacheinfo 100644 83baae61804e65cc73a7201a7252750c76066a30 test.txt
+     #+end_src
+     - --add to add file in the staging area
+     - --cacheinfo to take reference from objects not working directory
+
+     mode is:
+     - 100644: normal file with 0644 permission
+     - 100755: normal executable file
+     - 120000: symbolic link
+
+     write staging area out to a tree object
+     #+begin_src shell
+       git write-tree
+       d8329fc1cc938780ffdd9f94e0d364e0ea74f579
+
+       git cat-file -p d8329fc1cc938780ffdd9f94e0d364e0ea74f579
+       100644 blob 83baae61804e65cc73a7201a7252750c76066a30 test.txt
+     #+end_src
+
+     prepare a new tree
+     #+begin_src shell
+       echo 'new file' > new.txt
+       git update-index --add new.txt
+
+       git update-index --cacheinfo 100644 1f7a7a472abf3dd9643fd615f6da379c4acb3e3a test.txt
+     #+end_src
+
+     reload tree in staging area as subtree
+     #+begin_src shell
+       git read-tree --prefix=bak d8329fc1cc938780ffdd9f94e0d364e0ea74f579
+
+       git write-tree
+       3c4e9cd789d88d8d89c1073707c3585e41b0e614
+
+       git cat-file -p 3c4e9cd789d88d8d89c1073707c3585e41b0e614
+       040000 tree d8329fc1cc938780ffdd9f94e0d364e0ea74f579 bak
+       100644 blob fa49b077972391ad58037050f2a75f74e3671e92 new.txt
+       100644 blob 1f7a7a472abf3dd9643fd615f6da379c4acb3e3a test.txt
+     #+end_src
+**** commit objects
+     to store information about snapshots:
+     - who, when, why
+
+     stores:
+     - top-level tree
+     - the parent commit
+     - author information
+     - committer information
+     - commit message
+
+     to create a commit based on an existing tree
+     #+begin_src shell
+       echo 'First commit' | git commit-tree d8329f
+       8005e6d269737e8466d11fb68c1ea82987c90241
+     #+end_src
+
+     browse commit content
+     #+begin_src shell
+       git cat-file -p 8005e6d269737e8466d11fb68c1ea82987c90241
+       ...
+     #+end_src
+
+     type is commit
+     #+begin_src shell
+       git cat-file -t 8005e6d269737e8466d11fb68c1ea82987c90241
+       commit
+     #+end_src
+
+     commit with parent
+     #+begin_src shell
+       echo 'Second commit' | git commit-tree 0155eb -p 8005e6d269737e8466d11f
+       50fe600211f3b914f39f37caba4ba187fde806e6
+
+       echo 'Third commit' | git commit-tree 3c4e9c -p 50fe600211f3b914f
+       19b6d38f7bb6531539a89a5cae520fcc34d0dc75
+     #+end_src
+
+     browse commit history now
+     #+begin_src shell
+       git log --stat 19b6d38f7bb65
+     #+end_src
+**** object storage
+     content to store is: "what is up, doc?"
+     #+begin_src ruby
+       content = "what is up, doc?"
+     #+end_src
+
+     git first construct the header
+     #+begin_src ruby
+       header = "blob #{content.bytesize}\0"
+       # => "blob 16\u0000"
+     #+end_src
+
+     git concatenates header and content and calculate SHA-1
+     #+begin_src ruby
+       store = header + content
+       # => "blob 16\u0000what is up, doc?"
+
+       require 'digest/sha1'
+
+       sha1 = Digest::SHA1.hexdigest(store)
+       # => "bd9dbf5aae1a3862dd1526723246b20206e5fc37"
+     #+end_src
+
+     should obtain the same output from git command
+     #+begin_src shell
+       echo -n "what is up, doc?" | git hash-object --stdin
+       bd9dbf5aae1a3862dd1526723246b20206e5fc37
+     #+end_src
+
+     git compress store with zlib
+     #+begin_src ruby
+       require 'zlib'
+
+       zlib_content = Zlib::Deflate.deflate(store)
+       # => "x\x9CK\xCA\xC9OR04c(\xCFH,Q\xC8,V(-\xD0QH\xC9O\xB6\a\x00_\x1C\a\x9D"
+     #+end_src
+
+     git write compressed content to an object on disk
+     #+begin_src ruby
+       path = '.git/objects/' + sha1[0,2] + '/' + sha1[2,38]
+       # => ".git/objects/bd/9dbf5aae1a3862dd1526723246b20206e5fc37"
+
+       require 'fileutils'
+
+       FileUtils.mkdir_p(File.dirname(path))
+       # => ".git/objects/bd"
+
+       File.open(path, 'w') { |f| f.write zlib_content }
+       # => 32
+     #+end_src
+
+     check final content
+     #+begin_src shell
+       git cat-file -p bd9dbf5aae1a3862dd1526723246b20206e5fc37
+       what is up, doc?
+     #+end_src
+*** references
+     A file in which you could store that SHA-1 value under a simple name so you
+     could use that simple name rather than the raw SHA-1 value.
+
+     under the .git/refs directory
+     #+begin_src shell
+       find .git/refs
+       .git/refs
+       .git/refs/heads
+       .git/refs/tags
+
+       find .git/refs -type f
+     #+end_src
+
+     to simply edit ref
+     #+begin_src shell
+       echo 1a410efbd13591db07496601ebc7a059dd55cfe9 > .git/refs/heads/master
+     #+end_src
+     but prefer to
+     #+begin_src shell
+       git update-ref refs/heads/master 1a410efbd13591db07496601ebc7a059dd55cfe9
+     #+end_src
+
+     a branch in git is a refs to a commit SHA-1
+
+     to create a branch
+     #+begin_src shell
+       git update-ref refs/heads/test cac0ca
+     #+end_src
+**** HEAD
+      HEAD is a reference to another reference.
+      a symbolic reference.
+
+      In some rare cases, the HEAD file may contain the SHA-1 value of a git
+      object.
+      When checkout:
+      - a tag
+      - a commit
+      - a remote branch
+      which puts the repository in "detached HEAD" state.
+
+      read content of symbolic reference:
+      #+begin_src shell
+        cat .git/HEAD
+        ref: refs/heads/master
+      #+end_src
+
+      or:
+      #+begin_src shell
+        git symbolic-ref HEAD
+        refs/heads/master
+      #+end_src
+
+      edit HEAD with:
+      #+begin_src shell
+        git symbolic-ref HEAD refs/heads/test
+
+        cat .git/HEAD
+        ref: refs/heads/test
+      #+end_src
+**** tags
+***** lightweight
+       a reference that never moves.
+
+       create a lightweight tag:
+       #+begin_src shell
+         git update-ref refs/tags/v1.0 cac0cab538b970a37ea1e769cbbde608743bc96d
+       #+end_src
+***** annoted
+       The tag object is very much like a commit object,
+       it contains:
+       - a tagger
+       - a date
+       - a message
+       - a pointer
+       it generally points to a commit, like a branc reference,
+       but it never moves,
+       it always points to the same commit, and gives it a friendlier name.
+
+       create an annoted tag:
+       #+begin_src shell
+         git tag -a v1.1 1a410efbd13591db07496601ebc7a059dd55cfe9 -m 'Test tag'
+
+         cat .git/refs/tags/v1.1
+         9585191f37f7b0fb9444f35a9bf50de191beadc2
+
+         git cat-file -p 9585191f37f7b0fb9444f35a9bf50de191beadc2
+         object 1a410efbd13591db07496601ebc7a059dd55cfe9
+         type commit
+         [...]
+       #+end_src
+
+       can tag any Git object
+
+       for example tag gpg blob key
+       #+begin_src shell
+         git cat-file blob gpg-pub-maintainer
+       #+end_src
+***** remotes
+       in the refs/remotes directory.
+
+       for example:
+       #+begin_src shell
+         cat .git/refs/remotes/origin/master
+         ca82a6dff817ec66f44342007202690a93763949
+       #+end_src
+
+       - are considered read-only.
+       - managed as bookmarks to the last knows state for branches on remote
+       - won't be referenced by symbolic reference HEAD
+*** packfiles
+    Occasionally Git packs up several of these objects into a single binary file
+    called a "packfile" in order to save space and be more efficient.
+
+    Git does this if you have too many loose objects around, if you run the git
+    gc command manually, or if you push to a remote server.
+
+    #+begin_src shell
+      git gc
+      Counting objects: 18, done.
+      Delta compression using up to 8 threads.
+      Compressing objects: 100% (14/14), done.
+      Writing objects: 100% (18/18), done.
+      Total 18 (delta 3), reused 0 (delta 0)
+    #+end_src
+
+    If you look in your objects directory, you’ll find that most of your objects
+    are gone, and a new pair of files has appeared:
+    #+begin_src shell
+      find .git/objects -type f
+      .git/objects/bd/9dbf5aae1a3862dd1526723246b20206e5fc37
+      .git/objects/d6/70460b4b4aece5915caf5c68d12f560a9fe3e4
+      .git/objects/info/packs
+      .git/objects/pack/pack-978e03944f5c581011e6998cd0e9e30000905586.idx
+      .git/objects/pack/pack-978e03944f5c581011e6998cd0e9e30000905586.pack
+    #+end_src
+
+    objects considered dangling (not pointed by any commits) are not packed up
+    in your new packfile.
+
+    The packfile is a single file containing the contents of all the objects
+    that were removed from your filesystem.
+    When Git packs objects, it looks for files that are named and sized
+    similarly, and stores just the deltas from one version of the file to the
+    next.
+
+    browse pack content:
+    #+begin_src shell
+      git verify-pack -v .git/objects/pack/pack-978e03944f5c581011e6998cd0e9e30000905586.idx
+      2431da676938450a4d72e260db3bf7b0f587bbc1 commit 223 155 12
+      69bcdaff5328278ab1c0812ce0e07fa7d26a96d7 commit 214 152 167
+      80d02664cb23ed55b226516648c7ad5d0a3deb90 commit 214 145 319
+      43168a18b7613d1281e5560855a83eb8fde3d687 commit 213 146 464
+      092917823486a802e94d727c820a9024e14a1fc2 commit 214 146 610
+      [...]
+      .git/objects/pack/pack-978e03944f5c581011e6998cd0e9e30000905586.pack: ok
+    #+end_src
+
+    the last version is stored intact, whereas older versions are stored as
+    a delta — this is because you’re most likely to need faster access to the
+    most recent version of the file.
+*** refspec
+    The format of the refspec is, first, an optional +, followed by <src>:<dst>,
+    where <src> is the pattern for references on the remote side and <dst> is
+    where those references will be tracked locally. The + tells Git to update
+    the reference even if it isn’t a fast-forward.
+
+    example in .git/config
+    #+begin_src conf
+      fetch = +refs/heads/*:refs/remotes/origin/*
+
+      fetch = +refs/pull/*/head:refs/remotes/origin/pr/*
+    #+end_src
+**** fetch
+     with the first previous line, following references are equivalent:
+     #+begin_src shell
+       git log origin/master
+       git log remotes/origin/master
+       git log refs/remotes/origin/master
+     #+end_src
+     all are expanded to refs/remotes/origin/master
+
+     to fetch master only, in .git/config
+     #+begin_src conf
+       fetch = +refs/heads/master:refs/remotes/origin/master
+     #+end_src
+
+     fetch manually with specific refspec
+     #+begin_src shell
+       git fetch origin master:refs/remotes/origin/mymaster
+
+       git fetch origin master:refs/remotes/origin/mymaster \
+                        topic:refs/remotes/origin/topic
+     #+end_src
+
+     partial glob is also supported
+     #+begin_src conf
+       fetch = +refs/heads/qa*:refs/remotes/origin/qa*
+     #+end_src
+
+     or use namespace
+     #+begin_src conf
+       fetch = +refs/heads/qa/*:refs/remotes/origin/qa/*
+     #+end_src
+**** push
+     push manually to a specific refspec
+     #+begin_src shell
+       git push origin master:refs/heads/qa/master
+     #+end_src
+
+     push automatically to a specific refspec (.git/config)
+     #+begin_src conf
+       fetch = +refs/heads/*:refs/remotes/origin/*
+       push = refs/heads/master:refs/heads/qa/master
+     #+end_src
+     this will cause a git push origin to push the local master branch to the
+     remote qa/master branch by default
+**** delete
+     delete reference on remote with:
+     #+begin_src shell
+       git push origin :topic
+     #+end_src
+     Because the refspec is <src>:<dst>, by leaving off the <src> part, this
+     basically says to make the topic branch on the remote nothing, which
+     deletes it.
+
+     or use the newer syntax:
+     #+begin_src shell
+       git push origin --delete topic
+     #+end_src
+*** transfer protocols
+**** dumb protocol
+**** smart protocol
+*** maintenance
+    "gc" tands for garbage collect
+    - it gathers up all the loose objects and places them in packfiles
+    - it consolidates packfiles into one big packfile
+    - it removes objects that aren’t reachable from any commit and are a few months old
+
+    #+begin_src shell
+      git gc --auto
+    #+end_src
+
+    - it packs up references into a single file
+    #+begin_src shell
+      find .git/refs -type f
+      # to
+      cat .git/packed-refs
+    #+end_src
+*** data recovery
+**** reflog
+     use the reflog
+     located in .git/logs
+
+     #+begin_src shell
+       git reflog
+       # or
+       git log -g
+     #+end_src
+**** fsck
+     check database for integrity
+     #+begin_src shell
+       git fsck --full
+     #+end_src
+
+     with --full, it shows all objects that aren't pointed to by another object
+
+     dangling commit are lost heads to recover
+**** COMMENT removing objects
+     to remove old large file that are present in history
+
+     count objects
+     #+begin_src shell
+       git count-objects -v
+     #+end_src
+
+     use verify-pack to sort object by size
+     #+begin_src shell
+       git verify-pack -v .git/objects/pack/pack-29…69.idx \
+           | sort -k 3 -n \
+           | tail -3
+     #+end_src
+
+     verify association between blob and file path
+     #+begin_src shell
+       git rev-list --objects --all | grep <blob id>
+     #+end_src
+
+     check all commit associated to the file path
+     #+begin_src shell
+       git log --oneline --branches -- <file_path_associted_to_blob_id>
+     #+end_src
+
+     filter-branch by removing file in index
+     #+begin_src shell
+       git filter-branch --index-filter \
+       'git rm --ignore-unmatch --cached git.tgz' -- <first_commit_found>^..
+     #+end_src
+
+     clear reference added by filter-branch
+     #+begin_src shell
+       rm -Rf .git/refs/original
+     #+end_src
+
+     clear reflog
+     #+begin_src shell
+       rm -Rf .git/logs/
+     #+end_src
+
+     repack and check
+     #+begin_src shell
+       git gc
+       git count-objects -v
+     #+end_src
+
+     clean dangling with
+     #+begin_src shell
+       git prune --expire now
+       git count-objects -v
+     #+end_src
+*** environment variables
+**** global behavior
+***** HOME
+      system-wide configuration, for portable git install
+      to resolve global configuration
+***** PREFIX
+      system-wide configuration
+      to resolve $PREFIX/etc/gitconfig
+***** GIT_EXEC_PATH
+      where Git looks for its sub-programs (like git-commit, git-diff, and others)
+      check the current setting by running git --exec-path
+***** GIT_CONFIG_NOSYSTEM
+      if set, disables the use of the system-wide configuration file
+***** GIT_PAGER
+      controls the program used to display multi-page output on the command line
+      if unset, fallback to PAGER variable
+***** GIT_EDITOR
+      the editor Git will launch when the user needs to edit some text
+      if unset, fallback to EDITOR variable
+**** repository locations
+***** GIT_DIR
+      the location of the .git folder.
+
+      if unset, git walks up the directory tree until it gets to ~ or /, looking
+      for a .git directory at every step.
+***** GIT_CEILING_DIRECTORIES
+      controls the behavior of searching for a .git directory.
+      to have Git stop trying earlier than it might otherwise, especially if Git
+      is invoked when building your shell prompt.
+***** GIT_WORK_TREE
+      the location of the root of the working directory for a non-bare repository.
+      if --git-dir or GIT_DIR is specified but none of --work-tree,
+      GIT_WORK_TREE or core.worktree is specified, the current working directory
+      is regarded as the top level of your working tree.
+***** GIT_INDEX_FILE
+      the path to the index file (non-bare repositories only).
+***** GIT_OBJECT_DIRECTORY
+      can be used to specify the location of the directory that usually resides at .git/objects.
+***** GIT_ALTERNATE_OBJECT_DIRECTORIES
+      is a colon-separated list (formatted like /dir/one:/dir/two:…)
+      tells Git where to check for objects if they aren't in GIT_OBJECT_DIRECTORY.
+**** pathspecs
+***** GIT_GLOB_PATHSPECS  / GIT_NOGLOB_PATHSPECS
+      control the default behavior of wildcards in pathspecs.
+      if GIT_GLOB_PATHSPECS is set to 1, wildcard characters act as wildcards (which is thedefault)
+      if GIT_NOGLOB_PATHSPECS is set to 1, wildcard characters only match themselves
+      can be overrided in individual cases by starting the pathspec with :(glob) or :(literal), as in :(glob)\*.c
+***** GIT_LITERAL_PATHSPECS
+      disables both of the above behaviors; no wildcard characters will work,
+      and the override prefixes are disabled as well.
+***** GIT_ICASE_PATHSPECS
+      sets all pathspecs to work in a case-insensitive manner.
+**** committing
+***** GIT_AUTHOR_NAME
+      the human-readable name in the “author” field
+***** GIT_AUTHOR_EMAIL
+      the email for the “author” field
+***** GIT_AUTHOR_DATE
+      the timestamp used for the “author” field
+***** GIT_COMMITTER_NAME
+      the human name for the “committer” field
+***** GIT_COMMITTER_EMAIL
+      the email address for the “committer” field
+***** GIT_COMMITTER_DATE
+      the timestamp in the “committer” field
+***** EMAIL
+      the fallback email address in case the user.email configuration value isn’t set.
+      ff isn't set, Git falls back to the system user and host names.
+**** networking
+     git uses the curl library to do network operations over HTTP,
+     so GIT_CURL_VERBOSE tells Git to emit all the messages generated by that library.
+     This is similar to doing curl -v on the command line.
+***** GIT_SSL_NO_VERIFY
+      to not verify SSL certificates.
+***** GIT_HTTP_LOW_SPEED_LIMIT / GIT_HTTP_LOW_SPEED_TIME
+      if the data rate of an HTTP operation is lower than
+      GIT_HTTP_LOW_SPEED_LIMIT bytes per second for longer than
+      GIT_HTTP_LOW_SPEED_TIME seconds, Git will abort that operation. These
+      values override the http.lowSpeedLimit and http.lowSpeedTime configuration
+      values.
+***** GIT_HTTP_USER_AGENT
+      sets the user-agent string used by Git when communicating over HTTP.
+      The default is a value like git/2.0.0.
+**** diffing and merging
+***** GIT_DIFF_OPTS
+      is a bit of a misnomer.
+      The only valid values are -u<n> or --unified=<n>, which controls the number of context lines shown in a git diff command.
+***** GIT_EXTERNAL_DIFF
+      is used as an override for the diff.external configuration value.
+      If it’s set, Git will invoke this program when git diff is invoked.
+***** GIT_DIFF_PATH_COUNTER / GIT_DIFF_PATH_TOTAL
+      are useful from inside the program specified by GIT_EXTERNAL_DIFF or diff.external.
+      The former represents which file in a series is being diffed (starting with 1),
+      and the latter is the total number of files in the batch.
+***** GIT_MERGE_VERBOSITY
+      controls the output for the recursive merge strategy.
+      The allowed values are as follows:
+      - 0 outputs nothing, except possibly a single error message.
+      - 1 shows only conflicts.
+      - 2 also shows file changes.
+      - 3 shows when files are skipped because they haven’t changed.
+      - 4 shows all paths as they are processed.
+      - 5 and above show detailed debugging information.
+      The default value is 2.
+**** debugging
+     to turn on git traces
+     values are:
+     - “true”, “1”, or “2” – the trace category is written to stderr.
+     - an absolute path starting with / – the trace output will be written to that file.
+***** GIT_TRACE
+      controls general traces, which don’t fit into any specific category.
+      This includes the expansion of aliases, and delegation to other sub-programs.
+***** GIT_TRACE_PACK_ACCESS
+      controls tracing of packfile access.
+      The first field is the packfile being accessed, the second is the offset within that file.
+***** GIT_TRACE_PACKET
+      enables packet-level tracing for network operations.
+***** GIT_TRACE_PERFORMANCE
+      controls logging of performance data.
+      The output shows how long each particular git invocation takes.
+***** GIT_TRACE_SETUP
+      shows information about what Git is discovering about the repository and
+      environment it’s interacting with.
+**** miscellaneous
+***** GIT_SSH
+      if specified, is a program that is invoked instead of ssh when Git tries
+      to connect to an SSH host.
+      it is invoked like $GIT_SSH [username@]host [-p <port>] <command>.
+      Note that this isn't the easiest way to customize how ssh is invoked;
+      it won’t support extra command-line parameters, so you’d have to write a wrapper script and set GIT_SSH to point to it.
+      it’s probably easier just to use the ~/.ssh/config file for that.
+***** GIT_ASKPASS
+      is an override for the core.askpass configuration value.
+      This is the program invoked whenever Git needs to ask the user for
+      credentials, which can expect a text prompt as a command-line argument,
+      and should return the answer on stdout (see Credential Storage for more on
+      this subsystem).
+***** GIT_NAMESPACE
+      controls access to namespaced refs, and is equivalent to the --namespace flag.
+      This is mostly useful on the server side, where you may want to store
+      multiple forks of a single repository in one repository, only keeping the
+      refs separate.
+***** GIT_FLUSH
+      can be used to force Git to use non-buffered I/O when writing incrementally to stdout.
+      - a value of 1 causes Git to flush more often,
+      - a value of 0 causes all output to be buffered.
+      The default value (if this variable is not set) is to choose an
+      appropriate buffering scheme depending on the activity and the output
+      mode.
+***** GIT_REFLOG_ACTION
+      lets you specify the descriptive text written to the reflog.
 ** Branching patterns
 *** base patterns (integration + path to production)
 **** source branching
