@@ -29,7 +29,7 @@ bindkey -e			# emacs key bindings
 
 
 ## completion
-autoload -U compinit && compinit
+autoload -Uz compinit && compinit
 
 
 ## colors
@@ -60,8 +60,17 @@ setopt prompt_subst
 ###################
 # ##### VCS ##### #
 ###################
-
 # autoload -Uz vcs_info
+
+## example 1
+# precmd_vcs_info() { vcs_info }
+# precmd_functions+=( precmd_vcs_info )
+# setopt prompt_subst
+# RPROMPT='${vcs_info_msg_0_}'
+# # PROMPT='${vcs_info_msg_0_}%# '
+# zstyle ':vcs_info:git:*' formats '%b'
+
+# example 2
 # zstyle ':vcs_info:*' enable git # hg
 # zstyle ':vcs_info:git:*' formats '%F{240}(%b)%r%f'
 # alias vcs_i='vcs_info command; vcs_info_lastmsg'
