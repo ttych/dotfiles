@@ -102,7 +102,7 @@ if [ -r "$HOME/.gitmessage.txt" ]; then
 fi
 
 # algorithm : patience / histogram / <default>
-git config --global diff.algorithm histogram
+git config --global diff.algorithm patience
 
 # pager
 git config --global core.pager 'less -RFX'
@@ -129,9 +129,6 @@ git config --global rebase.autosquash true
 ## 90 days reachable / gc.reflogExpire
 ## 30 days unreachable / gc.reflogExpireUnreachable
 
-## merge
-git config --global merge.conflictStyle diff3
-
 ## init
 git config --global alias.i init
 
@@ -157,9 +154,8 @@ git config --global alias.bra 'branch --all -v'
 git config --global alias.brav 'branch --all -vv'
 git config --global alias.merged 'branch --merged'
 git config --global alias.unmerged 'branch --no-merged'
+git config --global alias.cleanmerged '!f() { for br in $(git branch --merged "$@" | egrep -v " master\$| main\$|^\*"); do echo git branch -d "$br"; done; }; f'
 # git config --global alias.cleanmerged '!f() { git branch --merged ${1:-master} | grep -v " ${1:-master}$" | xargs git branch -d; }; f
-git config --global alias.cleanmerged '!f() { for br in $(git branch --merged ${1:-master} | grep -v " ${1:-master}$"); do git branch -d "$br"; done; }; f'
-## git show-branch <br1> <br2>
 git config --global alias.bru 'branch -u'
 
 ## add
@@ -210,26 +206,32 @@ git config --global alias.difftext 'diff --word-diff --unified=10'
 git config --global alias.difft 'diff --word-diff --unified=10'
 
 ### log
-git config --global alias.last 'log -1 HEAD'
-git config --global alias.lf  'log --pretty=fuller'
-git config --global alias.lp  'log --patch'
-git config --global alias.lg  'log --decorate --graph'
-git config --global alias.la  'log --decorate --all'
-git config --global alias.lag 'log --decorate --all --graph'
-git config --global alias.l   'log --oneline --decorate --abbrev-commit'
-git config --global alias.ll  'log --oneline --decorate --abbrev-commit --graph'
-git config --global alias.lla 'log --oneline --decorate --abbrev-commit --graph --all'
-# git config --global alias.l1 "log --pretty='%C(yellow)%h %Cred%cr %Cblue(%an)%C(white)%d%Creset %s'"
-git config --global alias.l1 "log --pretty='%C(yellow)%h%Creset %C(red)%d%Creset %s %Cgreen(%cr)%Creset %C(cyan)[%an]%Creset'"
-## path from branch A to branch B (ancestor A / decendent B)
-## git lg --ancestry-path B..A
+git config --global log.decorate auto
+git config --global alias.lg   'log'
+git config --global alias.last 'log -1'
+git config --global alias.lf   'log --pretty=fuller'
+git config --global alias.lp   'log --patch'
+git config --global alias.lg1  'log --oneline --decorate'
+#
+git config --global alias.l1   'log --oneline --decorate'
+git config --global alias.l10  'log --oneline --decorate -10'
+git config --global alias.l1g  'log --oneline --decorate --graph'
+git config --global alias.l2 "log --pretty='%C(yellow)%h%Creset %C(red)%d%Creset %s %Cgreen(%cr)%Creset %C(cyan)[%an]%Creset'"
+# git config --global alias.l2 "log --pretty='%C(yellow)%h %Cred%cr %Cblue(%an)%C(white)%d%Creset %s'"
+#
 git config --global alias.lo   'log --oneline --decorate'
 git config --global alias.lol  'log --oneline --decorate --graph'
 git config --global alias.lola 'log --oneline --decorate --graph --all'
+#
+git config --global alias.ll  'log --decorate --all'
+git config --global alias.llg 'log --decorate --all --graph'
+## path from branch A to branch B (ancestor A / decendent B)
+## git lg --ancestry-path B..A
 
 ### show-branch
 git config --global alias.sb 'show-branch'
 git config --global alias.sbt '!f() { bt="$1"; [ $# -gt 0 ] && shift ; [ -z "$bt" ] && bt=$(git rev-parse --abbrev-ref HEAD); git show-branch --topic $bt "$@"; }; f'
+## git show-branch <br1> <br2>
 
 ### show
 git config --global alias.so "show --pretty='parent %C(yellow)%p%Creset commit %C(yellow)%h%Creset%Cred%d%Creset%n%n%w(72,2,2)%s%n%n%w(72,0,0)%C(cyan)%an%Creset %Cgreen%ar%Creset'"
@@ -238,7 +240,8 @@ git config --global alias.so "show --pretty='parent %C(yellow)%p%Creset commit %
 git config --global alias.plumb 'cat-file -p'
 
 ### merge
-git config --global alias.mergeto '!git checkout $1 && git merge @{-1}'
+git config --global merge.conflictStyle diff3
+git config --global alias.mergeto '!f() { git checkout $1 && git merge @{-1} && git checkout @{-1} ;}; f'
 git config --global alias.truemerge "merge --no-ff"
 git config --global alias.ffmerge "merge --ff-only"
 
@@ -283,7 +286,7 @@ git config --global alias.swb 'switch -'
 ## --hard / update : HEAD + index + workspace (destructive)
 ## --mixed (default) / update : HEAD + index
 ## --soft / update : HEAD
-git config --global alias.unstage 'reset HEAD --'
+git config --global alias.unstage 'reset --mixed HEAD --'
 git config --global alias.resetto '!f() { branch=$(git rev-parse --abbrev-ref HEAD); git reset --hard "${1:-$branch}"; }; f'
 git config --global alias.resetfile '!f() { git reset @~ "$@" && git commit --amend --no-edit }; f'
 
@@ -295,44 +298,48 @@ git config --global alias.resetfile '!f() { git reset @~ "$@" && git commit --am
 git config --global core.whitespace 'trailing-space,space-before-tab'
 git config --global alias.cleanwhitespace '!f() {git rebase HEAD~${1:-1} --whitespace=fix}; f'
 
-# stash = index + workspace (default)
-git config --global alias.saveall 'stash save --include-untracked "SAVE ALL"'
-git config --global alias.savewip 'stash save --keep-index --include-untracked "SAVE WIP"'
-git config --global alias.savefull 'stash save --include-untracked --all "SAVE FULL"'
+### stash = index + workspace (default)
+git config --global alias.savewd 'stash save --keep-index --include-untracked "SAVE WorkingDirectory"'
+git config --global alias.save 'stash save --include-untracked "SAVE"'
+git config --global alias.saveall 'stash save --include-untracked --all "SAVE ALL"'
 git config --global alias.st2br 'stash branch'
 
-# references
-git config --global alias.references 'show-ref'
+### references
+git config --global alias.ref 'show-ref'
 git config --global alias.refs 'show-ref'
-git config --global alias.logreferences "log --walk-reflogs"
-git config --global alias.logref "log --walk-reflogs"
-git config --global alias.reflogs 'log --walk-reflogs'
+git config --global alias.logr   'log --walk-reflogs'
+git config --global alias.logref 'log --walk-reflogs'
+git config --global alias.lgg    'log --walk-reflogs'
 
-# fsck
-git config --global alias.dangling 'fsck --dangling --no-reflogs'  # --no-progress
-git config --global alias.unreachable 'fsck --unreachable --no-reflogs'  # --no-progress
+### fsck
+git config --global alias.dangling 'fsck --dangling --no-reflogs --no-progress'
+git config --global alias.unreachable 'fsck --unreachable --no-reflogs --no-progress'
 
 # cherry-pick
-git config --global alias.cherry-picks '!git cherry-pick $(git merge-base HEAD $1)..$1'
-git config --global alias.append '!git cherry-pick $(git merge-base HEAD $1)..$1'
+git config --global alias.append '!f() { git cherry-pick $(git merge-base HEAD $1)..$1;}; f'
 
 # contributors
 git config --global alias.contribs 'shortlog -s -n'
 git config --global alias.contributors 'shortlog -s -n'
 
 # branch-diff
-git config --global alias.branchdiff '!f() { br1=HEAD; [ $# -gt 1 ] && br1="$1" && shift; br2="$1" ; git lg --cherry-mark --left-right --no-merges "$br2"..."$br1"; }; f'
+git config --global alias.branchdiff '!f() { [ -z "$2" ] && set -- "" "$1"; git lo --cherry-mark --left-right --no-merges "$1"..."$2"; }; f'
 git config --global alias.brdiff '!git branchdiff'
-git config --global alias.branchdiffp '!f() { br1=HEAD; [ $# -gt 1 ] && br1="$1" && shift; br2="$1" ; git lg --cherry-pick --left-right --no-merges "$br2"..."$br1"; }; f'
-git config --global alias.brdiffp '!git branchdiffp'
-git config --global alias.missingto '!f() { [ $# -lt 2 ] && set -- HEAD "$1"; git lg --cherry-pick --left-only --no-merges "$1"..."$2"; }; f'
-git config --global alias.missto '!git missingto'
-git config --global alias.missingfrom '!f() { [ $# -lt 2 ] && set -- HEAD "$1"; git lg --cherry "$1"..."$2"; }; f'
-git config --global alias.missfrom '!git missingfrom'
+#
+git config --global alias.branchdif '!f() { [ -z "$2" ] && set -- "" "$1"; git lo --cherry-pick --left-right --no-merges "$1"..."$2"; }; f'
+git config --global alias.brdif '!git branchdif'
+#
+git config --global alias.lbranchdiff '!f() { [ -z "$2" ] && set -- HEAD "$1"; git lo --cherry-mark --left-only --no-merges "$1"..."$2"; }; f'
+git config --global alias.lbrdiff '!git lbranchdiff'
+git config --global alias.rbranchdiff '!f() { [ -z "$2" ] && set -- HEAD "$1"; git lo --cherry-mark --right-only --no-merges "$1"..."$2"; }; f'
+git config --global alias.rbrdiff '!git rbranchdiff'
 
 # tracking changes
-git config --global alias.commitsonfile '!git lg --follow'
-git config --global alias.commitsonstring '!f() { git lg -G"$1"; }; f'
+git config --global alias.log4file '!git -C ${GIT_PREFIX:-.} lo --follow'
+git config --global alias.log4filep '!git -C ${GIT_PREFIX:-.} lo --follow --patch'
+git config --global alias.log4rgx '!f() { git -C ${GIT_PREFIX:-.} lo -G"$1"; }; f'
+git config --global alias.log4str '!f() { git -C ${GIT_PREFIX:-.} lo -G"$1"; }; f'
+git config --global alias.log4func '!f() { git -C ${GIT_PREFIX:-.} lo -L:"$1":"$2"; }; f'
 
 # unmerged commit
 #git config --global alias.unmergedc '!f() { brs="$1" ; [ -z "$brs" ] && brs=$(git unmerged); for br in $brs; do echo "# $br"; git lg HEAD..$br; done; }; f'

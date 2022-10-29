@@ -2,7 +2,7 @@
 #+AUTHOR: 
 #+DATE: 
 #+STARTUP: show3levels
- 
+
 
 * git
 ** basic
@@ -219,7 +219,7 @@
       git reflog HEAD@{5}
     #+end_src
 
-    can show the priori value of a <branch>
+    can show the prior value of a <branch>
     #+begin_src shell
       git reflog <branch>@{6}
     #+end_src
@@ -378,9 +378,6 @@
       git commit --amend
       git commit --amend --no-edit
     #+end_src
-*** rebase
-**** hands-on
-     https://git-rebase.io/
 *** filter-branch
 **** remove a file from entire history
      --tree-filter option runs the specified command after each checkout of the
@@ -935,6 +932,19 @@
      #+end_src
 
 ** commands
+*** add
+**** --patch / -p
+     answers:
+     y : yes
+     n : no
+     q : quit
+     a
+     d : discard
+     /
+     s : split
+     e : edit
+     ? : help
+     j/k : jump previous/next hunk
 *** bisect
     does a binary search through your commit history to help you identify as
     quickly as possible which commit introduced an issue
@@ -974,9 +984,19 @@
        git bisect run test-error.sh
      #+end_src
 *** blame
+    determine modification in the feature branch
+    #+begin_src shell
+      git blame master..feature
+    #+end_src
+
     determine which commit and committer was responsible for lines 69 to 82
     #+begin_src shell
-    git blame -L 69,82 Makefile
+      git blame -L 69,82 Makefile
+    #+end_src
+
+    determine reponsible for a function
+    #+begin_src shell
+      git blame -L :function code.rb
     #+end_src
 
     can detect code move, copy, ...
@@ -1023,6 +1043,24 @@
 **** help
      - man git-config
      - https://git-scm.com/docs/git-config
+*** diff
+**** compare individual file between commits
+     #+begin_src shell
+       git diff head~3:README.md..head:README.md
+     #+end_src
+**** check for whitespace
+     #+begin_src shell
+       git diff --check
+     #+end_src
+
+     in relation with core.whitespace config
+     - blank-at-eol : blank at end of line
+     - blank-at-eof : blank at end of file
+     - space-before-tab
+     - cr-at-eol
+     - tab-in-indent : tab used for indent instead of tab
+     - indent-with-non-tab : space used for indent instead of tab
+     - trailing-space = blank-at-eol + blank-at-eof
 *** diff-tree
     to compare what is in your subdirectory with what the branch on the remote
     server was the last time you fetched, you can run:
@@ -1030,13 +1068,57 @@
       git diff-tree -p branch
       git diff-tree -p remote/branch
     #+end_src
+*** log
+**** ancestry-path: range of commit between 2 references
+     list range of commit between 2 references,
+     like in git diff
+     #+begin_src shell
+       git log --ancestry-path feature..master
+     #+end_src
+     give commit list, from master to reach the feature ancestor
 *** ls-files
     list conflicted files:
     #+begin_src shell
       git ls-files -u
     #+end_src
+*** rebase
+**** rebase feature branch on top of master
+     from any branch:
+     #+begin_src shell
+       git rebase master feature
+     #+end_src
+
+     and from feature branch:
+     #+begin_src shell
+       git rebase master
+     #+end_src
+**** hands-on
+     https://git-rebase.io/
 *** replace
     to pretend to replace objects in the git database with other objects
+*** shortlog
+    compute statistic per Author
+
+    -s : sum the number of commit per Author
+    -n : sort the result by number of commit
+*** show
+    - --no-patch : remove patch section
+    - --stat : include summary of the change
+*** show-branch
+    limit view, focus on specific branch
+
+    * : mark current branch
+    + : regular commit
+    - : merge commit
+
+    at the end of the list, the first common ancestor
+**** topic
+     #+begin_src shell
+       git show-branch --topic master feature experiment
+     #+end_src
+     show graphically branches
+       filtering commit already merged in the topic branch
+       showing only commit not merged into the topic branch
 ** Server
 *** shared repository
     #+begin_src shell
@@ -1728,6 +1810,9 @@
 
        check_directory_perms
      #+end_src
+*** resources
+**** commit-msg
+     http://git.io/validate-commit-msg
 ** internals
 *** .git content
     - description
@@ -1943,6 +2028,13 @@
        find .git/refs -type f
      #+end_src
 
+     command is show-ref
+     #+begin_src shell
+       git show-ref
+       git show-ref --heads
+       git show-ref --tags
+     #+end_src
+**** branch
      to simply edit ref
      #+begin_src shell
        echo 1a410efbd13591db07496601ebc7a059dd55cfe9 > .git/refs/heads/master
@@ -2027,18 +2119,18 @@
        #+begin_src shell
          git cat-file blob gpg-pub-maintainer
        #+end_src
-***** remotes
-       in the refs/remotes directory.
+**** remotes
+     in the refs/remotes directory.
 
-       for example:
-       #+begin_src shell
-         cat .git/refs/remotes/origin/master
-         ca82a6dff817ec66f44342007202690a93763949
-       #+end_src
+     for example:
+     #+begin_src shell
+       cat .git/refs/remotes/origin/master
+       ca82a6dff817ec66f44342007202690a93763949
+     #+end_src
 
-       - are considered read-only.
-       - managed as bookmarks to the last knows state for branches on remote
-       - won't be referenced by symbolic reference HEAD
+     - are considered read-only.
+     - managed as bookmarks to the last knows state for branches on remote
+     - won't be referenced by symbolic reference HEAD
 *** packfiles
     Occasionally Git packs up several of these objects into a single binary file
     called a "packfile" in order to save space and be more efficient.
@@ -2400,6 +2492,43 @@
       mode.
 ***** GIT_REFLOG_ACTION
       lets you specify the descriptive text written to the reflog.
+** good commit
+*** atomic
+    - self-contained:
+      sementically related changes should not be splitted across commits
+    - coherent:
+      all change in 1 commit should be semantically related
+
+    -> 1 change = 1 commit
+
+    commit should be kept relatively small,
+    do not try to do too much in 1 commit
+*** consistent
+    - no compilation errors
+      a commit should not introduce compilation errors
+    - no broken tests
+      a commit should not break any existing tests nor add failing ones
+
+    -> should not introduction quality regressions
+
+    each commit should be apply-able/build-able individually
+*** incremental
+    - ordered:
+      commits should be ordered deliberately (not arbitrary)
+    - explanatory:
+      the order should be a trail of the programmer's thought process
+
+    -> should reflect the development flow
+*** documented
+    - a short summary:
+      a commit message should include a short one-sentence summary
+    - detailed description:
+      a longer description can be added if more details are necessary
+
+    -> meaning and role of the change, and the reason behind it
+*** message
+   summary: 50 chars max
+   longer description: 72 chars max per line
 ** Branching patterns
 *** base patterns (integration + path to production)
 **** source branching
@@ -2655,3 +2784,103 @@
         git config --global mergetool.extMerge.trustExitCode false
         git config --global diff.external extDiff
       #+end_src
+** fun
+*** commit message
+    http://whatthecommit.com/
+** questions/answers
+*** list diff of commits between 2 branches with patch equivalent
+    #+begin_src shell
+      git log --cherry-mark --left-right --no-merges master...feature
+    #+end_src
+    to consider only 1 side, use
+    --left-only / --right-only
+*** list diff of commits between 2 branches without patch equivalent
+    #+begin_src shell
+      git log --cherry-pick --left-right --no-merges master...feature
+    #+end_src
+    to consider only 1 side, use
+    --left-only / --right-only
+*** list present in one feature branch and not in master
+    #+begin_src shell
+      git log --cherry-pick --right-only --no-merges master...feature
+    #+end_src
+    or
+    #+begin_src shell
+      git log --cherry-mark --right-only --no-merges master...feature
+    #+end_src
+
+    2nd can be shortened to
+    #+begin_src shell
+      git log --cherry master...feature
+    #+end_src
+*** find all merges between 2 branches
+    list merge commits reachable from master but not from feature branch
+    #+begin_src shell
+      git log --merges feature..master
+    #+end_src
+*** find latest merge between 2 branches
+    #+begin_src shell
+      git log --merges --ancestry-path feature..master
+    #+end_src
+*** find commits where a file is changed
+    #+begin_src shell
+      git log --follow calculator.c
+    #+end_src
+*** find commits that have added/removed on specific string
+    -S : display added XOR removed (exclude modified)
+    -G : display added AND/OR removed (both)
+
+    raw string
+    #+begin_src shell
+      git log -S<string>
+    #+end_src
+
+    regular expression
+    #+begin_src shell
+      git log -S".*is.*" --pickaxe-regex
+    #+end_src
+
+    regular expression
+    #+begin_src shell
+      git log -G".*is.*"
+    #+end_src
+*** find commits where a function is modified
+    #+begin_src shell
+      git log -L:substract:calculator.c
+    #+end_src
+    find commits, where substract function is modified in file calculator.c
+
+    parser is configured in .gitattributes
+    #+begin_src conf
+      *.java  diff=java
+      *.ruby  diff=ruby
+    #+end_src
+
+    supported languages:
+    https://git-scm.com/docs/gitattributes#_defining_a_custom_hunk_header
+*** find commits by (patch) author
+    #+begin_src shell
+      git lg --author="thomas"
+    #+end_src
+*** find commits by committer
+    #+begin_src shell
+      git lg --committer="thomas"
+    #+end_src
+*** find commits by time frame
+    #+begin_src shell
+      git lg --since="1 week" --until="2 days ago"
+    #+end_src
+
+    date format is managed by approxidate
+*** top 10 Author
+    #+begin_src shell
+      git shortlog -s -n | head -10
+    #+end_src
+*** list dangling commits
+    #+begin_src shell
+      git fsck --dangling --no-reflogs --no-progress
+    #+end_src
+*** list unreachable commits
+    #+begin_src shell
+      git fsck --unreachable --no-reflogs --no-progress
+    #+end_src
