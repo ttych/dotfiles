@@ -1,0 +1,469 @@
+#+TITLE: 
+#+AUTHOR: 
+#+DATE: 
+#+STARTUP: show3levels
+
+* tmux
+** command
+   | command                                                      | description                                                                                   |
+   |--------------------------------------------------------------+-----------------------------------------------------------------------------------------------|
+   | --- SESSION ---                                              |                                                                                               |
+   | tmux new-session                                             | Creates a new session (can be shortened to tmux new or tmux)                                  |
+   | tmux new -s development                                      | Creates a new session called "development"                                                    |
+   | tmux new-session -t [session] -s [new_session]               | Creates a connection to a grouped session                                                     |
+   | tmux new-session "[command]"                                 | Launches tmux and executes a command, when command completes, the session closes              |
+   | tmux attach -t development                                   | Attaches to a session named "development"                                                     |
+   | tmux -S [socket]                                             | Creates a new session using a socket instead of a name                                        |
+   | tmux -S [socket] attach                                      | Attaches to an existing session using a socket instead of a name                              |
+   |--------------------------------------------------------------+-----------------------------------------------------------------------------------------------|
+   | --- BUFFER ---                                               |                                                                                               |
+   | show-buffer                                                  | Displays current buffer contents                                                              |
+   | capture-pane                                                 | Captures the selected pane’s visible contents to a new buffer                                 |
+   | list-buffers                                                 | Lists all paste buffers                                                                       |
+   | choose-buffer                                                | Shows paste buffers and pastes the contents of the one you select                             |
+   | save-buffer [filename]                                       | Saves the buffer’s contents to the specified file                                             |
+   |--------------------------------------------------------------+-----------------------------------------------------------------------------------------------|
+   | --- DEBUG ---                                                |                                                                                               |
+   | show-message                                                 | Displays a log of messages in the current window, useful for debugging                        |
+   |--------------------------------------------------------------+-----------------------------------------------------------------------------------------------|
+   | --- WINDOW ---                                               |                                                                                               |
+   | set-window-option synchronize-panes                          | Toggles pane synchronization                                                                  |
+   | move-window -s [source session]:[window] -t [target session] | Also available with PREFIX . , followed by the target session name                            |
+   |--------------------------------------------------------------+-----------------------------------------------------------------------------------------------|
+   | --- PANE ---                                                 |                                                                                               |
+   | join-pane -s [session]:[window].[pane]                       | Converts the specified session’s window or pane into a pane in the current window             |
+   | join-pane -s [session]:[window].[pane] -t [other session]    | Converts the specified session’s window or pane into a pane in the target session             |
+   | split-pane "[command]"                                       | Splits the current window and executes the specified command, when completed, the pane closes |
+   | pipe-pane -o "cat >>~/#W.log"                                | Records the current pane to a text file                                                       |
+   |--------------------------------------------------------------+-----------------------------------------------------------------------------------------------|
+   | --- GLOBAL ---                                               |                                                                                               |
+   | source-file [file]                                           | Loads a configuration file                                                                    |
+   | bind-key [key] [command]                                     | Creates a keybinding that executes the specified command (shortened to bind)                  |
+   | bind-key -r [key] [command]                                  | Creates a keybinding that is repeatable                                                       |
+   | unbind-key [key]                                             | Removes a defined keybinding (shortened to unbind)                                                                        |
+   | set -g default-shell [shell]                                 | Sets the default shell that tmux uses when creating new windows                               |
+   | set -g default-command [command]                             | Sets the default command that tmux uses when creating new windows (blank by default)          |
+   | if-shell "[condition]" "[command]"                           | Performs a given command if the condition evaluates to true                                   |
+   |--------------------------------------------------------------+-----------------------------------------------------------------------------------------------|
+   |                                                              |                                                                                               |
+*** session
+**** attach
+     if only 1 session available
+     #+begin_src shell
+       tmux attach
+     #+end_src
+
+     attach specific session
+     #+begin_src shell
+       tmux attach -t <session_name>
+     #+end_src
+**** kill-session
+     kill session by name
+     #+begin_src shell
+       tmux kill-session -t <session_name>
+     #+end_src
+**** list-sessions
+     #+begin_src shell
+       tmux list-sessions
+     #+end_src
+
+     shortened to
+     #+begin_src shell
+       tmux ls
+     #+end_src
+**** new-session
+     created named sessions
+     #+begin_src shell
+       tmux new-session -s <name>
+     #+end_src
+
+     shortened to
+     #+begin_src shell
+       tmux new -s <name>
+     #+end_src
+***** background: -d
+      #+begin_src shell
+        tmux new-session -s <name> -d
+      #+end_src
+***** windows: -n
+      name the first window
+      #+begin_src shell
+        tmux new-session -s <name> -n <first_window>
+      #+end_src
+*** window
+**** new-window
+***** named window: -n
+      #+begin_src shell
+        tmux new-window -n <name>
+      #+end_src
+***** execute program
+      run <program>
+      #+begin_src shell
+        tmux new-window -n <name> <program>
+      #+end_src
+*** command
+**** source-file
+     reload conf
+     #+begin_src shell
+       source-file ~/.tmux.conf
+     #+end_src
+*** conf
+**** COMMENT bind-key
+     with prefix
+     #+begin_src shell
+       bind r source-file ~/.tmux.conf \; display "Reloaded!"
+     #+end_src
+     C-b r will reload conf
+
+     without prefix (-n)
+     #+begin_src shell
+       bind-key -n C-r source-file ~/.tmux.conf
+     #+end_src
+     C-r will reload conf without prefix
+
+     repeatable (-r)
+     #+begin_src shell
+       bind-key -r a ...
+     #+end_src
+     a is a repeatable key, only need to press the PREFIX key once
+** binding
+   | binding            | description                                                              |
+   |--------------------+--------------------------------------------------------------------------|
+   | --- SESSION ---    |                                                                          |
+   | PREFIX d           | Detaches from the session, leaving the session running in the background |
+   | PREFIX (           | Moves to the next tmux session                                           |
+   | PREFIX )           | Moves to the previous tmux session                                       |
+   | PREFIX s           | Shows the session selection list                                         |
+   |--------------------+--------------------------------------------------------------------------|
+   | --- WINDOW ---     |                                                                          |
+   | PREFIX c           | Creates a new window from within an existing tmux session                |
+   | PREFIX n           | Moves to the next window                                                 |
+   | PREFIX p           | Moves to the previous window                                             |
+   | PREFIX 0 … 9       | Selects windows by number                                                |
+   | PREFIX .           | Moves a window from one session to another                               |
+   | PREFIX <arrow_key> | Move around panes                                                        |
+   | PREFIX w           | Displays a selectable list of windows in the current session             |
+   | PREFIX f           | Searches for a window that contains the text you specify                 |
+   | PREFIX ,           | Displays a prompt to rename a window                                     |
+   | PREFIX &           | Closes the current window after prompting for confirmation               |
+   | PREFIX %           | Divides the current window in half vertically                            |
+   | PREFIX "           | Divides the current window in half horizontally                          |
+   |--------------------+--------------------------------------------------------------------------|
+   | --- PANE ---       |                                                                          |
+   | PREFIX !           | Converts the currently selected pane into a new window                   |
+   | PREFIX z           | Zooms the current pane (toggle)                                          |
+   | PREFIX o           | Cycles through open panes                                                |
+   | PREFIX q           | Momentarily displays pane numbers in each pane                           |
+   | PREFIX x           | Closes the current pane after prompting for confirmation                 |
+   | PREFIX <space>     | Cycles through the various pane layouts                                  |
+   |--------------------+--------------------------------------------------------------------------|
+   | --- GLOBAL ---     |                                                                          |
+   | PREFIX :           | Enters Command mode                                                      |
+   | PREFIX ?           |                                                                          |
+   |--------------------+--------------------------------------------------------------------------|
+   |                    |                                                                          |
+** conf
+   #+begin_src conf
+     # Setting the prefix from C-b to C-a
+     set -g prefix C-a
+     # Free the original Ctrl-b prefix keybinding
+     unbind C-b
+     # Ensure that we can send Ctrl-A to other apps
+     bind C-a send-prefix
+
+     #setting the delay between prefix and command
+     set -s escape-time 1
+
+     # Set the base index for windows to 1 instead of 0
+     set -g base-index 1
+     # Set the base index for panes to 1 instead of 0
+     setw -g pane-base-index 1
+
+     # Reload the file with Prefix r
+     bind r source-file ~/.tmux.conf \; display "Reloaded!"
+
+     # splitting panes with | and -
+     bind | split-window -h
+     bind - split-window -v
+
+     # moving between panes with Prefix h,j,k,l
+     bind h select-pane -L
+     bind j select-pane -D
+     bind k select-pane -U
+     bind l select-pane -R
+
+     # Quick window selection
+     bind -r C-h select-window -t :-
+     bind -r C-l select-window -t :+
+
+     # Pane resizing panes with Prefix H,J,K,L
+     bind -r H resize-pane -L 5
+     bind -r J resize-pane -D 5
+     bind -r K resize-pane -U 5
+     bind -r L resize-pane -R 5
+
+     # If your terminal is set up to forward mouse clicks and movement through to
+     # programs in the terminal
+     # mouse support - set to on if you want to use the mouse
+     set -g mouse off
+
+     # Set the default terminal mode to 256color mode
+     set -g default-terminal "screen-256color"
+
+     # set the status line's colors
+     set -g status-style fg=white,bg=black
+     # set the color of the window list
+     setw -g window-status-style fg=cyan,bg=black
+     # set colors for the active window
+     setw -g window-status-current-style fg=white,bold,bg=red
+     # colors for pane borders
+     setw -g pane-border-style fg=green,bg=black
+     setw -g pane-active-border-style fg=white,bg=yellow
+     # active pane normal, other shaded out
+     setw -g window-style fg=colour240,bg=colour235
+     setw -g window-active-style fg=white,bg=black
+     # Command / message line
+     set -g message-style fg=white,bold,bg=black
+
+     # Status line left side to show Session:window:pane
+     set -g status-left-length 40
+     set -g status-left "#[fg=green]Session: #S #[fg=yellow]#I #[fg=cyan]#P"
+     # Status line right side - 50% | 31 Oct 13:37
+     set -g status-right "#(~/battery Discharging) | #[fg=cyan]%d %b %R"
+     # Update the status line every sixty seconds
+     set -g status-interval 60
+     # Center the window list in the status line
+     set -g status-justify centre
+
+     # enable activity alerts
+     setw -g monitor-activity on
+     set -g visual-activity on
+
+     # enable vi keys.
+     setw -g mode-keys vi
+
+     # escape turns on copy mode
+     bind Escape copy-mode
+
+     # v in copy mode starts making selection
+     bind-key -T copy-mode-vi v send -X begin-selection
+     # make Prefix p paste the buffer.
+     unbind p
+     bind p paste-buffer
+     # shortcut for synchronize-panes toggle
+     bind C-s set-window-option synchronize-panes
+     # split pane and retain the current directory of existing pane
+     bind _ split-window -v -c "#{pane_current_path}"
+     bind \ split-window -h -c "#{pane_current_path}"
+     # Log output to a text file on demand
+     bind P pipe-pane -o "cat >>~/#W.log" \; display "Toggled logging to ~/#W.log"
+
+     # Load mac-specific settings
+     if-shell "uname | grep -q Darwin" "source-file ~/.tmux.mac.conf"
+     if-shell "uname | grep -q Linux" "source-file ~/.tmux.linux.conf"
+
+     # load private settings if they exist
+     if-shell "[ -f ~/.tmux.private]" "source ~/.tmux.private"
+
+     is_vim="ps -o state= -o comm= -t '#{pane_tty}' \
+                | grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?(view|n?vim?x?)(diff)?$'"
+     bind-key -n C-h if-shell "$is_vim" "send-keys C-h" "select-pane -L"
+     bind-key -n C-j if-shell "$is_vim" "send-keys C-j" "select-pane -D"
+     bind-key -n C-k if-shell "$is_vim" "send-keys C-k" "select-pane -U"
+     bind-key -n C-l if-shell "$is_vim" "send-keys C-l" "select-pane -R"
+     bind-key -n C-\ if-shell "$is_vim" "send-keys C-\\" "select-pane -l"
+
+     bind C-l send-keys 'C-l'
+
+     set -g @plugin 'tmux-plugins/tpm'
+     set -g @plugin 'tmux-plugins/tmux-resurrect'
+     run '~/.tmux/plugins/tpm/tpm'
+   #+end_src
+
+   linux specific
+   #+begin_src conf
+     # Prefix Ctrl-C takes what's in the buffer and sends it to system clipboard
+     # via xclip
+     bind C-c run "tmux save-buffer - | xclip -sel clip -i"
+     # y in copy mode takes selection and sends it to system clipboard via xclip
+     bind-key -T copy-mode-vi y send-keys -X copy-pipe-and-cancel "xclip -sel clip -i"
+     # Prefix Ctrl-v fills tmux buffer from system clipboard via xclip, then
+     # pastes from buffer into tmux window
+     bind C-v run "tmux set-buffer \"$(xclip -sel clip -o)\"; tmux paste-buffer"
+   #+end_src
+
+   mac specific
+   #+begin_src conf
+     # Prefix Ctrl-C takes what's in the buffer and sends it to system clipboard
+     # via pbcopy
+     bind C-c run "tmux save-buffer - | pbcopy"
+     # y in copy mode takes selection and sends it to system clipboard via pbcopy
+     bind-key -T copy-mode-vi y send-keys -X copy-pipe-and-cancel "pbcopy"
+     # Prefix Ctrl-v fills tmux buffer from system clipboard via pbpaste, then
+     # pastes from buffer into tmux window
+     bind C-v run "tmux set-buffer \"$(pbpaste)\"; tmux paste-buffer"
+   #+end_src
+** context
+*** terminal support and colors
+    #+begin_src shell
+      tput colors
+    #+end_src
+    should return 256
+
+    add xterm support, in bashrc / zshrc
+    #+begin_src shell
+      [ -z "$TMUX" ] && export TERM=xterm-256color
+    #+end_src
+
+    #+begin_src shell
+      for i in {0..255} ; do
+          printf "\x1b[38;5;${i}m${i} "
+      done
+    #+end_src
+** scripting
+*** developement sample script
+    #+begin_src shell
+      #/bin/sh
+
+tmux has-session -t development
+if [ $? != 0 ]
+then
+      tmux new-session -s development -n editor -d
+      tmux send-keys -t development 'cd ~/devproject' C-m
+      tmux send-keys -t development 'vim' C-m
+      tmux split-window -v -t development
+      tmux select-layout -t development main-horizontal
+      tmux send-keys -t development:1.2 'cd ~/devproject' C-m
+      tmux new-window -n console -t development
+      tmux send-keys -t development:2 'cd ~/devproject' C-m
+      tmux select-window -t development:1
+      fi
+      tmux attach -t development
+    #+end_src
+
+    to be run with
+    #+begin_src shell
+      ./development
+    #+end_src
+*** development sample conf
+    #+begin_src conf
+  source-file ~/.tmux.conf
+new-session -s development -n editor -d
+send-keys -t development 'cd ~/devproject' C-m
+send-keys -t development 'vim' C-m
+split-window -v -t development
+select-layout -t development main-horizontal
+send-keys -t development:1.2 'cd ~/devproject' C-m
+new-window -n console -t development
+send-keys -t development:2 'cd ~/devproject' C-m
+select-window -t development:1
+#+end_src
+
+    use it with
+    #+begin_src shell
+  tmux -f app.conf attach
+#+end_src
+*** tmuxinator
+    install tmuxinator
+    #+begin_src shell
+      gem install tmuxinator
+    #+end_src
+
+    edit development
+    #+begin_src shell
+      tmuxinator open development
+    #+end_src
+
+    default tmuxinator conf example
+    #+begin_src yaml
+      # ~/.tmuxinator/development.yml
+      name: development
+      root: ~/
+
+      # a bunch of comments....
+
+      windows:
+        - editor:
+            layout: main-vertical
+            panes:
+              - vim
+              - guard
+        - server: bundle exec rails s
+        - logs: tail -f log/development.log
+    #+end_src
+
+    development tmuxinator conf
+    #+begin_src yaml
+      name: development
+      root: ~/devproject
+      windows:
+        - editor:
+            layout: main-horizontal
+            panes:
+              - vim
+              - #empty, will just run plain bash
+        - console: # empty
+    #+end_src
+
+    start environment with
+    #+begin_src shell
+      tmuxinator development
+    #+end_src
+
+    export tmuxinator to script
+    #+begin_src shell
+      tmuxinator debug development
+    #+end_src
+*** buffer
+    flow can be
+    1. capture-pane (from tmux: PREFIX :)
+    2. either paste within tmux with: PREFIX ]
+    3. either paste from shell with: tmux show-buffer
+    4. either save buffer to a file with: save-buffer command
+*** launching commands
+    #+begin_src shell
+      tmux new-session -s servers -d "ssh deploy@burns"
+      tmux split-window -v "ssh dba@smithers"
+      tmux attach -t servers
+    #+end_src
+    when the connection are closed, the session
+*** creating or attaching to a tmux session
+    #+begin_src shell
+      if ! tmux has-session -t development; then
+          exec tmux new-session -s development -d
+          # other setup commands before attaching....
+      fi
+      exec tmux attach -t development
+    #+end_src
+*** launching tmux by Default
+    #+begin_src shell
+      if [ -z "$TMUX" ]; then
+          tmux new-session -A -s "$USER"
+      fi
+    #+end_src
+** sharing
+*** tmux
+**** same account, single screen
+     1. tmux new-session -s Pairing
+     2. tmux attach -t Pairing
+**** same account, separate windows
+     1. tmux new-session -s groupedsession
+     2. tmux new-session -t groupedsession -s mysession
+*** tmate
+    https://tmate.io/
+*** separate accounts
+    prepare:
+    #+begin_src shell
+      sudo adduser ted
+      sudo adduser barney
+      sudo addgroup tmux
+      sudo usermod -aG tmux ted
+      sudo usermod -aG tmux barney
+
+      sudo mkdir /var/tmux
+      sudo chgrp tmux /var/tmux
+      sudo chmod g+ws /var/tmux
+    #+end_src
+
+    1. tmux -S /var/tmux/pairing
+    2. tmux -S /var/tmux/pairing attach
