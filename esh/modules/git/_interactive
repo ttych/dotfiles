@@ -1,13 +1,16 @@
 #!/bin/sh
+# -*- mode: sh -*-
 
-if [ -z "$ESH_MODULE_DIR" ]; then
-    SCRIPT_NAME="${0##*/}"
-    SCRIPT_RPATH="${0%$SCRIPT_NAME}"
-    SCRIPT_PATH=`cd "${SCRIPT_RPATH:-.}" && pwd`
-    ESH_MODULE_DIR="$SCRIPT_PATH"
-fi
 
-esh_git_completion_f="$ESH_MODULE_DIR/git-completion.$ESH_SH_CUR_SHORT"
-if [ -r "$esh_git_completion_f" ]; then
-    . "$esh_git_completion_f"
-fi
+### completion
+# if [ -z "$ESH_MODULE_DIR" ]; then
+#     SCRIPT_NAME="${0##*/}"
+#     SCRIPT_RPATH="${0%$SCRIPT_NAME}"
+#     SCRIPT_PATH=`cd "${SCRIPT_RPATH:-.}" && pwd`
+#     ESH_MODULE_DIR="$SCRIPT_PATH"
+# fi
+
+# esh_git_completion_f="$ESH_MODULE_DIR/git-completion.$ESH_SH_CUR_SHORT"
+# if [ -r "$esh_git_completion_f" ]; then
+#     . "$esh_git_completion_f"
+# fi

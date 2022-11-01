@@ -410,8 +410,9 @@ for esh_module in terminal \
                       utilsh \
                       tmux \
                       ssh-agent \
-                      interactive \
-                      git
+                      git \
+                      tooling \
+                      interactive
 do
     esh_module_load "$esh_module"
 done
