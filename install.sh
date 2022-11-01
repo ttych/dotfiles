@@ -88,11 +88,11 @@ conf_install()
 
 DOTFILES_FORCE="${DOTFILES_FORCE:-false}"
 DOTFILES_INSTALL_DIR="${DOTFILES_INSTALL_DIR:-$HOME}"
-while getopts :hp: opt; do
+while getopts :hfp: opt; do
     case "$opt" in
+        h) usage ; exit 0 ;;
         f) DOTFILES_FORCE=true ;;
         p) DOTFILES_INSTALL_DIR="$OPTARG" ;;
-        h) usage ; exit 0 ;;
         *) usage ; exit 1 ;;
     esac
 done
