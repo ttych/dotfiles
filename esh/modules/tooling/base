@@ -1,0 +1,6 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+
+### tmuxinator
+export TMUXINATOR_CONFIG="$HOME/.tmuxinator"

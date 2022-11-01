@@ -254,33 +254,3 @@ mk()
 {
     make "$@"
 }
-
-
-### tmuxinator
-esh_has_ruby()
-{
-    esh_has_ruby=FALSE
-    which ruby >/dev/null 2>/dev/null && esh_has_ruby=TRUE
-}
-esh_has_ruby
-
-tmuxinator()
-{
-    tmuxinator__try=0
-    tmuxinator=
-    while : ; do
-        tmuxinator="$(which tmuxinator 2>/dev/null)"
-        [ -n "$tmuxinator" ] && break
-        if [ $tmuxinator__try -ne 0 ]; then
-            printf >&2 "%s\n" "could not setup tmuxinator"
-            return 1
-        fi
-        if ! $esh_has_ruby; then
-            printf >&2 "%s\n" "tmuxinator is missing" "ruby is missing"
-            return 1
-        fi
-        gem install tmuxinator
-        tmuxinator__try=1
-    done
-    "$tmuxinator" "$@"
-}
