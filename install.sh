@@ -23,7 +23,7 @@ user_accept()
     printf "%s ? (Y/n) " "$1"
     read user_accept__answer
     case $user_accept__answer in
-        [YyOo]|[YyOo][EeUu][SsIi]) return 0 ;;
+        [YyOo]|[Yy][Ee][Ss]|[Oo][Uu][Ii]|"") return 0 ;;
         *) return 1 ;;
     esac
 }
@@ -48,8 +48,8 @@ conf_install()
                 *) ;;
             esac
 
-            echo a : $a
-            echo b : $b
+            # echo a : $a
+            # echo b : $b
 
             a_rel=""
             b_tmp="$b"
