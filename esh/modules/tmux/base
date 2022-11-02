@@ -38,16 +38,28 @@ _ensure_tmux_is_running()
 _tmux_session_exists()
 {
     [ -z "$1" ] && return 1
-    tmux list-sessions | sed -E 's/:.*$//' | grep -q "^$1$"
+    tmux has-session -t "$1"
+}
+
+_tmux_session_name_for()
+{
+    _tmux_session_name_for__base="$1"
+    if [ -z "$_tmux_session_name_for__base" ]; then
+        if [ "$PWD" = "$HOME" ]; then
+            _tmux_session_name_for__base="home"
+        else
+            _tmux_session_name_for__base="${PWD##*/}"
+        fi
+    fi
+    _tmux_session_name_for="$(echo $_tmux_session_name_for__base | tr :. _)"
 }
 
 _atmux()
 {
     _has_tmux || return 1
 
-    _atmux__session_name="$1"
-    [ -z "$_atmux__session_name" ] &&
-        _atmux__session_name="$(echo ${PWD##*/} | tr . _)"
+    _tmux_session_name_for "$1"
+    _atmux__session_name="$_tmux_session_name_for"
 
     if _not_inside_tmux; then
         tmux new-session -As "$_atmux__session_name"
