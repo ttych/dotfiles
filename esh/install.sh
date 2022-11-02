@@ -1,6 +1,5 @@
 #!/bin/sh
-
-# -*- mode: sh -*-
+# -*- mode: shell-script -*-
 
 SCRIPT="${0}"
 SCRIPT_NAME="${SCRIPT##*/}"

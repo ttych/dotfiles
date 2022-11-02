@@ -1,5 +1,5 @@
 #!/bin/sh
-# -*- mode: shell -*-
+# -*- mode: shell-script -*-
 
 _terminal_colors_count()
 {
