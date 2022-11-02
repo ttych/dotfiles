@@ -61,12 +61,10 @@ _atmux()
     _tmux_session_name_for "$1"
     _atmux__session_name="$_tmux_session_name_for"
 
+    TMUX='' tmux new-session -Ads "$_atmux__session_name"
     if _not_inside_tmux; then
-        tmux new-session -As "$_atmux__session_name"
+        tmux attach -t "$_atmux__session_name"
     else
-        if ! _tmux_session_exists "$_atmux__session_name"; then
-            TMUX='' tmux new-session -Ads "$_atmux__session_name"
-        fi
         tmux switch-client -t "$_atmux__session_name"
     fi
 }
