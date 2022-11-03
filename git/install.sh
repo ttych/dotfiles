@@ -262,12 +262,12 @@ git config --global alias.rm-remote-ref '!f() { [ $# -ge 2 ] && rem="$1" && shif
 git config --global submodule.recurse true
 git config --global diff.submodule log
 git config --global status.submodulesummary 1
-git config --global push.recurseSubmodules check
+git config --global push.recurseSubmodules no
 
 git config --global alias.sinit 'submodule update --init --recursive'
 git config --global alias.sco 'checkout --recurse-submodules'
 git config --global alias.sdiff '!'"git diff && git submodule foreach 'git diff'"
-git config --global alias.spush 'push --recurse-submodules=on-demand'
+git config --global alias.spush 'push --recurse-submodules=check'
 git config --global alias.supdate 'submodule update --remote --merge'
 
 ### tag
