@@ -238,6 +238,11 @@ git config --global alias.so "show --pretty='parent %C(yellow)%p%Creset commit %
 
 ### plumb
 git config --global alias.plumb 'cat-file -p'
+git config --global alias.otype 'cat-file -t'
+git config --global alias.ocat 'cat-file -p'
+git config --global alias.ls 'ls-files'
+git config --global alias.lss 'ls-files -s'
+git config --global alias.lst 'ls-tree -r'
 
 ### merge
 git config --global merge.conflictStyle diff3
