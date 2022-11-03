@@ -611,31 +611,41 @@ shcat()
     [ $# -lt 1 ] && return 1
 
     shcat__cmd="$1"
+    shcat__cmd_v=$(command -v "$shcat__cmd")
 
-    case $(command -v "$shcat__cmd") in
-        "") echo >&2 "command $shcat__cmd not found"
-            return 1
-            ;;
-        /*) shcat__is_cmd=TRUE ;;
-        *) shcat__is_cmd=FALSE ;;
+    if [ $? -ne 0 ] || [ "$shcat__cmd_v" = "" ]; then
+        echo >&2 "command $shcat__cmd not found"
+        return 1
+    fi
+
+    case "$shcat__cmd_v" in
+        /*) shcat__is_func=FALSE ;;
+        *) shcat__is_func=TRUE ;;
     esac
 
-    if $shcat__is_cmd; then
-        shcat__real_cmd=$(which "$shcat__cmd") || {
-            echo >&2 "could not resolve \"$shcat__cmd\""
-            return 1
-        }
-
-        file "$shcat__real_cmd" | grep -q 'shell script' || {
-            echo >&2 "\"$shcat__cmd\" resolving as \"$shcat__real_cmd\" is not a shell script"
-            return 2
-        }
-
-        cat "$shcat__real_cmd"
-    else
+    if $shcat__is_func; then
         typeset -f "$shcat__cmd"
+        return $?
     fi
+
+    case `file "$shcat__cmd_v"` in
+        *"ELF"*|*"64-bit"*|*"32-bit"*)
+            echo >&2 "\"$shcat__cmd\" as \"$shcat__cmd_v\" is not a script"
+            return 2
+            ;;
+        *"ASCII text"*|*" script"*|*"text executable"*)
+            ;;
+        *)
+            echo >&2 "\"$shcat__cmd\" as \"$shcat__cmd_v\" has an unknown type"
+            return 2
+            ;;
+    esac
+    cat "$shcat__cmd_v"
 }
+# what()
+# {
+#     shcat "$@"
+# }
 
 
 ##################################################
