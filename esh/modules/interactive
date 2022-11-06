@@ -115,6 +115,10 @@ fssh()
 {
     ssh -o StrictHostKeyChecking=no -o CheckHostIP=no -o ConnectTimeout=10 "$@"
 }
+s()
+{
+    ssh -o StrictHostKeyChecking=no -o CheckHostIP=no -o ConnectTimeout=10 "$@"
+}
 
 fscp()
 {
