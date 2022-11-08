@@ -1,0 +1,11 @@
+Host *
+    ConnectTimeout 30
+    ForwardAgent no
+    ForwardX11   no
+    ForwardX11Trusted yes
+    Port 22
+    Protocol 2
+    ServerAliveInterval 60
+    ServerAliveCountMax 60
+
+Include config.local

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# set -x
+set -x
 
 SCRIPT_NAME="${0##*/}"
 SCRIPT_RPATH="${0%$SCRIPT_NAME}"
@@ -35,6 +35,13 @@ conf_install()
         if $DOTFILES_FORCE || user_accept "$conf_install__app -> install template $conf_install__tpl"; then
             cp -f "${conf_install__tpl}" "${conf_install__tpl%.tpl}"
             $DOTFILES_FORCE || vi "${conf_install__tpl%.tpl}"
+        fi
+    done
+
+    for conf_install__script in prepare.sh prepare_local.sh; do
+        if [ -x "${conf_install__app}/${conf_install__script}" ]; then
+            ( cd "${conf_install__app}" &&
+                  INSTALL_DIR="$DOTFILES_INSTALL_DIR" "./$conf_install__script" )
         fi
     done
 
