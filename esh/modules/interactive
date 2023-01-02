@@ -247,6 +247,13 @@ xpaste()
 }
 
 
+# X
+xopen()
+{
+    xdg-open "$@"
+}
+
+
 # editor
 export ALTERNATE_EDITOR=""
 export EDITOR="emacsclient -t"                  # $EDITOR opens in terminal
