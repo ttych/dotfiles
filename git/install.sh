@@ -366,6 +366,9 @@ git config --global alias.g "grep --break --heading --line-number"
 git config --global alias.pristine '!f() { git reset --hard ${1:-HEAD} && git clean -fdx; }; f'
 git config --global alias.cleantmp 'clean -dX'
 
+### daemon
+git config --global alias.serve '!git daemon --base-path=. --export-all --reuseaddr --informative-errors --verbose'
+git config --global alias.servew '!git daemon --base-path=. --export-all --enable=receive-pack --reuseaddr --informative-errors --verbose'
 
 # git pull --rebase
 WANT_REBASE=false
