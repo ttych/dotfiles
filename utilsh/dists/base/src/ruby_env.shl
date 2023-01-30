@@ -69,6 +69,7 @@ GEM_PACK_ASCIIDOC="asciidoctor asciidoctor-pdf asciidoctor-revealjs rouge"
 GEM_PACK_CAPISTRANO="capistrano"
 GEM_PACK_FLUENTD="fluentd fluent-plugin-kafka fluent-plugin-elasticsearch fluent-plugin-rewrite-tag-filter fluent-plugin-rename-key fluent-plugin-record-modifier fluent-plugin-flowcounter-simple fluent-plugin-http-healthcheck"
 GEM_PACK_JEKYLL="jekyll"
+GEM_PACK_MINA="mina"
 GEM_PACK_PUPPET="metadata-json-lint pdk puppet-lint"
 GEM_PACK_QUALITY="rubocop reek flay flog erb_lint"
 GEM_PACK_RACK="rack shotgun"
@@ -156,51 +157,120 @@ bundle_exec()
     bundle exec "$@"
 }
 
+be()
+{
+    bundle_exec "$@"
+}
+bexec()
+{
+    bundle_exec "$@"
+}
+brake()
+{
+    bundle_exec rake "$@"
+}
+bruby()
+{
+    bundlex_exec ruby "$@"
+}
+brb()
+{
+    bruby "$@"
+}
+birb()
+{
+    bundle_exec irb "$@"
+}
+brails()
+{
+    bundle_exec rails "$@"
+}
+bconsole()
+{
+    bundle_exec console "$@"
+}
+brubocop()
+{
+    bundle_exec rubocop "$@"
+}
+brcop()
+{
+    bundle_exec rubocop "$@"
+}
+brspec()
+{
+    bundle_exec rspec "$@"
+}
+bguard()
+{
+    bundle_exec guard "$@"
+}
+bcap()
+{
+    bundle_exec cap "$@"
+}
+bjekyll()
+{
+    bundle_exec jekyll "$@"
+}
+bjekylls()
+{
+    bjekyll serve --drafts --livereload --watch "$@"
+}
+bnanoc()
+{
+    bundle_exec nanoc "$@"
+}
+bnanocs()
+{
+    bnanoc view -L "$@"
+}
+bmiddleman()
+{
+    bundle_exec middleman "$@"
+}
+bmiddlemans()
+{
+    bmiddleman server "$@"
+}
+
+
 Bexec()
 {
     bundle_exec "$@"
 }
-
 Brake()
 {
     bundle_exec rake "$@"
 }
-
 Bruby()
 {
     bundle_exec ruby "$@"
 }
-
 Brails()
 {
     bundle_exec rails "$@"
 }
-
 Bconsole()
 {
     bundle_exec console "$@"
 }
-
 Birb()
 {
     bundle_exec irb "$@"
 }
-
 Brubocop()
 {
     bundle_exec rubocop "$@"
 }
-
 Brcop()
 {
     bundle_exec rubocop "$@"
 }
-
 Brspec()
 {
     bundle_exec rspec "$@"
 }
-
 Bguard()
 {
     bundle_exec guard "$@"
@@ -209,7 +279,6 @@ Bcap()
 {
     bundle_exec cap "$@"
 }
-
 Bjekyll()
 {
     bundle_exec jekyll "$@"
@@ -222,7 +291,6 @@ Bjekylls2()
 {
     bundle_exec jekyll serve --port 4001 --drafts --livereload --livereload-port 4011 --watch "$@"
 }
-
 Bnanoc()
 {
     bundle_exec nanoc "$@"
@@ -231,7 +299,6 @@ Bnanocs()
 {
     Bnanoc view -L "$@"
 }
-
 Bmiddleman()
 {
     bundle_exec middleman "$@"
