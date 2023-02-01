@@ -1,6 +1,9 @@
 #!/bin/sh
 # -*- mode: sh -*-
 
+
+########### tmux
+
 _want_auto_tmux()
 {
     [ -r "$ESH_CONF_DIR/auto_tmux" ] || return 1
@@ -61,10 +64,17 @@ _atmux()
     _tmux_session_name_for "$1"
     _atmux__session_name="$_tmux_session_name_for"
 
-    TMUX='' tmux new-session -Ads "$_atmux__session_name"
+    tmux has-session -t "$_atmux__session_name" ||
+        tmux new-session -d -s "$_atmux__session_name" ||
+        return 1
     if _not_inside_tmux; then
         tmux attach -t "$_atmux__session_name"
     else
         tmux switch-client -t "$_atmux__session_name"
     fi
 }
+
+
+########### tmuxinator
+
+export TMUXINATOR_CONFIG="$HOME/.tmuxinator"
