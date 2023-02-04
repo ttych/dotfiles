@@ -4,111 +4,12 @@
 
 ########### tmux
 
-if [ -z "$TMUX_CONF_DIR" ]; then
-    for d in "$HOME" "$HOME_ALT"; do
-        [ -z "$d" ] && continue
-        [ -d "$d/.tmux/" ] && TMUX_CONF_DIR="$d/.tmux" && break
-    done
+if [ -f "$ESH_MODULE_DIR/bin/atmux" ]; then
+    . "$ESH_MODULE_DIR/bin/atmux"
+
+    export PATH="$PATH:$ESH_MODULE_DIR/bin"
 fi
-TMUX_CONF_DIR="${TMUX_CONF_DIR:-$HOME/.tmux}"
 
-
-_want_auto_tmux()
-{
-    [ -r "$ESH_CONF_DIR/auto_tmux" ] || return 1
-
-    if grep "^${HOSTNAME}$" "$ESH_CONF_DIR/auto_tmux" >/dev/null 2>&1 || grep "^${SHORT_HOSTNAME}$" "$ESH_CONF_DIR/auto_tmux" >/dev/null 2>&1; then
-        return 0
-    fi
-    return 1
-}
-
-_has_tmux()
-{
-    which tmux >/dev/null 2>/dev/null
-}
-
-_inside_tmux()
-{
-    [ -n "$TMUX" ]
-}
-
-_not_inside_tmux()
-{
-    ! _inside_tmux
-}
-
-_atmux_session_exists()
-{
-    [ -z "$1" ] && return 1
-    tmux has-session -t "$1" 2>/dev/null
-}
-
-_atmux_session_name_for()
-{
-    _atmux_session_name_for__base="$1"
-    if [ -z "$_atmux_session_name_for__base" ]; then
-        if [ "$PWD" = "$HOME" ]; then
-            _atmux_session_name_for__base="home"
-        else
-            _atmux_session_name_for__base="${PWD##*/}"
-        fi
-    fi
-    _atmux_session_name_for="$(echo $_atmux_session_name_for__base | tr :. _)"
-}
-
-_atmux_session()
-{
-    _atmux_session__name="$1"
-    _atmux_session__dir="${2:-$PWD}"
-    TMUX= tmux new-session -c "$_atmux_session__dir" -s "$_atmux_session__name" -d || return 1
-
-    if [ -r "$_atmux_session__dir/.tmux" ]; then
-        _atmux_session__environment=`cat "$_atmux_session__dir/.tmux"`
-    else
-        _atmux_session__environment="session.$_atmux_session__name"
-    fi
-    _atmux_environment "$_atmux_session__environment" "$_atmux_session__name"
-
-    return 0
-}
-
-_atmux_environment()
-{
-    _atmux_environment__name="$1"
-    _atmux_environment__session="$2"
-
-    [ -z "$1" ] && return 0
-    if [ -r "$TMUX_CONF_DIR/environments/$_atmux_environment__name" ]; then
-        "$TMUX_CONF_DIR/environments/$_atmux_environment__name" "$_atmux_environment__session"
-    fi
-}
-
-_atmux()
-{
-    _has_tmux || return 1
-
-    _atmux_session_name_for "$1"
-    _atmux__session_name="$_atmux_session_name_for"
-
-    _atmux_session_exists "$_atmux__session_name" ||
-        _atmux_session "$_atmux__session_name" ||
-        return 1
-    if _not_inside_tmux; then
-        tmux attach -t "$_atmux__session_name"
-    else
-        tmux switch-client -t "$_atmux__session_name"
-    fi
-}
-
-_ensure_tmux_is_running()
-{
-    _has_tmux || return 0
-
-    if _not_inside_tmux; then
-        _atmux
-    fi
-}
 
 ########### tmuxinator
 

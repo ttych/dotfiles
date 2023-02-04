@@ -22,4 +22,4 @@ _tmuxinator() {
 }
 
 complete -F _tmuxinator tmuxinator mux
-alias mux="tmuxinator"
+# alias mux="tmuxinator"

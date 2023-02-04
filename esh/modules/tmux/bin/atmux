@@ -1,0 +1,182 @@
+#!/bin/sh
+
+if [ -z "$TMUX_CONF_DIR" ]; then
+    for d in "$HOME" "$HOME_ALT"; do
+        [ -z "$d" ] && continue
+        [ -d "$d/.tmux/" ] && TMUX_CONF_DIR="$d/.tmux" && break
+    done
+fi
+TMUX_CONF_DIR="${TMUX_CONF_DIR:-$HOME/.tmux}"
+
+_has_tmux()
+{
+    which tmux >/dev/null 2>/dev/null
+}
+
+_in_tmux()
+{
+    [ -n "$TMUX" ]
+}
+
+_not_in_tmux()
+{
+    ! _in_tmux
+}
+
+_atmux_session_exists()
+{
+    [ -z "$1" ] && return 1
+    tmux has-session -t "$1" 2>/dev/null
+}
+
+_atmux_normalize_name()
+{
+    _atmux_normalize_name="$(echo $1 | tr :. _)"
+}
+
+_atmux_normalize_path()
+{
+    _atmux_normalize_path=$(cd "$1"; pwd)
+}
+
+_atmux_session()
+{
+    _atmux_session__name="$1"
+    _atmux_session__path="${2:-$PWD}"
+    _atmux_session__layout="${3}"
+
+    TMUX= tmux new-session -c "$_atmux_session__path" -s "$_atmux_session__name" -d || return 1
+    _atmux_layout "$_atmux_session__layout" "$_atmux_session__name"
+    return 0
+}
+
+_atmux_layout()
+{
+    _atmux_layout__name="$1"
+    _atmux_layout__session="$2"
+
+    [ -z "$1" ] && return 0
+    if [ -r "$TMUX_CONF_DIR/layouts/$_atmux_layout__name" ]; then
+        "$TMUX_CONF_DIR/layouts/$_atmux_layout__name" "$_atmux_layout__session"
+    fi
+}
+
+_atmux_name_from_path()
+{
+    if [ "$1" = "$HOME" ]; then
+        _atmux_name_from_path="home"
+    else
+        _atmux_name_from_path="${1##*/}"
+    fi
+}
+
+_atmux_options()
+{
+    _atmux_options__name=
+    _atmux_options__path=
+    _atmux_options__layout=
+
+    case $# in
+        0)
+            _atmux_options__path="$PWD"
+            ;;
+        1)
+            if [ -d "$1" ]; then
+                _atmux_options__path="$1"
+            else
+                _atmux_options__name="$1"
+                _atmux_options__path="$PWD"
+            fi
+            ;;
+        2)
+            if [ -d "$1" ]; then
+                _atmux_options__path="$1"
+                _atmux_options__layout="$2"
+            else
+                _atmux_options__name="$1"
+                _atmux_options__path="$2"
+            fi
+            ;;
+        3)
+            _atmux_options__name="$1"
+            _atmux_options__path="$2"
+            _atmux_options__layout="$3"
+            ;;
+        *)
+            _atmux_usage
+            return 1
+            ;;
+    esac
+
+    _atmux_normalize_path "${_atmux_options__path:-$PWD}"
+    _atmux_options__path="$_atmux_normalize_path"
+
+    if [ -z "$_atmux_options__name" ]; then
+        _atmux_name_from_path "$_atmux_options__path"
+        _atmux_options__name="$_atmux_name_from_path"
+    fi
+    _atmux_normalize_name "$_atmux_options__name"
+    _atmux_options__name="$_atmux_normalize_name"
+
+    if [ -z "$_atmux_options__layout" ]; then
+        _atmux_options__layout=`cat "$_atmux_options__path/.tmux" 2>/dev/null`
+        if [ $? -ne 0 ]; then
+            _atmux_options__layout="session.$_atmux_session__name"
+        fi
+    fi
+}
+
+_atmux_usage()
+{
+    cat <<EOF    usage is
+usage is:  atmux <name> <path> <layout>
+
+example:
+  atmux  --  use current dir as starting point
+  atmux <path>  --  use <path> as starting point
+  atmux <name>  --  use <name> as session name, in current dir
+  atmux <path> <layout>
+  atmux <name> <path>
+  atmux <name> <path> <layout>
+EOF
+}
+
+_atmux()
+{
+    _has_tmux || return 1
+
+    _atmux_options "$@"
+    _atmux__name="$_atmux_options__name"
+    _atmux__path="$_atmux_options__path"
+    _atmux__layout="$_atmux_options__layout"
+
+    _atmux_session_exists "$_atmux__name" ||
+        _atmux_session "$_atmux__name" "$_atmux__path" "$_atmux__layout" ||
+        return 1
+    if _not_in_tmux; then
+        tmux attach -t "$_atmux__name"
+    else
+        tmux switch-client -t "$_atmux__name"
+    fi
+}
+
+atmux()
+{
+    case $1 in
+        _init_)
+            if _not_in_tmux; then
+                shift
+                _atmux "$@"
+            fi
+            ;;
+        *)
+            _atmux "$@"
+            ;;
+    esac
+}
+
+
+
+if [ "${0##*/}" = 'atmux' ]; then
+    atmux "$@"
+fi

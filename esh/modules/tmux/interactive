@@ -11,12 +11,33 @@ if _process_ppid && _process_comm "$_process_ppid"; then
     esac
 fi
 
+
+_want_auto_tmux()
+{
+    [ -r "$ESH_CONF_DIR/auto_tmux" ] || return 1
+
+    if grep "^${HOSTNAME}$" "$ESH_CONF_DIR/auto_tmux" >/dev/null 2>&1 || grep "^${SHORT_HOSTNAME}$" "$ESH_CONF_DIR/auto_tmux" >/dev/null 2>&1; then
+        return 0
+    fi
+    return 1
+}
+
+_ensure_tmux_is_running()
+{
+    atmux _init_
+}
+
 if _want_auto_tmux; then
     _ensure_tmux_is_running
 fi
 
 
 tx()
+{
+    tmux "$@"
+}
+
+tmx()
 {
     tmux "$@"
 }
@@ -44,7 +65,7 @@ if [ -r "$esh_tmux_completion_f" ]; then
 fi
 
 
-mx()
+txtor()
 {
     mx__try=0
     tmuxinator=
@@ -63,4 +84,9 @@ mx()
         mx__try=1
     done
     "$tmuxinator" "$@"
+}
+
+tmxtor()
+{
+    txtor "$@"
 }
