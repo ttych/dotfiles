@@ -1,4 +1,5 @@
 #!/bin/sh
+# -*- mode: sh -*-
 
 if [ -z "$TMUX_CONF_DIR" ]; then
     for d in "$HOME" "$HOME_ALT"; do
