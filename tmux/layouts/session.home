@@ -1,0 +1,3 @@
+#!/bin/sh
+
+tmux split-window ${1:+-t "$1"} -h -c ~/ 'etodo'
