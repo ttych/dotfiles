@@ -65,7 +65,7 @@ if [ -r "$esh_tmux_completion_f" ]; then
 fi
 
 
-txtor()
+txr()
 {
     mx__try=0
     tmuxinator=
@@ -86,7 +86,7 @@ txtor()
     "$tmuxinator" "$@"
 }
 
-tmxtor()
+tmxr()
 {
-    txtor "$@"
+    txr "$@"
 }
