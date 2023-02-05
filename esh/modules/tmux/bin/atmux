@@ -1,6 +1,8 @@
 #!/bin/sh
 # -*- mode: sh -*-
 
+# set -x
+
 if [ -z "$TMUX_CONF_DIR" ]; then
     for d in "$HOME" "$HOME_ALT"; do
         [ -z "$d" ] && continue
@@ -8,6 +10,7 @@ if [ -z "$TMUX_CONF_DIR" ]; then
     done
 fi
 TMUX_CONF_DIR="${TMUX_CONF_DIR:-$HOME/.tmux}"
+TMUX_LAYOUTS_DIR="${TMUX_CONF_DIR}/layouts"
 
 _has_tmux()
 {
@@ -24,11 +27,19 @@ _not_in_tmux()
     ! _in_tmux
 }
 
-_atmux_session_exists()
+
+_atmux_has_session()
 {
     [ -z "$1" ] && return 1
     tmux has-session -t "$1" 2>/dev/null
 }
+
+_atmux_has_layout()
+{
+    [ -z "$1" ] && return 1
+    [ -f "$TMUX_LAYOUTS_DIR/$1" ]
+}
+
 
 _atmux_normalize_name()
 {
@@ -39,6 +50,7 @@ _atmux_normalize_path()
 {
     _atmux_normalize_path=$(cd "$1"; pwd)
 }
+
 
 _atmux_session()
 {
@@ -71,40 +83,48 @@ _atmux_name_from_path()
     fi
 }
 
-_atmux_options()
+_atmux_args()
 {
-    _atmux_options__name=
-    _atmux_options__path=
-    _atmux_options__layout=
+    _atmux_args__name=
+    _atmux_args__path=
+    _atmux_args__layout=
 
     case $# in
         0)
-            _atmux_options__path="$PWD"
+            _atmux_args__path="$PWD"
             ;;
         1)
-            _atmux_options__path="$PWD"
-            if _atmux_session_exists "$1"; then
-               _atmux_options__name="$1"
-               _atmux_options__layout="_"
+            _atmux_args__path="$PWD"
+            if _atmux_has_session "$1"; then
+               _atmux_args__name="$1"
+               _atmux_args__layout="_"
             elif [ -d "$1" ]; then
-                _atmux_options__path="$1"
+                _atmux_args__path="$1"
+            elif _atmux_has_layout "$1"; then
+                _atmux_args__layout="$1"
             else
-               _atmux_options__name="$1"
+               _atmux_args__name="$1"
             fi
             ;;
         2)
-            if [ -d "$1" ]; then
-                _atmux_options__path="$1"
-                _atmux_options__layout="$2"
+            if [ -d "$1" ] && _atmux_has_layout "$2"; then
+                _atmux_args__path="$1"
+                _atmux_args__layout="$2"
+            elif [ -d "$2" ]; then
+                _atmux_args__name="$1"
+                _atmux_args__path="$2"
+            elif _atmux_has_layout "$2"; then
+                _atmux_args__name="$1"
+                _atmux_args__layout="$2"
             else
-                _atmux_options__name="$1"
-                _atmux_options__path="$2"
+                _atmux_usage
+                return 1
             fi
             ;;
         3)
-            _atmux_options__name="$1"
-            _atmux_options__path="$2"
-            _atmux_options__layout="$3"
+            _atmux_args__name="$1"
+            _atmux_args__path="$2"
+            _atmux_args__layout="$3"
             ;;
         *)
             _atmux_usage
@@ -112,20 +132,20 @@ _atmux_options()
             ;;
     esac
 
-    _atmux_normalize_path "${_atmux_options__path:-$PWD}"
-    _atmux_options__path="$_atmux_normalize_path"
+    _atmux_normalize_path "${_atmux_args__path:-$PWD}"
+    _atmux_args__path="$_atmux_normalize_path"
 
-    if [ -z "$_atmux_options__name" ]; then
-        _atmux_name_from_path "$_atmux_options__path"
-        _atmux_options__name="$_atmux_name_from_path"
+    if [ -z "$_atmux_args__name" ]; then
+        _atmux_name_from_path "$_atmux_args__path"
+        _atmux_args__name="$_atmux_name_from_path"
     fi
-    _atmux_normalize_name "$_atmux_options__name"
-    _atmux_options__name="$_atmux_normalize_name"
+    _atmux_normalize_name "$_atmux_args__name"
+    _atmux_args__name="$_atmux_normalize_name"
 
-    if [ -z "$_atmux_options__layout" ]; then
-        _atmux_options__layout=`cat "$_atmux_options__path/.tmux" 2>/dev/null`
+    if [ -z "$_atmux_args__layout" ]; then
+        _atmux_args__layout=`cat "$_atmux_args__path/.tmux" 2>/dev/null`
         if [ $? -ne 0 ]; then
-            _atmux_options__layout="session.$_atmux_options__name"
+            _atmux_args__layout="session.$_atmux_args__name"
         fi
     fi
 }
@@ -149,12 +169,12 @@ _atmux()
 {
     _has_tmux || return 1
 
-    _atmux_options "$@"
-    _atmux__name="$_atmux_options__name"
-    _atmux__path="$_atmux_options__path"
-    _atmux__layout="$_atmux_options__layout"
+    _atmux_args "$@"
+    _atmux__name="$_atmux_args__name"
+    _atmux__path="$_atmux_args__path"
+    _atmux__layout="$_atmux_args__layout"
 
-    _atmux_session_exists "$_atmux__name" ||
+    _atmux_has_session "$_atmux__name" ||
         _atmux_session "$_atmux__name" "$_atmux__path" "$_atmux__layout" ||
         return 1
     if _not_in_tmux; then
