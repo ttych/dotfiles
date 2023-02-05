@@ -1,3 +1,10 @@
 #!/bin/sh
+# -*- mode: sh -*-
 
-tmux split-window ${1:+-t "$1"} -h -c ~/ 'etodo'
+TARGET_SESSION="$1"
+if [ -z "$TARGET_SESSION" ]; then
+    TARGET_SESSION="$(tmux display-message -p '#S')"
+fi
+
+
+tmux split-window -t "$TARGET_SESSION" -h -c ~/ 'etodo'

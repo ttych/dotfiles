@@ -1,0 +1,24 @@
+#!/bin/sh
+
+SCRIPT_NAME="${0##*/}"
+SCRIPT_RPATH="${0%$SCRIPT_NAME}"
+SCRIPT_PATH=`cd "${SCRIPT_RPATH:-.}" && pwd`
+
+
+TARGET_DIR="${1:-$PWD}"
+cd "$TARGET_DIR" 2>/dev/null || return 1
+TARGET_NAME="${PWD##*/}"
+
+
+tmux has-session -t "$TARGET_DIR"
+if [ $? != 0 ]; then
+    tmux new-session -c "$TARGET_DIR" -s "$TARGET_NAME" -n editor -d
+    # tmux send-keys -t "$TARGET_NAME" 'cd "$TARGET_NAME"' C-m
+    tmux send-keys -t "$TARGET_NAME" 'vim' C-m
+    tmux split-window -v -t "$TARGET_NAME" -c '#{pane_current_path}'
+    # tmux split-window -v -p 10 -t "$TARGET_NAME"
+    tmux select-layout -t "$TARGET_NAME" main-horizontal
+    tmux new-window -t "$TARGET_NAME" -n console -c "$TARGET_DIR"
+    tmux select-window -t "$TARGET_NAME":1
+fi
+tmux attach -t "$TARGET_NAME"
