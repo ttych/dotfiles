@@ -23,8 +23,10 @@ amx_tmuxinator_has_project()
 {
     _has_tmuxinator || return 1
 
-    [ -z "$1" ] && [ -f "./.tmuxinator.yml" ] ||
-        tmuxinator list | grep -q "^$1$"
+    [ -z "$1" ] && [ -f "./.tmuxinator.yml" ] && return 0
+    [ -n "$1" ] && [ -f "${TMUXINATOR_CONFIG:-$HOME/.tmuxinator}/$1.yml" ] && return 0
+
+    return 1
 }
 
 amx_tmuxinator()
@@ -78,7 +80,7 @@ amx()
     #     return 1
     # fi
 
-    if _tmuxinator_has_project "$1"; then
+    if amx_tmuxinator_has_project "$1"; then
         amx_tmuxinator "$@"
     else
         amx_atmux "$@"
