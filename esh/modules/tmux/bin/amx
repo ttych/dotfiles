@@ -1,0 +1,92 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+
+_has_tmux()
+{
+    which tmux >/dev/null 2>/dev/null
+}
+
+_has_tmuxinator()
+{
+    which tmuxinator >/dev/null 2>/dev/null
+}
+
+_has_atmux()
+{
+    command -v atmux >/dev/null 2>/dev/null
+}
+
+
+
+amx_tmuxinator_has_project()
+{
+    _has_tmuxinator || return 1
+
+    [ -z "$1" ] && [ -f "./.tmuxinator.yml" ] ||
+        tmuxinator list | grep -q "^$1$"
+}
+
+amx_tmuxinator()
+{
+    _has_tmuxinator || return 1
+
+    tmuxinator start $1 ${3:+-n "$3"} ${2:+root="$2"}
+}
+
+amx_atmux()
+{
+    _has_atmux || return 1
+
+    atmux "$@"
+}
+
+
+amx_list()
+{
+    _has_tmuxinator &&
+        tmuxinator list
+
+    _has_atmux &&
+        atmux -l
+}
+
+amx_options()
+{
+    OPTIND=1
+    while getopts :hl opt; do
+        case $opt in
+            l) amx_list
+               return  0
+               ;;
+        esac
+    done
+}
+
+amx()
+{
+    # amx__command=
+    # for c in tmuxinator atmux; do
+    #     if _has_$c; then
+    #         amx__command="$c"
+    #         break
+    #     fi
+    #     echo >&2 "$c is not available"
+    # done
+    # if [ -z "$amx__command" ]; then
+    #     echo >&2 "nothing to execute"
+    #     return 1
+    # fi
+
+    if _tmuxinator_has_project "$1"; then
+        amx_tmuxinator "$@"
+    else
+        amx_atmux "$@"
+    fi
+}
+
+
+
+if [ "${0##*/}" = 'amx' ]; then
+    amx "$@"
+fi

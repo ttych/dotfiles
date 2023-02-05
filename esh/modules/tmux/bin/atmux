@@ -82,11 +82,14 @@ _atmux_options()
             _atmux_options__path="$PWD"
             ;;
         1)
-            if [ -d "$1" ]; then
+            _atmux_options__path="$PWD"
+            if _atmux_session_exists "$1"; then
+               _atmux_options__name="$1"
+               _atmux_options__layout="_"
+            elif [ -d "$1" ]; then
                 _atmux_options__path="$1"
             else
-                _atmux_options__name="$1"
-                _atmux_options__path="$PWD"
+               _atmux_options__name="$1"
             fi
             ;;
         2)
@@ -122,7 +125,7 @@ _atmux_options()
     if [ -z "$_atmux_options__layout" ]; then
         _atmux_options__layout=`cat "$_atmux_options__path/.tmux" 2>/dev/null`
         if [ $? -ne 0 ]; then
-            _atmux_options__layout="session.$_atmux_session__name"
+            _atmux_options__layout="session.$_atmux_options__name"
         fi
     fi
 }
