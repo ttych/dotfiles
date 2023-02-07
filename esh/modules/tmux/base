@@ -5,6 +5,7 @@
 ########### tmux
 
 if [ -f "$ESH_MODULE_DIR/bin/atmux" ]; then
+    set --
     . "$ESH_MODULE_DIR/bin/atmux"
 
     export PATH="$PATH:$ESH_MODULE_DIR/bin"
