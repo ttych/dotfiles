@@ -1,6 +1,15 @@
 #!/bin/sh
 # -*- mode: sh -*-
 
+is_sourced() {
+    if [ -n "$ZSH_VERSION" ]; then
+        case $ZSH_EVAL_CONTEXT in *:file:*) return 0;; esac
+    else  # Add additional POSIX-compatible shell names here, if needed.
+        case ${0##*/} in dash|-dash|bash|-bash|ksh|-ksh|sh|-sh) return 0;; esac
+    fi
+    return 1  # NOT sourced.
+}
+
 # set -x
 
 if [ -z "$TMUX_CONF_DIR" ]; then
@@ -96,14 +105,14 @@ _atmux_args()
         1)
             _atmux_args__path="$PWD"
             if _atmux_has_session "$1"; then
-               _atmux_args__name="$1"
-               _atmux_args__layout="_"
+                _atmux_args__name="$1"
+                _atmux_args__layout="_"
             elif [ -d "$1" ]; then
                 _atmux_args__path="$1"
             elif _atmux_has_layout "$1"; then
                 _atmux_args__layout="$1"
             else
-               _atmux_args__name="$1"
+                _atmux_args__name="$1"
             fi
             ;;
         2)
@@ -201,6 +210,6 @@ atmux()
 
 
 
-if [ "${0##*/}" = 'atmux' ]; then
+if ! is_sourced && [ "${0##*/}" = 'atmux' ]; then
     atmux "$@"
 fi
