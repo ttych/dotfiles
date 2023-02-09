@@ -145,46 +145,99 @@ bundle_exec()
     bundle exec "$@"
 }
 
+bexec()
+{
+    bundle_exec "$@"
+}
+brake()
+{
+    bundle_exec rake "$@"
+}
+bruby()
+{
+    bundlex_exec ruby "$@"
+}
+brb()
+{
+    bruby "$@"
+}
+birb()
+{
+    bundle_exec irb "$@"
+}
+brails()
+{
+    bundle_exec rails "$@"
+}
+bconsole()
+{
+    bundle_exec console "$@"
+}
+brubocop()
+{
+    bundle_exec rubocop "$@"
+}
+brcop()
+{
+    bundle_exec rubocop "$@"
+}
+brspec()
+{
+    bundle_exec rspec "$@"
+}
+bguard()
+{
+    bundle_exec guard "$@"
+}
+bnanoc()
+{
+    bundle_exec nanoc "$@"
+}
+bnanocs()
+{
+    bnanoc view -L "$@"
+}
+bmiddleman()
+{
+    bundle_exec middleman "$@"
+}
+bmiddlemans()
+{
+    bmiddleman server "$@"
+}
+
 Bexec()
 {
     bundle_exec "$@"
 }
-
 Brake()
 {
     bundle_exec rake "$@"
 }
-
 Bruby()
 {
     bundle_exec ruby "$@"
 }
-
 Brails()
 {
     bundle_exec rails "$@"
 }
-
 Bconsole()
 {
     bundle_exec console "$@"
 }
-
 Birb()
 {
     bundle_exec irb "$@"
 }
-
 Brubocop()
 {
     bundle_exec rubocop "$@"
 }
-
 Brspec()
 {
     bundle_exec rspec "$@"
 }
-
 Bguard()
 {
     bundle_exec guard "$@"
