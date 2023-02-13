@@ -680,21 +680,81 @@
        git rerere
      #+end_src
 ** Sign
-*** introduction
-    use an existing key
+*** sign with gpg
+    use gpg format
     #+begin_src shell
-      gpg --list-keys
+      git config --global --unset gpg.format
     #+end_src
 
-    or create a new key
+    use an existing private key
+    (private key is required for signing commits or tags)
+    #+begin_src shell
+      gpg --list-secret-keys --keyid-format=long
+    #+end_src
+
+    or create a new sign key
     #+begin_src shell
       gpg --gen-key
     #+end_src
 
     configure git to use this key
+    (when setting a subkey include the ! suffix)
     #+begin_src shell
       git config --global user.signingkey <0A12345!>
     #+end_src
+
+    tell git to sign all commits by default
+    #+begin_src shell
+      git config --global commit.gpgsign true
+    #+end_src
+*** sign with ssh key
+    use ssh format
+    #+begin_src shell
+      git config --global gpg.format ssh
+    #+end_src
+
+    set your SSH signing key
+    #+begin_src shell
+      git config --global user.signingkey /PATH/TO/.SSH/KEY.PUB
+    #+end_src
+*** sign with X.509
+    install smimesign
+    from https://github.com/github/smimesign
+
+    To use S/MIME to sign for all repositories
+    #+begin_src shell
+      git config --global gpg.x509.program smimesign
+      git config --global gpg.format x509
+    #+end_src
+
+    To use S/MIME to sign for a single repository
+    #+begin_src shell
+      cd PATH-TO-REPOSITORY
+      git config --local gpg.x509.program smimesign
+      git config --local gpg.format x509
+    #+end_src
+
+    If you're not using an X.509 key that matches your committer identity, list
+    X.509 keys for which you have both a certificate and private key
+    #+begin_src shell
+      smimesign --list-keys
+    #+end_src
+
+    From the list of X.509 keys, copy the certificate ID of the X.509 key you'd
+    like to use
+
+    To use your X.509 key to sign for all repositories
+    #+begin_src shell
+      git config --global user.signingkey 0ff455a2708394633e4bb2f88002e3cd80cbd76f
+    #+end_src
+
+    To use your X.509 key to sign for a single repository
+    #+begin_src shell
+      cd  PATH-TO-REPOSITORY
+      git config --local user.signingkey 0ff455a2708394633e4bb2f88002e3cd80cbd76f
+    #+end_src
+*** configuration references
+    https://docs.github.com/en/authentication/managing-commit-signature-verification/telling-git-about-your-signing-key
 *** tags
     signed tag: -s instead of -a
     #+begin_src shell
