@@ -193,7 +193,7 @@ BUILD_TOOLS_TERRAFORM_URL_PATTERN='https://releases.hashicorp.com/terraform/${ve
 BUILD_TOOLS_TERRAFORM_DEFAULT_VERSION='1.0.11'
 
 #> hub - hub
-BUILD_TOOLS_HUB_URL_PATTERN='https://github.com/github/hub/releases/download/v${version}/hub-${kernel_l}-${arch}-${version}.tgz'
+BUILD_TOOLS_HUB_URL_PATTERN='https://github.com/github/hub/releases/download/v${version}/hub-${kernel_l}-${machine}-${version}.tgz'
 BUILD_TOOLS_HUB_DEFAULT_VERSION='2.12.4'
 
 #> xsel - xsel
@@ -209,7 +209,7 @@ BUILD_TOOLS_GOLANG_ENV=
 BUILD_TOOLS_GOLANG_CONFIG=
 BUILD_TOOLS_GOLANG_PREREQ_REDHAT=
 BUILD_TOOLS_GOLANG_PREREQ_UBUNTU=
-BUILD_TOOLS_GOLANG_URL_PATTERN='https://dl.google.com/go/go${version}.${kernel_l}-${arch}.tar.gz'
+BUILD_TOOLS_GOLANG_URL_PATTERN='https://dl.google.com/go/go${version}.${kernel_l}-${machine}.tar.gz'
 BUILD_TOOLS_GOLANG_DEFAULT_VERSION=1.14.3
 
 #> gh - githubcli
@@ -217,7 +217,7 @@ BUILD_TOOLS_GH_ENV=
 BUILD_TOOLS_GH_CONFIG=
 BUILD_TOOLS_GH_PREREQ_REDHAT=
 BUILD_TOOLS_GH_PREREQ_UBUNTU=
-BUILD_TOOLS_GH_URL_PATTERN='https://github.com/cli/cli/releases/download/v${version}/gh_${version}_${kernel_l}_${arch}.tar.gz'
+BUILD_TOOLS_GH_URL_PATTERN='https://github.com/cli/cli/releases/download/v${version}/gh_${version}_${kernel_l}_${machine}.tar.gz'
 BUILD_TOOLS_GH_DEFAULT_VERSION=2.2.0
 
 #> pass - password store
@@ -279,6 +279,11 @@ BUILD_TOOLS_P4MERGE_PREREQ_UBUNTU=
 BUILD_TOOLS_P4MERGE_URL_PATTERN='https://www.perforce.com/downloads/perforce/${version}/bin.linux26x86_64/p4v.tgz'
 BUILD_TOOLS_P4MERGE_DEFAULT_VERSION=r22.2
 
+#> exercism - exercism cli
+#
+BUILD_TOOLS_EXERCISM_URL_PATTERN='https://github.com/exercism/cli/releases/download/v${version}/exercism-${version}-${kernel_l}-${arch}.tar.gz'
+BUILD_TOOLS_EXERCISM_DEFAULT_VERSION=3.1.0
+
 
 #
 
@@ -296,9 +301,10 @@ build_tools_env()
 
     kernel=`uname -s`
     kernel_l=`echo $kernel | tr '[A-Z]' '[a-z]'`
-    machine=`uname -m`
-    case $machine in
-        x86_64) arch=amd64 ;;
+    arch=`uname -m`
+    arch_s="${arch%%_*}"
+    case $arch in
+        x86_64) machine=amd64 ;;
     esac
     name="$build_tools_env__name"
     version="$build_tools_env__version"
