@@ -104,7 +104,7 @@ _atmux_args()
             ;;
         1)
             _atmux_args__path="$PWD"
-            if _atmux_has_session "$1"; then
+            if _atmux_has_session "=$1"; then
                 _atmux_args__name="$1"
                 _atmux_args__layout="_"
             elif [ -d "$1" ]; then
@@ -183,7 +183,7 @@ _atmux()
     _atmux__path="$_atmux_args__path"
     _atmux__layout="$_atmux_args__layout"
 
-    _atmux_has_session "$_atmux__name" ||
+    _atmux_has_session "=$_atmux__name" ||
         _atmux_session "$_atmux__name" "$_atmux__path" "$_atmux__layout" ||
         return 1
     if _not_in_tmux; then
