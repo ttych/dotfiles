@@ -13,13 +13,13 @@
 BUILD_TOOLS_RUBY_PREREQ_REDHAT='readline-devel openssl-devel zlib-devel sqlite-devel libyaml-devel'
 BUILD_TOOLS_RUBY_PREREQ_UBUNTU='libreadline-dev libssl-dev libsqlite3-dev zlib1g-dev libyaml-dev'
 BUILD_TOOLS_RUBY_URL_PATTERN='http://cache.ruby-lang.org/pub/ruby/ruby-${version}.tar.gz'
-BUILD_TOOLS_RUBY_DEFAULT_VERSION='2.4.3'
+BUILD_TOOLS_RUBY_DEFAULT_VERSION='3.2.1'
 
 #> python - python interpreter
 BUILD_TOOLS_PYTHON_PREREQ_REDHAT='readline-devel openssl-devel libffi-devel tk-devel sqlite-devel bzip2-devel'
 BUILD_TOOLS_PYTHON_PREREQ_UBUNTU='libreadline-dev libssl-dev libffi-dev tk-dev libsqlite3-dev libbz2-dev'
 BUILD_TOOLS_PYTHON_URL_PATTERN='https://www.python.org/ftp/python/${version}/Python-${version}.tgz'
-BUILD_TOOLS_PYTHON_DEFAULT_VERSION='3.6.6'
+BUILD_TOOLS_PYTHON_DEFAULT_VERSION='3.9.16'
 
 #> ag - the silver searcher
 BUILD_TOOLS_AG_PREREQ_REDHAT='xz-devel'
@@ -103,7 +103,7 @@ BUILD_TOOLS_CMAKE_DEFAULT_VERSION='3.14.2'
 BUILD_TOOLS_NODEJS_PREREQ_REDHAT=
 BUILD_TOOLS_NODEJS_PREREQ_UBUNTU=
 BUILD_TOOLS_NODEJS_URL_PATTERN='https://nodejs.org/dist/${version}/node-${version}-linux-x64.tar.xz'
-BUILD_TOOLS_NODEJS_DEFAULT_VERSION='v13.0.1'
+BUILD_TOOLS_NODEJS_DEFAULT_VERSION='v18.14.1'  # v19.6.1
 
 #> jdk11 - jdk11
 BUILD_TOOLS_JDK11_PREREQ_REDHAT=
