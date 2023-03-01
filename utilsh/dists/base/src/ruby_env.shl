@@ -67,6 +67,7 @@ ruby_env
 ########## gem
 GEM_PACK_ASCIIDOC="asciidoctor asciidoctor-pdf asciidoctor-revealjs rouge"
 GEM_PACK_CAPISTRANO="capistrano"
+GEM_PACK_CLI="gli main"
 GEM_PACK_FLUENTD="fluentd fluent-plugin-kafka fluent-plugin-elasticsearch fluent-plugin-rewrite-tag-filter fluent-plugin-rename-key fluent-plugin-record-modifier fluent-plugin-flowcounter-simple fluent-plugin-http-healthcheck"
 GEM_PACK_JEKYLL="jekyll"
 GEM_PACK_MINA="mina"
@@ -77,7 +78,7 @@ GEM_PACK_RAILS="rails rails-erb-lint rspec-rails"
 GEM_PACK_RSPEC="rspec"
 GEM_PACK_SINATRA="sinatra"
 GEM_PACK_TEXT="octodown $GEM_PACK_ASCIIDOC"
-GEM_PACK_TOOLS="quick_and_ruby semver tmuxinator"
+GEM_PACK_TOOLS="quick_and_ruby semver tmuxinator gli"
 GEM_PACK_UTILS="$GEM_PACK_TOOLS"
 GEM_PACK_WWW="nanoc middleman middleman-livereload puma webrick"
 
