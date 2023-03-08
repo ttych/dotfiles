@@ -1100,6 +1100,10 @@
        git fetch ../commits.bundle master:other-master
      #+end_src
 *** config
+**** 3 locations
+***** system: --system
+***** global: --global
+***** local: --local (default)
 **** help
      - man git-config
      - https://git-scm.com/docs/git-config
