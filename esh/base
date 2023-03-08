@@ -411,7 +411,7 @@ for esh_module in terminal \
                       tmux \
                       ssh-agent \
                       git \
-                      defaults \
+                      apps \
                       interactive
 do
     esh_module_load "$esh_module"
