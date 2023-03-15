@@ -224,7 +224,11 @@ bnanoc()
 }
 bnanocs()
 {
-    bnanoc view -L "$@"
+    bnanoc view --live-reload "$@"
+}
+bnanocb()
+{
+    bnanoc compile --watch "$@"
 }
 bmiddleman()
 {
@@ -298,7 +302,11 @@ Bnanoc()
 }
 Bnanocs()
 {
-    Bnanoc view -L "$@"
+    Bnanoc view --live-reload "$@"
+}
+Bnanocb()
+{
+    Bnanoc compile --watch "$@"
 }
 Bmiddleman()
 {
