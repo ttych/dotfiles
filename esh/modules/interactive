@@ -189,22 +189,6 @@ bguard()
 {
     bundle_exec guard "$@"
 }
-bnanoc()
-{
-    bundle_exec nanoc "$@"
-}
-bnanocs()
-{
-    bnanoc view -L "$@"
-}
-bmiddleman()
-{
-    bundle_exec middleman "$@"
-}
-bmiddlemans()
-{
-    bmiddleman server "$@"
-}
 
 Bexec()
 {
