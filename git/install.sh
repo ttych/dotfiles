@@ -145,6 +145,7 @@ git config --global alias.co checkout
 git config --global alias.cob 'checkout -b'
 git config --global alias.com 'checkout master'
 git config --global alias.cor 'checkout --track'
+git config --global alias.orphan 'checkout --orphan'
 
 ## branch
 git config --global alias.br branch
