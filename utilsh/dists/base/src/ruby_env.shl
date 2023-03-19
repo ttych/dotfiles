@@ -236,7 +236,7 @@ bmiddleman()
 }
 bmiddlemans()
 {
-    bmiddleman server "$@"
+    bmiddleman server --verbose "$@"
 }
 
 
@@ -314,5 +314,5 @@ Bmiddleman()
 }
 Bmiddlemans()
 {
-    Bmiddleman server "$@"
+    Bmiddleman server --verbose "$@"
 }
