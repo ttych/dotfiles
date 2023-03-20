@@ -409,6 +409,35 @@
          git commit-tree "$@";
        fi' HEAD
      #+end_src
+*** clean history
+**** filter-branch --tree-filter
+     The --tree-filter option runs the specified command after each checkout of
+     the project and then recommits the results.
+
+     #+begin_src shell
+       git filter-branch --tree-filter "rm -rf path_fo_file" HEAD
+     #+end_src
+
+     To run filter-branch on all your branches, you can pass --all to the
+     command.
+**** filter-branch --index-filter
+     The --index-filter option is similar to the --tree-filter option used in
+     Rewriting History, except that instead of passing a command that modifies
+     files checked out on disk, you’re modifying your staging area or index each
+     time.
+
+     It works on the index, not on the disk.
+
+     The reason to do it this way is speed – because Git doesn’t have to check
+     out each revision to disk before running your filter, the process can be
+     much, much faster.
+
+     #+begin_src shell
+       git filter-branch --index-filter "git rm -rf --cached --ignore-unmatch path_fo_file" HEAD
+     #+end_src
+
+     To run filter-branch on all your branches, you can pass --all to the
+     command.
 ** advanced
 *** plumbing
     #+begin_src shell
