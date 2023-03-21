@@ -172,7 +172,7 @@ brake()
 }
 bruby()
 {
-    bundlex_exec ruby "$@"
+    bundle_exec ruby "$@"
 }
 brb()
 {
