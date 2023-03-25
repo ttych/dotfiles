@@ -26,6 +26,19 @@ IRB.conf[:PROMPT_MODE] = :MY
 # IRB.conf[:PROMPT] = {...}
 
 
+def history(count = 0)
+  # Get history into an array
+  histories = Readline::HISTORY.to_a
+
+  count ||= 0
+  if count > 0
+    from = histories.length - count
+    histories = histories[from..-1]
+  end
+
+  puts histories
+end
+
 def i_m(obj)
   list = obj.methods
   anc = obj.class.ancestors - [obj.class]
