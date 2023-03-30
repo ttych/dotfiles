@@ -140,6 +140,11 @@ tailf()
 
 
 ### ruby
+rb()
+{
+    ruby "$@"
+}
+
 bundle_exec()
 {
     bundle exec "$@"
