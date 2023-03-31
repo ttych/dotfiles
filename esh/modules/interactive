@@ -145,6 +145,11 @@ rb()
     ruby "$@"
 }
 
+rcop()
+{
+    rubocop "$@"
+}
+
 bundle_exec()
 {
     bundle exec "$@"
