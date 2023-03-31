@@ -153,6 +153,15 @@ rubyenv_guess_root RUBY_INSTALL_ROOT local/ruby-install
 
 
 ########## interactive
+rb()
+{
+    ruby "$@"
+}
+rcop()
+{
+    rubocop "$@"
+}
+
 bundle_exec()
 {
     bundle exec "$@"
