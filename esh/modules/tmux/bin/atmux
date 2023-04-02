@@ -161,7 +161,7 @@ _atmux_args()
 
 _atmux_usage()
 {
-    cat <<EOF    usage is
+    cat <<EOF
 usage is:  atmux <name> <path> <layout>
 
 example:
