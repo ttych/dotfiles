@@ -24,7 +24,7 @@ _want_auto_tmux()
 
 _ensure_tmux_is_running()
 {
-    atmux _init_
+    atx _init_
 }
 
 if _want_auto_tmux; then

@@ -1,0 +1,383 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+is_sourced() {
+    if [ -n "$ZSH_VERSION" ]; then
+        case $ZSH_EVAL_CONTEXT in *:file:*) return 0;; esac
+    else  # Add additional POSIX-compatible shell names here, if needed.
+        case ${0##*/} in dash|-dash|bash|-bash|ksh|-ksh|sh|-sh) return 0;; esac
+    fi
+    return 1  # NOT sourced.
+}
+
+# set -x
+
+if [ -z "$TMUX_CONF_DIR" ]; then
+    for d in "$HOME" "$HOME_ALT"; do
+        [ -z "$d" ] && continue
+        [ -d "$d/.tmux/" ] && TMUX_CONF_DIR="$d/.tmux" && break
+    done
+fi
+TMUX_CONF_DIR="${TMUX_CONF_DIR:-$HOME/.tmux}"
+TMUX_LAYOUTS_DIR="${TMUX_CONF_DIR}/layouts"
+TMUX_LAYOUTS_SKELETON="$TMUX_LAYOUTS_DIR/_skeleton_"
+TMUX_PROJECTS_DIR="${TMUX_CONF_DIR}/projects"
+
+#
+
+err_msg()
+{
+    echo >&2 "! $* !"
+    return 1
+}
+
+_has_tmux()
+{
+    _has_tmux=$(which tmux 2>/dev/null)
+}
+
+_in_tmux()
+{
+    [ -n "$TMUX" ]
+}
+
+_not_in_tmux()
+{
+    ! _in_tmux
+}
+
+#
+
+_atx_current_session()
+{
+    _in_tmux || return 1
+
+    # _atx_current_session=$(tmux display-message -p '#S')
+
+    tty=$(tty)
+    _atx_current_session=$(
+        for s in $(tmux list-sessions -F '#{session_name}'); do
+            tmux list-panes -F '#{pane_tty} #{session_name}' -t "$s"
+        done | grep "^$tty " | awk '{print $2}'
+                        )
+
+    echo $_atx_current_session
+}
+
+_atx_has_session()
+{
+    [ -z "$1" ] && return 1
+    tmux has-session -t "$1" 2>/dev/null
+}
+
+_atx_has_layout()
+{
+    [ -z "$1" ] && return 1
+    [ -f "$TMUX_LAYOUTS_DIR/$1" ]
+}
+
+_atx_has_project()
+{
+    [ -z "$1" ] && return 1
+    [ -f "$TMUX_PROJECTS_DIR/$1" ]
+}
+
+_atx_normalize_name()
+{
+    _atx_normalize_name="$(echo $1 | tr :. _)"
+}
+
+_atx_normalize_path()
+{
+    _atx_normalize_path=$(cd "$1"; pwd)
+}
+
+_atx_name_from_path()
+{
+    if [ "$1" = "$HOME" ]; then
+        _atx_name_from_path="home"
+    else
+        _atx_name_from_path="${1##*/}"
+    fi
+}
+
+#
+
+_atx_layout_list()
+(
+    cat <<EOF
+LAYOUTS:
+--------
+EOF
+    cd "$TMUX_LAYOUTS_DIR" 2>/dev/null || return 0
+    for f in *; do
+        [ -f "$f" ] || continue
+        case "$f" in
+            .*|_*) continue ;;
+        esac
+
+        echo "$f"
+    done
+)
+
+_atx_layout_load()
+{
+    _atx_layout_load__layout="$1"
+    _atx_layout_load__session="$2"
+
+    _atx_has_layout "$1" || return 1
+    if [ -z "$_atx_layout_load__session" ]; then
+        _atx_layout_load__session=$(_atx_current_session)
+        [ $? -ne 0 ] && return 1
+    fi
+
+    echo current session "$_atx_layout_load__session"
+
+    "$TMUX_CONF_DIR/layouts/$1" "$2"
+}
+
+_atx_layout()
+{
+    if [ $# -eq 0 ]; then
+        _atx_layout_list
+    else
+        _atx_layout_load "$@"
+    fi
+}
+
+_atx_layout_auto()
+{
+    _atx_layout_load "session.$1" "$1"
+
+    _atx_layout_auto_l=`cat "$2/.atxl" 2>/dev/null`
+    _atx_layout_load "$_atx_layout_auto_l" "$1"
+}
+
+_atx_layout_skeleton()
+{
+    cat "$TMUX_LAYOUTS_SKELETON"
+}
+
+_atx_layout_create()
+{
+    if [ -z "$1" ]; then
+        err_msg "missing layout name to create"
+        return 1
+    fi
+    if _atx_has_layout "$1"; then
+        err_msg "layout \"$1\" already existing"
+        return 1
+    fi
+
+    _atx_layout_skeleton > "$TMUX_LAYOUTS_DIR/$1"
+
+    echo "want to edit \"$1\" layout (y/n) ? "
+    read answer
+    case $answer in
+        [Yy]|[Yy][Ee][Ss])
+            $EDITOR "$TMUX_LAYOUTS_DIR/$1"
+            ;;
+    esac
+}
+
+#
+
+_atx_project_list()
+(
+    cat <<EOF
+PROJECTS:
+---------
+EOF
+    cd "$TMUX_PROJECTS_DIR" 2>/dev/null || return 0
+    for f in *; do
+        [ -f "$f" ] || continue
+        case "$f" in
+            .*|_*) continue ;;
+        esac
+
+        echo "$f"
+    done
+)
+
+
+_atx_project()
+{
+    if [ $# -eq 0 ]; then
+        _atx_project_list
+    fi
+
+}
+
+#
+
+_atx_session()
+{
+    _atx_session__name="$1"
+    _atx_session__path="${2:-$PWD}"
+
+    _atx_normalize_name "$_atx_session__name"
+    _atx_session__name="$_atx_normalize_name"
+    _atx_normalize_path "$_atx_session__path"
+    _atx_session__path="$_atx_normalize_path"
+
+    TMUX= tmux new-session -c "$_atx_session__path" -s "$_atx_session__name" -d || return 1
+    _atx_layout_auto "$_atx_session__name" "$_atx_session__path"
+    return 0
+}
+
+#
+
+_atx_usage()
+{
+    cat <<EOF
+usage is
+    atx <options> <parameters>
+
+options in:
+    -h           : help
+    -l [layout]  : list or apply layout
+    -L layout    : create layout
+    -p [project] : list or load project
+    -P project   : create project
+    -s session   : load session
+
+examples:
+    atx  --  use current dir as starting point
+    atx  <params>  --  in order existing-session,project,path,new-session
+    atx  <name> <path>  --  in order existing-session,new-session-within-path
+EOF
+}
+
+_atx()
+{
+    _has_tmux || return 1
+
+    case "$1" in
+        "-c")
+            _atx_current_session
+            return $?
+            ;;
+        "-l")
+            shift
+            _atx_layout "$@"
+            return $?
+            ;;
+        "-L")
+            shift
+            _atx_layout_create "$@"
+            return $?
+            ;;
+        "-p")
+            shift
+            _atx_project "$@"
+            return $?
+            ;;
+        "-P")
+            shift
+            _atx_project_create "$@"
+            return $?
+            ;;
+        "-s")
+            shift
+            _atx_session "$@"
+            return $?
+            ;;
+        "-h")
+            _atx_usage
+            return 0
+            ;;
+        "-"*)
+            err_msg "unexpected parameter \"$1\""
+            _atx_usage
+            return 1
+            ;;
+    esac
+
+    _atx__name=
+    _atx__path=
+    _atx__project=
+
+    case $# in
+        0)
+            _atx__path="$PWD"
+            ;;
+        1)
+            _atx__path="$PWD"
+            if _atx_has_session "=$1"; then
+                _atx__name="$1"
+            elif _atx_has_project "$1"; then
+                _atx__project="$1"
+            elif [ -d "$1" ]; then
+                _atx__path="$1"
+            else
+                _atx__name="$1"
+            fi
+            ;;
+        2)
+            if [ -d "$2" ]; then
+                _atx__path="$2"
+                if _atx_has_project "$1"; then
+                    _atx__project="$1"
+                    _atx__project_path="$2"
+                else
+                    _atx__name="$1"
+                fi
+            else
+                _atx_usage
+                return 1
+            fi
+            ;;
+        *) _atx_usage
+           return 1
+           ;;
+    esac
+
+    _atx_normalize_path "${_atx__path:-$PWD}"
+    _atx__path="$_atx_normalize_path"
+
+    if [ -z "$_atx__name" ]; then
+        _atx_name_from_path "$_atx__path"
+        _atx__name="$_atx_name_from_path"
+    fi
+    _atx_normalize_name "$_atx__name"
+    _atx__name="$_atx_normalize_name"
+
+    if [ -n "$_atx__project_path" ]; then
+        _atx_normalize_path "$_atx__project_path"
+        _atx__project_path="$_atx_normalize_path"
+    fi
+
+    if [ -n "$_atx__project" ]; then
+        _atx_project_load "$_atx__project" "$_atx__project_path"
+    else
+        _atx_has_session "=$_atx__name" ||
+            _atx_session "$_atx__name" "$_atx__path" ||
+            return 1
+        if _not_in_tmux; then
+            tmux attach -t "$_atx__name"
+        else
+            tmux switch-client -t "$_atx__name"
+        fi
+    fi
+}
+
+atx()
+{
+    case $1 in
+        _init_)
+            if _not_in_tmux; then
+                shift
+                _atx "$@"
+            fi
+            ;;
+        *)
+            _atx "$@"
+            ;;
+    esac
+}
+
+#
+
+if ! is_sourced && [ "${0##*/}" = 'atx' ]; then
+    atx "$@"
+fi
