@@ -31,32 +31,17 @@ fi
 #
 
 
-# window "main"
-tmux rename-window -t "$TARGET_SESSION":1 main
+# dev
+tmux send-keys -t "$TARGET_SESSION":"$TARGET_WINDOW".1 e C-m
 
-tmux send-keys -t "$TARGET_SESSION":1.1 e C-m
+tmux splitw -h -t "$TARGET_SESSION":"$TARGET_WINDOW" -p 33
+tmux send-keys -t "$TARGET_SESSION":"$TARGET_WINDOW".2 rgr C-m
 
-tmux splitw -h -t "$TARGET_SESSION":1 -p 33
-tmux send-keys -t "$TARGET_SESSION":1.2 rgr C-m
+tmux splitw -v -t "$TARGET_SESSION":"$TARGET_WINDOW".2 -p66
 
-tmux splitw -v -t "$TARGET_SESSION":1.2
-
-tmux select-pane -t "$TARGET_SESSION":1.1
-
-
-# window "server"
-tmux new-window -t "$TARGET_SESSION":2 -n server
-
-tmux send-keys -t "$TARGET_SESSION":2.1 run server C-m
-
-tmux splitw -t "$TARGET_SESSION":2
-tmux send-keys -t "$TARGET_SESSION":2.2 tail\ -f\ log/....log C-m
-
-tmux select-layout -t "$TARGET_SESSION":2 even-horizontal
-
-tmux select-pane -t "$TARGET_SESSION":2.1
+tmux select-pane -t "$TARGET_SESSION":"$TARGET_WINDOW".1
 
 
 #  Select
-tmux select-window -t "$TARGET_SESSION":1
-tmux select-pane -t "$TARGET_SESSION":1.1
+tmux select-window -t "$TARGET_SESSION":"$TARGET_WINDOW"
+tmux select-pane -t "$TARGET_SESSION":"$TARGET_WINDOW".1
