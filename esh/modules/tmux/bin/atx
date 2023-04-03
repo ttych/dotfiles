@@ -131,9 +131,8 @@ _atx_layout_load()
         [ $? -ne 0 ] && return 1
     fi
 
-    echo current session "$_atx_layout_load__session"
-
-    "$TMUX_CONF_DIR/layouts/$1" "$2"
+    echo "$TMUX_CONF_DIR/layouts/$_atx_layout_load__layout" "$_atx_layout_load__session"
+    "$TMUX_CONF_DIR/layouts/$_atx_layout_load__layout" "$_atx_layout_load__session"
 }
 
 _atx_layout()
@@ -169,6 +168,8 @@ _atx_layout_create()
         return 1
     fi
 
+    mkdir -p "$TMUX_LAYOUTS_DIR" || return 1
+
     _atx_layout_skeleton > "$TMUX_LAYOUTS_DIR/$1"
 
     echo "want to edit \"$1\" layout (y/n) ? "
@@ -195,10 +196,33 @@ EOF
             .*|_*) continue ;;
         esac
 
-        echo "$f"
+        . ./"$f"
+        echo "$f ($name, $path, $layout)"
     done
 )
 
+_atx_project_load()
+(
+    _atx_has_project "$1" || return 1
+
+    _atx_project_load__name="$1"
+    shift
+
+    . "$TMUX_PROJECTS_DIR/$_atx_project_load__name"
+
+    OPTIND=1
+    while getopts :n:p: opt; do
+        case $opt in
+            n) _atx_project_load__name="$OPTARG" ;;
+            p) path="$OPTARG" ;;
+        esac
+    done
+    shift $(($OPTIND - 1))
+
+    cd "$path" || return 1
+
+    _atx_session_and_switch "$_atx_project_load__name" "$path" "$layout"
+)
 
 _atx_project()
 {
@@ -206,14 +230,41 @@ _atx_project()
         _atx_project_list
     fi
 
+    _atx_project_load "$@"
+}
+
+_atx_project_create()
+{
+    if [ $# -ne 3 ]; then
+        err_msg "create project with <name> <path> <layout>"
+        return 1
+    fi
+
+    if _atx_has_project "$1"; then
+        err_msg "project with name \"$1\" already exists"
+        return 1
+    fi
+
+    mkdir -p "$TMUX_PROJECTS_DIR" || return 1
+
+    _atx_normalize_name "$1"
+    ( cd "$2" 2>/dev/null ) || err_msg "error accessing directory \"$2\""
+
+    cat <<EOF > "$TMUX_PROJECTS_DIR/$1"
+path="$2"
+layout="$3"
+EOF
 }
 
 #
 
 _atx_session()
 {
+    _atx_has_session "=$1" && return 0
+
     _atx_session__name="$1"
     _atx_session__path="${2:-$PWD}"
+    _atx_session__layout="$3"
 
     _atx_normalize_name "$_atx_session__name"
     _atx_session__name="$_atx_normalize_name"
@@ -221,8 +272,25 @@ _atx_session()
     _atx_session__path="$_atx_normalize_path"
 
     TMUX= tmux new-session -c "$_atx_session__path" -s "$_atx_session__name" -d || return 1
+
+    [ -n "$_atx_session__layout" ] && _atx_layout_load "$_atx_session__layout" "$_atx_session__name"
     _atx_layout_auto "$_atx_session__name" "$_atx_session__path"
+
     return 0
+}
+
+_atx_session_and_switch()
+{
+    _atx_session_and_switch__name="$1"
+
+    _atx_has_session "=$_atx_session_and_switch__name" ||
+        _atx_session "$@" ||
+        return 1
+    if _not_in_tmux; then
+        tmux attach -t "$_atx_session_and_switch__name"
+    else
+        tmux switch-client -t "$_atx_session_and_switch__name"
+    fi
 }
 
 #
@@ -348,16 +416,9 @@ _atx()
     fi
 
     if [ -n "$_atx__project" ]; then
-        _atx_project_load "$_atx__project" "$_atx__project_path"
+        _atx_project_load "$_atx__project" -p "$_atx__project_path"
     else
-        _atx_has_session "=$_atx__name" ||
-            _atx_session "$_atx__name" "$_atx__path" ||
-            return 1
-        if _not_in_tmux; then
-            tmux attach -t "$_atx__name"
-        else
-            tmux switch-client -t "$_atx__name"
-        fi
+        _atx_session_and_switch "$_atx__name" "$_atx__path"
     fi
 }
 
