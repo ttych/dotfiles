@@ -431,6 +431,6 @@ HISTFILE="$HOME/.log/${HOSTNAME}_${ESH_SH_CUR_SHORT}"; export HISTFILE
 # history file size
 HISTSIZE=2000; export HISTSIZE
 # bash history file size
-HISTFILESIZE=1000; export HISTFILESIZE
+HISTFILESIZE=2000; export HISTFILESIZE
 # session history size
 SAVEHIST=3000; export SAVEHIST
