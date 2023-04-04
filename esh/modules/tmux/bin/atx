@@ -131,7 +131,6 @@ _atx_layout_load()
         [ $? -ne 0 ] && return 1
     fi
 
-    echo "$TMUX_CONF_DIR/layouts/$_atx_layout_load__layout" "$_atx_layout_load__session"
     "$TMUX_CONF_DIR/layouts/$_atx_layout_load__layout" "$_atx_layout_load__session"
 }
 
@@ -364,6 +363,7 @@ _atx()
     _atx__name=
     _atx__path=
     _atx__project=
+    _atx__project_path=
 
     case $# in
         0)
@@ -416,7 +416,7 @@ _atx()
     fi
 
     if [ -n "$_atx__project" ]; then
-        _atx_project_load "$_atx__project" -p "$_atx__project_path"
+        _atx_project_load "$_atx__project" ${_atx__project_path:+-p "$_atx__project_path"}
     else
         _atx_session_and_switch "$_atx__name" "$_atx__path"
     fi
