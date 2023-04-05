@@ -32,7 +32,7 @@ fi
 
 
 # dev
-tmux send-keys -t "$TARGET_SESSION":"$TARGET_WINDOW".1 e C-m
+tmux send-keys -t "$TARGET_SESSION":"$TARGET_WINDOW".1 "e ." C-m
 
 tmux splitw -h -t "$TARGET_SESSION":"$TARGET_WINDOW" -p 33
 tmux send-keys -t "$TARGET_SESSION":"$TARGET_WINDOW".2 rgr C-m
