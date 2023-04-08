@@ -21,6 +21,17 @@ _terminal_switch_to_256_colors()
     fi
 }
 
+treset()
+{
+    # set terminal characteristics to "sane"
+    stty sane
+    # sets the terminal modes to "sane"
+    reset
+    # reset terminal attribute
+    tput sgr0
+}
+
+
 if esh_interactive; then
     _terminal_switch_to_256_colors
 fi
