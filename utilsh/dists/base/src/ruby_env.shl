@@ -247,11 +247,15 @@ bmiddlemans()
 {
     bmiddleman server --verbose "$@"
 }
+
+yards()
+{
+    yard server --reload "$@"
+}
 byards()
 {
-    bundle_exec yard server --reload "$@"
+    bundle exec yard server --reload "$@"
 }
-
 
 Bexec()
 {
