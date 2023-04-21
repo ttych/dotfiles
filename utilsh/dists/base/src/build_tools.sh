@@ -61,20 +61,20 @@ BUILD_TOOLS_EMACS_CONFIG='--with-x-toolkit=gtk3 --with-gif=no --with-x=yes --wit
 BUILD_TOOLS_EMACS_PREREQ_REDHAT='gtk2-devel libtiff-devel gnutls-devel'
 BUILD_TOOLS_EMACS_PREREQ_UBUNTU='libtiff5-dev libgif-dev libgnutls28-dev libgtk-3-dev libncurses-dev libxpm-dev'
 BUILD_TOOLS_EMACS_URL_PATTERN='http://ftpmirror.gnu.org/emacs/emacs-${version}.tar.xz'
-BUILD_TOOLS_EMACS_DEFAULT_VERSION='28.1'
+BUILD_TOOLS_EMACS_DEFAULT_VERSION='28.2'
 
 #> emacs-nox - emacs editor without X
 BUILD_TOOLS_EMACS_NOX_CONFIG='--with-x=no --with-gif=no --with-gnutls=yes'
 BUILD_TOOLS_EMACS_NOX_PREREQ_REDHAT='libtiff-devel gnutls-devel'
 BUILD_TOOLS_EMACS_NOX_PREREQ_UBUNTU='libtiff5-dev libgif-dev libgnutls28-dev libncurses-dev'
 BUILD_TOOLS_EMACS_NOX_URL_PATTERN='http://ftpmirror.gnu.org/emacs/emacs-${version}.tar.xz'
-BUILD_TOOLS_EMACS_NOX_DEFAULT_VERSION='27.2'
+BUILD_TOOLS_EMACS_NOX_DEFAULT_VERSION='28.2'
 
 #> vscode - Visual Studio Code
 BUILD_TOOLS_VSCODE_PREREQ_REDHAT='libXScrnSaver'
 BUILD_TOOLS_VSCODE_PREREQ_UBUNTU='libgconf-2-4'
-BUILD_TOOLS_VSCODE_URL_PATTERN='https://az764295.vo.msecnd.net/stable/f46c4c469d6e6d8c46f268d1553c5dc4b475840f/code-stable-${version}.tar.gz'
-BUILD_TOOLS_VSCODE_DEFAULT_VERSION='1536736541'
+BUILD_TOOLS_VSCODE_URL_PATTERN='https://az764295.vo.msecnd.net/stable/704ed70d4fd1c6bd6342c436f1ede30d1cff4710/code-stable-x64-1681293081.tar.gz'
+BUILD_TOOLS_VSCODE_DEFAULT_VERSION='1681293081'
 
 #> guile - guile
 BUILD_TOOLS_GUILE_PREREQ_REDHAT='libtool-ltdl-devel gmp-devel'
