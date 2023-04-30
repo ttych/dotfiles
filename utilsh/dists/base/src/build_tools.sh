@@ -13,7 +13,7 @@
 BUILD_TOOLS_RUBY_PREREQ_REDHAT='readline-devel openssl-devel zlib-devel sqlite-devel libyaml-devel'
 BUILD_TOOLS_RUBY_PREREQ_UBUNTU='libreadline-dev libssl-dev libsqlite3-dev zlib1g-dev libyaml-dev'
 BUILD_TOOLS_RUBY_URL_PATTERN='http://cache.ruby-lang.org/pub/ruby/ruby-${version}.tar.gz'
-BUILD_TOOLS_RUBY_DEFAULT_VERSION='3.2.1'
+BUILD_TOOLS_RUBY_DEFAULT_VERSION='3.2.2'
 
 #> python - python interpreter
 BUILD_TOOLS_PYTHON_PREREQ_REDHAT='readline-devel openssl-devel libffi-devel tk-devel sqlite-devel bzip2-devel'
