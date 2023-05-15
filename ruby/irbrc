@@ -8,6 +8,9 @@ IRB.conf[:AUTO_INDENT] = true
 IRB.conf[:USE_READLINE] = true
 IRB.conf[:LOAD_MODULES] ||= []
 IRB.conf[:LOAD_MODULES] |= ['irb/completion']
+IRB.conf[:LOAD_MODULES] |= ['json']
+IRB.conf[:LOAD_MODULES] |= ['yaml']
+IRB.conf[:LOAD_MODULES] |= ['pp']
 
 IRB.conf[:SAVE_HISTORY] = 10000
 IRB.conf[:HISTORY_FILE] = "#{ENV['HOME']}/.irb_history"
@@ -25,6 +28,7 @@ IRB.conf[:PROMPT][:MY] = {
 IRB.conf[:PROMPT_MODE] = :MY
 # IRB.conf[:PROMPT] = {...}
 
+IRB.conf[:USE_AUTOCOMPLETE] = true
 
 def history(count = 0)
   # Get history into an array
