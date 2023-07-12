@@ -10,7 +10,9 @@ IRB.conf[:LOAD_MODULES] ||= []
 IRB.conf[:LOAD_MODULES] |= ['irb/completion']
 IRB.conf[:LOAD_MODULES] |= ['json']
 IRB.conf[:LOAD_MODULES] |= ['yaml']
+IRB.conf[:LOAD_MODULES] |= ['set']
 IRB.conf[:LOAD_MODULES] |= ['pp']
+IRB.conf[:LOAD_MODULES] |= ['objspace']
 
 IRB.conf[:SAVE_HISTORY] = 10000
 IRB.conf[:HISTORY_FILE] = "#{ENV['HOME']}/.irb_history"
@@ -54,6 +56,29 @@ def json_pp(json)
   require 'json'
   puts JSON.pretty_generate(JSON.parse(json))
 end
+
+def mem_size(obj)
+  case obj
+  when String
+    obj.bytesize
+  when Integer
+    obj.size
+  when Hash
+    sum = 0
+    obj.each do |key, val|
+      sum += mem_size(key)
+      sum += mem_size(val)
+    end
+    sum
+  when Array
+    obj.reduce(0) do |sum, val|
+      sum + mem_size(val)
+    end
+  else
+    ObjectSpace.memsize_of(obj)
+  end
+end
+
 
 ## trace
 # proc_object = proc do |event, file, line, id, binding, klass|
