@@ -633,9 +633,9 @@ esac
 
 ########## references
 ##### install
-# base commands list to install
+# Installing FreeBSD Root on ZFS using GPT
 # - https://wiki.freebsd.org/RootOnZFS/GPTZFSBoot
-# commands list to install
+# [UEFI/GPT] [Dual-Boot] How to install FreeBSD (with ZFS) alongside another OS
 # - https://forums.freebsd.org/threads/uefi-gpt-dual-boot-how-to-install-freebsd-with-zfs-alongside-another-os-sharing-the-same-disk.75734/
 # Converting FreeBSD from bios / mbr to UEFI / GPT
 # - https://just.graphica.com.au/tips/converting-freebsd-bios/
