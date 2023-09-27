@@ -284,6 +284,22 @@ BUILD_TOOLS_P4MERGE_DEFAULT_VERSION=r22.2
 BUILD_TOOLS_EXERCISM_URL_PATTERN='https://github.com/exercism/cli/releases/download/v${version}/exercism-${version}-${kernel_l}-${arch}.tar.gz'
 BUILD_TOOLS_EXERCISM_DEFAULT_VERSION=3.1.0
 
+#> libnfc - libnfc
+BUILD_TOOLS_LIBNFC_URL_PATTERN='https://github.com/nfc-tools/libnfc/releases/download/libnfc-${version}/libnfc-${version}.tar.bz2'
+BUILD_TOOLS_LIBNFC_DEFAULT_VERSION=1.8.0
+
+#> mfcuk - mfcuk
+BUILD_TOOLS_MFCUK_URL_PATTERN='https://github.com/nfc-tools/mfcuk.git'
+BUILD_TOOLS_MFCUK_DEFAULT_VERSION=master
+
+#> mfoc - mfoc
+BUILD_TOOLS_MFOC_URL_PATTERN='https://github.com/nfc-tools/mfoc.git'
+BUILD_TOOLS_MFOC_DEFAULT_VERSION=master
+
+#> crypto1_bs - crypto1_bs
+BUILD_TOOLS_CRYPTO1_BS_URL_PATTERN='https://github.com/aczid/crypto1_bs.git'
+BUILD_TOOLS_CRYPTO1_BS_DEFAULT_VERSION=master
+
 
 #
 

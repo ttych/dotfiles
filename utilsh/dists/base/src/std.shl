@@ -382,6 +382,9 @@ download()
         "")
             return 1
             ;;
+        http*.git)
+            download__act=git
+            ;;
         http*|ftp*)
             download__act=curl
             ;;
@@ -413,6 +416,9 @@ download()
             ;;
         curl)
             CURL ${download__header:+-H "$download__header"} "$download__src" -o "$download"
+            ;;
+        git)
+            git clone "$download__src" "$download"
             ;;
         *)
             return 1

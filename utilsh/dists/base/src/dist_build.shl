@@ -70,6 +70,12 @@ dist_build_configure()
         eval $3 make install
 }
 
+dist_build_autoreconf()
+{
+    eval $3 autoreconf -is &&
+        dist_build_configure "$1" "$2" "$3"
+}
+
 dist_build_autogen_autogen()
 {
     if ./autogen.sh --help | grep -q -- --prefix; then
@@ -155,8 +161,10 @@ dist_build()
     _mktemp_dir && dist_build__dir="$_mktemp_dir" || return 1
     download "$1" "$_mktemp_dir" "$3" || return 1
     cd "$_mktemp_dir" || return 1
-    extract -rm "$download__file" || return 1
-    if [ -d "$extract__file" ]; then
+    if [ -n "$download__file" ]; then
+        extract -rm "$download__file" || return 1
+    fi
+    if [ -n "$download__file" ] && [ -d "$extract__file" ]; then
         cd "$extract__file" || return 1
     else
         dist_build__guess_count=$(ls -1 | wc -l)
@@ -170,6 +178,8 @@ dist_build()
 
     if [ -x configure ]; then
         dist_build_configure "$dist_build__loc" "$2" "$4"
+    elif [ -r configure.ac ]; then
+        dist_build_autoreconf "$dist_build__loc" "$2" "$4"
     elif [ -r CMakeLists.txt ]; then
         dist_build_cmake "$dist_build__loc" "$2" "$4"
     elif [ -r autogen.sh ]; then
