@@ -80,7 +80,7 @@ GEM_PACK_SINATRA="sinatra"
 GEM_PACK_TEXT="octodown $GEM_PACK_ASCIIDOC"
 GEM_PACK_TOOLS="quick_and_ruby semver tmuxinator gli yard bump"
 GEM_PACK_UTILS="$GEM_PACK_TOOLS"
-GEM_PACK_WWW="nanoc middleman middleman-livereload puma webrick"
+GEM_PACK_WWW="nanoc middleman middleman-livereload puma webrick $GEM_PACK_JEKYLL"
 
 _gem_pack_1()
 {
