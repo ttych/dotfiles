@@ -70,6 +70,7 @@ GEM_PACK_CAPISTRANO="capistrano"
 GEM_PACK_CLI="gli main"
 GEM_PACK_FLUENTD="fluentd fluent-plugin-kafka fluent-plugin-elasticsearch fluent-plugin-rewrite-tag-filter fluent-plugin-rename-key fluent-plugin-record-modifier fluent-plugin-flowcounter-simple fluent-plugin-http-healthcheck"
 GEM_PACK_JEKYLL="jekyll"
+GEM_PACK_MIDDLEMAN="middleman middleman-livereload middleman-autoprefixer middleman-blog"
 GEM_PACK_MINA="mina"
 GEM_PACK_PUPPET="metadata-json-lint pdk puppet-lint"
 GEM_PACK_QUALITY="rubocop reek flay flog erb_lint"
@@ -80,7 +81,8 @@ GEM_PACK_SINATRA="sinatra"
 GEM_PACK_TEXT="octodown $GEM_PACK_ASCIIDOC"
 GEM_PACK_TOOLS="quick_and_ruby semver tmuxinator gli yard bump"
 GEM_PACK_UTILS="$GEM_PACK_TOOLS"
-GEM_PACK_WWW="nanoc middleman middleman-livereload puma webrick $GEM_PACK_JEKYLL"
+GEM_PACK_RUBYWEB="webrick puma"
+GEM_PACK_WWW="$GEM_PACK_RUBYWEB nanoc $GEM_PACK_MIDDLEMAN $GEM_PACK_JEKYLL"
 
 _gem_pack_1()
 {
