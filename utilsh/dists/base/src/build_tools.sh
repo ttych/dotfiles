@@ -286,7 +286,7 @@ BUILD_TOOLS_EXERCISM_DEFAULT_VERSION=3.1.0
 
 #> libnfc - libnfc
 BUILD_TOOLS_LIBNFC_URL_PATTERN='https://github.com/nfc-tools/libnfc/releases/download/libnfc-${version}/libnfc-${version}.tar.bz2'
-BUILD_TOOLS_LIBNFC_DEFAULT_VERSION=1.8.0
+BUILD_TOOLS_LIBNFC_DEFAULT_VERSION=1.7.1
 
 #> mfcuk - mfcuk
 BUILD_TOOLS_MFCUK_URL_PATTERN='https://github.com/nfc-tools/mfcuk.git'
