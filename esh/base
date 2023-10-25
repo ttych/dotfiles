@@ -402,7 +402,8 @@ esh_module_load()
     done
 }
 
-for esh_module in terminal \
+for esh_module in system \
+                      terminal \
                       host \
                       $ESH_SH_CUR_SHORT \
                       local \
