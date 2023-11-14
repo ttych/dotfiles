@@ -262,6 +262,7 @@ git config --global alias.push2all '!f() { for remote in `git remote`; do git pu
 # push : nothing | matching | simple | current
 git config --global push.default current
 git config --global alias.pushf 'push --force-with-lease'
+git config --global alias.pufl 'push --force-with-lease'
 git config --global alias.rm-remote-ref '!f() { [ $# -ge 2 ] && rem="$1" && shift ; git push "${rem:-origin}" --delete "$@"; }; f'
 # alternativ is: git push <origin> :refs/tags/<v1.4-lw>
 
