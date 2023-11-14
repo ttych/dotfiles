@@ -164,6 +164,7 @@ git config --global alias.a add
 
 # commit
 git config --global alias.ci commit
+git config --global alias.cs "commit --signoff"
 git config --global alias.cim "commit -m"
 git config --global alias.cam "commit --all -m"
 git config --global alias.amend 'commit --amend'
