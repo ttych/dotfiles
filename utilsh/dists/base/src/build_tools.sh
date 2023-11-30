@@ -304,6 +304,14 @@ BUILD_TOOLS_CRYPTO1_BS_DEFAULT_VERSION=master
 BUILD_TOOLS_SQLITE3_URL_PATTERN='https://www.sqlite.org/2023/sqlite-autoconf-3440000.tar.gz'
 BUILD_TOOLS_SQLITE3_DEFAULT_VERSION=3440000
 
+#> librdkafka
+BUILD_TOOLS_RDKAFKA_URL_PATTERN='https://github.com/confluentinc/librdkafka/archive/refs/tags/v${version}.tar.gz'
+BUILD_TOOLS_RDKAFKA_DEFAULT_VERSION=2.3.0
+
+#> kcat
+BUILD_TOOLS_KCAT_URL_PATTERN='https://github.com/edenhill/kcat/archive/refs/tags/${version}.tar.gz'
+BUILD_TOOLS_KCAT_DEFAULT_VERSION=1.7.0
+
 #
 
 
