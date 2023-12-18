@@ -1,11 +1,19 @@
 # -*- mode: ruby -*-
 
-IRB.conf[:IRB_NAME]="irb"
-IRB.conf[:USE_READLINE] = false if ENV['EMACS']
+# IRB.conf[:IRB_NAME]="irb"
+
 IRB.conf[:BACK_TRACE_LIMIT] = 16
+IRB.conf[:SAVE_HISTORY] = 10000
+IRB.conf[:HISTORY_FILE] = "#{ENV['HOME']}/.irb_history"
+IRB.conf[:EVAL_HISTORY] = 1000
+
+
+# IRB.conf[:USE_READLINE] = true
+# IRB.conf[:USE_READLINE] = false if ENV['EMACS']
+
 # IRB.conf[:AUTO_INDENT_MODE] = false
 IRB.conf[:AUTO_INDENT] = true
-IRB.conf[:USE_READLINE] = true
+
 IRB.conf[:LOAD_MODULES] ||= []
 IRB.conf[:LOAD_MODULES] |= ['irb/completion']
 IRB.conf[:LOAD_MODULES] |= ['json']
@@ -14,12 +22,6 @@ IRB.conf[:LOAD_MODULES] |= ['set']
 IRB.conf[:LOAD_MODULES] |= ['pp']
 IRB.conf[:LOAD_MODULES] |= ['objspace']
 
-IRB.conf[:SAVE_HISTORY] = 10000
-IRB.conf[:HISTORY_FILE] = "#{ENV['HOME']}/.irb_history"
-IRB.conf[:EVAL_HISTORY] = 1000
-
-IRB.conf[:PROMPT_MODE] = :DEFAULT
-# IRB.conf[:PROMPT_MODE] = :SIMPLE
 IRB.conf[:PROMPT][:MY] = {
   :PROMPT_I => "%N(%m):%03n:%i> ",   # simple prompt
   :PROMPT_N => "%N(%m):%03n:%i> ",   #
@@ -27,10 +29,27 @@ IRB.conf[:PROMPT][:MY] = {
   :PROMPT_C => "%N(%m):%03n:%i* ",   # prompt for continuated statement
   :RETURN => "=> %s\n"               # format to return value
 }
-IRB.conf[:PROMPT_MODE] = :MY
-# IRB.conf[:PROMPT] = {...}
+IRB.conf[:PROMPT][:CUSTOM] = {
+  :PROMPT_I => ">> ",
+  :PROMPT_S => "%l>> ",
+  :PROMPT_C => "%l>> ",
+  :PROMPT_N => "%l>> ",
+  :RETURN => "=> %s\n"
+}
+# :NULL / :DEFAULT / :CLASSIC / :SIMPLE / :INF_RUBY / :XMP
+# IRB.conf[:PROMPT_MODE] = :SIMPLE
+IRB.conf[:PROMPT_MODE] = :DEFAULT
+# IRB.conf[:PROMPT_MODE] = :CUSTOM
 
-IRB.conf[:USE_AUTOCOMPLETE] = true
+IRB.conf[:ALIASES] = {
+  :quit => 'exit',
+  :q => 'exit',
+  :wirb => 'Wirb.start',
+  :hirb => 'Hirb.enable'
+}
+
+# IRB.conf[:USE_AUTOCOMPLETE] = true
+# IRB.conf[:COMPLETOR] = :type
 
 def history(count = 0)
   # Get history into an array
