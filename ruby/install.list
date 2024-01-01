@@ -2,3 +2,4 @@ irbrc    .irbrc
 gemrc    .gemrc
 guard.rb .guard.rb
 pryrc    .pryrc
+rubocop.yml .rubocop.yml

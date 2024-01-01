@@ -1,0 +1,18 @@
+---
+AllCops:
+  RubyInterpreters:
+    - ruby
+    - macruby
+    - rake
+    - jruby
+    - rbx
+  NewCops: enable
+
+Gemspec/DevelopmentDependencies:
+  Enabled: false
+
+Layout/LineLength:
+  Max: 80
+
+Style/Documentation:
+  Enabled: false
