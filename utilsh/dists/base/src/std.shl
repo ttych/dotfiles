@@ -655,6 +655,39 @@ shcat()
 
 
 ##################################################
+# which based utilities
+##################################################
+
+wcat()
+{
+    :
+}
+
+wcd()
+{
+    [ $# -eq 1 ] || {
+        echo >&2 "wcd | too many argument: $*"
+        return 1
+    }
+    [ -z "$1" ] && {
+        echo >&2 "wcd | argument should not be empty \"$1\""
+        return 1
+    }
+
+    wcd=$(which 2>/dev/null "$1")
+    if [ $? -ne 0 ] || [ -z "$wcd" ]; then
+        wcd="$1"
+    fi
+
+    if ! [ -d "$wcd" ]; then
+        wcd=$(dirname "$wcd")
+    fi
+
+    cd "$wcd"
+}
+
+
+##################################################
 # mkcd
 ##################################################
 mkcd()
