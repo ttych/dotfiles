@@ -657,16 +657,50 @@ shcat()
 ##################################################
 # which based utilities
 ##################################################
-
 wcat()
 {
-    :
+    wcat=
+    [ $# -eq 1 ] || {
+        echo >&2 "wcat | accept only 1 arg: ($#) $*"
+        return 1
+    }
+    [ -z "$1" ] && {
+        echo >&2 "wcat | argument should not be empty \"$1\""
+        return 1
+    }
+
+    wcat=$(command -v "$1")
+    if [ $? -ne 0 ] || [ -z "$wcat" ]; then
+        echo >&2 "wcat | $1 not found"
+        return 1
+    fi
+
+    if ! [ -r "$wcat" ]; then
+        typeset -f "$wcat"
+        return $?
+    fi
+
+    case $(file "$wcat") in
+        *"ELF"*|*"64-bit"*|*"32-bit"*)
+            echo >&2 "wcat | \"$1\" as \"$wcat\" is not printable"
+            return 2
+            ;;
+        *"ASCII text"*|*" script"*|*"text executable"*)
+            ;;
+        *)
+            echo >&2 "wcat | \"$1\" as \"$wcat\" has an unsupported type"
+            return 2
+            ;;
+    esac
+
+    cat "$wcat"
 }
 
 wcd()
 {
+    wcd=
     [ $# -eq 1 ] || {
-        echo >&2 "wcd | too many argument: $*"
+        echo >&2 "wcd | accept only 1 arg: ($#) $*"
         return 1
     }
     [ -z "$1" ] && {
@@ -677,6 +711,11 @@ wcd()
     wcd=$(which 2>/dev/null "$1")
     if [ $? -ne 0 ] || [ -z "$wcd" ]; then
         wcd="$1"
+    fi
+
+    if ! [ -r "$wcd" ]; then
+        echo >&2 "wcd: $1 is not a valid reference"
+        return 1
     fi
 
     if ! [ -d "$wcd" ]; then
