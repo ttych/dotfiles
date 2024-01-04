@@ -26,25 +26,25 @@ file_inspect()
 json_inspect()
 {
     has_ruby || return 1
-    ruby -r json -e "puts JSON.parse(File.read('$1')).to_json.inspect"
+    ruby -r json -e "puts JSON.parse(ARGF.read).to_json.inspect" "$@"
 }
 
 json_pp()
 {
     has_ruby || return 1
-    ruby -r json -e "puts JSON.pretty_generate(JSON.parse(File.read('$1')))"
+    ruby -r json -e "puts JSON.pretty_generate(JSON.parse(ARGF.read))" "$@"
 }
 
 yaml_inspect()
 {
     has_ruby || return 1
-    ruby  -r yaml -e "puts YAML.load_file('$1').to_yaml.inspect"
+    ruby  -r yaml -e "puts YAML.load(ARGF.read).to_yaml.inspect" "$@"
 }
 
 yaml_pp()
 {
     has_ruby || return 1
-    ruby  -r yaml -e "puts YAML.dump(YAML.load_file('$1'))"
+    ruby  -r yaml -e "puts YAML.dump(YAML.load(ARGF.read))" "$@"
 }
 
 xml_inspect()
@@ -62,6 +62,12 @@ now()
 now_utc()
 {
     utc=true now "$@"
+}
+
+rcat()
+{
+    has_ruby || return 1
+    ruby -e "puts ARGF.read"
 }
 
 
