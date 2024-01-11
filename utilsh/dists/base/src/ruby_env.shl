@@ -347,3 +347,8 @@ Byards()
 {
     bundle_exec yard server --reload "$@"
 }
+
+rman()
+{
+    gem man -s "$@"
+}
