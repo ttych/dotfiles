@@ -237,6 +237,11 @@ Bguard()
     bundle_exec guard "$@"
 }
 
+rman()
+{
+    gem man -s "$@"
+}
+
 
 ### copy / paste
 
