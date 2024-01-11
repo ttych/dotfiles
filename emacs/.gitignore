@@ -3,16 +3,16 @@
 
 /myinit.el
 /conf.el
+/conf/proxy.el
 
 /.history
-/save
-/elpa
-/games
-/eshell/history
 /.mc-lists.el
+/eln-cache
+/elpa
+/eshell/history
+/games
+/save
 /transient
 /url
 
 /snippets
-
-/conf/proxy.el
