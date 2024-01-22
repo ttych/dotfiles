@@ -312,6 +312,10 @@ BUILD_TOOLS_RDKAFKA_DEFAULT_VERSION=2.3.0
 BUILD_TOOLS_KCAT_URL_PATTERN='https://github.com/edenhill/kcat/archive/refs/tags/${version}.tar.gz'
 BUILD_TOOLS_KCAT_DEFAULT_VERSION=1.7.0
 
+#> tailwind
+BUILD_TOOLS_TAILWIND_URL_PATTERN='https://github.com/tailwindlabs/tailwindcss/releases/download/v${version}/tailwindcss-${kernel_l}-${arch_b}'
+BUILD_TOOLS_TAILWIND_DEFAULT_VERSION=3.4.1
+
 #
 
 
@@ -331,7 +335,9 @@ build_tools_env()
     arch=`uname -m`
     arch_s="${arch%%_*}"
     case $arch in
-        x86_64) machine=amd64 ;;
+        x86_64) machine=amd64
+                arch_b=x64
+                ;;
     esac
     name="$build_tools_env__name"
     version="$build_tools_env__version"
