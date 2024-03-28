@@ -1,0 +1,22 @@
+#+TITLE: 
+#+AUTHOR: 
+#+DATE: 
+#+STARTUP: show3levels
+
+* goto.lib.sh
+* myenv.lib.sh
+* system.lib.sh
+* trash
+
+  move file to a temporary space where it can be garbage later on
+  ... or restored.
+
+** actions
+
+   possibles actions are :
+   - help
+   - rm (default one)
+   - gc, garbage collect old trashed files/directory
+   - restore (to be implemented)
+
+* wucp.lib.sh

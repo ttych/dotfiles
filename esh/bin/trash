@@ -1,0 +1,110 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+dbg()
+{
+    [ -n "$DBG" ] || return 0
+    echo >&2 "$@"
+}
+
+# rely on realpath command
+
+
+if [ -z "$TRASH_DIR" ]; then
+    TRASH_DIR="${HOME_ALT:-$HOME}/.trash"
+fi
+TRASH_GC_TIME="${TRASH_GC_TIME:-60}"
+TRASH_GC_PATTERN='%*_*_[1-9][0-9][0-9][0-9][0-1][0-9][0-3][0-9]_[0-2][0-9][0-6][0-9][0-6][0-9]'
+
+trash_help()
+{
+    cat <<EOF
+Usage is:
+    $0 [-h] [-D] <action> <action_parameters>
+
+with action in:
+    help
+    gc
+    rm
+EOF
+}
+
+trash_gc()
+{
+    # find "$TRASH_DIR" -name '%*_[0-9][0-9]*' -ctime +"$TRASH_GC_TIME" -print
+    find "$TRASH_DIR" -name "$TRASH_GC_PATTERN" -ctime +"$TRASH_GC_TIME" -print | while read trash_gc__file; do
+        echo "rm -Rf \"$trash_gc__file\""
+        rm -Rf "$trash_gc__file"
+    done
+}
+
+trash_list()
+{
+    find "$TRASH_DIR" -name "$TRASH_GC_PATTERN" -print
+}
+
+trash_rm()
+{
+    trash_rm=0
+    trash_rm__timestamp=`date +%Y%m%d_%H%M%S`
+    for trash_rm__file; do
+        if [ ! -r "$trash_rm__file" ]; then
+            echo >&2 "trash_rm: unable to find file \"$trash_rm__file\""
+            trash_rm=1
+            continue
+        fi
+
+        trash_rm__ffile=`realpath -s "$trash_rm__file"`
+        trash_rm__ffile_normalized=`echo "$trash_rm__ffile" | tr '/ ' '%'`
+
+        trash_rm__padding=""
+        trash_rm__target="$TRASH_DIR/${trash_rm__ffile_normalized}_${trash_rm__padding}_${trash_rm__timestamp}"
+        while [ -e "$trash_rm__target" ]; do
+            trash_rm__padding="${trash_rm__padding}+"
+            trash_rm__target="$TRASH_DIR/${trash_rm__ffile_normalized}_${trash_rm__padding}_${trash_rm__timestamp}"
+        done
+
+        mv "$trash_rm__file" "$trash_rm__target"
+    done
+    return $trash_rm
+}
+
+trash()
+{
+    trash=
+
+    while getopts :hD opt; do
+        case $opt in
+            h) trash_help
+               exit 0
+               ;;
+            D) DEBUG=true
+               set -x
+               ;;
+        esac
+    done
+    shift $(($OPTIND - 1))
+
+    case $1 in
+        h|help|'')
+            trash_help
+            ;;
+        gc|garbage|purge)
+            shift
+            trash_gc "$@"
+            ;;
+        l|list)
+            shift
+            trash_list "$@"
+            ;;
+        *)
+            trash_rm "$@"
+            ;;
+    esac
+}
+
+case "$0" in
+    */trash)
+        trash "$@"
+        ;;
+esac

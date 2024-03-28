@@ -5,6 +5,7 @@ ESH_DIR="${ESH_DIR:-$HOME/.esh}"
 export ESH_DIR
 
 ESH_CONF_DIR="$ESH_DIR/conf"
+ESH_BIN_DIR="$ESH_DIR/bin"
 
 ESH_SH_INIT="${ESH_SH_INIT:-$0}"
 ESH_SH_CUR="${ESH_SH_INIT#-}"
@@ -376,6 +377,26 @@ if esh_interactive; then
 fi
 
 
+### BIN
+esh_bin_load()
+{
+    [ -d "$ESH_BIN_DIR" ] || return 1
+
+    path_add "$ESH_BIN_DIR"
+
+    for esh_bin_load__f in "$ESH_BIN_DIR"/*; do
+        [ -d "$esh_bin_load__f" ] && continue
+        case "${esh_bin_load__f##*/}" in
+            _*) continue ;;
+            *.lib.sh) ;;
+            *) continue ;;
+        esac
+        . "$esh_bin_load__f"
+    done
+}
+esh_bin_load
+
+
 ### MODULE
 esh_module_load()
 {
@@ -402,8 +423,7 @@ esh_module_load()
     done
 }
 
-for esh_module in system \
-                      terminal \
+for esh_module in terminal \
                       host \
                       $ESH_SH_CUR_SHORT \
                       local \
@@ -422,16 +442,19 @@ done
 ### TIMEOUT
 #TMOUT=600; export TMOUT
 if [ -n "$TMOUT" ]; then
-    TMOUT=
-    export TMOUT
+    if ! unset TMOUT 2>/dev/null; then
+        TMOUT=
+        export TMOUT
+    fi
 fi
 
-## History
+
+### History
 [ -d "$HOME/.log" ] || mkdir "$HOME/.log"
 HISTFILE="$HOME/.log/${HOSTNAME}_${ESH_SH_CUR_SHORT}"; export HISTFILE
 # history file size
-HISTSIZE=2000; export HISTSIZE
+HISTSIZE=4000; export HISTSIZE
 # bash history file size
-HISTFILESIZE=2000; export HISTFILESIZE
+HISTFILESIZE=4000; export HISTFILESIZE
 # session history size
-SAVEHIST=3000; export SAVEHIST
+SAVEHIST=4000; export SAVEHIST
