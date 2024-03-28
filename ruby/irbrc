@@ -51,18 +51,18 @@ IRB.conf[:ALIASES] = {
 # IRB.conf[:USE_AUTOCOMPLETE] = true
 # IRB.conf[:COMPLETOR] = :type
 
-def history(count = 0)
-  # Get history into an array
-  histories = Readline::HISTORY.to_a
+# def history(count = 0)
+#   # Get history into an array
+#   histories = Readline::HISTORY.to_a
 
-  count ||= 0
-  if count > 0
-    from = histories.length - count
-    histories = histories[from..-1]
-  end
+#   count ||= 0
+#   if count > 0
+#     from = histories.length - count
+#     histories = histories[from..-1]
+#   end
 
-  puts histories
-end
+#   puts histories
+# end
 
 def i_m(obj)
   list = obj.methods
@@ -105,3 +105,7 @@ end
 # end
 
 # set_trace_func(proc_object)
+
+# def which(binary)
+#    ENV["PATH"].split(File::PATH_SEPARATOR).find {|p| File.exists?( File.join( p, binary ) ) }
+# end
