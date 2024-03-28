@@ -82,8 +82,8 @@
 
 #steam
 "steam"
-    m:0x40 + c:39
-    Mod4 + s 
+    m:0x41 + c:39
+    Shift+Mod4 + s 
 
 #editor1
 "emacs"
