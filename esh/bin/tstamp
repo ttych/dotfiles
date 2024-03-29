@@ -1,0 +1,60 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+# About:
+# add timestamp to given path as argument
+
+UTC=
+TIME=
+
+
+DATE()
+{
+    date ${UTC:+-u} "$@"
+}
+
+tstamp()
+{
+    tstamp__fmt="+%Y-%m-%d${TIME:+T%H:%M:%S}${UTC:+%:::z}"
+    DATE "$tstamp__fmt"
+}
+
+tstamp_file()
+{
+    [ -r "$1" ] || return 1
+
+    tstamp_file="${1}.$(tstamp)"
+    if [ -r "$tstamp_file" ]; then
+        tstamp_file_base="$tstamp_file"
+        tstamp_file__i=1
+        while : ; do
+            tstamp_file="${tstamp_file_base}.${tstamp_file__i}"
+            [ ! -r "$tstamp_file" ] && break
+        done
+    fi
+
+    mv "$1" "$tstamp_file" || return 1
+}
+
+
+OPTIND=1
+while getopts :htu opt; do
+    case $opt in
+        t) TIME=yes ;;
+        u) UTC=yes ;;
+
+        h) ;;
+    esac
+done
+shift $(($OPTIND - 1))
+
+
+status=0
+if [ $# -eq 0 ]; then
+    tstamp || status=1
+else
+    for target; do
+        tstamp_file "$target" || status=1
+    done
+fi
+exit $status
