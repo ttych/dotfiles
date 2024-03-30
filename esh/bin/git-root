@@ -1,0 +1,33 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+git_is_inside_work_tree()
+{
+    [ "$(git rev-parse --is-inside-work-tree)" = "true" ]
+}
+
+git_is_inside_git_dir()
+{
+    [ "$(git rev-parse --is-inside-git-dir)" = "true" ]
+}
+
+git_is_bare_repository()
+{
+    [ "$(git rev-parse --is-bare-repository)" = "true" ]
+}
+
+git_root()
+{
+    if git_is_inside_work_tree; then
+        git_root="$(git rev-parse --show-toplevel)"
+    elif git_is_inside_git_dir; then
+        git_root="$(git rev-parse --absolute-git-dir)"
+        if ! git_is_bare_repository; then
+            git_root="${git_root%/.git}"
+        fi
+    else
+        return 1
+    fi
+}
+
+git_root && echo "$git_root"

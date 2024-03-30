@@ -1,0 +1,87 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+
+git_is_inside_work_tree()
+{
+    [ "$(git rev-parse --is-inside-work-tree)" = "true" ]
+}
+
+git_is_inside_git_dir()
+{
+    [ "$(git rev-parse --is-inside-git-dir)" = "true" ]
+}
+
+git_is_bare_repository()
+{
+    [ "$(git rev-parse --is-bare-repository)" = "true" ]
+}
+
+git_root()
+{
+    if git_is_inside_work_tree; then
+        git_root="$(git rev-parse --show-toplevel)"
+    elif git_is_inside_git_dir; then
+        git_root="$(git rev-parse --absolute-git-dir)"
+        if ! git_is_bare_repository; then
+            git_root="${git_root%/.git}"
+        fi
+    else
+        return 1
+    fi
+}
+
+git_ignore_file()
+{
+    git_ignore_file=
+    git_ignore_file__root="$(git rev-parse --show-toplevel)"
+    [ $? -eq 0 ] || return 1
+
+    git_ignore_file__cur="$(pwd -P)"
+    while [ "$git_ignore_file__root" != "$git_ignore_file__cur" ]; do
+        git_ignore_file="$git_ignore_file__cur/.gitignore"
+        [ -r "$git_ignore_file" ] && return 0
+
+        git_ignore_file__cur=$( cd "$git_ignore_file__cur/.."; pwd -P)
+    done
+    git_ignore_file="$git_ignore_file__root/.gitignore"
+}
+
+git_ignore_add()
+{
+    git_ignore_file || return 1
+
+    git_ignore_add="$1"
+    if [ -r "$git_ignore_add" ]; then
+        # case "$git_ignore_add" in
+        #     /*|./*|../*)
+                git_ignore_add=$(realpath "$git_ignore_add")
+                git_root || return 1
+                git_ignore_add="${git_ignore_add#$git_root}"
+        #         ;;
+        # esac
+    fi
+
+    grep "^$git_ignore_add$" "$git_ignore_file" 2>/dev/null >dev/null && return 0
+    echo "$git_ignore_add" >> "$git_ignore_file"
+}
+
+git_ignore_list()
+{
+    git_ignore_file || return 1
+    echo "# cat $git_ignore_file"
+    cat "$git_ignore_file" 2>/dev/null
+}
+
+git_ignore()
+{
+    if [ $# -eq 0 ]; then
+        git_ignore_list
+    else
+        for git_ignore__f; do
+            git_ignore_add "$git_ignore__f"
+        done
+    fi
+}
+
+git_ignore "$@"
