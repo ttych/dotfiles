@@ -117,8 +117,8 @@
 
 #virtualbox
 "virtualbox"
-    m:0x40 + c:55
-    Mod4 + v 
+    m:0x41 + c:55
+    Shift+Mod4 + v 
 
 #
 # End of xbindkeys configuration
