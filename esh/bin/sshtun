@@ -1,0 +1,15 @@
+#!/bin/sh
+
+SCRIPT_NAME="${0##*/}"
+
+SSH_DEFAULTS="-o StrictHostKeyChecking=no -o CheckHostIP=no -o ConnectTimeout=10"
+
+sshtun()
+{
+    ssh \
+        $SSH_DEFAULTS \
+        -o ExitOnForwardFailure=yes \
+        "$@"
+}
+
+"$SCRIPT_NAME" "$@"
