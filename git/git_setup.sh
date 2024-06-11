@@ -326,8 +326,8 @@ fi
 
 ## sign
 git config --global commit.gpgSign true
-git config --global push.gpgSign true
 # git config --global tag.gpgSign true
+# git config --global push.gpgSign true
 
 
 ######################################### grep
