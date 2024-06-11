@@ -303,6 +303,8 @@ git config --global alias.difftext 'diff --word-diff --unified=10'
 
 # git diff HEAD~2:Readme.md..HEAD:Readme.md
 
+git config --global alias.lsstg    'diff --name-only --staged'
+
 
 ######################################### exec
 git config --global alias.exec '!exec '
@@ -420,9 +422,21 @@ git config --global alias.l1ref  'l1 --walk-reflogs'
 
 
 ######################################### ls-files
-git config --global alias.ls   'ls-files'
-git config --global alias.lss  'ls-files -s'
-git config --global alias.lst  'ls-tree -r'
+git config --global alias.ls            'ls-files'
+git config --global alias.lsindex       'ls-files --stage'
+git config --global alias.lsmod         'ls-files --modified'
+git config --global alias.lsunt         'ls-files --others --exclude-standard'
+git config --global alias.lsign         'ls-files --others --ignored --exclude-standard'
+
+# git config --global alias.ls-files-root '!git ls-files'
+git config --global alias.ls-files-root 'ls-files --full-name'
+git config --global alias.lsr           'ls-files-root'
+git config --global alias.lsrmod        'ls-files-root --modified'
+git config --global alias.lsrunt        'ls-files-root --others --exclude-standard'
+git config --global alias.lsrign        'ls-files-root --others --ignored --exclude-standard'
+# git config --global alias.lsf           '!f() { lsf_path=:/ ; for arg; do case $arg in -*) ;; *) lsf_path= ;; esac ; done ; git ls-files "$@" $lsf_path ; }; f'
+
+git config --global alias.lst           'ls-tree -r'
 
 
 ######################################### maintenance
