@@ -508,8 +508,9 @@ git config --global alias.rm-remote-ref '!f() { [ $# -ge 2 ] && rem="$1" && shif
 ## and reorder the commit list before presenting it for further editing
 git config --global rebase.autosquash true
 
-git config --global alias.rb 'rebase'
-git config --global alias.rbi 'rebase -i'
+git config --global alias.rb   'rebase'
+git config --global alias.rbi  'rebase -i'
+git config --global alias.tidy 'rebase -i @{upstream}'
 git config --global alias.rbif 'rebase -i --fork-point'
 # equivalent to
 # git rebase -i $(git merge-base --fork-point <branch>)
