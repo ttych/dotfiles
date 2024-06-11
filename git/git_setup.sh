@@ -304,6 +304,10 @@ git config --global alias.difftext 'diff --word-diff --unified=10'
 # git diff HEAD~2:Readme.md..HEAD:Readme.md
 
 
+######################################### exec
+git config --global alias.exec '!exec '
+
+
 ######################################### fetch
 # git config --global alias.fe fetch
 
@@ -567,6 +571,11 @@ git config --global alias.rtp  'restore -p'
 
 ######################################### rm
 git config --global alias.untrack 'rm --cache --'
+
+
+######################################### root
+# git config --global alias.root 'rev-parse --show-toplevel'
+git config --global --add alias.rootdir '!pwd'
 
 
 ######################################### scalar
