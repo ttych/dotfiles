@@ -95,6 +95,9 @@ GIT_VERSION=${GIT_VERSION##* }
 # git config --local --list         # repo
 # git config --global --list        # user
 # git config --system --list        # system
+#
+# git config --get-all <setting>
+
 
 ### config :: user
 git_current_user_name=`git config --global --get user.name`
@@ -115,6 +118,10 @@ git config --global alias.confe      'config --global -e'
 git config --global alias.configlist 'config --list --show-origin'
 git config --global alias.listconfig 'config --list --show-origin'
 git config --global alias.confl      'config --list --show-origin'
+
+### config :: includeIf
+git config --global includeIf.gitdir:~/work/$USER/.path ~/work/$USER/.gitconfig
+git config --global alias.workconfig '!f() { git config --global includeIf.gitdir:"${1%/}/".path "${1%/}/.gitconfig"; }; f'
 
 
 ######################################### gitignore
@@ -198,7 +205,20 @@ git config --global alias.addp  "add --patch"
 ## bisect start HEAD HEAD~4 ; git bisect run <make>
 
 
+######################################### blame
+# git blame -L14,25 <file>
+git config --global alias.blamew  "blame -w"
+## detect lines moved
+# -C : in the same commit
+# -C -C : in the same commit + commit that create file
+# -C -C -C : in any commit
+git config --global alias.blamec  "blame -w -C"
+
+
 ######################################### branch
+# sort by: refname (def) | committerdate | creatordate | head | version:refname | ...
+git config --global branch.sort -committerdate
+
 git config --global alias.br branch
 # git config --global alias.brv 'branch -v'
 git config --global alias.brv 'branch -vv'
@@ -214,7 +234,9 @@ git config --global alias.bru 'branch -u'
 
 ######################################### checkout
 git config --global alias.cob       'checkout -b'
+git config --global alias.col       'checkout -'
 git config --global alias.com       'checkout master'
+git config --global alias.cop       'checkout --patch'
 git config --global alias.cor       'checkout --track'
 git config --global alias.orphan    'checkout --orphan'
 git config --global alias.coours    'checkout --ours'
@@ -234,6 +256,11 @@ git config --global alias.cleantmp 'clean -dX'
 
 ######################################### clone
 # git config --global alias.cl clone
+
+
+######################################### column
+# git config --global column.ui auto
+# seq 1 24 | git column --mode=column --padding=5
 
 
 ######################################### commit
@@ -261,6 +288,10 @@ git config --global alias.squash 'commit --squash'
 ### diff :: algorithm : myers | minimal | patience | histogram
 git config --global diff.algorithm patience
 
+### diff strategy
+# echo '*.png diff=exif' >> .gitattributes
+# git config diff.exif.textconf exiftool
+
 git config --global alias.di       'diff'
 # git config --global alias.dc       'diff --check'
 git config --global alias.ds       'diff --staged'
@@ -284,8 +315,18 @@ git config --global alias.unreachable 'fsck --unreachable --no-reflogs --no-prog
 
 
 ######################################### gpg
+## ssh
+if [ -r ~/.ssh/git_key.pub ]; then
+    git config --global gpg.format ssh
+    git config --global user.signingkey ~/.ssh/git_key.pub
+fi
+
+## gpg
 #git config --global user.signingKey <gpg-keyid>
+
+## sign
 git config --global commit.gpgSign true
+git config --global push.gpgSign true
 # git config --global tag.gpgSign true
 
 
@@ -356,7 +397,10 @@ git config --global alias.log4filep '!git -C ${GIT_PREFIX:-.} l1 --follow --patc
 # log -G".*pattern.*"
 git config --global alias.log4str '!f() { git -C ${GIT_PREFIX:-.} l1 -G"$1"; }; f'
 git config --global alias.log4rgx '!f() { git -C ${GIT_PREFIX:-.} l1 -G"$1"; }; f'
-# log -L:function_name:code_file.rb
+git config --global alias.pickaxe '!f() { git -C ${GIT_PREFIX:-.} l1 -G"$1" "$@"; }; f'
+git config --global alias.pickaxep '!f() { git -C ${GIT_PREFIX:-.} l1 -G"$1" --patch "$@"; }; f'
+# git log -L14,25:<file>
+# git log -L:<function>:<file>
 # alias.log4func <func> <file>
 git config --global alias.log4func '!f() { git -C ${GIT_PREFIX:-.} l1 -L:"${1}${2:+:$2}"; }; f'
 # rely on .gitattributes
@@ -375,6 +419,24 @@ git config --global alias.l1ref  'l1 --walk-reflogs'
 git config --global alias.ls   'ls-files'
 git config --global alias.lss  'ls-files -s'
 git config --global alias.lst  'ls-tree -r'
+
+
+######################################### maintenance
+## global
+# git config --global maintenance.auto true
+# git config --global maintenance.commit-graph.auto true
+# git config --global maintenance.schedule daily
+# git config --global maintenance.repack.incremental true
+# git config --global maintenance.repack.full true
+# git config --global maintenance.repack.full.schedule weekly
+## by repo
+# git maintenance [start | status | stop]
+## Enable daily incremental repacking
+# git config maintenance.repack.incremental true
+# git config maintenance.repack.schedule daily
+## Enable weekly full repacking
+# git config maintenance.repack.full true
+# git config maintenance.repack.full.schedule weekly
 
 
 ######################################### merge
@@ -438,6 +500,8 @@ git config --global alias.rm-remote-ref '!f() { [ $# -ge 2 ] && rem="$1" && shif
 
 
 ######################################### rebase
+### automatically update branch references
+# git config --global rebase.updateRefs true
 ### Rebase + autosquash
 ## causes git rebase -i to parse magic comments created
 ## by git commit --squash=some-hash and git commit --fixup=some-hash
@@ -461,7 +525,7 @@ git config --global alias.undo '!f() { git reset --hard $(git rev-parse --abbrev
 
 
 ######################################### rerere
-### ReReRe : Reuse Recorded Resolution
+### REuse REcorded REsolution
 git config --global rerere.enabled true
 
 
@@ -475,14 +539,25 @@ git config --global alias.resetfile '!f() { git reset @~ "$@" && git commit --am
 
 
 ######################################### remote
+### remote fetch
+# git config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
+# git config --add remote.origin.fetch '+refs/pull/*:refs/remotes/origin/pull/*'
+git config --global alias.remfpr '!f() { config --add remote.${1:-origin}.fetch "+refs/pull/*:refs/remotes/origin/pull/*"; }; f'
+
 git config --global alias.rem      'remote -v'
 git config --global alias.remshow  'remote -v show'
-git config --global alias.remref   'ls-remote'
+git config --global alias.lsrem    'ls-remote'
 
 
 ######################################### restore
-# git config --global alias.unstage- 'restore --staged --'
+# git config --global alias.unstage 'restore --staged --'
 # git config --global alias.unmodify 'restore --'
+# = git restore <file.txt>
+git config --global alias.rt   'restore'
+# = git checkout -p
+git config --global alias.rtp  'restore -p'
+# = git checkout HEAD@{10.minutes.ago} -- <file.txt>
+# git restore --source HEAD@{10.minutes.ago} <file.txt>
 
 
 ######################################### rev-list
@@ -491,6 +566,16 @@ git config --global alias.remref   'ls-remote'
 
 ######################################### rm
 git config --global alias.untrack 'rm --cache --'
+
+
+######################################### scalar
+# clone for huge repository
+# scalar clone git@github.com:.../....git
+# - prefetching
+# - commit-graph
+# - filesystem monitor
+# - partial cloning
+# - sparse checkout
 
 
 ######################################### shortlog
@@ -541,6 +626,7 @@ git config --global alias.stashi   'stash save --include-untracked "> Index"'
 git config --global alias.stashs   'stash save --include-untracked "> Index"'
 git config --global alias.stash3   'stash save --include-untracked --all "> All"'
 git config --global alias.stashall 'stash save --include-untracked --all "> All"'
+git config --global alias.staash    'stash save --include-untracked --all "> All"'
 git config --global alias.stash2br 'stash branch'
 
 
@@ -551,9 +637,12 @@ git config --global alias.s "status --short --branch"
 
 
 ######################################### switch
-git config --global alias.sw 'switch'
+# = git checkout
+git config --global alias.sw  'switch'
+# = git checkout -b
 git config --global alias.swc 'switch -c'
-git config --global alias.swb 'switch -'
+# = git checkout -
+git config --global alias.swl 'switch -'
 
 
 ######################################### tag
@@ -563,8 +652,44 @@ git config --global alias.ctag 'describe --exact-match --tags'
 # git push origin --delete <tagname>
 
 
+######################################### worktree
+# working on more than one branch at a time
+# provide a new working directory for each branch
+
+
+######################################### large repository
+## prefect
+## commit-graph
+# git config --global fetch.writeCommitGraph true
+## filesystem monitor
+# git config core.untrackedcache true
+# git config core.fsmonitor true
+## ref
+# https://github.blog/2021-04-29-scaling-monorepo-maintenance/
+
+
+######################################### hook : client-side (11)
+## Commit Stuff
+# pre-commit
+# prepare-commit-msg
+# commit-msg
+# post-commit
+## Rewriting Stuff
+# pre-rebase
+# post-rewrite
+## Merging Stuff
+# post-merge
+# pre-merge-commit
+## Switching/Pushing Stuff
+# post-checkout
+# reference-transaction
+# pre-push
+
+
 ######################################### extra
 # browse
 git config --global alias.browse '!f() { url=$(git config remote.origin.url | sed -e "s/^git@\([a-z.-]*\):\(.*\)$/https:\/\/\1\/\2/") ; xdg-open ${url}; }; f'
 # ui
 git config --global alias.ui '!gitk'
+# git-better-branch
+git config --global alias.bb '!git-better-branch'
