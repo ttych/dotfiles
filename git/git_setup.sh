@@ -231,6 +231,9 @@ git config --global alias.cleanmerged '!f() { for br in $(git branch --merged "$
 # git config --global alias.cleanmerged '!f() { git branch --merged ${1:-master} | grep -v " ${1:-master}$" | xargs git branch -d; }; f
 git config --global alias.bru 'branch -u'
 
+# git config --global alias.local-branches "!git branch -vv | cut -c 3- | awk '$3 !~/\\[/ { print $1 }'"
+# git config --global alias.recent-branches '!git branch --sort=-committerdate | head'
+
 
 ######################################### checkout
 git config --global alias.cob       'checkout -b'
@@ -303,7 +306,12 @@ git config --global alias.difftext 'diff --word-diff --unified=10'
 
 # git diff HEAD~2:Readme.md..HEAD:Readme.md
 
-git config --global alias.lsstg    'diff --name-only --staged'
+git config --global alias.lsstg     'diff --name-only --staged'
+
+git config --global alias.conflicts 'diff --name-only --diff-filter=U'
+git config --global alias.dlc 'diff --cached HEAD^'
+git config --global alias.dic '!f() { git diff "${1:-HEAD}"^.."${1:-HEAD}"; }; f'
+
 
 
 ######################################### exec
@@ -338,6 +346,7 @@ git config --global commit.gpgSign true
 
 ######################################### grep
 git config --global alias.gr "grep --break --heading --line-number"
+# git config --global alias.search '!f() { git rev-list --all | xargs git grep -F "$1"; }; f'
 
 
 ######################################### log
@@ -348,11 +357,14 @@ git config --global log.decorate auto
 
 git config --global alias.lg   'log'
 git config --global alias.l1   'log --oneline --decorate'
+git config --global alias.l1s  'log --oneline --decorate --numstat'
 git config --global alias.l1g  'log --oneline --decorate --graph --all'
 git config --global alias.l10  'log --oneline --decorate -10'
+git config --global alias.l10s 'log --oneline --decorate -10'
 git config --global alias.l10g 'log --oneline --decorate -10 --graph --all'
 git config --global alias.l11  'log --oneline --decorate -1'
 git config --global alias.ll   'log --decorate --all'
+git config --global alias.lls  'log --decorate --all --numstat'
 git config --global alias.llg  'log --decorate --all --graph'
 git config --global alias.logf 'log --pretty=fuller'
 # git config --global alias.lo   'log --oneline --decorate'
@@ -361,6 +373,13 @@ git config --global alias.logf 'log --pretty=fuller'
 git config --global alias.l2 "log --pretty='%C(yellow)%h%Creset %s %C(green)(%cr)%Creset %C(cyan)[%an]%Creset%C(red)%d%Creset'"
 # git config --global alias.l2g "log --pretty='%C(red)%h%Creset | %C(yellow)%d%Creset %s %C(green)(%cr)%Creset %C(cyan)[%an]%Creset' --graph --all"
 # git config --global alias.l2 "log --pretty='%C(yellow)%h %Cred%cr %Cblue(%an)%C(white)%d%Creset %s'"
+
+# git config --global alias.l3   'log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate'
+# git config --global alias.l3s  'log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat'
+# git config --global alias.l3ds 'log --pretty=format:"%C(yellow)%h\\ %ad%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=short
+# git config --global alias.l31  '!git l3s -1'
+
+git config --global alias.loc  '!f() { git l1s "${1:-HEAD}"^.."${1:-HEAD}"; }; f'
 
 ### search by word in commit message
 # git log --grep apples
@@ -606,6 +625,7 @@ git config --global --add alias.rootdir '!pwd'
 # contributors
 git config --global alias.contribs 'shortlog -s -n'
 git config --global alias.contributors 'shortlog -s -n'
+# git config --global alias.authors "!git log --format='%aN <%aE>' | grep -v 'users.noreply.github.com' | sort -u --ignore-case"
 
 
 ######################################### show
