@@ -57,18 +57,18 @@ BUILD_TOOLS_XBINDKEYS_DEFAULT_VERSION='1.8.6'
 
 #> emacs - emacs editor
 #BUILD_TOOLS_EMACS_CONFIG='--with-x-toolkit=gtk2 --with-gif=no --with-x=yes'
-BUILD_TOOLS_EMACS_CONFIG='--with-x-toolkit=gtk3 --with-gif=no --with-x=yes --with-gnutls=yes'
+BUILD_TOOLS_EMACS_CONFIG='--with-x-toolkit=gtk3 --with-gif=no --with-x=yes --with-gnutls=yes --with-json'
 BUILD_TOOLS_EMACS_PREREQ_REDHAT='gtk2-devel libtiff-devel gnutls-devel'
-BUILD_TOOLS_EMACS_PREREQ_UBUNTU='libtiff5-dev libgif-dev libgnutls28-dev libgtk-3-dev libncurses-dev libxpm-dev'
+BUILD_TOOLS_EMACS_PREREQ_UBUNTU='libtiff5-dev libgif-dev libgnutls28-dev libgtk-3-dev libncurses-dev libxpm-dev libjansson-dev texinfo'
 BUILD_TOOLS_EMACS_URL_PATTERN='http://ftpmirror.gnu.org/emacs/emacs-${version}.tar.xz'
-BUILD_TOOLS_EMACS_DEFAULT_VERSION='28.2'
+BUILD_TOOLS_EMACS_DEFAULT_VERSION='29.4'
 
 #> emacs-nox - emacs editor without X
-BUILD_TOOLS_EMACS_NOX_CONFIG='--with-x=no --with-gif=no --with-gnutls=yes'
+BUILD_TOOLS_EMACS_NOX_CONFIG='--with-x=no --with-gif=no --with-gnutls=yes --with-json'
 BUILD_TOOLS_EMACS_NOX_PREREQ_REDHAT='libtiff-devel gnutls-devel'
-BUILD_TOOLS_EMACS_NOX_PREREQ_UBUNTU='libtiff5-dev libgif-dev libgnutls28-dev libncurses-dev'
+BUILD_TOOLS_EMACS_NOX_PREREQ_UBUNTU='libtiff5-dev libgif-dev libgnutls28-dev libncurses-dev libjansson-dev texinfo'
 BUILD_TOOLS_EMACS_NOX_URL_PATTERN='http://ftpmirror.gnu.org/emacs/emacs-${version}.tar.xz'
-BUILD_TOOLS_EMACS_NOX_DEFAULT_VERSION='28.2'
+BUILD_TOOLS_EMACS_NOX_DEFAULT_VERSION='29.4'
 
 #> vscode - Visual Studio Code
 BUILD_TOOLS_VSCODE_PREREQ_REDHAT='libXScrnSaver'
@@ -315,6 +315,10 @@ BUILD_TOOLS_KCAT_DEFAULT_VERSION=1.7.0
 #> tailwind
 BUILD_TOOLS_TAILWIND_URL_PATTERN='https://github.com/tailwindlabs/tailwindcss/releases/download/v${version}/tailwindcss-${kernel_l}-${arch_b}'
 BUILD_TOOLS_TAILWIND_DEFAULT_VERSION=3.4.1
+
+#> openjdk11 - jdk
+BUILD_TOOLS_OPENJDK11_URL_PATTERN='https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.22%2B7/OpenJDK11U-jdk_x64_linux_hotspot_11.0.22_7.tar.gz'
+BUILD_TOOLS_OPENJDK11_DEFAULT_VERSION=11
 
 #
 
