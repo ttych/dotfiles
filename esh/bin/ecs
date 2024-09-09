@@ -1,0 +1,3 @@
+#!/bin/sh
+
+emacsclient --tty --eval "(stop-save-kill-emacs)"

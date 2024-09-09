@@ -1,0 +1,328 @@
+#+TITLE: 
+#+AUTHOR: 
+#+DATE: 
+#+STARTUP: show3levels
+
+* to study
+:PROPERTIES:
+:header-args: :tangle no
+:END:
+
+*** project
+- https://www.gnu.org/software/emacs/manual/html_node/emacs/Projects.html#Projects
+*** magit
+*** ivy
+
+#+begin_src emacs-lisp
+(use-package ivy
+  :diminish
+  :bind (("C-s" . swiper)
+         :map ivy-minibuffer-map
+         ("TAB" . ivy-alt-done)
+         ("C-l" . ivy-alt-done)
+         ("C-j" . ivy-next-line)
+         ("C-k" . ivy-previous-line)
+         :map ivy-switch-buffer-map
+         ("C-k" . ivy-previous-line)
+         ("C-l" . ivy-done)
+         ("C-d" . ivy-switch-buffer-kill)
+         :map ivy-reverse-i-search-map
+         ("C-k" . ivy-previous-line)
+         ("C-d" . ivy-reverse-i-search-kill))
+  :config
+  (ivy-mode 1))
+
+#+end_src
+
+**** ivy-rich
+
+#+begin_src emacs-lisp
+  (use-package ivy-rich
+    :after ivy
+    :init
+    (ivy-rich-mode 1))
+#+end_src
+
+**** counsel
+
+#+begin_src emacs-lisp
+  (use-package counsel
+    :bind (("C-M-j" . 'counsel-switch-buffer)
+           ("M-x" . counsel-M-x)
+           ("C-x b" . counsel-ibuffer)
+           ("C-x C-f" . counsel-find-file)
+           :map minibuffer-local-map
+           ("C-r" . 'counsel-minibuffer-history))
+    ;; :custom
+    ;; (counsel-linux-app-format-function #'counsel-linux-app-format-function-name-only)
+    :config
+    (setq ivy-initial-inputs-alist nil)  ;; don't start searches with ^
+    ;; (counsel-mode 1)
+    )
+#+end_src
+
+*** helpful
+
+#+begin_src emacs-lisp :tangle no
+  (use-package helpful
+    :ensure t
+    :commands (helpful-callable helpful-variable helpful-command helpful-key)
+    :custom
+    (counsel-describe-function-function #'helpful-callable)
+    (counsel-describe-variable-function #'helpful-variable)
+    :bind
+    ([remap describe-function] . counsel-describe-function)
+    ([remap describe-command] . helpful-command)
+    ([remap describe-variable] . counsel-describe-variable)
+    ([remap describe-key] . helpful-key)
+    )
+#+end_src
+
+*** general
+
+#+begin_src emacs-lisp :tangle no
+  (use-package general
+    :ensure t
+    :config
+    (general-create-definer my/leader-keys
+                            :keymaps '(normal insert visual emacs)
+                            :prefix "SPC"
+                            :global-prefix "C-SPC")
+    (my/leader-keys
+     "t" '(:ignore t :which-key "toggles")
+     "tt" '(counsel-load-theme :which-key "choose theme"))
+    )
+#+end_src
+
+#+begin_src emacs-lisp :tangle no
+  (general-define-key
+   )
+#+end_src
+
+*** hydra
+
+#+begin_src emacs-lisp :tangle no
+  (use-package hydra
+    :ensure t
+   )
+#+end_src
+
+#+begin_src emacs-lisp :tangle no
+  (defhydra hydra-zoom (global-map "<f2>")
+  "zoom"
+  ("g" text-scale-increase "in")
+  ("l" text-scale-decrease "out"))
+#+end_src
+
+*** treemacs
+
+#+begin_src emacs-lisp :tangle no
+  (use-package treemacs
+    :ensure t
+    :defer t
+    :bind (("C-x T o"   . treemacs-select-window)
+           ("C-x T 0"   . treemacs-select-window)
+           ("C-x T t"   . treemacs)
+           ("C-x T B"   . treemacs-bookmark)
+           ("C-x T C-f" . treemacs-find-file)
+           ("C-x T C-t" . treemacs-find-tag))
+    :config
+    (setq treemacs-width 35
+          treemacs-follow-after-init t
+          treemacs-is-never-other-window t
+          treemacs-sorting 'alphabetic-asc
+          treemacs-show-hidden-files t
+          treemacs-indentation 2
+          treemacs-indentation-string " ")
+
+    (if (not (display-graphic-p))
+    (setq treemacs-no-png-images t))
+
+    (treemacs-follow-mode t)
+    (treemacs-filewatch-mode t)
+    (treemacs-git-mode 'deferred)
+    (treemacs-fringe-indicator-mode 'always)
+    )
+#+end_src
+
+#+begin_src emacs-lisp :tangle no
+  (use-package treemacs-magit
+    :after (treemacs magit)
+    :ensure t)
+#+end_src
+
+#+begin_src emacs-lisp :tangle no
+  (use-package treemacs-icons-dired
+    :ensure t
+    :if (display-graphic-p)
+    :hook (dired-mode . treemacs-icons-dired-mode)
+    )
+ #+end_src
+
+*** no-littering
+
+from https://github.com/emacscollective/no-littering
+
+#+begin_src emacs-lisp :tangle no
+  (use-package no-littering
+    :ensure t)
+#+end_src
+
+*** projectile
+
+#+begin_src emacs-lisp :tangle no
+  (use-package projectile
+    :ensure t
+    :delight
+    :config (projectile-mode)
+    ;; :custom ((projectile-completion-system 'ivy))
+    :bind-keymap
+    ("C-c p" . projectile-command-map)
+    :init
+    (when (file-directory-p "~/work")
+      (setq projectile-project-search-path '("~/work")))
+    (setq projectile-switch-project-action #'projectile-dired))
+#+end_src
+
+enhance with counsel for projectile
+
+#+begin_src emacs-lisp :tangle no
+  (use-package counsel-projectile
+    :after projectile
+    :config (counsel-projectile-mode))
+#+end_src
+
+*** flyspell
+
+#+begin_src emacs-lisp :tangle no
+  (setq-default
+   flyspell-issue-welcome-flag nil
+   flyspell-issue-message-flag t
+   )
+#+end_src
+
+Enable global Flyspell mode:
+#+begin_src emacs-lisp :tangle no
+  (global-flyspell-mode 1)
+#+end_src
+
+Enable on specific mode:
+#+begin_src emacs-lisp
+  (defvar my/flyspell-excluded-modes '(log-edit-mode)
+    "List of modes in which flyspell-mode should not be enabled.")
+
+  (defun my/flyspell-enable ()
+   "Enable flyspell-mode unless the current major mode is excluded"
+  (unless (member major-mode my/flyspell-excluded-modes)
+    (flyspell-mode 1)))
+
+  ;; (add-hook 'text-mode-hook 'flyspell-mode)
+  (add-hook 'text-mode-hook 'my/flyspell-enable)
+  ;; (add-hook 'prog-mode-hook 'flyspell-prog-mode)
+  (add-hook 'prog-mode-hook 'my/flyspell-enable)
+#+end_src
+
+*** hunspell, aspell, ispell
+
+| command                      | shortcut |
+|------------------------------+----------|
+| ispell-valid-dictionary-list |          |
+| ispell-change-dictionary     |          |
+
+#+begin_src emacs-lisp
+  (setq ispell-dictionary "en_US"
+        ispell-dictionary-alist
+        ;; Please note the list `("-d" "en_US")` contains ACTUAL parameters passed to hunspell
+        ;; You could use `("-d" "en_US,en_US-med")` to check with multiple dictionaries
+        '(
+          (nil "[[:alpha:]]" "[^[:alpha:]]" "[']" t ("-d" "en_US") nil utf-8)
+          ;; ("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)
+          ("fr_FR" "[[:alpha:]]" "[^[:alpha:]]" "[']" t ("-d" "fr_FR") nil utf-8)
+          )
+        ispell-silently-savep t
+        )
+  (cond
+   ;; try hunspell at first
+   ;; if hunspell does NOT exist, use aspell
+   ((executable-find "hunspell")
+    (setq ispell-program-name "hunspell"
+          ispell-really-hunspell t
+          )
+    ;; new variable `ispell-hunspell-dictionary-alist' is defined in Emacs
+    ;; If it's nil, Emacs tries to automatically set up the dictionaries.
+    (when (boundp 'ispell-hunspell-dictionary-alist)
+      (setq ispell-hunspell-dictionary-alist ispell-dictionary-alist)))
+
+   ((executable-find "aspell")
+    (setq ispell-program-name "aspell")
+    ;; Please note ispell-extra-args contains ACTUAL parameters passed to aspell
+    (setq ispell-extra-args '("--sug-mode=ultra" "--lang=en_US"))))
+#+end_src
+
+*** midnight
+
+#+begin_src emacs-lisp
+  (require 'midnight)
+
+  (setq midnight-period (* 24 60 60))
+
+  (setq clean-buffer-list-delay-general 1
+        clean-buffer-list-kill-never-buffer-names (nconc clean-buffer-list-kill-never-buffer-names
+                                                         '("*scratch*"
+                                                           "*Messages*"))
+        clean-buffer-list-kill-regexps (nconc clean-buffer-list-kill-regexps
+                                              '("^\\*Buffer List\\*"
+                                                "^\\*Apropos\\*"))
+        )
+
+  (midnight-mode 1)
+#+end_src
+
+*** syntax highlight
+
+- global-font-lock-mode : provides syntax highlighting for your buffers
+- transient-mark-mode : visually highlights the selected region
+  (the text between the mark and the point) when the mark is active.
+
+#+begin_src emacs-lisp :tangle "init.el"
+  (global-font-lock-mode 1)
+  (setq font-lock-maximum-decoration t
+        font-lock-support-mode 'lazy-lock-mode
+        )
+  (transient-mark-mode 1)
+#+end_src
+
+*** scroll
+
+#+begin_src emacs-lisp :tangle "init.el"
+  (setq next-screen-context-lines 1)
+#+end_src
+
+Enable scroll left / right:
+#+begin_src emacs-lisp :tangle "init.el"
+(put 'scroll-left 'disabled nil)
+;; Bind scroll-left to C-c <left>
+;; (global-set-key (kbd "C-c <left>") 'scroll-left)
+;; Bind scroll-right to C-c <right>
+;; (global-set-key (kbd "C-c <right>") 'scroll-right)
+#+end_src
+
+*** completion
+
+#+begin_src emacs-lisp :tangle no
+  (setq completion-auto-wrap t
+        completion-auto-select 'second-tab
+        completion-auto-help 'always
+        completion-show-help nil
+        completion-max-height 10)
+#+end_src
+
+completion-at-point:
+#+begin_src emacs-lisp :tangle no
+  (global-set-key (kbd "M-.") 'completion-at-point)
+#+end_src
+
+*** swiper
+
+fuzy match
+

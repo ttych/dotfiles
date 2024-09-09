@@ -1,0 +1,3 @@
+#!/bin/sh
+
+emacsclient --eval "(kill-emacs)"

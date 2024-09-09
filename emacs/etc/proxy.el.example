@@ -1,0 +1,14 @@
+;; -*-no-byte-compile: t; -*-
+
+;; (setq url-proxy-services
+;;       '(("no_proxy" . "^\\(localhost\\|127\\..*\\|10\\..*\\|192\\.168\\..*\\|work\\.com\\)")
+;;         ("http" . "127.0.0.1:8080")
+;;         ("https" . "127.0.0.1:8080")))
+
+;; (setq url-http-proxy-basic-auth-storage
+;;       (list (list "proxy.com:8080"
+;;                   (cons "Input your LDAP UID !"
+;;                         (base64-encode-string "LOGIN:PASSWORD")))))
+
+;; (setenv "http_proxy" "http://proxy.example.com:8080")
+;; (setenv "https_proxy" "http://proxy.example.com:8080")

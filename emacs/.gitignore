@@ -9,10 +9,16 @@
 /.mc-lists.el
 /eln-cache
 /elpa
-/eshell/history
 /games
 /save
 /transient
 /url
 
+/init.el
+/early-init.el
+
+/history
+/eshell/history
+/data/recentf
 /snippets
+/tmp

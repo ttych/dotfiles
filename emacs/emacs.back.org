@@ -1,0 +1,187 @@
+#+TITLE: 
+#+AUTHOR: 
+#+DATE: 
+#+STARTUP: show3levels
+
+* init.el
+:PROPERTIES:
+:header-args: :tangle no
+:END:
+
+** performence
+*** gcmh
+REFERENCE: ELPA: https://elpa.gnu.org/packages/gcmh.html
+REFERENCE: SRC: https://gitlab.com/koral/gcmh
+
+** utility
+
+*** command-log
+
+To displays the commands you execute and the keys you press in a separate buffer.
+
+#+begin_src emacs-lisp
+  (use-package command-log-mode
+    :ensure t
+    :defer t
+    :commands (command-log-mode global-command-log-mode)
+    :config
+    (setq command-log-mode-auto-show t)
+    (setq command-log-mode-open-log-turns-on-mode t)
+    )
+#+end_src
+
+open log-buffer:
+#+begin_src emacs-lisp :tangle no
+  (clm/toggle-command-log-buffer)
+#+end_src
+
+*** helpful
+
+#+begin_src emacs-lisp
+  (use-package helpful
+    :commands (helpful-callable helpful-variable helpful-command helpful-key)
+    :custom
+    (counsel-describe-function-function #'helpful-callable)
+    (counsel-describe-variable-function #'helpful-variable)
+    :bind
+    ([remap describe-function] . counsel-describe-function)
+    ([remap describe-command] . helpful-command)
+    ([remap describe-variable] . counsel-describe-variable)
+    ([remap describe-key] . helpful-key))
+#+end_src
+
+** org
+
+*** auto-tangle this configuration file
+
+#+begin_src emacs-lisp
+  (defun em/org-babel-tangle-emacs-conf ()
+    (when (string-equal (buffer-file-name)
+                        (expand-file-name "~/.emacs.d/emacs.org"))
+      (let ((org-confirm-babel-evaluate nil))
+        (org-babel-tangle))))
+
+  (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook  #'em/org-babel-tangle-emacs-conf)))
+#+end_src
+
+** theme
+
+*** doom
+
+| rate | meaning      |
+|------+--------------|
+|    5 | top          |
+|    4 | bien         |
+|    3 | utilisable   |
+|    2 | moche        |
+|    1 | inutilisable |
+
+| theme                             | background | rate (/5) |
+|-----------------------------------+------------+-----------|
+| doom-1337                         | dark       |         1 |
+| doom-Iosvkem                      | dark       |         5 |
+| doom-acario-dark                  | dark       |         2 |
+| doom-acario-light                 | light      |           |
+| doom-ayu-dark                     | dark       |         2 |
+| doom-ayu-light                    |            |         1 |
+| doom-ayu-mirage                   |            |         2 |
+| doom-badger                       | dark       |         4 |
+| doom-bluloco-dark                 | dark       |         3 |
+| doom-bluloco-light                | light      |           |
+| doom-challenger-deep              | dark       |         2 |
+| doom-city-lights                  | dark       |         2 |
+| doom-dark+                        | dark       |         2 |
+| doom-dracula                      | dark       |         2 |
+| doom-earl-grey                    | light      |           |
+| doom-ephemeral                    | dark       |         2 |
+| doom-fairy-floss                  | dark       |         2 |
+| doom-feather-dark                 | dark       |         2 |
+| doom-feather-light                | light      |           |
+| doom-flatwhite                    |            |         2 |
+| doom-gruvbox-light                | light      |           |
+| doom-gruvbox                      | dark       |         4 |
+| doom-henna                        | dark       |         4 |
+| doom-homage-black                 | dark       |         2 |
+| doom-homage-white                 | dark       |         2 |
+| doom-horizon                      | dark       |         2 |
+| doom-ir-black                     | dark       |         4 |
+| doom-lantern                      | dark       |         2 |
+| doom-laserwave                    | dark       |         2 |
+| doom-manegarm                     | dark       |         2 |
+| doom-material-dark                | dark       |         2 |
+| doom-material                     | dark       |         2 |
+| doom-meltbus                      | dark       |         2 |
+| doom-miramare                     | dark       |         3 |
+| doom-molokai                      | dark       |         4 |
+| doom-monokai-classic              | dark       |         3 |
+| doom-monokai-machine              | dark       |         3 |
+| doom-monokai-octagon              | dark       |         3 |
+| doom-monokai-pro                  | dark       |         4 |
+| doom-monokai-ristretto            | dark       |         3 |
+| doom-monokai-spectrum             | dark       |         3 |
+| doom-moonlight                    | blue       |         2 |
+| doom-nord-aurora                  | dark       |         3 |
+| doom-nord-light                   | dark       |         1 |
+| doom-nord                         | dark       |         3 |
+| doom-nova                         | dark       |         3 |
+| doom-oceanic-next                 | dark       |         1 |
+| doom-oksolar-dark                 | blue       |         2 |
+| doom-oksolar-light                | light      |           |
+| doom-old-hope                     | dark       |         4 |
+| doom-one-light                    | light      |           |
+| doom-one                          | dark       |         3 |
+| doom-opera-light                  | dark       |         1 |
+| doom-opera                        | dark       |         3 |
+| doom-outrun-electric              | blue       |         2 |
+| doom-palenight                    | dark       |      +  4 |
+| doom-peacock                      | dark       |         4 |
+| doom-pine                         | dark       |         2 |
+| doom-plain-dark                   | dark       |         2 |
+| doom-plain                        | light      |           |
+| doom-rouge                        | dark       |         3 |
+| doom-shades-of-purple             | blue       |         2 |
+| doom-snazzy                       | blue       |         2 |
+| doom-solarized-dark-high-contrast | blue       |         2 |
+| doom-solarized-dark               | blue       |         2 |
+| doom-solarized-light              | light      |           |
+| doom-sourcerer                    | dark       |         3 |
+| doom-spacegrey                    | dark       |         3 |
+| doom-tokyo-night                  | dark       |         2 |
+| doom-tomorrow-day                 | light      |           |
+| doom-tomorrow-night               | dark       |         3 |
+| doom-vibrant                      | dark       |         3 |
+| doom-wilmersdorf                  | blue       |         2 |
+| doom-xcode                        | dark       |         2 |
+| doom-zenburn                      | dark       |         4 |
+
+#+begin_src emacs-lisp :tangle no
+  (use-package doom-themes
+    :ensure t
+    :config
+
+    ;; load-theme
+    (load-theme 'doom-Iosvkem t)
+    ;; (load-theme 'doom-badger t)
+
+    (doom-themes-org-config)
+    )
+#+end_src
+
+With the doom modeline:
+
+#+begin_src emacs-lisp :tangle no
+  (use-package doom-modeline
+    :ensure t
+    :hook (after-init . doom-modeline-mode))
+#+end_src
+
+* notes
+
+** elisp
+
+*** evaluate
+
+| command         | usage                                                         |
+|-----------------+---------------------------------------------------------------|
+| M-x eval-buffer | Execute the accessible portion of current buffer as Lisp code |
+|                 |                                                               |
