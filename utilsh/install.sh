@@ -1,16 +1,12 @@
 #!/bin/sh
 
 DISTRIBUTIONS='
-  https://github.com/ttych/goto.git
   https://github.com/ttych/pyv.git
   https://github.com/ttych/wtmux.git
   https://github.com/ttych/wwine.git
   https://github.com/ttych/installer.git
   https://github.com/ttych/wec.git
-  https://github.com/ttych/wucp.git
   https://github.com/ttych/git-hooks.git
-  https://github.com/ttych/trash.git
-  https://gitlab.com/ttych/myenv.git
   https://gitlab.com/ttych/publish.git
 '
 
@@ -20,8 +16,6 @@ AUTOLOADS='
   ruby_env.shl
   python_env.shl
   pyv.sh
-  wucp.shl
-  myenv.shl
   git.lib.sh
   editors.lib.sh
   texlive.lib.sh
