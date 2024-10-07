@@ -299,6 +299,13 @@ define emacs-etc-dir
   (load custom-file 'noerror 'nomessage)
 #+end_src
 
+*** ding
+
+#+begin_src emacs-lisp
+(defvar emacs-etc-ding (expand-file-name "ding.wav" emacs-etc-dir)
+  "emacs ding sound.")
+#+end_src
+
 ** load
 
 load-prefer-newer is a variable that controls whether Emacs prefers to
@@ -411,6 +418,11 @@ line number toggle:
   ;; (global-set-key (kbd "C-c l") 'em/line-numbers-type-toggle)
 #+end_src
 
+You can also restrict line number to prog-mode:
+#+begin_src emacs-lisp :tangle no
+  (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+#+end_src
+
 **** hl-line
 
 #+begin_src emacs-lisp
@@ -516,6 +528,23 @@ Function method to stop properly emacs background instance.
 #+end_src
 
 ** buffer
+*** bookmark
+
+| command             | shortcut |
+|---------------------+----------|
+| bookmark-set        | C-x r m  |
+| bookmark-jump       | C-x r b  |
+| list-bookmarks      |          |
+| bookmark-bmenu-list | C-x r l  |
+
+~ bookmark-save-flag
+  save bookmarks immediately after they are changed
+
+#+begin_src emacs-lisp
+  (setq bookmark-default-file (expand-file-name "bookmarks" emacs-tmp-dir)
+        bookmark-save-flag 1)
+#+end_src
+
 *** protect
 
 #+begin_src emacs-lisp
@@ -678,24 +707,6 @@ manual cleanup
           (mode (or mode initial-major-mode)))
       (switch-to-buffer (get-buffer-create bufname))
       (funcall mode)))
-#+end_src
-
-*** bookmark
-
-
-| command             | shortcut |
-|---------------------+----------|
-| bookmark-set        | C-x r m  |
-| bookmark-jump       | C-x r b  |
-| list-bookmarks      |          |
-| bookmark-bmenu-list | C-x r l  |
-
-~ bookmark-save-flag
-  save bookmarks immediately after they are changed
-
-#+begin_src emacs-lisp :tangle no
-  (setq bookmark-default-file (expand-file-name "bookmarks" emacs-tmp-dir)
-        bookmark-save-flag 1)
 #+end_src
 
 ** edit
@@ -882,9 +893,9 @@ to use the Shift key in combination with the arrow keys to select text
 
 #+begin_src emacs-lisp
   (setq-default
-   delete-selection-mode t
    shift-select-mode t
    )
+  (delete-selection-mode t)
 #+end_src
 
 *** paren
@@ -1177,6 +1188,13 @@ To defer package loading:
     (auto-package-update-at-time "09:00"))
 #+end_src
 
+*** try
+
+#+begin_src emacs-lisp :tangle no
+  (use-package try
+    :ensure t)
+#+end_src
+
 ** utility
 
 *** dired
@@ -1310,6 +1328,29 @@ basic dired settings :
     ;;                            "H" 'dired-hide-dotfiles-mode))
 #+end_src
 
+*** project
+
+#+begin_src emacs-lisp
+  (setq project-list-file (expand-file-name "projects" emacs-tmp-dir))
+  ;; (project-remember-projects-under "~/work/")
+
+  (setq project-vc-extra-root-markers '(".project-root"
+                                        "Gemfile"
+                                        "build.gradle"
+                                        "Makefile"))
+  (setq project-vc-ignores '(".git" ".cache"))
+#+end_src
+
+**** notes
+
+| command                      | shortcut |
+|------------------------------+----------|
+| project-switch-project       | C-x p p  |
+| project-find-file            | C-x p f  |
+| project-find-regexp          | C-x p g  |
+| project-query-replace-regexp | C-x p r  |
+| project-vc-dir               | C-x p v  |
+
 *** delight
 
 #+begin_src emacs-lisp
@@ -1404,14 +1445,17 @@ On snippets update, execute
            ("C-x g s" . magit-status)
            ("C-x g f" . magit-file-dispatch)
            ("C-x g b" . magit-blame)
+           ("C-x g d" . magit-dispatch)
            ("C-x g l" . magit-log-all)
-           ("C-x g c" . magit-dispatch)
+           ("C-x g c" . magit-commit)
            )
     :config
-    ;; Optional: Configure additional Magit settings here
     (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
-    (setq magit-save-repository-buffers 'dontask)
+    (setq magit-log-section-commit-count 10
+          magit-save-repository-buffers 'dontask
+          )
     ;; (setq magit-commit-show-diff nil)
+    (magit-auto-revert-mode t)
     )
 #+end_src
 
@@ -1526,14 +1570,17 @@ On first execution, run (M-x):
 #+end_src
 
 *** expand-region
+SOURCE: [[https://github.com/magnars/expand-region.el][https://github.com/magnars/expand-region.el]]
 
 #+begin_src emacs-lisp
   (use-package expand-region
     :ensure t
+    :defer t
     :bind (("M-_" . er/contract-region)
            ("M-+" . er/expand-region))
     :config
     (setq expand-region-fast-keys-enabled nil)
+    ;; (setq er--show-expansion-message t)
     )
 #+end_src
 
@@ -1600,6 +1647,7 @@ org configuration:
           org-startup-indented t
           org-hide-emphasis-markers t
           ;; org-ellipsis " ▾"
+          ;; org-support-shift-select t
           )
 
     (setq org-src-tab-acts-natively t
@@ -1617,7 +1665,8 @@ org configuration:
     ;; )
     ;; (setq org-agenda-files
     ;;       (directory-files-recursively "~/org" "\\(work\\|tasks\\|todo\\|agenda\\)\\.org$"))
-    (setq org-agenda-files (directory-files-recursively org-directory "\\.org$"))
+    ;; (setq org-agenda-files (directory-files-recursively org-directory "\\.org$"))
+    (setq org-agenda-files (directory-files org-directory t "\\.org$"))
 
     (setq org-agenda-start-with-log-mode t
           org-log-done 'time
@@ -1655,6 +1704,9 @@ org configuration:
 
     ;; (setq org-export-coding-system 'utf-8)
 
+    (when (file-exists-p emacs-etc-ding)
+      (setq org-clock-sound emacs-etc-ding))
+
     :bind (
            ("C-x O a" . org-agenda)
            ("C-x O c" . org-capture)
@@ -1677,7 +1729,7 @@ org configuration:
 | org-agenda-list             |           |                                                       |
 |-----------------------------+-----------+-------------------------------------------------------|
 | org-schedule                |           | insert SCHEDULED: info                                |
-| org-deadline                |           | insert DEADLINE: info                                 |
+| org-deadline                | C-c C-d   | insert DEADLINE: info                                 |
 | org-time-stamp              |           | insert time label in heading                          |
 | org-set-tags-command        | C-c C-q   | add tags                                              |
 | org-set-effort              | C-c C-x e | add effort property                                   |
@@ -1694,11 +1746,12 @@ Configure custom agenda views:
 #+begin_src emacs-lisp
   (setq org-agenda-custom-commands
         '(
-          ("m" "Agenda and TODOs"
+          ("1" "Agenda and TODOs"
            (
-            (agenda #1="" ((org-agenda-span '8)
-                           (org-dealine-warning-days 14)))
-            (alltodo #1#)))
+            (agenda "" ((org-agenda-span '8)
+                        (org-dealine-warning-days 14)))
+            (tags-todo "-rdv-off")
+            ))
 
           ("n" "Agenda and all TODOs"
            ((agenda #1="")
@@ -2095,7 +2148,10 @@ and ‘@’ (for a note) in parentheses after each keyword
     "Customizations for terminal."
     (setq-local show-trailing-whitespace nil)
     (display-line-numbers-mode 0)
-    (hl-line-mode nil)
+    (make-variable-buffer-local 'global-hl-line-mode)
+    (setq global-hl-line-mode nil)
+    (hl-line-mode -1)
+    (yas-minor-mode -1)
     )
 #+end_src
 
@@ -2226,6 +2282,22 @@ configure
 | term-char-mode | C-c C-k  | every keystroke is sent directly to the underlying terminal |
 | term-line-mode | C-c C-j  | input is sent to the terminal only when you press RET       |
 
+**** named-term
+
+#+begin_src emacs-lisp
+  (defun named-term (name)
+  "Create a terminal buffer with a login shell and optionally rename it to NAME."
+  (interactive "sTerminal name (leave blank for default): ")
+  (let* ((shell (or (getenv "ESHELL") (getenv "SHELL")))
+         (login-shell (concat shell " --login"))
+         (term-buffer (term login-shell)))
+    (with-current-buffer term-buffer
+      (unless (string= name "")
+        (rename-buffer name)))
+    (switch-to-buffer term-buffer)                ;; Switch to the terminal buffer
+    term-buffer))
+#+end_src
+
 ** key-binding
 *** to add
 
@@ -2309,10 +2381,10 @@ configure
   (global-set-key (kbd "<f8>") 'org-agenda)
   (global-set-key (kbd "M-<f8>") 'org-capture)
 
-  (global-set-key (kbd "<f9>") 'magit)
+  (global-set-key (kbd "<f9>") 'magit-status)
   (global-set-key (kbd "M-<f9>") 'magit-file-dispatch)
 
-  ;; (global-set-key (kbd "<f12>") 'shell)
+  (global-set-key (kbd "<f12>") 'named-term)
   ;; (global-set-key (kbd "M-<f12>") ')
 #+end_src
 
@@ -2363,21 +2435,28 @@ configure
   (global-set-key (kbd "M-* b c") 'em/scratch-new)
   (global-set-key (kbd "M-* b n") 'em/scratch-new)
 
+  (global-set-key (kbd "M-* l R") 'eglot-reconnect)
+  (global-set-key (kbd "M-* l S") 'eglot-shutdown)
+  (global-set-key (kbd "M-* l a") 'eglot-code-actions)
+  (global-set-key (kbd "M-* l f") 'eglot-format)
+  (global-set-key (kbd "M-* l r") 'eglot-rename)
+
   (global-set-key (kbd "M-* m l") 'display-line-numbers-mode)
   (global-set-key (kbd "M-* m F") 'auto-fill-mode)
   (global-set-key (kbd "M-* m W") 'whitespace-mode)
   (global-set-key (kbd "M-* m S") 'auto-save-mode)
   (global-set-key (kbd "M-* m T") 'toggle-truncate-lines)
 
+  (global-set-key (kbd "M-* o D") 'org-deadline)
+  (global-set-key (kbd "M-* o E") 'org-set-effort)
+  (global-set-key (kbd "M-* o P") 'org-set-property)
+  (global-set-key (kbd "M-* o S") 'org-schedule)
+  (global-set-key (kbd "M-* o T") 'org-set-tags-command)
   (global-set-key (kbd "M-* o a") 'org-agenda)
   (global-set-key (kbd "M-* o c") 'org-capture)
-  (global-set-key (kbd "M-* o d") 'org-deadline)
-  (global-set-key (kbd "M-* o E") 'org-set-effort)
   (global-set-key (kbd "M-* o l") 'org-todo-list)
-  (global-set-key (kbd "M-* o P") 'org-set-property)
-  (global-set-key (kbd "M-* o s") 'org-schedule)
-  (global-set-key (kbd "M-* o t") 'org-set-tags-command)
-  (global-set-key (kbd "M-* o T") 'org-time-stamp)
+  (global-set-key (kbd "M-* o t") 'org-time-stamp)
+  (global-set-key (kbd "M-* o y") 'org-timer-set-timer)
 
   (global-set-key (kbd "M-* t t") 'treemacs)
   (global-set-key (kbd "M-* t o") 'treemacs-select-window)
@@ -2516,8 +2595,9 @@ Order example:
     :bind (:map company-active-map
                 ;; ("C-d" . company-show-doc-buffer)
                 ;; ("M-." . company-show-location)
-                ("<tab>" . company-complete-selection)
-                )
+                ("<tab>" . company-complete-selection))
+          ;; (:map lsp-mode-map
+          ;;       ("<tab>" . company-indent-or-complete-common))
     )
 #+end_src
 
@@ -2584,7 +2664,7 @@ Corfu settings:
 | corfu-quit-no-match | separator | t     | automatically quit if no match is found |
 
 ** language server
-*** eglot
+*** TODO eglot
 
 #+begin_src emacs-lisp
   (use-package eglot
@@ -2600,9 +2680,13 @@ Corfu settings:
      (c-mode . eglot-ensure)
      (c++-mode . eglot-ensure))
     :custom
-    (eglot-autoshutdown nil)
+    (eglot-autoshutdown t)
     (eglot-extend-to-xref t)
+    (eglot-send-changes-idle-time  0.5)
+    ;; (eglot-events-buffer-size 2000000)
     :config
+    (add-to-list 'eglot-server-programs
+             '(ruby-mode . ("ruby-lsp")))
     )
 #+end_src
 
@@ -2648,12 +2732,13 @@ Corfu settings:
 | eglot-clear-status                  |                                           |
 |-------------------------------------+-------------------------------------------|
 | eldoc                               |                                           |
+| eldoc-doc-buffer                    |                                           |
+| lymake-show-diagnostics
 | flymake-show-buffer-diagnostics     |                                           |
 | flymake-show-project-diagnostics    |                                           |
 | xref-find-definitions               |                                           |
 | imenu                               |                                           |
 | completion-at-point                 |                                           |
-|                                     |                                           |
 
 ***** variables
 
@@ -3064,6 +3149,18 @@ Customize text-mode when activated:
 (add-hook 'text-mode-hook 'em/configure-text-mode)
 #+end_src
 
+*** typescript
+
+#+begin_src emacs-lisp
+  (use-package typescript-mode
+    :ensure t
+    :defer t
+    :mode ("\\.ts\\'")
+    :config
+    (setq typescript-indent-level 2)
+    )
+#+end_src
+
 *** yaml
 
 #+begin_src emacs-lisp
@@ -3184,3 +3281,57 @@ Indicate that the init module has been loaded.
   (provide 'init)
   ;;; init.el ends here
 #+end_src
+
+* notes
+
+** movement
+
+| shortcut | action            |
+|----------+-------------------|
+| M-a M-e  | move by sentence  |
+| M-{ M-}  | move by paragraph |
+|----------+-------------------|
+| C-v M-v  | scroll window     |
+| C-l      | centering window  |
+|          |                   |
+
+** select
+
+| shortcut          | action                          |
+|-------------------+---------------------------------|
+| C-SPC / C-@       | set-mark-command                |
+| C-x C-x           | exchange-point-and-mark         |
+|-------------------+---------------------------------|
+| C-w               | kill-region                     |
+| M-w               | kill-ring-save                  |
+| C-x C-u / C-x C-l | upcase-region / downcase-region |
+|                   | eval-region                     |
+|-------------------+---------------------------------|
+| M-@               | mark-word                       |
+| C-M-@             | mark-sexp                       |
+| M-h               | mark-paragraph                  |
+| C-M-h             | mark-defun                      |
+| C-x C-p           | mark-page                       |
+| C-x h             | mark-whole-buffer               |
+|-------------------+---------------------------------|
+| C-u C-SPC         | back to previous mark           |
+| C-x C-SPC         | pop-global-mark                 |
+|-------------------+---------------------------------|
+|                   |                                 |
+
+** elisp
+*** ielm - interactive
+
+#+begin_src emacs-lisp
+  (ielm)
+#+end_src
+
+*** evaluate
+
+| function             | shortcut    | usage                                                         |
+|----------------------+-------------+---------------------------------------------------------------|
+| eval-last-sexp       | C-x C-e     | Evaluate sexp before point                                    |
+| eval-last-sexp       | C-u C-x C-e | Evaluate sexp before point + insert                           |
+| eval-print-last-sexp | C-c C-e     | Evaluate sexp before point and Print                          |
+| eval-buffer          |             | Execute the accessible portion of current buffer as Lisp code |
+|                      |             |                                                               |

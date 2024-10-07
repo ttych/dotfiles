@@ -50,6 +50,81 @@ open log-buffer:
     ([remap describe-key] . helpful-key))
 #+end_src
 
+*** helm
+
+**** helm for projectile
+
+#+begin_src emacs-lisp
+  (use-package helm-projectile
+    :ensure t
+    :config
+    (helm-projectile-on)
+    )
+#+end_src
+
+*** dashboard
+
+source: [[https://github.com/emacs-dashboard/emacs-dashboard][https://github.com/emacs-dashboard/emacs-dashboard]]
+
+#+begin_src emacs-lisp
+  (use-package dashboard
+    :ensure t
+    :config
+    ;; (setq dashboard-show-shortcuts nil)
+    (setq dashboard-center-content nil)
+    ;; (setq dashboard-set-file-icons t)
+    ;; (setq dasboard-set-heading-icons t)
+    (dashboard-setup-startup-hook)
+    )
+#+end_src
+
+*** tabs (centaur)
+
+#+begin_src emacs-lisp
+  (use-package centaur-tabs
+    :ensure t
+    :config
+    (setq centaur-tabs-set-bar 'over
+          centaur-tabs-set-icons t
+          centaur-tabs-gray-out-icons 'buffer
+          centaur-tabs-height 24
+          centaur-tabs-set-modified-marker t
+          centaur-tabs-modifier-marker "*")
+    (centaur-tabs-mode t)
+    )
+#+end_src
+
+*** flycheck
+
+#+begin_src emacs-lisp
+  (use-package flycheck
+    :ensure t
+    :init
+    (global-flycheck-mode)
+    )
+#+end_src
+
+** project
+
+*** projectile
+
+#+begin_src emacs-lisp
+  (use-package projectile
+    :ensure t
+    :config
+    (define-key projectile-mode-map (kbd "C-x p") 'projectile-command-map)
+    (projectile-mode t)
+    )
+#+end_src
+
+*** treemacs
+
+#+begin_src emacs-lisp
+  '(use-package treemacs
+     :ensure t
+     )
+#+end_src
+
 ** org
 
 *** auto-tangle this configuration file
@@ -175,13 +250,15 @@ With the doom modeline:
     :hook (after-init . doom-modeline-mode))
 #+end_src
 
-* notes
+* ToDo
 
-** elisp
-
-*** evaluate
-
-| command         | usage                                                         |
-|-----------------+---------------------------------------------------------------|
-| M-x eval-buffer | Execute the accessible portion of current buffer as Lisp code |
-|                 |                                                               |
+** mark-multiple
+** multiple-cursors
+** iy-go-to-char
+** ace-jump-mode
+** avy
+** paredit
+** html
+*** zen mode
+** restclient
+** magit
