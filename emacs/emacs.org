@@ -1192,7 +1192,10 @@ To defer package loading:
 
 #+begin_src emacs-lisp :tangle no
   (use-package try
-    :ensure t)
+    :ensure t
+    :defer t
+    :commands (try)
+    )
 #+end_src
 
 ** utility
