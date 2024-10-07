@@ -294,9 +294,15 @@ define emacs-etc-dir
 
 *** custom-vars
 
+set custom-file :
 #+begin_src emacs-lisp
   (setq custom-file (expand-file-name "custom-vars.el" emacs-etc-dir))
   (load custom-file 'noerror 'nomessage)
+#+end_src
+
+or disable it :
+#+begin_src emacs-lisp :tangle no
+  (setq custom-file null-device)
 #+end_src
 
 *** ding
