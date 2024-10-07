@@ -447,6 +447,40 @@ You can also restrict line number to prog-mode:
   (setq split-height-threshold 80)
 #+end_src
 
+**** winner
+
+enable:
+#+begin_src emacs-lisp :tangle no
+  (winner-mode 1)
+#+end_src
+
+#+begin_src emacs-lisp :tangle no
+  ;; (global-set-key (kbd "M-<left>") 'winner-undo)
+  ;; (global-set-key (kbd "M-<right>") 'winner-redo)
+#+end_src
+
+**** windmove
+
+default bindings:
+| binding   | action                          |
+|-----------+---------------------------------|
+| S-<left>  | Move to the window on the left  |
+| S-<right> | Move to the window on the right |
+| S-<up>    | Move to the window above        |
+| S-<down>  | Move to the window below        |
+
+#+begin_src emacs-lisp :tangle no
+  (windmove-default-keybindings)
+#+end_src
+
+custom bindings:
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-x <left>")  'windmove-left)
+  (global-set-key (kbd "C-x <right>") 'windmove-right)
+  (global-set-key (kbd "C-x <up>")    'windmove-up)
+  (global-set-key (kbd "C-x <down>")  'windmove-down)
+#+end_src
+
 ** server
 
 *** start
@@ -582,6 +616,7 @@ Function method to stop properly emacs background instance.
 
 #+begin_src emacs-lisp
   (global-set-key (kbd "C-x B") 'ibuffer)
+  ;; (global-set-key (kbd "C-x B") 'ibuffer-other-window)
 #+end_src
 
 *** uniquify
@@ -1331,6 +1366,18 @@ basic dired settings :
     ;;                            "H" 'dired-hide-dotfiles-mode))
 #+end_src
 
+*** lossage
+
+view lossage:
+#+begin_src emacs-lisp :tangle no
+  (lossage-size)
+#+end_src
+
+set lossage:
+#+begin_src emacs-lisp :tangle no
+  (lossage-size 500)
+#+end_src
+
 *** project
 
 #+begin_src emacs-lisp
@@ -1485,6 +1532,65 @@ Enable Magit-todos for showing TODOs in magit-status
     :config
     (magit-todos-mode))
 #+end_src
+
+*** ace-window
+
+#+begin_src emacs-lisp
+  (use-package ace-window
+    :ensure t
+    :defer t
+    :bind (("M-g M-o" . ace-window))
+    :commands (ace-window)
+    :config
+    (setq aw-dispatch-always t)
+    :custom
+    (aw-scope 'frame)
+    )
+#+end_src
+
+default dispatch actions :
+| shortcut | action                       |
+|----------+------------------------------|
+| x        | Delete Window                |
+| m        | Swap Windows                 |
+| M        | Move Window                  |
+| c        | Copy Window                  |
+| j        | Select Buffer                |
+| n        | aw-flip-window               |
+| u        | Switch Buffer Other Window   |
+| e        | Execute Command Other Window |
+| F        | Split Fair Window            |
+| v        | Split Vert Window            |
+| b        | Split Horz Window            |
+| o        | Delete Other Windows         |
+| T        | Transpose Frame              |
+| ?        | aw-show-dispatch-help        |
+
+configure *aw-dispatch-alist* for dispatch custom actions :
+#+begin_src emacs-lisp :tangle no
+  (setq aw-dispatch-alist
+        '((?x aw-delete-window "Delete Window")
+          (?v aw-split-window-vert "Split Vertically")
+          (?b aw-split-window-horz "Split Horizontally")
+          (?m aw-maximize-window "Maximize Window")
+          (?u winner-undo "Undo Window Conf")
+          (?f aw-flip-window)))
+#+end_src
+
+| shortcut | action                                  |
+|----------+-----------------------------------------|
+| x        | delete window                           |
+| v        | split window vertically                 |
+| b        | split window horizontally               |
+| m        | maximize the selected window            |
+| u        | undo window configuration (winner-undo) |
+| f        | switch buffer in selected window        |
+
+configure *aw-scope* values :
+| value  | purpose                     |
+|--------+-----------------------------|
+| global | work across frame (default) |
+| frame  | work on current frame only  |
 
 *** git-timemachine
 
