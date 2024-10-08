@@ -1727,6 +1727,47 @@ SOURCE: [[https://github.com/magnars/expand-region.el][https://github.com/magnar
     )
 #+end_src
 
+*** ivy counsel swiper
+
+*Ivy*, a generic completion mechanism for Emacs.
+*Counsel*, a collection of Ivy-enhanced versions of common Emacs commands.
+*Swiper*, an Ivy-enhanced alternative to Isearch.
+
+source: [[https://github.com/abo-abo/swiper][https://github.com/abo-abo/swiper]]
+
+*** avy
+SRC: [[https://github.com/abo-abo/avy][https://github.com/abo-abo/avy]]
+
+| function                   | purpose                                                                            |
+|----------------------------+------------------------------------------------------------------------------------|
+| avy-goto-char              | Input one char, jump to it with a tree.                                            |
+| avy-goto-char-2            | Input two consecutive chars, jump to the first one with a tree.                    |
+| avy-goto-char-timer        | Input an arbitrary amount of consecutive chars, jump to the first one with a tree. |
+|----------------------------+------------------------------------------------------------------------------------|
+| avy-goto-line              | Input zero chars, jump to a line start with a tree.                                |
+|----------------------------+------------------------------------------------------------------------------------|
+| avy-goto-word-1            | Input one char at word start, jump to a word start with a tree.                    |
+| avy-goto-word-0            | Input zero chars, jump to a word start with a tree.                                |
+|----------------------------+------------------------------------------------------------------------------------|
+| avy-org-goto-heading-timer | (org)                                                                              |
+| avy-org-refile-as-child    | (org)                                                                              |
+|----------------------------+------------------------------------------------------------------------------------|
+| avy-resume                 |                                                                                    |
+
+
+#+begin_src emacs-lisp
+  (use-package avy
+    :ensure t
+    :defer t
+    :commands
+    :bind
+    (("C-:" . avy-goto-char)        ;; Associe `C-:` à la commande `avy-goto-char`
+     ("C-'" . avy-goto-char-2)      ;; Associe `C-'` à `avy-goto-char-2`
+     ("M-g f" . avy-goto-line)      ;; Associe `M-g f` à `avy-goto-line`
+     ("M-g w" . avy-goto-word-1))
+    )
+#+end_src
+
 ** org
 
 define emacs-org-conf-dir:
