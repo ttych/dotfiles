@@ -1759,11 +1759,11 @@ SRC: [[https://github.com/abo-abo/avy][https://github.com/abo-abo/avy]]
   (use-package avy
     :ensure t
     :defer t
-    :commands
+    :commands (avy-goto-char avy-goto-char-2 avy-goto-char-timer avy-goto-line avy-goto-word-1 avy-goto-word-0 avy-resume)
     :bind
-    (("C-:" . avy-goto-char)        ;; Associe `C-:` à la commande `avy-goto-char`
-     ("C-'" . avy-goto-char-2)      ;; Associe `C-'` à `avy-goto-char-2`
-     ("M-g f" . avy-goto-line)      ;; Associe `M-g f` à `avy-goto-line`
+    (("M-g f" . avy-goto-char)
+     ("M-g M-f" . avy-goto-char-timer)
+     ("M-g l" . avy-goto-line)
      ("M-g w" . avy-goto-word-1))
     )
 #+end_src
