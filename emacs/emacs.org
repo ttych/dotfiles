@@ -186,6 +186,17 @@ warn on function redefinition
   (setq ad-redefinition-action 'warn)
 #+end_src
 
+*** no advice
+
+#+begin_src emacs-lisp
+  (defun emc/no-msg (function &rest args)
+    "Prevent FUNCTION from showing messages.
+  \(The messages are still logged to `*Messages*'.)"
+    (let ((inhibit-message  t))
+      ; (funcall function)
+      (apply function args)))
+#+end_src
+
 *** tooltip
 
 enable tooltip:
@@ -724,9 +735,14 @@ enable auto-save:
   (recentf-mode 1)
 
   (run-at-time nil (* 5 60) 'recentf-save-list)
+#+end_src
 
-  ;; (advice-add 'recentf-save-list :around 'emc/no-msg)
-  ;; (advice-add 'recentf-cleanup :around 'emc/no-msg)
+prevent "write recentf" messages :
+#+begin_src emacs-lisp
+  (advice-add 'recentf-save-list :around 'emc/no-msg)
+  ;; (advice-remove 'recentf-save-list 'emc/no-msg)
+  (advice-add 'recentf-cleanup :around 'emc/no-msg)
+  ;; (advice-remove 'recentf-cleanup 'emc/no-msg)
 #+end_src
 
 manual cleanup
