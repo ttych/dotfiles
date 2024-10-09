@@ -1305,9 +1305,11 @@ basic dired settings :
 
 | shortcut | action                                            |
 |----------+---------------------------------------------------|
-| (        | toggle details                                    |
-|----------+---------------------------------------------------|
 | g        | refresh                                           |
+|----------+---------------------------------------------------|
+| (        | toggle details                                    |
+| s        | sort file (by name, timestamp, ...)               |
+|----------+---------------------------------------------------|
 | j        | jump to a specific filename                       |
 | \^       | parent directory                                  |
 | o        | open current to other window                      |
@@ -1321,6 +1323,7 @@ basic dired settings :
 | * .      | mark by extension                                 |
 | * *      | mark executables                                  |
 | k        | kill (hide) marked entries                        |
+| ~        | to mark ending with ~ (like files~)               |
 |----------+---------------------------------------------------|
 | C        | copy to ...                                       |
 | R        | rename to ...                                     |
@@ -1328,10 +1331,13 @@ basic dired settings :
 |----------+---------------------------------------------------|
 | D        | delete marked file                                |
 | d        | mark file for deletion                            |
+|----------+---------------------------------------------------|
 | x        | execute deletion for marks                        |
 |----------+---------------------------------------------------|
 | Z        | compress or uncompress a file / folder (tar.gz)   |
 | c        | compress selection to a specific file             |
+|----------+---------------------------------------------------|
+| A        | search by regexp in selected                      |
 |----------+---------------------------------------------------|
 | T        | change timestamp (YYYYmmddHHMM)                   |
 | M        | change file mode                                  |
@@ -1340,10 +1346,10 @@ basic dired settings :
 | S        | create a symbolic link to                         |
 | L        | load as emacs lisp into emacs                     |
 |----------+---------------------------------------------------|
-| C-x C-q  | (toggle) editable dired                           |
-|----------+---------------------------------------------------|
 | \!       | run command sync in minibuffer                    |
 | &        | run command async in other window                 |
+|----------+---------------------------------------------------|
+| C-x C-q  | (toggle) editable dired  (then C-c C-c to apply)  |
 |----------+---------------------------------------------------|
 |          |                                                   |
 
