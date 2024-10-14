@@ -356,6 +356,13 @@ load a specific file from a directory:
         (message "File %s does not exist or is not a valid .el file" filepath))))
 #+end_src
 
+*** notes
+
+| command      | shortcut | purpose                                      |
+|--------------+----------+----------------------------------------------|
+| find-library |          | open library file associated to library name |
+|              |          |                                              |
+
 ** ui
 
 *** modeline
@@ -768,6 +775,45 @@ manual cleanup
 
 ** edit
 
+*** input
+
+**** input-method
+
+Commands :
+
+| command                         | shortcut  | purpose                                                          |
+|---------------------------------+-----------+------------------------------------------------------------------|
+| describe-input-method           |           |                                                                  |
+| set-input-method                |           |                                                                  |
+| toggle-input-method             | C-\       | enable / disable multilingual text input method (current buffer) |
+|---------------------------------+-----------+------------------------------------------------------------------|
+| what-cursor-position            | C-x =     | display current char under cursor                                |
+| what-cursor-position (extended) | C-u C-x = | extended display current char under cursor                       |
+|                                 |           |                                                                  |
+
+Example of input-method:
+
+| input-method   | language |
+|----------------+----------|
+| greek          | Greek    |
+| latin-1-prefix | Latin    |
+| japanese       | Japanese |
+| TeX            | TeX      |
+|                |          |
+
+**** radix
+
+Radix for C-q in hexa
+#+begin_src emacs-lisp
+  (setq read-quoted-char-radix 16)
+#+end_src
+
+examples:
+| char | hexa code |
+|------+-----------|
+| ☺    | 263a      |
+|      |           |
+
 *** abbrev
 
 | command                   | shortcut  |
@@ -964,13 +1010,6 @@ to use the Shift key in combination with the arrow keys to select text
   (show-paren-mode 1)
 #+end_src
 
-*** radix
-
-Radix for C-q in hexa
-#+begin_src emacs-lisp
-  (setq read-quoted-char-radix 16)
-#+end_src
-
 *** region
 
 #+begin_src emacs-lisp
@@ -1074,12 +1113,17 @@ by reducing the need to repeatedly invoke the same command / sequence of command
 
 *** flow (memo)
 
-| command                              | shortcut | shortcut2 |
-|--------------------------------------+----------+-----------|
-| kmacro-start-macro-or-insert-counter | <f3>     |           |
-| kmacro-end-or-call-macro             | <f4>     | C-x e     |
-| name-last-kbd-macro                  |          |           |
-| insert-kbd-macro                     |          |           |
+| command                              | shortcut        | purpose                                     |
+|--------------------------------------+-----------------+---------------------------------------------|
+| kmacro-start-macro-or-insert-counter | <f3>            |                                             |
+| kmacro-end-or-call-macro             | <f4>            |                                             |
+| kmacro-end-and-call-macro            | C-x e           |                                             |
+| name-last-kbd-macro                  | C-x C-k n       |                                             |
+| insert-kbd-macro                     |                 | inject named macro code at current position |
+| kmacro-step-edit-macro               | C-x C-k <space> | debug step-by-step current macro            |
+| edit-kbd-macro                       | C-x C-k e       | edit current macro                          |
+| kmacro-edit-lossage                  | C-x C-k l       | display recent macro commands               |
+|                                      |                 |                                             |
 
 To name the last macro:
   M-x name-last-kbd-macro RET my-macro RET
@@ -1349,7 +1393,8 @@ basic dired settings :
 | \!       | run command sync in minibuffer                    |
 | &        | run command async in other window                 |
 |----------+---------------------------------------------------|
-| C-x C-q  | (toggle) editable dired  (then C-c C-c to apply)  |
+| C-x C-q  | (toggle) editable dired                           |
+| C-c C-c  | apply changes of dired buffer                     |
 |----------+---------------------------------------------------|
 |          |                                                   |
 
@@ -2321,6 +2366,17 @@ and ‘@’ (for a note) in parentheses after each keyword
 
 *** common
 
+Available shell:
+
+| shell     | mode       | comment                      |
+|-----------+------------+------------------------------|
+| shell     | shell-mode | wrapper around shell         |
+| term      | term-mode  | terminal emulator  +  unique |
+| ansi-term | term-mode  | terminal emulator            |
+| eshell    |            | emacs lisp shell             |
+|-----------+------------+------------------------------|
+| vterm     |            | (to install)                 |
+
 #+begin_src emacs-lisp
   (defun em/configure-terminal-common ()
     "Customizations for terminal."
@@ -2417,17 +2473,6 @@ comint-based buffers configuration
 
 *** term
 
-Available shell:
-
-| shell     | mode       | comment                      |
-|-----------+------------+------------------------------|
-| shell     | shell-mode | wrapper around shell         |
-| term      | term-mode  | terminal emulator  +  unique |
-| ansi-term | term-mode  | terminal emulator            |
-| eshell    |            | emacs lisp shell             |
-|-----------+------------+------------------------------|
-| vterm     |            | (to install)                 |
-
 #+begin_src emacs-lisp
   (setq explicit-shell-args '("--login"))
   (defvar emacs-shell-program (getenv "ESHELL"))
@@ -2446,20 +2491,6 @@ configure
   (add-hook 'term-mode-hook 'em/configure-terminal-common)
 #+end_src
 
-**** move by prompt
-
-| shortcut | purpose    |
-|----------+------------|
-| C-c C-p  | go back    |
-| C-c C-n  | go forward |
-
-**** term-char-mode vs. term-line-mode
-
-| mode           | shortcut | purpose                                                     |
-|----------------+----------+-------------------------------------------------------------|
-| term-char-mode | C-c C-k  | every keystroke is sent directly to the underlying terminal |
-| term-line-mode | C-c C-j  | input is sent to the terminal only when you press RET       |
-
 **** named-term
 
 #+begin_src emacs-lisp
@@ -2475,6 +2506,25 @@ configure
     (switch-to-buffer term-buffer)                ;; Switch to the terminal buffer
     term-buffer))
 #+end_src
+
+**** notes
+
+to reach command,
+replace *C-x* witch *C-c*
+
+***** move by prompt:
+
+| shortcut | purpose    |
+|----------+------------|
+| C-c C-p  | go back    |
+| C-c C-n  | go forward |
+
+***** term-char-mode vs. term-line-mode
+
+| mode           | shortcut | purpose                                                     |
+|----------------+----------+-------------------------------------------------------------|
+| term-char-mode | C-c C-k  | every keystroke is sent directly to the underlying terminal |
+| term-line-mode | C-c C-j  | input is sent to the terminal only when you press RET       |
 
 ** key-binding
 *** to add
@@ -2524,6 +2574,7 @@ configure
   ;; (global-set-key (kbd "M-s O") 'multi-occur)
   (global-set-key (kbd "M-s O") 'multi-occur-in-matching-buffers)
   (global-set-key (kbd "M-s g") 'rgrep)
+  (global-set-key (kbd "M-s l") 'lgrep)
   (global-set-key (kbd "M-s f f") 'find-dired)
   (global-set-key (kbd "M-s f n") 'find-name-dired)
   (global-set-key (kbd "M-s f r") 'find-lisp-find-dired)
