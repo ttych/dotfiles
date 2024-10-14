@@ -824,6 +824,12 @@ examples:
 | inverse-add-mode-abbrev   | C-x a i l |
 | edit-abbrevs              |           |
 | list-abbrevs              |           |
+| abbrev-prefix-mark        | C-x a "   |
+
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-x a \"") 'abbrev-prefix-mark)
+  (global-set-key (kbd "M-\"") 'abbrev-prefix-mark)
+#+end_src
 
 #+begin_src emacs-lisp
   (setq-default
@@ -2813,20 +2819,20 @@ Order example:
     :init
     (global-company-mode t)
     :config
-    (setq company-idle-delay 0.1
+    (setq company-idle-delay 0.2
           company-minimum-prefix-length 2
           company-show-numbers t
+          company-tooltip-limit 10
           company-tooltip-align-annotations t
           ;; company-require-match nil
           ;; company-dabbrev-downcase nil
           ;; company-dabbrev-ignore-case t
           )
-    :bind (:map company-active-map
-                ;; ("C-d" . company-show-doc-buffer)
-                ;; ("M-." . company-show-location)
-                ("<tab>" . company-complete-selection))
-          ;; (:map lsp-mode-map
-          ;;       ("<tab>" . company-indent-or-complete-common))
+    :bind (("<TAB>" . company-indent-or-complete-common)
+           ("M-'" . company-complete)
+           :map company-active-map
+           ("<TAB>" . company-complete-common-or-cycle)
+           ("<backtab>" . company-select-previous))
     )
 #+end_src
 
@@ -2836,6 +2842,19 @@ Order example:
     :defer t
     :hook (company-mode . company-box-mode))
 #+end_src
+
+bindings in company-active-map
+| Keybinding | Command                                                   | Action                                                         |
+|------------+-----------------------------------------------------------+----------------------------------------------------------------|
+| M-n / C-n  | company-select-next-or-abort, company-select-next         | Select the next completion candidate                           |
+| M-p / C-p  | company-select-previous-or-abort, company-select-previous | Select the previous completion candidate                       |
+| TAB / C-i  | company-complete-common-or-cycle                          | Complete the common part, or cycle through candidates          |
+| RET / C-m  | company-complete-selection                                | Select the current completion candidate                        |
+| C-w        | company-show-location                                     | Display a buffer with the definition of the selected candidate |
+| C-h        | company-show-doc-buffer                                   | Show documentation for the selected candidate                  |
+| C-g        | company-abort                                             | Abort completion                                               |
+| C-s        | company-search-candidates                                 | Search through the completions                                 |
+|            |                                                           |                                                                |
 
 *** corfu
 :PROPERTIES:
@@ -2893,6 +2912,14 @@ Corfu settings:
 | corfu-quit-no-match | separator | t     | automatically quit if no match is found |
 
 ** language server
+
+| shortcut | command               |
+|----------+-----------------------|
+| M-,      | xref-go-back          |
+| M-.      | xref-find-definitions |
+| M-/      | hippie-expand         |
+| M-'      | company-complete      |
+
 *** TODO eglot
 
 #+begin_src emacs-lisp
@@ -3034,9 +3061,11 @@ extend *eglot-server-programs* with
     :hook (
            (lsp-mode . lsp-enable-which-key-integration)
            )
-    :bind (:map lsp-mode-map
-                ("<tab>" . company-indent-or-complete-common)
-                )
+    :bind ((:map lsp-mode-map
+                 ("<tab>" . company-indent-or-complete-common)
+                 )
+           ("M-'" . company-complete)
+           )
     :config
     (setq lsp-enable-symbol-highlighting t
           lsp-lens-enable t
