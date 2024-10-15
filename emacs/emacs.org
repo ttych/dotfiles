@@ -1568,7 +1568,7 @@ On snippets update, execute
   (use-package magit
     :ensure t
     :defer t
-    :commands (magit magit-status magit-file-dispatch magit-blame magit-log-all magit-dispatch)
+    :commands (magit magit-status magit-file-dispatch magit-blame magit-log-all magit-dispatch magit-commit)
     :bind (
            ("C-x g g" . magit)
            ("C-x g s" . magit-status)
@@ -1587,6 +1587,21 @@ On snippets update, execute
     (magit-auto-revert-mode t)
     )
 #+end_src
+
+navigation :
+| key       | action                        |
+|-----------+-------------------------------|
+| q         | quit magit view               |
+|-----------+-------------------------------|
+| C-n , C-p | move by line                  |
+| n , p     | move by visible section       |
+| M-n , M-p | move by section "sibling"     |
+| \^        | parent of the current section |
+|-----------+-------------------------------|
+| ?         | open magit transient panel    |
+| C-g       | close magit transient panel   |
+|-----------+-------------------------------|
+|           |                               |
 
 **** forge
 
@@ -2605,10 +2620,10 @@ replace *C-x* witch *C-c*
 
 #+begin_src emacs-lisp
   (global-set-key (kbd "<f5>") 'revert-buffer)
-  (global-set-key (kbd "M-<f5>") 'recentf-open-files)
+  (global-set-key (kbd "M-<f5>") 'em/scratch-new)
 
-  ;; (global-set-key (kbd "<f6>") ')
-  ;; (global-set-key (kbd "M-<f6>") ')
+  (global-set-key (kbd "<f6>") 'magit-status)
+  (global-set-key (kbd "M-<f6>") 'magit-file-dispatch)
 
   (global-set-key (kbd "<f7>") 'term)
   (global-set-key (kbd "M-<f7>") 'ansi-term)
@@ -2616,8 +2631,8 @@ replace *C-x* witch *C-c*
   (global-set-key (kbd "<f8>") 'org-agenda)
   (global-set-key (kbd "M-<f8>") 'org-capture)
 
-  (global-set-key (kbd "<f9>") 'magit-status)
-  (global-set-key (kbd "M-<f9>") 'magit-file-dispatch)
+  (global-set-key (kbd "<f9>") 'recentf-open-files)
+  ;; (global-set-key (kbd "M-<f9>") ')
 
   (global-set-key (kbd "<f12>") 'named-term)
   ;; (global-set-key (kbd "M-<f12>") ')
