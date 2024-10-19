@@ -603,6 +603,11 @@ Function method to stop properly emacs background instance.
         bookmark-save-flag 1)
 #+end_src
 
+and prevent "write bookmark" messages :
+#+begin_src emacs-lisp
+  (advice-add 'bookmark-write-file :around 'emc/no-msg)
+#+end_src
+
 *** protect
 
 #+begin_src emacs-lisp
