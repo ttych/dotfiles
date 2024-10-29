@@ -179,6 +179,8 @@ git config --global alias.cleanblank '!f() {git rebase HEAD~${1:-1} --whitespace
 ### garbage collection cycle
 ## 90 days reachable / gc.reflogExpire
 ## 30 days unreachable / gc.reflogExpireUnreachable
+git config --global alias.gcnow 'gc --prune=now --aggressive'
+git config --global alias.gc-now 'gc --prune=now --aggressive'
 
 
 ######################################### help
@@ -276,8 +278,8 @@ git config --global alias.cim "commit -m"
 git config --global alias.cs "commit --signoff"
 git config --global alias.cam "commit --all -m"
 git config --global alias.amend 'commit --amend'
+git config --global alias.extend 'commit --amend --no-edit'
 git config --global alias.amendh 'commit --amend -C HEAD'
-git config --global alias.amendn 'commit --amend --no-edit'
 git config --global alias.fixup 'commit --fixup'
 git config --global alias.squash 'commit --squash'
 
@@ -326,6 +328,12 @@ git config --global alias.exec '!exec '
 # without reflogs
 git config --global alias.dangling 'fsck --dangling --no-reflogs --no-progress'
 git config --global alias.unreachable 'fsck --unreachable --no-reflogs --no-progress'
+# purge-reflog
+git config --global alias.purge-reflog 'reflog expire --expire=now --all'
+
+
+######################################### filter-branch
+git config --global alias.purge-file '!f() { git filter-branch --force --index-filter "git rm --cached --ignore-unmatch $1" --prune-empty --tag-name-filter cat -- --all ; }; f'
 
 
 ######################################### gpg
