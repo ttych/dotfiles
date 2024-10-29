@@ -1573,7 +1573,7 @@ On snippets update, execute
   (use-package magit
     :ensure t
     :defer t
-    :commands (magit magit-status magit-file-dispatch magit-blame magit-log-all magit-dispatch magit-commit magit-log-current)
+    :commands (magit magit-status magit-file-dispatch magit-blame magit-log-all magit-dispatch magit-commit magit-log-current magit-clone magit-ignore)
     :bind (
            ("C-x g g" . magit)
            ("C-x g s" . magit-status)
@@ -1583,6 +1583,8 @@ On snippets update, execute
            ("C-x g l" . magit-log-current)
            ("C-x g L" . magit-log-all)
            ("C-x g c" . magit-commit)
+           ("C-x g C" . magit-clone)
+           ("C-x g i" . magit-ignore)
            )
     :config
     (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
