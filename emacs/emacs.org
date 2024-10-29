@@ -2611,20 +2611,20 @@ replace *C-x* witch *C-c*
 
 *** <fn>
 
-| <fn>  | function                             | default | custom |
-|-------+--------------------------------------+---------+--------|
-| <f1>  | <help menu>                          | X       |        |
-| <f2>  | <display menu>                       | X       |        |
-| <f3>  | kmacro-start-macro-or-insert-counter | X       |        |
-| <f4>  | kmacro-end-or-call-macro             | X       |        |
-| <f5>  | revert-buffer / recentf-open-files   |         | Y      |
-| <f6>  |                                      |         |        |
-| <f7>  | term / ansi-term                     |         |        |
-| <f8>  |                                      |         |        |
-| <f9>  | recentf-open-files                   |         | Y      |
-| <f10> | menu-bar-open                        | X       |        |
-| <f11> | ------------------------------------ | ------- | ------ |
-| <f12> |                                      |         |        |
+| <fn>  | function                             | alt                    |
+|-------+--------------------------------------+------------------------|
+| <f1>  | *help menu*                            | ---------------------- |
+| <f2>  | *display menu*                         | < >                    |
+| <f3>  | *kmacro-start-macro-or-insert-counter* | < >                    |
+| <f4>  | *kmacro-end-or-call-macro*             | ---------------------- |
+| <f5>  | revert-buffer                        | em/scratch-new         |
+| <f6>  | magit-status                         | magit-file-dispatch    |
+| <f7>  | term                                 | ansi-term              |
+| <f8>  | org-agenda                           | org-capture            |
+| <f9>  | recentf-open-files                   | < >                    |
+| <f10> | *menu-bar-open*                        | *toggle-frame-maximized* |
+| <f11> | ------------------------------------ | ---------------------- |
+| <f12> | named-term                           | < >                    |
 
 #+begin_src emacs-lisp
   (global-set-key (kbd "<f5>") 'revert-buffer)
