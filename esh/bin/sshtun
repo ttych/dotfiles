@@ -8,6 +8,9 @@ sshtun()
 {
     ssh \
         $SSH_DEFAULTS \
+        -N \
+        -f \
+        -q \
         -o ExitOnForwardFailure=yes \
         "$@"
 }
