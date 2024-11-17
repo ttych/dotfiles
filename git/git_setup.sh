@@ -683,7 +683,8 @@ git config --global alias.stash2br 'stash branch'
 
 
 ######################################### status
-git config --global alias.st status
+git config --global alias.st 'status'
+git config --global alias.stt 'status .'
 git config --global alias.s "status --short --branch"
 # git config --global advice.statusuoption false
 
