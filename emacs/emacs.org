@@ -1910,6 +1910,12 @@ org configuration:
 
     (setq org-directory "~/org")
 
+    (defvar org-directories
+      (list org-directory
+            (concat org-directory "/tasks")
+            )
+      "List of directories containing Org files.")
+
     ;; (setq org-agenda-files '("~/org/todo.org"
     ;; "~/org/tasks.org"
     ;; "~/org/work.org"
@@ -1917,8 +1923,15 @@ org configuration:
     ;; )
     ;; (setq org-agenda-files
     ;;       (directory-files-recursively "~/org" "\\(work\\|tasks\\|todo\\|agenda\\)\\.org$"))
+    ;; (setq org-agenda-files (directory-files org-directory t "\\.org$"))
     ;; (setq org-agenda-files (directory-files-recursively org-directory "\\.org$"))
-    (setq org-agenda-files (directory-files org-directory t "\\.org$"))
+    (setq org-agenda-files
+          (apply #'append
+                 (mapcar (lambda (dir)
+                           (if (file-exists-p dir)
+                               (directory-files dir t "\\.org$")
+                             '()))
+                         org-directories)))
 
     (setq org-agenda-start-with-log-mode t
           org-log-done 'time
@@ -2122,6 +2135,23 @@ or can use method to append to org-agenda-files:
     (if (file-exists-p file)
         (add-to-list 'org-agenda-files file)))
 #+end_src
+
+***** egenda
+
+#+begin_src emacs-lisp
+  (defvar egenda-default-agenda-key "n"
+  "Default key for Org Agenda view in `egenda`.")
+
+  (defun egenda (&optional agenda-key)
+    "Open the Org Agenda."
+    (interactive)
+    (let ((org-agenda-window-setup 'current-window))
+      (require 'org)
+      (org-agenda nil (or agenda-key egenda-default-agenda-key))
+      )
+    )
+#+end_src
+
 
 **** org-capture
 
