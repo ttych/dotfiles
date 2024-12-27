@@ -7,4 +7,4 @@ if [ -z "$TARGET_SESSION" ]; then
 fi
 
 
-tmux split-window -t "$TARGET_SESSION" -h -c ~/ 'etodo'
+tmux split-window -t "$TARGET_SESSION" -h -c ~/ 'egenda'
