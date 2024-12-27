@@ -129,9 +129,9 @@ _tmpdir()
 {
     for _tmpdir__d; do
         if [ -d "$_tmpdir__d" ]; then
-            _tmpdir__d=$(cd "$_tmpdir__d" && \
+            _tmpdir__d=$(cd "$_tmpdir__d" 2>/dev/null && \
                                   touch _tmpdir.$$ 2>/dev/null && \
-                                  rm _tmpdir.$$ && \
+                                  rm _tmpdir.$$ 2>/dev/null && \
                                   pwd -P)
             [ $? -ne 0 ] && continue
             _TMPDIR="$_tmpdir__d"
