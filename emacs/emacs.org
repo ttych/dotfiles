@@ -1911,8 +1911,8 @@ org configuration:
     (setq org-directory "~/org")
 
     (defvar org-directories
-      (list org-directory
-            (concat org-directory "/tasks")
+      (list (concat org-directory "/tasks")
+            org-directory
             )
       "List of directories containing Org files.")
 
