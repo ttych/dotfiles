@@ -2013,7 +2013,7 @@ Configure custom agenda views:
         '(
           ("1" "Agenda and TODOs"
            (
-            (agenda "" ((org-agenda-span '8)
+            (agenda "" ((org-agenda-span '9)
                         (org-dealine-warning-days 14)))
             (tags-todo "-rdv-off")
             ))
