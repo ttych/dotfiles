@@ -9,7 +9,7 @@ AllCops:
   NewCops: enable
 
 Gemspec/DevelopmentDependencies:
-  Enabled: false
+  EnforcedStyle: gemspec
 
 Layout/LineLength:
   Max: 80
