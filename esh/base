@@ -35,7 +35,7 @@ esh_update()
 )
 
 
-### BOOLEAN
+######################################### BOOLEAN
 TRUE()
 {
     return 0
@@ -46,18 +46,18 @@ FALSE()
 }
 
 
-### SECURITY
+######################################### SECURITY
 umask 022
 
 
-### ENVIRONMENT
+######################################### ENVIRONMENT
 ESH_OS=`uname -s`
 ESH_OS_ARCH=`uname -m`
 
 export ESH_OS ESH_OS_ARCH HOSTNAME
 
 
-### PATH
+######################################### PATH
 PATH_BASE=/usr/local/bin:/usr/local/sbin:/bin:/usr/bin:/sbin:/usr/sbin
 MANPATH_BASE=/usr/local/man:/usr/local/share/man:/usr/man:/usr/share/man
 INFOPATH_BASE=/usr/local/share/info:/usr/local/share/doc/info:/usr/share/info:/usr/share/doc/info
@@ -307,13 +307,47 @@ path_pprint()
     echo "$PATH" | tr ':' '\012'
 }
 
+
+######################################### LD
 ld_library_path_do()
 {
     LD_LIBRARY_PATH="${_LD_LIBRARY_PATH}" "$@"
 }
 
 
-### PROCESS
+######################################### COMMAND
+_command_type()
+{
+    type -t "$1"
+}
+
+_is_command()
+{
+    command -v "$1" >/dev/null 2>&1
+}
+
+_is_builtin()
+{
+    test "$(_command_type $1)" = "builtin"
+}
+
+_is_function()
+{
+    _is_command "$1" && test "$(_command_type $1)" = "function"
+}
+
+_is_binary()
+{
+    _is_command "$1" && test "$(_command_type $1)" = "file"
+}
+
+_is_alias()
+{
+    test "$(_command_type $1)" = "alias"
+}
+
+
+######################################### PROCESS
 _process_ppid()
 {
     _process_ppid=$(ps -p "${1:-$$}" -o ppid=)
@@ -327,7 +361,7 @@ _process_comm()
 }
 
 
-### PREFERRED SHELLS
+######################################### PREFERRED SHELLS
 preferred_shells_list()
 {
     preferred_shells_list__conf="$ESH_DIR/conf/preferred_shell"
@@ -358,7 +392,27 @@ preferred_shells_switch()
 preferred_shells_switch
 
 
-### INTERACTIVE
+######################################### TIMEOUT
+#TMOUT=600; export TMOUT
+if [ -n "$TMOUT" ]; then
+    if ! unset TMOUT 2>/dev/null; then
+        TMOUT=0
+    fi
+fi
+
+
+######################################### History
+[ -d "$HOME/.log" ] || mkdir "$HOME/.log"
+HISTFILE="$HOME/.log/${HOSTNAME}_${ESH_SH_CUR_SHORT}"; export HISTFILE
+# history file size
+[ "${HISTSIZE:-0}" -lt 4000 ] && HISTSIZE=4000; export HISTSIZE
+# bash history file size
+[ "${HISTFILESIZE:-0}" -lt 4000 ] && HISTFILESIZE=4000; export HISTFILESIZE
+# session history size
+[ "${SAVEHIST:-0}" -lt 4000 ] && SAVEHIST=4000; export SAVEHIST
+
+
+######################################### INTERACTIVE
 esh_interactive()
 {
     if [ -z "$esh_interactive" ]; then
@@ -377,7 +431,7 @@ if esh_interactive; then
 fi
 
 
-### BIN
+######################################### BIN
 esh_bin_load()
 {
     [ -d "$ESH_BIN_DIR" ] || return 1
@@ -397,7 +451,7 @@ esh_bin_load()
 esh_bin_load
 
 
-### MODULE
+######################################### MODULE
 esh_module_load()
 {
     [ $# -ne 1 ] && return 1
@@ -439,22 +493,34 @@ do
 done
 
 
-### TIMEOUT
-#TMOUT=600; export TMOUT
-if [ -n "$TMOUT" ]; then
-    if ! unset TMOUT 2>/dev/null; then
-        TMOUT=
-        export TMOUT
-    fi
-fi
+######################################### EMODULE
+esh_emodule_load()
+{
+    [ $# -eq 0 ] && return 0
 
+    for esh_emodule_load__name; do
+        if _is_function "esh_emod_${esh_emodule_load__name}"; then
+            "esh_emod_${esh_emodule_load__name}"
+        fi
+        if esh_interactive && _is_function "esh_emod_${esh_emodule_load__name}_interactive"; then
+            "esh_emod_${esh_emodule_load__name}_interactive"
+        fi
+    done
+    return 0
+}
 
-### History
-[ -d "$HOME/.log" ] || mkdir "$HOME/.log"
-HISTFILE="$HOME/.log/${HOSTNAME}_${ESH_SH_CUR_SHORT}"; export HISTFILE
-# history file size
-HISTSIZE=4000; export HISTSIZE
-# bash history file size
-HISTFILESIZE=4000; export HISTFILESIZE
-# session history size
-SAVEHIST=4000; export SAVEHIST
+######################################### EMODULE :: direnv
+esh_emod_direnv_interactive()
+{
+    _is_command direnv || return 1
+
+    case $ESH_SH_CUR_SHORT in
+        bash|zsh|fish|tcsh)
+            eval "$(direnv hook $ESH_SH_CUR_SHORT)"
+            ;;
+    esac
+}
+
+######################################### EMODULE :: load
+esh_emodule_load \
+    direnv
