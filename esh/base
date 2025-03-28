@@ -132,24 +132,27 @@ _path_add()
     _path_splitter
     for _path_add__p; do
         if [ -d "$_path_add__p" ]; then
-            if [ -d "$_path_add__p/bin" ]; then
+            [ -d "$_path_add__p/bin" ] && [ -r "$_path_add__p/bin" ] &&
                 _path_add_var PATH "$_path_add__loc1" "$_path_add__loc2" "$_path_add__p/bin"
-                [ -d "$_path_add__p/lib" ] &&
-                    _path_add_var _LD_LIBRARY_PATH "$_path_add__loc1" "$_path_add__loc2" "$_path_add__p/lib"
-                [ -d "$_path_add__p/man" ] &&
-                    _path_add_var MANPATH "$_path_add__loc1" "$_path_add__loc2" "$_path_add__p/man"
-                [ -d "$_path_add__p/share/man" ] &&
-                    _path_add_var MANPATH "$_path_add__loc1" "$_path_add__loc2" "$_path_add__p/share/man"
-                [ -d "$_path_add__p/info" ] &&
-                    _path_add_var INFOPATH "$_path_add__loc1" "$_path_add__loc2" "$_path_add__p/man"
-                [ -d "$_path_add__p/share/info" ] &&
-                    _path_add_var INFOPATH "$_path_add__loc1" "$_path_add__loc2" "$_path_add__p/share/man"
-                [ -d "$_path_add__p/sbin" ] &&
-                    _path_add_var PATH "$_path_add__loc1" "$_path_add__loc2" "$_path_add__p/sbin"
-                _path_activate && [ -r "$_path_add__p/bin/$_path_activate" ] &&
-                    . "$_path_add__p/bin/$_path_activate"
-            else
-                _path_add_var PATH "$_path_add__loc1" "$_path_add__loc2" "$_path_add__p"
+            [ -d "$_path_add__p/lib" ] && [ -r "$_path_add__p/lib" ] &&
+                _path_add_var _LD_LIBRARY_PATH "$_path_add__loc1" "$_path_add__loc2" "$_path_add__p/lib"
+            [ -d "$_path_add__p/man" ] && [ -r "$_path_add__p/man" ] &&
+                _path_add_var MANPATH "$_path_add__loc1" "$_path_add__loc2" "$_path_add__p/man"
+            [ -d "$_path_add__p/share/man" ] && [ -r "$_path_add__p/share/man" ] &&
+                _path_add_var MANPATH "$_path_add__loc1" "$_path_add__loc2" "$_path_add__p/share/man"
+            [ -d "$_path_add__p/info" ] && [ -r "$_path_add__p/info" ] &&
+                _path_add_var INFOPATH "$_path_add__loc1" "$_path_add__loc2" "$_path_add__p/man"
+            [ -d "$_path_add__p/share/info" ] && [ -r "$_path_add__p/share/info" ] &&
+                _path_add_var INFOPATH "$_path_add__loc1" "$_path_add__loc2" "$_path_add__p/share/man"
+            [ -d "$_path_add__p/sbin" ] && [ -r "$_path_add__p/sbin" ] &&
+                _path_add_var PATH "$_path_add__loc1" "$_path_add__loc2" "$_path_add__p/sbin"
+
+            _path_activate && [ -r "$_path_add__p/bin/$_path_activate" ] &&
+                . "$_path_add__p/bin/$_path_activate"
+
+            if [ ! -d "$_path_add__p/bin" ] && [ ! -d "$_path_add__p/sbin" ]; then
+                [ -r "$_path_add__p" ] &&
+                    _path_add_var PATH "$_path_add__loc1" "$_path_add__loc2" "$_path_add__p"
                 _path_activate && [ -r "$_path_add__p/$_path_activate" ] &&
                     . "$_path_add__p/$_path_activate"
             fi
