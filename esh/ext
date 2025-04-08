@@ -1,0 +1,992 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+
+######################################### PROCESS
+_process_ppid()
+{
+    _process_ppid=$(ps -p "${1:-$$}" -o ppid=)
+    _process_ppid="${_process_ppid##* }"
+}
+
+_process_comm()
+{
+    _process_comm=$(ps -p "${1:-$$}" -o comm=)
+    _process_comm="${_process_comm##* }"
+}
+
+
+######################################### EXT
+esh_ext_load()
+{
+    [ $# -eq 0 ] && return 0
+
+    for esh_ext_load__name; do
+        if is_function "esh_ext_${esh_ext_load__name}"; then
+            "esh_ext_${esh_ext_load__name}"
+        fi
+        if esh_interactive && is_function "esh_ext_${esh_ext_load__name}_interactive"; then
+            "esh_ext_${esh_ext_load__name}_interactive"
+        fi
+    done
+    return 0
+}
+
+######################################### EXT :: bash
+esh_ext_bash()
+{
+    ###########
+    # set
+    #set -o allexport      # / set -a
+    #set -o braceexpand    # / set -B    # ON by default
+    set -o emacs
+    #set -o errtrace       # / set -E    # trap on ERR is inherited in a subshell environment
+    #set -o functrace      # / set -T    # any trap on DEBUG and RETURN are inherited in a subshell environment
+    #set -o hashall        # / set -h    # ON by default / locate and remember (hash) commands as they are looked up for execution
+    #set -o histexpand     # / set -H    # ON for interactive by default / Enable ! style history substitution
+    #set -o history                      # ON by default / enable command history
+    #set -o ignoreeof                    # an interactive shell will not exit upon reading EOF
+    #set -o keyword        # / set -k    # all arguments in the form of assignment statements are placed in the environment for a command, not just those that precede the command name
+    #set -o monitor        # / set -m    # job control is enabled / processes run in a separate process group
+    #set -o noclobber      # / set -C    # prevent output redirection from overwriting existing files
+    #set -o noexec         # / set -n    # read commands but do not execute them
+    #set -o noglob         # / set -f    # disable filename expansion
+    #set -o nolog                        # currently ignored.
+    #set -o notify         # / set -b    # status of terminated background jobs to be reported immediately
+    #set -o nounset        # / set -u    # unset variables and parameters other than the special parameters @ or * as an error when performing parameter expansion
+    #set -o onecmd         # / set -t    # exit after reading and executing one command
+    #set -o physical       # / set -P    # physical directory is used instead of logical chain of directories
+    #set -o pipefail                     # OFF by default, return value of pipeline is the value of the last (rightmost) command to exit with a non-zero status, or zero if all commands in the pipeline exit successfully
+    #set -o posix          #             # match the standard (Bash POSIX Mode)
+    #set -o privileged     # / set -p    # $BASH_ENV and $ENV files are not processed / some inherited blocked
+    #set -o vi
+    #set -o xtrace         # / set -x
+
+    ###########
+    # SHell OPTional
+    # -s : set
+    # -u : unset
+    #shopt -s autocd       # If set, a command name that is the name of a directory is executed as if it were the argument to the cd command. This option is only used by interactive shells.
+    #shopt -s cdable_vars  # If this is set, an argument to the cd builtin command that is not a directory is assumed to be the name of a variable whose value is the directory to change to.
+    #shopt -s cdspell      # If set, minor errors in the spelling of a directory component in a cd command will be corrected. The errors checked for are transposed characters, a missing character, and a character too many. If a correction is found, the corrected path is printed, and the command proceeds. This option is only used by interactive shells.
+    #shopt -s checkhash    # If this is set, Bash checks that a command found in the hash table exists before trying to execute it. If a hashed command no longer exists, a normal path search is performed.
+    #shopt -s checkjobs    # If set, Bash lists the status of any stopped and running jobs before exiting an interactive shell. If any jobs are running, this causes the exit to be deferred until a second exit is attempted without an intervening command (see Job Control). The shell always postpones exiting if any jobs are stopped.
+    #shopt -s checkwinsize # If set, Bash checks the window size after each command and, if necessary, updates the values of LINES and COLUMNS.
+    shopt -s cmdhist       # If set, Bash attempts to save all lines of a multiple-line command in the same history entry. This allows easy re-editing of multi-line commands.
+    #shopt -s compat31     # If set, Bash changes its behavior to that of version 3.1 with respect to quoted arguments to the conditional commands =~ operator and with respect to locale-specific string comparison when using the [[ conditional commands < and > operators. Bash versions prior to bash-4.1 use ASCII collation and strcmp(3); bash-4.1 and later use the current locales collation sequence and strcoll(3).
+    #shopt -s compat32     # If set, Bash changes its behavior to that of version 3.2 with respect to locale-specific string comparison when using the [[ conditional commands < and > operators (see previous item).
+    #shopt -s compat40     # If set, Bash changes its behavior to that of version 4.0 with respect to locale-specific string comparison when using the [[ conditional commands < and > operators (see description of compat31) and the effect of interrupting a command list. Bash versions 4.0 and later interrupt the list as if the shell received the interrupt; previous versions continue with the next command in the list.
+    #shopt -s compat41     # If set, Bash, when in POSIX mode, treats a single quote in a double-quoted parameter expansion as a special character. The single quotes must match (an even number) and the characters between the single quotes are considered quoted. This is the behavior of POSIX mode through version 4.1. The default Bash behavior remains as in previous versions.
+    #shopt -s compat42     # If set, Bash does not process the replacement string in the pattern substitution word expansion using quote removal.
+    #shopt -s complete_fullquote # If set, Bash quotes all shell metacharacters in filenames and directory names when performing completion. If not set, Bash removes metacharacters such as the dollar sign from the set of characters that will be quoted in completed filenames when these metacharacters appear in shell variable references in words to be completed. This means that dollar signs in variable names that expand to directories will not be quoted; however, any dollar signs appearing in filenames will not be quoted, either. This is active only when bash is using backslashes to quote completed filenames. This variable is set by default, which is the default Bash behavior in versions through 4.2.
+    #shopt -s direxpand    # If set, Bash replaces directory names with the results of word expansion when performing filename completion. This changes the contents of the readline editing buffer. If not set, Bash attempts to preserve what the user typed.
+    #shopt -s dirspell     # If set, Bash attempts spelling correction on directory names during word completion if the directory name initially supplied does not exist.
+    #shopt -s dotglob      # If set, Bash includes filenames beginning with a . in the results of filename expansion.
+    #shopt -s execfail     # If this is set, a non-interactive shell will not exit if it cannot execute the file specified as an argument to the exec builtin command. An interactive shell does not exit if exec fails.
+    #shopt -s expand_aliases # If set, aliases are expanded as described below under Aliases, Aliases. This option is enabled by default for interactive shells.
+    #shopt -s extdebug      # If set, behavior intended for use by debuggers is enabled:
+    #        The -F option to the declare builtin (see Bash Builtins) displays the source file name and line number corresponding to each function name supplied as an argument.
+    #        If the command run by the DEBUG trap returns a non-zero value, the next command is skipped and not executed.
+    #        If the command run by the DEBUG trap returns a value of 2, and the shell is executing in a subroutine (a shell function or a shell script executed by the . or source builtins), a call to return is simulated.
+    #        BASH_ARGC and BASH_ARGV are updated as described in their descriptions (see Bash Variables).
+    #        Function tracing is enabled: command substitution, shell functions, and subshells invoked with ( command ) inherit the DEBUG and RETURN traps.
+    #        Error tracing is enabled: command substitution, shell functions, and subshells invoked with ( command ) inherit the ERR trap.
+    #shopt -s extglob      # If set, the extended pattern matching features described above (see Pattern Matching) are enabled.
+    #shopt -s extquote     # If set, $'string' and $"string" quoting is performed within ${parameter} expansions enclosed in double quotes. This option is enabled by default.
+    #shopt -s failglob     # If set, patterns which fail to match filenames during filename expansion result in an expansion error.
+    #shopt -s force_fignore # If set, the suffixes specified by the FIGNORE shell variable cause words to be ignored when performing word completion even if the ignored words are the only possible completions. See Bash Variables, for a description of FIGNORE. This option is enabled by default.
+    #shopt -s globasciiranges # If set, range expressions used in pattern matching bracket expressions (see Pattern Matching) behave as if in the traditional C locale when performing comparisons. That is, the current locales collating sequence is not taken into account, so b will not collate between A and B, and upper-case and lower-case ASCII characters will collate together.
+    #shopt -s globstar     # If set, the pattern ** used in a filename expansion context will match all files and zero or more directories and subdirectories. If the pattern is followed by a /, only directories and subdirectories match.
+    #shopt -s gnu_errfmt   # If set, shell error messages are written in the standard GNU error message format.
+    shopt -s histappend    # If set, the history list is appended to the file named by the value of the HISTFILE variable when the shell exits, rather than overwriting the file.
+    shopt -s histreedit    # If set, and Readline is being used, a user is given the opportunity to re-edit a failed history substitution.
+    shopt -s histverify    # If set, and Readline is being used, the results of history substitution are not immediately passed to the shell parser. Instead, the resulting line is loaded into the Readline editing buffer, allowing further modification.
+    #shopt -s hostcomplete # If set, and Readline is being used, Bash will attempt to perform hostname completion when a word containing a @ is being completed (see Commands For Completion). This option is enabled by default.
+    #shopt -s huponexit    # If set, Bash will send SIGHUP to all jobs when an interactive login shell exits (see Signals).
+    #shopt -s interactive_comments # Allow a word beginning with # to cause that word and all remaining characters on that line to be ignored in an interactive shell. This option is enabled by default.
+    #shopt -s lastpipe     # If set, and job control is not active, the shell runs the last command of a pipeline not executed in the background in the current shell environment.
+    #shopt -s lithist      # If enabled, and the cmdhist option is enabled, multi-line commands are saved to the history with embedded newlines rather than using semicolon separators where possible.
+    #shopt -s login_shell  # The shell sets this option if it is started as a login shell (see Invoking Bash). The value may not be changed.
+    #shopt -s mailwarn     # If set, and a file that Bash is checking for mail has been accessed since the last time it was checked, the message "The mail in mailfile has been read" is displayed.
+    #shopt -s no_empty_cmd_completion # If set, and Readline is being used, Bash will not attempt to search the PATH for possible completions when completion is attempted on an empty line.
+    #shopt -s nocaseglob   # If set, Bash matches filenames in a case-insensitive fashion when performing filename expansion.
+    #shopt -s nocasematch  # If set, Bash matches patterns in a case-insensitive fashion when performing matching while executing case or [[ conditional commands.
+    #shopt -s nullglob     # If set, Bash allows filename patterns which match no files to expand to a null string, rather than themselves.
+    #shopt -s progcomp     # If set, the programmable completion facilities (see Programmable Completion) are enabled. This option is enabled by default.
+    shopt -s promptvars    # If set, prompt strings undergo parameter expansion, command substitution, arithmetic expansion, and quote removal after being expanded as described below (see Controlling the Prompt). This option is enabled by default.
+    #shopt -s restricted_shell # The shell sets this option if it is started in restricted mode (see The Restricted Shell). The value may not be changed. This is not reset when the startup files are executed, allowing the startup files to discover whether or not a shell is restricted.
+    shopt -s shift_verbose # If this is set, the shift builtin prints an error message when the shift count exceeds the number of positional parameters.
+    shopt -u sourcepath    # If set, the source builtin uses the value of PATH to find the directory containing the file supplied as an argument. This option is enabled by default.
+    shopt -u xpg_echo      # If set, the echo builtin expands backslash-escape sequences by default.
+
+    ###########
+    # unset
+    #unset MAILCHECK
+}
+
+######################################### EXT :: zsh
+esh_ext_zsh()
+{
+    ## Shell Emulation
+    setopt   shwordsplit
+    ## Expansion and Globbing
+    setopt   globsubst
+    setopt   nonomatch
+    ## Input/Output
+    setopt   rmstarsilent
+
+    ## History
+    # share history across multiple zsh sessions
+    # setopt SHARE_HISTORY
+    # append to history
+    setopt APPEND_HISTORY
+    # adds commands as they are typed, not at shell exit
+    setopt INC_APPEND_HISTORY
+    # expire duplicates first
+    setopt HIST_EXPIRE_DUPS_FIRST
+    # do not store duplications
+    setopt HIST_IGNORE_DUPS
+    # setopt  HIST_IGNORE_ALL_DUPS
+    # ignore duplicates when searching
+    setopt HIST_FIND_NO_DUPS
+    # removes blank lines from history
+    setopt HIST_REDUCE_BLANKS
+    # verify history replacement
+    setopt HIST_VERIFY
+    # do not save duplications
+    setopt HIST_SAVE_NO_DUPS
+
+    ## Correction
+    setopt CORRECT
+    setopt CORRECT_ALL
+}
+
+######################################### EXT :: git
+esh_ext_git_interactive()
+{
+    [ -r "${ESH_EXTD_DIR}/git/git-completion.${ESH_SH_CUR_SHORT}" ] &&
+        . "${ESH_EXTD_DIR}/git/git-completion.${ESH_SH_CUR_SHORT}"
+    return 0
+}
+
+######################################### EXT :: gpg
+esh_ext_gpg_interactive()
+{
+    GPG_TTY=$(tty)
+    export GPG_TTY
+}
+
+######################################### EXT :: keychain
+esh_ext_keychain_interactive()
+{
+    ESH_TRUSTED_CONF="$ESH_DIR/conf/trusted_host"
+    _want_ssh_agent()
+    {
+        [ -r "$ESH_TRUSTED_CONF" ] || return 1
+
+        if grep "^${HOSTNAME}$" "$ESH_TRUSTED_CONF" >/dev/null 2>&1 ; then
+            return 0
+        fi
+        return 1
+    }
+
+    # DISPLAY= ssh-keygen -q -y -f id_ed25519 </dev/null
+    # DISPLAY= ssh-keygen -q -y -f id_rsa_test </dev/null
+
+    sshkey_protected()
+    {
+        DISPLAY= ssh-keygen -q -y -P "" -f "$1" </dev/null 2>/dev/null >/dev/null && return 1
+        return 0
+    }
+
+    KEYCHAIN_BIN="$ESH_BIN_DIR/keychain"
+
+    keychain()
+    {
+        [ -x "$KEYCHAIN_BIN" ] || return 1
+
+        "$KEYCHAIN_BIN" "$@"
+    }
+
+    keychain_load_old()
+    {
+        [ -d "$HOME/.ssh" ] || return 1
+        [ -x "$KEYCHAIN_BIN" ] || return 1
+
+        keychain_load__login=
+        [ "$1" = "login" ] && keychain_load__login=true
+
+        [ -r "$HOME/.ssh/keychain/$HOSTNAME-sh" ] && \
+            . "$HOME/.ssh/keychain/$HOSTNAME-sh"
+
+        keychain_load__key=
+        for keyfile in "$HOME/.ssh"/*; do
+            [ -d "$keyfile" ] && continue
+            [ ! -r "$keyfile" ] && continue
+            case "${keyfile##*/}" in
+                id_*.pub) continue ;;
+                id_*) ;;
+                *) case `file -b "$keyfile"` in
+                       *" private key") ;;
+                       *) continue ;;
+                   esac
+                   ;;
+            esac
+            if [ -z "$keychain_load__login" ] || ! sshkey_protected "$keyfile"; then
+                keychain_load__key="${keychain_load__key:+$keychain_load__key }$keyfile"
+            fi
+        done
+
+        if [ -n "$keychain_load__key" ]; then
+            keychain --quiet --attempts 1 --dir "$HOME/.ssh/keychain" $keychain_load__key
+        fi
+
+        [ -r "$HOME/.ssh/keychain/$HOSTNAME-sh" ] && \
+            . "$HOME/.ssh/keychain/$HOSTNAME-sh"
+    }
+
+    keychain_load_keys()
+    {
+        keychain_load_keys=
+        for keyfile in "$HOME/.ssh"/*; do
+            [ -d "$keyfile" ] && continue
+            [ ! -r "$keyfile" ] && continue
+            case "${keyfile##*/}" in
+                id_*.pub) continue ;;
+                id_*) ;;
+                *) case `file -b "$keyfile"` in
+                       *" private key") ;;
+                       *) continue ;;
+                   esac
+                   ;;
+            esac
+            if [ "$1" != "nopassphrase" ] || ! sshkey_protected "$keyfile"; then
+                keychain_load_keys="${keychain_load_keys:+$keychain_load_keys }$keyfile"
+            fi
+        done
+
+        if [ -n "$keychain_load_keys" ]; then
+            keychain --quiet --attempts 1 --dir "$HOME/.ssh/keychain" $keychain_load_keys
+        fi
+    }
+
+    keychain_load()
+    {
+        keychain_load__login=
+        [ "$1" = "login" ] && keychain_load__login=true
+
+        [ -r "$HOME/.ssh/keychain/$HOSTNAME-sh" ] &&
+            . "$HOME/.ssh/keychain/$HOSTNAME-sh"
+
+        keychain --dir "$HOME/.ssh/keychain" \
+                 --quick --quiet --ignore-missing \
+                 --noask  --nogui --nocolor || \
+            return 1
+
+        [ -r "$HOME/.ssh/keychain/$HOSTNAME-sh" ] &&
+            . "$HOME/.ssh/keychain/$HOSTNAME-sh"
+
+        if [ -n "$keychain_load__login" ]; then
+            (keychain_load_keys nopassphrase &)
+        else
+            keychain_load_keys
+        fi
+    }
+
+    if _want_ssh_agent; then
+        keychain_load login
+    fi
+}
+
+######################################### EXT :: home
+esh_ext_home_interactive()
+{
+    home()
+    {
+        cd "$HOME"
+    }
+
+    HOME_ALT_REF="${HOME}/.local/home/${ESH_HOSTNAME}"
+    HOME_ALT=$(cd "$HOME_ALT_REF" 2>/dev/null && pwd -P)
+    export HOME_ALT
+
+    home_alt()
+    {
+        [ -z "$HOME_ALT" ] &&
+            echo >&2 "no HOME_ALT set, check ${HOME_ALT_REF}" &&
+            return 1
+        cd "$HOME_ALT"
+    }
+}
+
+######################################### EXT :: lang
+esh_ext_lang()
+{
+    LANG_PRIO=' en_US.utf8 fr_FR.utf8 C.UTF-8 '
+    LANG_SUFFIX=' utf8 UTF-8 '
+
+    lang_support()
+    {
+        [ -z "$1" ] && return 1
+        locale -a 2>/dev/null | grep -q "^${1}$"
+    }
+
+    lang_charmap_support()
+    {
+        [ -z "$1" ] && return 1
+        locale -m 2>/dev/null | grep -q "^${1}$"
+    }
+
+    lang_autoset()
+    {
+        if lang_charmap_support 'UTF-8'; then
+            for lang in $LANG_PRIO; do
+                if [ "$LANG" = "$lang" ]; then
+                    break
+                fi
+                if lang_support "$lang"; then
+                    export LANG="$lang"
+                    break
+                fi
+            done
+        fi
+    }
+
+    lang_check()
+    {
+        case "$LANG_SUFFIX" in
+            *" ${LANG##*.} "*)
+                return 0 ;;
+        esac
+
+        lang_autoset
+    }
+
+    lang_check
+
+    if [ -z "$LANG" ]; then
+        LANG=C
+        export LANG
+    fi
+
+    lang_fr_do()
+    {
+        if [ -z "$fr__LANG" ]; then
+            for fr__s in $LANG_SUFFIX; do
+                if lang_support "fr_FR.$fr__s"; then
+                    fr__LANG="fr_FR.$fr__s"
+                    break
+                fi
+            done
+        fi
+        if [ -z "$fr__LANG" ]; then
+            echo >&2 'no locale matching fr_FR found'
+            return 1
+        fi
+        LANG="$fr__LANG" "$@"
+    }
+}
+
+######################################### EXT :: local
+esh_ext_local()
+{
+    LOCAL_DIR="$HOME/local"
+    LOCAL_OS_DIR="$LOCAL_DIR/${ESH_OS}"
+    LOCAL_OS_ARCH_DIR="$LOCAL_OS_DIR/${ESH_OS_ARCH}"
+    export LOCAL_DIR LOCAL_OS_DIR LOCAL_OS_ARCH_DIR
+
+    if [ -n "$HOME_ALT" ]; then
+        LOCAL_ALT_DIR="$HOME_ALT/local"
+        LOCAL_ALT_OS_DIR="$LOCAL_ALT_DIR/${ESH_OS}"
+        LOCAL_ALT_OS_ARCH_DIR="$LOCAL_ALT_OS_DIR/${ESH_OS_ARCH}"
+
+        export LOCAL_ALT_DIR LOCAL_ALT_OS_DIR LOCAL_ALT_OS_ARCH_DIR
+    fi
+
+    local_path_load()
+    {
+        path_addin_pre "$LOCAL_OS_ARCH_DIR"
+        path_addin_pre "$LOCAL_OS_DIR"
+        path_addin_pre "$LOCAL_DIR"
+        path_addin_pre "$LOCAL_ALT_OS_ARCH_DIR"
+        path_addin_pre "$LOCAL_ALT_OS_DIR"
+        path_addin_pre "$LOCAL_ALT_DIR"
+    }
+    local_path_load
+
+    local_path_reload()
+    {
+        path_purge "$LOCAL_DIR"
+        path_purge "$LOCAL_ALT_DIR"
+        path_load_local
+    }
+
+    local_pkgconfig_path_list()
+    {
+        for local_pkgconfig_path_list__d in "$LOCAL_OS_ARCH_DIR" "$LOCAL_OS_DIR" "$LOCAL_DIR" "$LOCAL_ALT_OS_ARCH_DIR" "$LOCAL_ALT_OS_DIR" "$LOCAL_ALT_DIR"; do
+            [ -z "$local_pkgconfig_path_list__d" ] && continue
+            for local_pkgconfig_path_list__d_in in "$local_pkgconfig_path_list__d"/*/; do
+                local_pkgconfig_path_list__d_in="${local_pkgconfig_path_list__d_in%/}"
+                local_pkgconfig_path_list__d_in_short="${local_pkgconfig_path_list__d_in##*/}"
+
+                case $local_pkgconfig_path_list__d_in_short in
+                    _*) continue ;;
+                esac
+
+                [ -d "${local_pkgconfig_path_list__d_in}/lib/pkgconfig" ] || continue
+                echo "$local_pkgconfig_path_list__d_in"
+            done
+        done
+    }
+
+    local_pkgconfig_path_add()
+    {
+        for local_pkgconfig_path_add__p; do
+            [ -z "$local_pkgconfig_path_add__p" ] && continue
+            local_pkgconfig_path_add__p="${local_pkgconfig_path_add__p%/}"
+
+            case $local_pkgconfig_path_add__p in
+                */pkgconfig) ;;
+                */lib) local_pkgconfig_path_add__p="${local_pkgconfig_path_add__p}/pkgconfig" ;;
+                *) local_pkgconfig_path_add__p="${local_pkgconfig_path_add__p}/lib/pkgconfig" ;;
+            esac
+
+            pkgconfig_path_add "$local_pkgconfig_path_add__p"
+        done
+    }
+
+    local_pkgconfig_path()
+    {
+        if [ $# -eq 0 ]; then
+            local_pkgconfig_path_list
+        else
+            local_pkgconfig_path_add "$@"
+        fi
+    }
+}
+
+######################################### EXT :: ruby
+esh_ext_ruby()
+{
+    esh_has_ruby()
+    {
+        esh_has_ruby=FALSE
+        which ruby >/dev/null 2>/dev/null && esh_has_ruby=TRUE
+    }
+    esh_has_ruby
+}
+esh_ext_ruby_interactive()
+{
+    :
+}
+
+######################################### EXT :: terminal
+esh_ext_terminal()
+{
+    _term_reset()
+    {
+        # set terminal characteristics to "sane"
+        stty sane
+        # sets the terminal modes to "sane"
+        reset
+        # reset terminal attribute
+        tput sgr0
+    }
+}
+esh_ext_terminal_interactive()
+{
+    _terminal_colors_count()
+    {
+        _terminal_colors_count="$(tput colors 2>/dev/null)"
+    }
+
+    _terminal_switch_to_256_colors()
+    {
+        if _terminal_colors_count; then
+            if [ "$_terminal_colors_count" != '256' ]; then
+                _terminal_switch_to_256_colors__bkp="$TERM"
+                export TERM="${TERM%-*}-256color" 2>/dev/null
+                if _terminal_colors_count; then
+                    return 0
+                else
+                    export TERM="$_terminal_switch_to_256_colors__bkp"
+                fi
+            fi
+        fi
+    }
+
+    _terminal_switch_to_256_colors
+}
+
+######################################### EXT :: tmux
+esh_ext_tmux()
+{
+    if [ -f "${ESH_BIN_DIR}/atmux" ]; then
+        # set --
+        . "${ESH_BIN_DIR}/atmux"
+    fi
+}
+esh_ext_tmux_interactive()
+{
+    if _process_ppid && _process_comm "$_process_ppid"; then
+        case "$_process_comm" in
+            *[Tt][Ee][Rr][Mm]*) export TMUX= ;;
+            *[Rr][Xx][Vv][Tt]*) export TMUX= ;;
+        esac
+    fi
+
+    _want_auto_tmux()
+    {
+        [ -r "$ESH_CONF_DIR/auto_tmux" ] || return 1
+
+        if grep "^${HOSTNAME}$" "$ESH_CONF_DIR/auto_tmux" >/dev/null 2>&1 ; then
+            return 0
+        fi
+        return 1
+    }
+
+    _ensure_tmux_is_running()
+    {
+        atx _init_
+    }
+
+    if _want_auto_tmux; then
+        _ensure_tmux_is_running
+    fi
+
+    tmx()
+    {
+        tmux "$@"
+    }
+}
+
+######################################### EXT :: tmuxinator
+esh_ext_tmuxinator_interactive()
+{
+    export TMUXINATOR_CONFIG="$HOME/.tmuxinator"
+
+    esh_tmux_completion_f="$ESH_EXTD_DIR/tmuxinator/tmuxinator.$ESH_SH_CUR_SHORT"
+    if [ -r "$esh_tmux_completion_f" ]; then
+        . "$esh_tmux_completion_f"
+    fi
+
+    tmxr()
+    {
+        tmxr__try=0
+        tmuxinator=
+        while : ; do
+            tmuxinator="$(which tmuxinator 2>/dev/null)"
+            [ -n "$tmuxinator" ] && break
+            if [ $tmxr__try -ne 0 ]; then
+                printf >&2 "%s\n" "could not setup tmuxinator"
+                return 1
+            fi
+            if ! $esh_has_ruby; then
+                printf >&2 "%s\n" "tmuxinator is missing" "ruby is missing"
+                return 1
+            fi
+            gem install tmuxinator
+            tmxr__try=1
+        done
+        "$tmuxinator" "$@"
+    }
+}
+
+######################################### EXT :: utilsh
+esh_ext_utilsh()
+{
+    UTILSH_DIR="${UTILSH_DIR:-$HOME/.utilsh}"
+    if [ -x "$UTILSH_DIR/bin/utilsh" ]; then
+        eval "$($UTILSH_DIR/bin/utilsh init)"
+    fi
+}
+
+######################################### EXT :: shortcuts
+esh_ext_shortcuts()
+{
+    whence ()
+    {
+        type -p "$@"
+    }
+}
+
+esh_ext_shortcuts_interactive()
+{
+    ### xterm
+    # xterm()
+    # {
+    #     if [ -z "$XTERM_PATH" ]; then
+    #         XTERM_PATH="$(which xterm | grep '^/')"
+    #         [ -z "$XTERM_PATH" ] && return 1
+    #     fi
+    #     $XTERM_PATH -lf "$HOME/.log/Xterm.$HOSTNAME.$(date +%Y%m%d%H%M%S).$RANDOM.log"
+    # }
+
+
+    ### git
+    g()
+    {
+        if [ -z "$G" ]; then
+            G=`command -v hub`
+            [ -z "$G" ] && G=git
+        fi
+        "$G" "$@"
+    }
+    gcd()
+    {
+        gcd=$(git rev-parse --absolute-git-dir --is-bare-repository 2>/dev/null)
+        if [ $? -ne 0 ] || [ -z "$gcd" ];  then
+            echo >&2 "not inside git repository"
+            return 1
+        fi
+
+        case $gcd in
+            *true)
+                gcd="${gcd%?true}"
+                ;;
+            *false)
+                gcd="${gcd%/.git?false}"
+                ;;
+        esac
+
+        case $1 in
+            -) case "$OLDPWD" in
+                   "$gcd"/*) cd - ;;
+                   *) echo >&2 "not inside git repository"
+                      return 1
+                      ;;
+               esac ;;
+            /*) cd "$gcd/$1" ;;
+            .|./*|..|../*) cd "$1" ;;
+            *) cd "$gcd/$1" ;;
+        esac
+    }
+
+
+    ### ls
+    #alias l='ls'
+    alias ll='ls -l'
+    alias l1='ls -1'
+    alias lt='ls -1tr'
+    alias la='ls -a'
+    alias lh='ls -lh'
+    l()
+    {
+        l=
+        if [ -n "$1" ] && [ ! -r "$1" ]; then
+            case "$1" in
+                [1ahltr]*) l="-$1"
+                           shift
+                           ;;
+            esac
+        fi
+        ls $l "$@"
+    }
+
+    case $ESH_OS in
+        Linux)
+            LS_COLORS='no=00:fi=00:di=01;34:ln=01;36:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:su=37;41:sg=30;43:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.gz=01;31:*.bz2=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.avi=01;35:*.fli=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.flac=01;35:*.mp3=01;34:*.mpc=01;35:*.ogg=01;35:*.wav=01;35:'
+            export LS_COLORS
+            ;;
+        FreeBSD)
+            LS_COLORS='no=01;37:fi=01;37:di=01;34:ln=01;36:pi=01;32:so=01;35:do=01;35:bd=01;33:cd=01;33:ex=01;31:mi=00;37:or=00;36:'
+            export LS_COLORS
+
+            CLICOLOR="enable"
+            export CLICOLOR
+
+            LSCOLORS='cxgxhxhxbxhxhxbabacaca'
+            export LSCOLORS
+            ;;
+    esac
+
+
+    ### mv
+    alias mvi='mv -i'
+    alias cpi='cp -i'
+
+    ### terms
+    xtermadm() { xterm -name xtermadm "$@" & }
+    admterm() { xterm -name xtermadm "$@" & }
+    xtermdos() { xterm -name xtermdos "$@" & }
+    dosterm() { xterm -name xtermdos "$@" & }
+    xtermcons() { xterm -name xtermcons "$@" & }
+    consterm() { xterm -name xtermcons "$@" & }
+    xtermams() { xterm -name xtermams "$@" & }
+    amsterm() { xterm -name xtermams "$@" & }
+    myterm() { xterm -name myxterm "$@" & }
+    myxterm() { xterm -name myxterm "$@" & }
+    tterm() { xterm -name tterm "$@" & }
+
+
+    ### ssh
+    # -o CheckHostIP=no
+    fssh()
+    {
+        ssh -o StrictHostKeyChecking=no -o CheckHostIP=no -o ConnectTimeout=10 "$@"
+    }
+    s()
+    {
+        ssh -o StrictHostKeyChecking=no -o CheckHostIP=no -o ConnectTimeout=10 "$@"
+    }
+
+    fscp()
+    {
+        scp -o StrictHostKeyChecking=no -o CheckHostIP=no -o ConnectTimeout=10 "$@"
+    }
+
+
+    ### tail
+    tailf()
+    {
+        tail -f "$@"
+    }
+
+
+    ### BackSpace
+    #alias eraz='stty erase '
+    #stty erase '^H'
+    #stty intr '^C'
+
+
+    ### ruby
+    rb()
+    {
+        ruby "$@"
+    }
+
+    rcop()
+    {
+        rubocop "$@"
+    }
+
+    bundle_exec()
+    {
+        bundle exec "$@"
+    }
+
+    bexec()
+    {
+        bundle_exec "$@"
+    }
+    brake()
+    {
+        bundle_exec rake "$@"
+    }
+    bruby()
+    {
+        bundle_exec ruby "$@"
+    }
+    brb()
+    {
+        bruby "$@"
+    }
+    birb()
+    {
+        bundle_exec irb "$@"
+    }
+    brails()
+    {
+        bundle_exec rails "$@"
+    }
+    bconsole()
+    {
+        bundle_exec console "$@"
+    }
+    brubocop()
+    {
+        bundle_exec rubocop "$@"
+    }
+    brcop()
+    {
+        bundle_exec rubocop "$@"
+    }
+    brspec()
+    {
+        bundle_exec rspec "$@"
+    }
+    bguard()
+    {
+        bundle_exec guard "$@"
+    }
+
+    Bexec()
+    {
+        bundle_exec "$@"
+    }
+    Brake()
+    {
+        bundle_exec rake "$@"
+    }
+    Bruby()
+    {
+        bundle_exec ruby "$@"
+    }
+    Brails()
+    {
+        bundle_exec rails "$@"
+    }
+    Bconsole()
+    {
+        bundle_exec console "$@"
+    }
+    Birb()
+    {
+        bundle_exec irb "$@"
+    }
+    Brubocop()
+    {
+        bundle_exec rubocop "$@"
+    }
+    Brspec()
+    {
+        bundle_exec rspec "$@"
+    }
+    Bguard()
+    {
+        bundle_exec guard "$@"
+    }
+
+    rman()
+    {
+        gem man -s "$@"
+    }
+
+
+    ### copy / paste
+
+    # alias pbcopy='xsel --clipboard --input'
+    # alias pbpaste='xsel --clipboard --output'
+
+
+    has_xsel=FALSE
+    which xsel >/dev/null 2>/dev/null && has_xsel=TRUE
+
+    xsel_copy()
+    {
+        xsel --input "${1:---clipboard}"
+    }
+
+    xsel_paste()
+    {
+        xsel --output "${1:---clipboard}"
+    }
+
+    has_xclip=FALSE
+    which xclip >/dev/null 2>/dev/null && hash_xclip=TRUE
+
+    xclip_copy()
+    {
+        xclip -selection clipboard
+    }
+
+    xclip_paste()
+    {
+        xclip -selection clipboard -o
+    }
+
+    xcopy_paste()
+    {
+        [ -z "$1" ] && return 1
+
+        xcopy_paste="$1"
+        shift
+        if $has_xsel; then
+            xsel_$xcopy_paste "$@"
+        elif $has_xclip; then
+            xclip_$xcopy_paste "$@"
+        fi
+    }
+
+    xcopy()
+    {
+        xcopy_paste copy "$@"
+    }
+
+    xpaste()
+    {
+        xcopy_paste paste "$@"
+    }
+
+
+    # X
+    xopen()
+    {
+        xdg-open "$@"
+    }
+
+
+    # editor
+    export ALTERNATE_EDITOR=""
+    export EDITOR="emacsclient -t"                  # $EDITOR opens in terminal
+    export VISUAL="emacsclient -c -a emacs"         # $VISUAL opens in GUI mode
+
+
+    # make
+    mk()
+    {
+        make "$@"
+    }
+}
+
+######################################### EXT :: direnv
+esh_ext_direnv_interactive()
+{
+    is_command direnv || return 1
+
+    case $ESH_SH_CUR_SHORT in
+        bash|zsh|fish|tcsh)
+            eval "$(direnv hook $ESH_SH_CUR_SHORT)"
+            ;;
+    esac
+}
+
+######################################### EXT :: load
+esh_ext_load \
+    terminal \
+    lang \
+    local \
+    tmux \
+    home \
+    $ESH_SH_CUR_SHORT \
+    utilsh \
+    ruby \
+    tmuxinator \
+    keychain \
+    git \
+    gpg \
+    shortcuts \
+    direnv
+
+
+######################################### MODULE
+esh_extd_load()
+{
+    [ $# -ne 1 ] && return 1
+    esh_extd_load__m=
+    esh_extd_load__m_alt=
+    case "$1" in
+        /*) esh_extd_load__m="$1" ;;
+        *) esh_extd_load__m="$ESH_EXTD_DIR/$1"
+           esh_extd_load__m_alt="$ESH_DIR/$1"
+           ;;
+    esac
+    for esh_extd_load__try in "$esh_extd_load__m" "$esh_extd_load__m_alt"; do
+        [ -r "$esh_extd_load__try" ] || continue
+
+        if [ -d "$esh_extd_load__try" ]; then
+            [ -r "$esh_extd_load__try/base" ] &&
+                ESH_MODULE_DIR="${esh_extd_load__try}" . "$esh_extd_load__try/base"
+            esh_interactive && [ -r "$esh_extd_load__try/interactive" ] &&
+                ESH_MODULE_DIR="${esh_extd_load__try}" . "$esh_extd_load__try/interactive"
+        elif [ -r "$esh_extd_load__try" ]; then
+            ESH_MODULE_DIR="${esh_extd_load__try%/?*}" . "$esh_extd_load__try"
+        fi
+    done
+}
+
+for esh_module in \
+    nop
+do
+    esh_extd_load "$esh_module"
+done

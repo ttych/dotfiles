@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 _tmuxinator() {
     COMPREPLY=()
     local word
@@ -21,5 +19,4 @@ _tmuxinator() {
     fi
 }
 
-complete -F _tmuxinator tmuxinator mux
-# alias mux="tmuxinator"
+complete -F _tmuxinator tmuxinator

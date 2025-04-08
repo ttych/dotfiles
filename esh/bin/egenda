@@ -1,3 +1,3 @@
 #!/bin/sh
 
-emacsclient --tty --eval "(egenda \"1\")"
+emacsclient --tty --alternate-editor= --eval "(egenda \"1\")"

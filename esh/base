@@ -6,6 +6,7 @@ export ESH_DIR
 
 ESH_CONF_DIR="$ESH_DIR/conf"
 ESH_BIN_DIR="$ESH_DIR/bin"
+ESH_EXTD_DIR="$ESH_DIR/ext.d"
 
 ESH_SH_INIT="${ESH_SH_INIT:-$0}"
 ESH_SH_CUR="${ESH_SH_INIT#-}"
@@ -21,10 +22,17 @@ SHELL="${SHELL:-$ESH_SH_CUR}"
 SHELL_SHORT="${SHELL_SHORT:-$ESH_SH_CUR_SHORT}"
 export SHELL SHELL_SHORT
 
+ESH_BASE="$ESH_DIR/base"
+ESH_EXT="$ESH_DIR/ext"
+
+esh_load()
+{
+    [ -r "$ESH_BASE" ] && . "$ESH_BASE"
+}
 
 esh_reload()
 {
-    [ -r "$ESH_DIR/base" ] && . "$ESH_DIR/base"
+    esh_load
 }
 
 esh_update()
@@ -32,6 +40,8 @@ esh_update()
     cd "$ESH_DIR" &&
         git reset --quiet --hard HEAD &&
         git pull --no-rebase --ff-only
+
+    esh_reload
 )
 
 
@@ -51,10 +61,11 @@ umask 022
 
 
 ######################################### ENVIRONMENT
+ESH_HOSTNAME=`uname -n`
 ESH_OS=`uname -s`
 ESH_OS_ARCH=`uname -m`
 
-export ESH_OS ESH_OS_ARCH HOSTNAME
+export ESH_OS ESH_OS_ARCH ESH_HOSTNAME
 
 
 ######################################### PATH
@@ -319,48 +330,39 @@ ld_library_path_do()
 
 
 ######################################### COMMAND
-_command_type()
+whence()
+{
+    command -v "$@"
+}
+
+command_type()
 {
     type -t "$1"
 }
 
-_is_command()
+is_command()
 {
     command -v "$1" >/dev/null 2>&1
 }
 
-_is_builtin()
+is_builtin()
 {
     test "$(_command_type $1)" = "builtin"
 }
 
-_is_function()
+is_function()
 {
-    _is_command "$1" && test "$(_command_type $1)" = "function"
+    is_command "$1" && test "$(command_type $1)" = "function"
 }
 
-_is_binary()
+is_binary()
 {
-    _is_command "$1" && test "$(_command_type $1)" = "file"
+    is_command "$1" && test "$(command_type $1)" = "file"
 }
 
-_is_alias()
+is_alias()
 {
-    test "$(_command_type $1)" = "alias"
-}
-
-
-######################################### PROCESS
-_process_ppid()
-{
-    _process_ppid=$(ps -p "${1:-$$}" -o ppid=)
-    _process_ppid="${_process_ppid##* }"
-}
-
-_process_comm()
-{
-    _process_comm=$(ps -p "${1:-$$}" -o comm=)
-    _process_comm="${_process_comm##* }"
+    test "$(command_type $1)" = "alias"
 }
 
 
@@ -406,7 +408,7 @@ fi
 
 ######################################### History
 [ -d "$HOME/.log" ] || mkdir "$HOME/.log"
-HISTFILE="$HOME/.log/${HOSTNAME}_${ESH_SH_CUR_SHORT}"; export HISTFILE
+HISTFILE="$HOME/.log/${ESH_HOSTNAME}_${ESH_SH_CUR_SHORT}"; export HISTFILE
 # history file size
 [ "${HISTSIZE:-0}" -lt 4000 ] && HISTSIZE=4000; export HISTSIZE
 # bash history file size
@@ -435,95 +437,29 @@ fi
 
 
 ######################################### BIN
-esh_bin_load()
+esh_bin_sh_load()
 {
     [ -d "$ESH_BIN_DIR" ] || return 1
 
     path_add "$ESH_BIN_DIR"
 
-    for esh_bin_load__f in "$ESH_BIN_DIR"/*; do
-        [ -d "$esh_bin_load__f" ] && continue
-        case "${esh_bin_load__f##*/}" in
+    for esh_bin_sh_load__f in "$ESH_BIN_DIR"/*; do
+        [ -d "$esh_bin_sh_load__f" ] && continue
+        case "${esh_bin_sh_load__f##*/}" in
             _*) continue ;;
             *.lib.sh) ;;
             *) continue ;;
         esac
-        . "$esh_bin_load__f"
+        . "$esh_bin_sh_load__f"
     done
 }
-esh_bin_load
+esh_bin_sh_load
 
 
-######################################### MODULE
-esh_module_load()
+######################################### EXT
+esh_ext_load()
 {
-    [ $# -ne 1 ] && return 1
-    esh_module_load__m=
-    esh_module_load__m_alt=
-    case "$1" in
-        /*) esh_module_load__m="$1" ;;
-        *) esh_module_load__m="$ESH_DIR/modules/$1"
-           esh_module_load__m_alt="$ESH_DIR/$1"
-           ;;
-    esac
-    for esh_module_load__try in "$esh_module_load__m" "$esh_module_load__m_alt"; do
-        [ -r "$esh_module_load__try" ] || continue
-
-        if [ -d "$esh_module_load__try" ]; then
-            [ -r "$esh_module_load__try/base" ] &&
-                ESH_MODULE_DIR="${esh_module_load__try}" . "$esh_module_load__try/base"
-            esh_interactive && [ -r "$esh_module_load__try/interactive" ] &&
-                ESH_MODULE_DIR="${esh_module_load__try}" . "$esh_module_load__try/interactive"
-        elif [ -r "$esh_module_load__try" ]; then
-            ESH_MODULE_DIR="${esh_module_load__try%/?*}" . "$esh_module_load__try"
-        fi
-    done
+    [ -r "$ESH_EXT" ] && . "$ESH_EXT"
 }
 
-for esh_module in terminal \
-                      host \
-                      $ESH_SH_CUR_SHORT \
-                      local \
-                      utils \
-                      utilsh \
-                      tmux \
-                      ssh-agent \
-                      git \
-                      apps \
-                      interactive
-do
-    esh_module_load "$esh_module"
-done
-
-
-######################################### EMODULE
-esh_emodule_load()
-{
-    [ $# -eq 0 ] && return 0
-
-    for esh_emodule_load__name; do
-        if _is_function "esh_emod_${esh_emodule_load__name}"; then
-            "esh_emod_${esh_emodule_load__name}"
-        fi
-        if esh_interactive && _is_function "esh_emod_${esh_emodule_load__name}_interactive"; then
-            "esh_emod_${esh_emodule_load__name}_interactive"
-        fi
-    done
-    return 0
-}
-
-######################################### EMODULE :: direnv
-esh_emod_direnv_interactive()
-{
-    _is_command direnv || return 1
-
-    case $ESH_SH_CUR_SHORT in
-        bash|zsh|fish|tcsh)
-            eval "$(direnv hook $ESH_SH_CUR_SHORT)"
-            ;;
-    esac
-}
-
-######################################### EMODULE :: load
-esh_emodule_load \
-    direnv
+esh_ext_load

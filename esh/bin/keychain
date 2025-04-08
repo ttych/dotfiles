@@ -268,7 +268,7 @@ OPTIONS
                  Prior to keychain-2.5.0, this was the behavior of the bare
                  "--stop" option.
 
-        others   Kill agent processes other than the ones keychain is
+        others   Kill agent processes other than the one keychain is
                  providing. Prior to keychain-2.5.0, keychain would do this
                  automatically. The new behavior requires that you specify
                  it explicitly if you want it.
@@ -354,7 +354,7 @@ lockfile() {
 	# This function originates from Parallels Inc.'s OpenVZ vpsreboot script
 
 	# Description: This function attempts to acquire the lock. If it succeeds,
-	# it returns 0. If it fails, it returns 1. This function returns immediately
+	# it returns 0. If it fails, it returns 1. This function retuns immediately
 	# and only tries to acquire the lock once.
 
 		tmpfile="$lockf.$$"
@@ -1034,15 +1034,7 @@ ssh_listmissing() {
 
 	for slm_k in "$@"; do
 		# Fingerprint current user-specified key
-		if ! slm_finger=$(ssh_f "$slm_k"); then
-			warn "Unable to extract fingerprint from keyfile ${slm_k}.pub, skipping"
-			continue
-		fi
-		slm_wordcount="$(printf -- '%s\n' "$slm_finger" | wc -w)"
-		if [ "$slm_wordcount" -ne 1 ]; then
-			warn "Unable to extract exactly one key fingerprint from keyfile ${slm_k}.pub, got $slm_wordcount instead, skipping"
-			continue
-		fi
+		slm_finger=$(ssh_f "$slm_k") || continue
 
 		# Check if it needs to be added
 		case " $sshavail " in

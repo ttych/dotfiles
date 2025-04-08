@@ -5,13 +5,13 @@
 ###################
 # ##### ESH ##### #
 ###################
-[ -r "$ESH_DIR/prompt/prompt" ] && . "$ESH_DIR/prompt/prompt"
+[ -r "$ESH_EXTD_DIR/prompt/prompt" ] && . "$ESH_EXTD_DIR/prompt/prompt"
 
 
 #######################
 # ##### COLORS  ##### #
 #######################
-[ -r "$ESH_DIR/prompt/colors" ] && . "$ESH_DIR/prompt/colors"
+[ -r "$ESH_EXTD_DIR/prompt/colors" ] && . "$ESH_EXTD_DIR/prompt/colors"
 
 
 #######################
