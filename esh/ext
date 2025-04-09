@@ -179,10 +179,11 @@ esh_ext_gpg_interactive()
 ######################################### EXT :: keychain
 esh_ext_keychain_interactive()
 {
-    ESH_TRUSTED_CONF="$ESH_DIR/conf/trusted_host"
+    ESH_TRUSTED_CONF="$ESH_CONF_DIR/trusted_host"
     _want_ssh_agent()
     {
         [ -r "$ESH_TRUSTED_CONF" ] || return 1
+        [ -s "$ESH_TRUSTED_CONF" ] || return 0
 
         if grep "^${HOSTNAME}$" "$ESH_TRUSTED_CONF" >/dev/null 2>&1 ; then
             return 0
@@ -535,11 +536,12 @@ esh_ext_tmux_interactive()
         esac
     fi
 
+    ESH_ATMUX_CONF="$ESH_CONF_DIR/auto_tmux"
     _want_auto_tmux()
     {
-        [ -r "$ESH_CONF_DIR/auto_tmux" ] || return 1
-
-        if grep "^${HOSTNAME}$" "$ESH_CONF_DIR/auto_tmux" >/dev/null 2>&1 ; then
+        [ -r "$ESH_ATMUX_CONF" ] || return 1
+        [ -s "$ESH_ATMUX_CONF" ] || return 0
+        if grep "^${HOSTNAME}$" "$ESH_ATMUX_CONF" >/dev/null 2>&1 ; then
             return 0
         fi
         return 1
