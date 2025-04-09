@@ -92,9 +92,13 @@ GIT_VERSION=${GIT_VERSION##* }
 
 ######################################### config
 
-# git config --local --list         # repo
-# git config --global --list        # user
-# git config --system --list        # system
+# git config --local --list                 # repo
+# git config --global --list                # user
+# git config --system --list                # system
+#
+# git config --local --get <git.setting>    # repo
+# git config --global --get <git.setting>   # user
+# git config --system --get <git.setting>   # system
 #
 # git config --get-all <setting>
 
