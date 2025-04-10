@@ -2179,6 +2179,11 @@ or can use method to append to org-agenda-files:
            "* TODO %^{who} . %^{speciality} . %^{contact}%? :rdv:\nDEADLINE: %^t\nCREATED: %U\nLOCATION: %^{location}\nSAMPLE: %i\nFROM: %a"
            :empty-lines 1
            )
+          ("rO" "Off" entry
+           (file+headline "rdv.org" "Off")
+           "* TODO %^{who} . OFF%? :off:\nDEADLINE: %^t\nCREATED: %U\nLOCATION: %^{location}"
+           :empty-lines 1
+           )
           ("rs" "Sport" entry
            (file+headline "rdv.org" "Sport")
            "* TODO %^{who} . %^{sport} . %^{contact}%? :rdv:\nDEADLINE: %^t\nCREATED: %U\nLOCATION: %^{location}\nSAMPLE: %i\nFROM: %a"
@@ -2189,9 +2194,9 @@ or can use method to append to org-agenda-files:
            "* TODO %^{who} . %^{what} . %^{contact}%? :rdv:\nDEADLINE: %^t\nCREATED: %U\nLOCATION: %^{location}\nSAMPLE: %i\nFROM: %a"
            :empty-lines 1
            )
-          ("rO" "Off" entry
-           (file+headline "rdv.org" "Off")
-           "* TODO %^{who} . OFF%? :off:\nDEADLINE: %^t\nCREATED: %U\nLOCATION: %^{location}"
+          ("rw" "Work" entry
+           (file+headline "rdv.org" "Other")
+           "* TODO %^{who} . %^{Company} . %^{contact}%? :rdv:\nDEADLINE: %^t\nCREATED: %U\nLOCATION: %^{location}\nSAMPLE: %i\nFROM: %a"
            :empty-lines 1
            )
 
