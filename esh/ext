@@ -575,25 +575,25 @@ esh_ext_tmuxinator_interactive()
         . "$esh_tmux_completion_f"
     fi
 
-    tmxr()
+    tmuxinator()
     {
-        tmxr__try=0
+        tmuxinator__try=0
         tmuxinator=
         while : ; do
             tmuxinator="$(which tmuxinator 2>/dev/null)"
             [ -n "$tmuxinator" ] && break
-            if [ $tmxr__try -ne 0 ]; then
-                printf >&2 "%s\n" "could not setup tmuxinator"
+            if [ $tmuxinator__try -ne 0 ]; then
+                printf >&2 "%s\n" "# no tmuxinator setup"
                 return 1
             fi
             if ! $esh_has_ruby; then
-                printf >&2 "%s\n" "tmuxinator is missing" "ruby is missing"
+                printf >&2 "%s\n" "# tmuxinator is missing" "# ruby is missing"
                 return 1
             fi
             gem install tmuxinator
-            tmxr__try=1
+            tmuxinator__try=1
         done
-        "$tmuxinator" "$@"
+        command "$tmuxinator" "$@"
     }
 }
 
