@@ -565,9 +565,12 @@ esh_ext_tmux_interactive()
 ######################################### EXT :: tmuxinator
 esh_ext_tmuxinator_interactive()
 {
-    export TMUXINATOR_CONFIG="$HOME/.tmuxinator"
+    for TMUXINATOR_CONFIG in "$HOME/.config/tmuxinator" "$HOME/.tmuxinator"; do
+        [ -d "$TMUXINATOR_CONFIG" ] && break
+    done
+    export TMUXINATOR_CONFIG
 
-    esh_tmux_completion_f="$ESH_EXTD_DIR/tmuxinator/tmuxinator.$ESH_SH_CUR_SHORT"
+    esh_tmux_completion_f="$TMUXINATOR_CONFIG/tmuxinator.$ESH_SH_CUR_SHORT"
     if [ -r "$esh_tmux_completion_f" ]; then
         . "$esh_tmux_completion_f"
     fi
