@@ -7,7 +7,7 @@ DISTRIBUTIONS='
   https://github.com/ttych/installer.git
   https://github.com/ttych/wec.git
   https://github.com/ttych/git-hooks.git
-  https://gitlab.com/ttych/publish.git
+  https://github.com/ttych/publish.git
 '
 
 AUTOLOADS='
