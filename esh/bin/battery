@@ -1,0 +1,82 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+set -e
+
+BATTERY="${BATTERY:-/org/freedesktop/UPower/devices/battery_BAT0}"
+
+OK_C=green
+ALERT_C=red
+WARN_C=#ffff00
+
+upower_cmd()
+{
+    upower -i "$BATTERY"
+}
+
+upower_info()
+{
+    upower_info=$(upower_cmd | awk '
+        $1 ~ /state:/ { print "upower_state=\""$2"\"" }
+        $1 ~ /percentage:/ { print "upower_percentage=\""$2"\"" }
+    ')
+    eval "$upower_info"
+}
+
+battery_info()
+{
+    battery_state=
+    battery_state_l=
+    battery_percentage=
+    battery_percentage_s=
+    battery_color=$OK_C
+
+    upower_info || return 1
+
+    battery_state="$upower_state"
+    battery_percentage="$upower_percentage"
+    battery_percentage_s="${battery_percentage%%%}"
+
+    case "$battery_state" in
+        fully-charged)
+            battery_state_l='=' ;;
+        discharging)
+            battery_state_l=- ;;
+        charging)
+            battery_state_l=+ ;;
+    esac
+    case "$battery_percentage_s" in
+        0*|1?|2*)
+            battery_color=$ALERT_C ;;
+        3*|4*|5*)
+            battery_color=$WARN_C ;;
+    esac
+}
+
+battery()
+{
+    if [ -z "$battery_state" ] || [ -z "$battery_percentage" ]; then
+        return 0
+    fi
+    printf "$format" "$battery_state/$battery_percentage"
+}
+
+battery_tmux()
+{
+    if [ -z "$battery_state" ] || [ -z "$battery_percentage" ]; then
+        return 0
+    fi
+    printf "$format" "#[fg=${battery_color}][${battery_state_l}${battery_percentage}]#[fg=default]"
+}
+
+action=battery
+while getopts :t opt; do
+    case $opt in
+        t) action=battery_tmux ;;
+    esac
+done
+shift $(($OPTIND - 1))
+format="${1:-%s}"
+
+battery_info
+$action

@@ -1,0 +1,5 @@
+#!/bin/sh
+
+URL="http://icanhazip.com"
+
+curl "$URL" "$@"

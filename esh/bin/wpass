@@ -1,0 +1,125 @@
+#!/bin/sh
+
+wpass_usage()
+{
+    cat <<EOF
+usage is:
+    wpass [options] [pass command]
+
+options in:
+    -h  :  help
+    -n  :  display notes
+    -s <store>  :  select store
+    -c  :  select common store
+    -a <gpg-id> :  append gpg-id in selected store
+EOF
+}
+
+wpass_notes()
+{
+    cat <<EOF
+INIT:
+- pass init <gpg-id>
+- pass git init
+- pass git remote add origin <...>
+- pass git config --bool --add pass.signcommits true
+
+
+ADD GPG ID:
+- import public key for <gpg-id>
+- append <gpg-id> to ~/.password-store/.gpg-id
+- re-encrypt password store
+  pass init $(cat ~/.password-store/.gpg-id)
+
+
+SIGN PASS COMMIT:
+- pass git config --bool --add pass.signcommits true
+
+
+SHARED:
+- create shared store
+- create shared subfolder
+  pass init -p <shared> <gpg-id>
+- add teammate's public gpg ids to the <shared>/.gpg-id file
+- import the teammate public keys
+- sign its ?
+  gpg --edit-key <gpg-id>
+  gpg> lsign
+  gpg> y
+  gpg> exit
+- re-encrypt the password store with:
+  pass init -p <shared> $(cat ~/.password-store/<shared>/.gpg-id)
+
+
+COMPLETION:
+### wrapper
+wpass () { PASSWORD_STORE_DIR=${HOME}/.wpasswordstore pass "$@" ; }
+
+### Completion
+## bash completion
+_wpass() {
+    # trailing / is required for the password-store dir.
+    PASSWORD_STORE_DIR=~/.wpasswordstore/ _pass
+}
+complete -o filenames -o nospace -F _wpass wpass
+## zsh completion
+compdef -e 'PASSWORD_STORE_DIR=$HOME/.wpasswordstore _pass' wpass
+
+
+REFERENCES:
+- shared: https://www.gilesorr.com/blog/shared-passwordstore.html
+- shared: https://medium.com/@davidpiegza/using-pass-in-a-team-1aa7adf36592
+EOF
+}
+
+wpass_add_gpg_id()
+{
+    [ -z "$1" ] && return 1
+
+    grep "^$1\$" "$wpass__store" >/dev/null && return 0
+    echo "$1" >> "$wpass__store" &&
+        PASSWORD_STORE_DIR="$wpass__store" pass init $(cat "$wpass__store/.gpg-id")
+}
+
+wpass()
+{
+    wpass__store="$HOME/.password-store/"
+
+    OPTIND=1
+    while getopts :hns:ca: opt; do
+        case $opt in
+            h)
+                wpass_usage
+                exit 0
+                ;;
+            n)
+                wpass_notes
+                exit 0
+                ;;
+            s)
+                if [ -d "$HOME/.password-store_$OPTARG" ]; then
+                    wpass__store="$HOME/.password-store_$OPTARG"
+                elif [ -d "$HOME/.$OPTARG" ]; then
+                    wpass__store="$HOME/.$OPTARG"
+                else
+                    wpass__store="$HOME/.password-store_$OPTARG"
+                fi
+                ;;
+            c)
+                wpass__store="$HOME/.password-store_common"
+                ;;
+            a)
+                wpass_add_gpg_id "$OPTARG"
+                exit $?
+                ;;
+        esac
+    done
+    shift $(($OPTIND - 1))
+
+    # set -x
+    PASSWORD_STORE_DIR="$wpass__store" pass "$@"
+    # set +x
+}
+
+
+wpass "$@"
