@@ -447,7 +447,7 @@ esh_bin_sh_load()
         [ -d "$esh_bin_sh_load__f" ] && continue
         case "${esh_bin_sh_load__f##*/}" in
             _*) continue ;;
-            *.lib.sh) ;;
+            *.lib.sh.auto) ;;
             *) continue ;;
         esac
         . "$esh_bin_sh_load__f"
