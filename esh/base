@@ -335,34 +335,66 @@ whence()
     command -v "$@"
 }
 
-command_type()
+_is_alias()
 {
-    type -t "$1"
+    alias "$1" >/dev/null 2>&1
 }
 
-is_command()
+_is_function()
+{
+    case $(type "$1" 2>/dev/null) in
+        "$1 is a function"*|"$1 is a shell function"*)
+            return 0
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
+_is_builtin()
+{
+    case $(type "$1" 2>/dev/null) in
+        "$1 is a builtin"*|"$1 is a shell builtin"*)
+            return 0
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
+_is_command()
 {
     command -v "$1" >/dev/null 2>&1
 }
 
-is_builtin()
+type_t()
 {
-    test "$(_command_type $1)" = "builtin"
-}
+    type_t=
 
-is_function()
-{
-    is_command "$1" && test "$(command_type $1)" = "function"
-}
+    type_t__type=$(type "$1" 2>/dev/null)
+    case $type_t__type in
+        "$1 is an alias for "*|"$1 is aliased to "*)
+            type_t="alias"
+            ;;
+        "$1 is a function"*|"$1 is a shell function"*)
+            type_t="function"
+            ;;
+        "$1 is a builtin"*|"$1 is a shell builtin"*)
+            type_t="builtin"
+            ;;
+        *)
+            command -v "$1" >/dev/null 2>&1 &&
+                type_t="file"
+            ;;
+    esac
 
-is_binary()
-{
-    is_command "$1" && test "$(command_type $1)" = "file"
-}
-
-is_alias()
-{
-    test "$(command_type $1)" = "alias"
+    if [ -n "$type_t" ]; then
+        echo "$type_t"
+        return 0
+    fi
+    return 1
 }
 
 

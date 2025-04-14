@@ -22,10 +22,10 @@ esh_ext_load()
     [ $# -eq 0 ] && return 0
 
     for esh_ext_load__name; do
-        if is_function "esh_ext_${esh_ext_load__name}"; then
+        if _is_function "esh_ext_${esh_ext_load__name}"; then
             "esh_ext_${esh_ext_load__name}"
         fi
-        if esh_interactive && is_function "esh_ext_${esh_ext_load__name}_interactive"; then
+        if esh_interactive && _is_function "esh_ext_${esh_ext_load__name}_interactive"; then
             "esh_ext_${esh_ext_load__name}_interactive"
         fi
     done
@@ -937,7 +937,7 @@ esh_ext_shortcuts_interactive()
 ######################################### EXT :: direnv
 esh_ext_direnv_interactive()
 {
-    is_command direnv || return 1
+    _is_command direnv || return 1
 
     case $ESH_SH_CUR_SHORT in
         bash|zsh|fish|tcsh)
