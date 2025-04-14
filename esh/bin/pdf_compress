@@ -1,0 +1,21 @@
+#!/bin/sh
+
+if ! which hexapdf >/dev/null 2>&1; then
+    echo >&2 "install hexapdf with gem install hexapdf"
+    exit 1
+fi
+
+src="$1"
+dst="$2"
+
+if [ -z "$src" ] || [ ! -r "$src" ]; then
+    echo >&2 "please specify a valid pdf file"
+    exit 1
+fi
+
+if [ -z "$dst" ]; then
+    dst="${src%.pdf}.c.pdf"
+fi
+
+
+hexapdf optimize --compress-pages "$src" "$dst"

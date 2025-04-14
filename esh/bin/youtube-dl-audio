@@ -1,0 +1,29 @@
+#!/bin/sh
+
+Y_DL=
+for exe in yt-dlp youtube-dl; do
+    which "$exe" >/dev/null 2>/dev/null &&
+        Y_DL="$exe" &&
+        break
+done
+if [ -z "$Y_DL" ]; then
+    cat <<EOF >&2
+no yt-dlp or youtube-dl exe,
+consider installing one or the other:
+- pip install -U yt-dlp
+- pip install -U youtube-dl
+EOF
+    exit 1
+fi
+
+DOWNLOAD_DIR="${DOWNLOAD_DIR:-$HOME/Downloads/}"
+AUDIO_FORMAT="${AUDIO_FORMAT:-mp3}"
+
+for link; do
+    $Y_DL \
+        --extract-audio \
+        --audio-format $AUDIO_FORMAT \
+        --audio-quality 0 \
+        -o "$DOWNLOAD_DIR/%(title)s.%(ext)s" \
+        "$link"
+done

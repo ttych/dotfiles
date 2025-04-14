@@ -1,0 +1,9 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+build_static()
+{
+    eval LDFLAGS="\"${LDFLAGS:+$LDFLAGS }-static\"" "$@"
+}
+
+build_static "$@"

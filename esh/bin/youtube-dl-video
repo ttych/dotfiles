@@ -1,0 +1,32 @@
+#!/bin/sh
+
+Y_DL=
+for exe in yt-dlp youtube-dl; do
+    which "$exe" >/dev/null 2>/dev/null &&
+        Y_DL="$exe" &&
+        break
+done
+if [ -z "$Y_DL" ]; then
+    cat <<EOF >&2
+no yt-dlp or youtube-dl exe,
+consider installing one or the other:
+- pip install -U yt-dlp
+- pip install -U youtube-dl
+EOF
+    exit 1
+fi
+
+DOWNLOAD_DIR="${DOWNLOAD_DIR:-$HOME/Downloads/}"
+
+for link; do
+    $Y_DL \
+        --all-subs \
+        -o "$DOWNLOAD_DIR/%(upload_date)s_%(channel)s__%(title)s.%(ext)s" \
+        -f "bv*[height<=1080]+ba/b" \
+        "$link"
+
+    ## youtube-dl
+    # -f 'mp4[height=1080]+m4a/bestvideo[height<=1080]+bestaudio'
+    ## mp4 else best
+    # -f "bv*[height=1080][ext=mp4]+ba[ext=m4a]/b[ext=mp4] / bv*[height<=1080]+ba/b"
+done

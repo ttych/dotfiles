@@ -1,0 +1,11 @@
+#!/usr/bin/env python
+
+import platform
+print(f"Sys     : {platform.system()} {platform.release()}")
+print(f"Python  : {platform.python_implementation()} {platform.python_version()}")
+
+import ssl
+print(f"OpenSSL : {ssl.OPENSSL_VERSION}")
+
+import sqlite3
+print(f"SQLite  : {sqlite3.sqlite_version}")

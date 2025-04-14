@@ -1,0 +1,681 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+is_sourced()
+{
+    if [ -n "$ZSH_VERSION" ]; then
+        case $ZSH_EVAL_CONTEXT in *:file:*) return 0;; esac
+    else  # Add additional POSIX-compatible shell names here, if needed.
+        case ${0##*/} in dash|-dash|bash|-bash|ksh|-ksh|sh|-sh) return 0;; esac
+    fi
+    return 1
+}
+
+SCRIPT_NAME="${0##*/}"
+SCRIPT_RPATH="${0%$SCRIPT_NAME}"
+SCRIPT_PATH=`cd "${SCRIPT_RPATH:-.}" && pwd`
+
+
+gpg_keyring__vars()
+{
+    GPG_KEYRING="${GPG_KEYRING:-$HOME}"
+    GPG_KEYRING_FORCE="${GPG_KEYRING_FORCE:-0}"
+
+    if [ -z "$GPG_KEYRING" ] || [ "$GPG_KEYRING" = "$HOME" ]; then
+        GPG_KEYRING_NAME=
+        GPG_KEYRING_SOCKET=
+        GPG_KEYRING_CONF_DIR="$HOME/.gnupg"
+
+        unset GNUPGHOME
+    else
+        GPG_KEYRING_NAME="${GPG_KEYRING##*/}"
+        GPG_KEYRING_SOCKET="${GPG_KEYRING}/S.gpg-agent"
+        GPG_KEYRING_CONF_DIR="${GPG_KEYRING}"
+
+        export GNUPGHOME="$GPG_KEYRING"
+    fi
+
+    GPG_KEYRING_CONF="${GPG_KEYRING_CONF_DIR}/gpg.conf"
+    GPG_KEYRING_EXPORT="${GPG_KEYRING_CONF_DIR}/export/"
+    GPG_KEYRING_TRUSTDB="${GPG_KEYRING_CONF_DIR}/trustdb.gpg"
+}
+
+
+gpg_keyring__init_conf()
+{
+    if [ ! -f "$GPG_KEYRING_CONF" ] || [ "$1" = "force" ]; then
+        cat <<EOF > "$GPG_KEYRING_CONF"
+no-greeting
+
+personal-cipher-preferences AES256 AES192 AES
+personal-digest-preferences SHA512 SHA384 SHA256
+personal-compress-preferences ZLIB BZIP2 ZIP Uncompressed
+default-preference-list SHA512 SHA384 SHA256 AES256 AES192 AES ZLIB BZIP2 ZIP Uncompressed
+cert-digest-algo SHA512
+s2k-digest-algo SHA512
+s2k-cipher-algo AES256
+charset utf-8
+keyid-format 0xlong
+# with-fingerprint
+no-symkey-cache
+EOF
+        chmod 0600 "$GPG_KEYRING_CONF"
+    fi
+
+    mkdir -p "$GPG_KEYRING_EXPORT" &&
+        chmod 0700 "$GPG_KEYRING_CONF_DIR"
+}
+
+gpg_keyring__init_socket()
+{
+    [ -z "$GPG_KEYRING_SOCKET" ] && return 0
+
+    if [ ! -f "$GPG_KEYRING_SOCKET" ] || [ "$1" = "force" ]; then
+        cat <<EOF > "$GPG_KEYRING_SOCKET"
+%Assuan%
+socket=/run/user/$(id -u)/gnupg/S.${GPG_KEYRING_NAME}.gpg-agent
+EOF
+    fi
+}
+
+gpg_keyring__reset_agent()
+{
+    gpgconf --kill gpg-agent || gpg-connect-agent reloadagent /bye 2>/dev/null
+    unset GPG_AGENT_INFO
+}
+
+
+gpg_keyring__context()
+{
+    gpg_keyring__vars || return 1
+    mkdir -p "$GPG_KEYRING" || return 1
+    gpg_keyring__init_socket || return 1
+    gpg_keyring__init_conf || return 1
+    gpg_keyring__reset_agent || return 1
+}
+
+gpg_keyring__clean_context()
+{
+    gpg_keyring__reset_agent || return 1
+}
+
+
+gpg_keyring__init()
+{
+    gpg_keyring__context || return 1
+
+    gpg_keyring__init_socket force || return 1
+    gpg_keyring__init_conf force || return 1
+}
+
+gpg_keyring__generate_key()
+{
+    gpg_keyring__context || return 1
+
+    gpg --expert --full-generate-key || return 1
+
+}
+
+gpg_keyring__generate_key_batch()
+{
+    gpg_keyring__generate_key_batch__args="expected args: <name> <mail> <comment> <password> <expire|10y> <key-type|RSA> <key-length|8192> <key-usage|cert>"
+
+    gpg_keyring__generate_key_batch__name="$1"
+    gpg_keyring__generate_key_batch__mail="$2"
+    gpg_keyring__generate_key_batch__name_comment="$3"
+    gpg_keyring__generate_key_batch__password="$4"
+    gpg_keyring__generate_key_batch__expire="${5:-10y}"
+    gpg_keyring__generate_key_batch__key_type="${6:-RSA}"
+    gpg_keyring__generate_key_batch__key_length="${7:-8192}"
+    gpg_keyring__generate_key_batch__key_usage="${8:-cert}"
+
+    if [ -z "$gpg_keyring__generate_key_batch__name" ] ||
+           [ -z "$gpg_keyring__generate_key_batch__mail" ] ||
+           [ -z "$gpg_keyring__generate_key_batch__password" ]; then
+        echo >&2 "missing args !"
+        echo >&2 "$gpg_keyring__generate_key_batch__args"
+        return 2
+    fi
+
+    gpg_keyring__context || return 1
+
+    gpg_keyring__generate_key_batch__tmpkey=$(mktemp)
+
+    cat >$gpg_keyring__generate_key_batch__tmpkey <<EOF
+%echo Generating a RSA key
+Key-Type: $gpg_keyring__generate_key_batch__key_type
+Key-Length: $gpg_keyring__generate_key_batch__key_length
+Key-Usage: $gpg_keyring__generate_key_batch__key_usage
+Name-Real: $gpg_keyring__generate_key_batch__name
+${gpg_keyring__generate_key_batch__name_comment:+Name-Comment: $gpg_keyring__generate_key_batch__name_comment}
+Name-Email: $gpg_keyring__generate_key_batch__mail
+Expire-Date: $gpg_keyring__generate_key_batch__expire
+Passphrase: $gpg_keyring__generate_key_batch__password
+# Do a commit here, so that we can later print "done"
+%commit
+%echo done
+EOF
+
+    gpg --batch -v --full-generate-key --enable-large-rsa -a $gpg_keyring__generate_key_batch__tmpkey
+    gpg_keyring__generate_key_batch__status=$?
+
+    rm -f $gpg_keyring__generate_key_batch__tmpkey
+
+    return $gpg_keyring__generate_key_batch__status
+}
+
+gpg_keyring__generate_master_key()
+{
+    gpg_keyring__generate_master_key__args="expected args: <name> <mail> <password> <expire|10y> <key-type|RSA> <key-length|8192> <key-usage|cert>"
+
+    if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ]; then
+        echo >&2 "missing args !"
+        echo >&2 "$gpg_keyring__generate_master_key__args"
+        return 2
+    fi
+
+    gpg_keyring__generate_key_batch "$1" "$2" "master" "$3" "$4" "$5" "$6" "$7"
+}
+
+gpg_keyring__edit_key()
+{
+    gpg_keyring__edit_key__args="expected args: <id>"
+
+    if [ -z "$1" ]; then
+        echo >&2 "missing args !"
+        echo >&2 "$gpg_keyring__edit_key__args"
+        return 2
+    fi
+
+    gpg_keyring__context || return 1
+
+    gpg --expert --edit-key "$1"
+}
+
+gpg_keyring__edit_adduid()
+{
+    cat <<EOF
+
+> to edit/adduid on "$1"
+- adduid
+- answer name, mail, comment
+- confirm details
+- enter passphrase
+- save
+- quit
+
+EOF
+
+    gpg_keyring__edit_key "$@"
+}
+
+gpg_keyring__edit_addkey()
+{
+    cat <<EOF
+
+> to edit/addkey on "$1"
+- addkey
+- signature key:
+  - (4) RSA (sign only)
+- crpto key:
+  - (6) RSA (encrypt only)
+- auth key:
+  - (8) RSA (set your own capabilities)
+  - (S) Toggle the sign capability  (disabled)
+  - (E) Toggle the encrypt capability  (disabled)
+  - (A) Toggle the authenticate capability  (enabled)
+  - (Q) Finished
+- size:  4096
+- save
+- quit
+
+EOF
+
+    gpg_keyring__edit_key "$@"
+}
+
+gpg_keyring__edit_trust()
+{
+    cat <<EOF
+
+> to edit/trust on "$1"
+- trust
+  - 5 = I trust ultimately
+- save
+- quit
+
+EOF
+
+    gpg_keyring__edit_key "$@"
+}
+
+
+
+gpg_keyring__list_public_keys()
+{
+    gpg_keyring__context || return 1
+
+    echo "LIST PUBLIC KEYS"
+    gpg --list-public-keys --keyid-format=long --with-subkey-fingerprint "$@"
+}
+
+gpg_keyring__list_secret_keys()
+{
+    gpg_keyring__context || return 1
+
+    echo "LIST SECRET KEYS"
+    gpg --list-secret-keys --keyid-format=long --with-subkey-fingerprint "$@"
+}
+
+gpg_keyring__list_keys()
+{
+    gpg_keyring__list_public_keys "$@"
+
+    gpg_keyring__list_secret_keys "$@"
+}
+
+gpg_keyring__list_signatures()
+{
+    gpg_keyring__context || return 1
+
+    # gpg --list-signatures "$@"
+    gpg --list-sigs "$@"
+}
+
+gpg_keyring__check_signatures()
+{
+    gpg_keyring__context || return 1
+
+    gpg --check-signatures "$@"
+}
+
+
+gpg_keyring__export_secret_key_full()
+{
+    gpg_keyring__export_secret_key_full__args="expected args: <id> <path>"
+
+    if [ -z "$1" ]; then
+        echo >&2 "missing args !"
+        echo >&2 "$gpg_keyring__export_secret_key_full__args"
+        return 2
+    fi
+
+    gpg_keyring__context || return 1
+
+    gpg_keyring__export_secret_key_full__target="${2:-$GPG_KEYRING_EXPORT}"
+    if [ -d "$gpg_keyring__export_secret_key_full__target" ]; then
+        gpg_keyring__export_secret_key_full__target="$gpg_keyring__export_secret_key_full__target/$1.masterkey_and_subkey.$(date +%Y%m%d).priv.key"
+    fi
+
+    gpg --output "$gpg_keyring__export_secret_key_full__target" --armor --export-secret-keys "$1"
+}
+
+gpg_keyring__export_secret_key_sub()
+{
+    gpg_keyring__export_secret_key_sub__args="expected args: <id> <path>"
+
+    if [ -z "$1" ]; then
+        echo >&2 "missing args !"
+        echo >&2 "$gpg_keyring__export_secret_key_sub__args"
+        return 2
+    fi
+
+    gpg_keyring__context || return 1
+
+    gpg_keyring__export_secret_key_sub__target="${2:-$GPG_KEYRING_EXPORT}"
+    if [ -d "$gpg_keyring__export_secret_key_sub__target" ]; then
+        gpg_keyring__export_secret_key_sub__target="$gpg_keyring__export_secret_key_sub__target/$1.subkey_only.$(date +%Y%m%d).priv.key"
+    fi
+
+    gpg --output "$gpg_keyring__export_secret_key_sub__target" --armor --export-secret-subkeys "$1"
+}
+
+gpg_keyring__export_public_key()
+{
+    gpg_keyring__export_public_key__args="expected args: <id> <path>"
+
+    if [ -z "$1" ]; then
+        echo >&2 "missing args !"
+        echo >&2 "$gpg_keyring__export_public_key__args"
+        return 2
+    fi
+
+    gpg_keyring__context || return 1
+
+    gpg_keyring__export_public_key__target="${2:-$GPG_KEYRING_EXPORT}"
+    if [ -d "$gpg_keyring__export_public_key__target" ]; then
+        gpg_keyring__export_public_key__target="$gpg_keyring__export_public_key__target/$1.masterkey_and_subkey.$(date +%Y%m%d).pub.gpg"
+    fi
+
+    gpg --output "$gpg_keyring__export_public_key__target" --armor --export "$1"
+}
+
+
+gpg_keyring__publish()
+{
+    gpg_keyring__publish__args="expected args: <id>"
+
+    if [ -z "$1" ]; then
+        echo >&2 "missing args !"
+        echo >&2 "$gpg_keyring__publish__args"
+        return 2
+    fi
+
+    gpg_keyring__context || return 1
+
+    gpg --keyserver hkp://keyserver.ubuntu.com --send-key "$1"
+    gpg --keyserver hkp://pool.sks-keyservers.net --send-key "$1"
+    gpg --keyserver hkp://keys.openpgp.org --send-key "$1"
+    gpg --keyserver hkp://pgp.mit.edu --send-key "$1"
+}
+
+
+gpg_keyring__import_key()
+{
+    gpg_keyring__import_key__args="expected args: <path>"
+
+    if [ -z "$1" ] || [ ! -f "$1" ]; then
+        echo >&2 "missing args !"
+        echo >&2 "$gpg_keyring__import_key__args"
+        return 2
+    fi
+
+    gpg_keyring__context || return 1
+
+    gpg --import "$1"
+}
+
+gpg_keyring__import_secret_key()
+{
+    gpg_keyring__import_secret_key__args="expected args: <path>"
+
+    if [ -z "$1" ] || [ ! -f "$1" ]; then
+        echo >&2 "missing args !"
+        echo >&2 "$gpg_keyring__import_secret_key__args"
+        return 2
+    fi
+
+    gpg_keyring__context || return 1
+
+    gpg --allow-secret-key-import --import "$1"
+}
+
+
+gpg_keyring__export_trustdb()
+{
+    gpg_keyring__export_trustdb__args="expected args: <path>"
+
+    gpg_keyring__context || return 1
+
+    gpg_keyring__export_trustdb__target="${2:-$GPG_KEYRING_EXPORT}"
+    if [ -d "$gpg_keyring__export_trustdb__target" ]; then
+        gpg_keyring__export_trustdb__target="$gpg_keyring__export_trustdb__target/trustdb.$(date +%Y%m%d).gpg"
+    fi
+
+    gpg --export-ownertrust > "$gpg_keyring__export_trustdb__target"
+}
+
+gpg_keyring__import_trustdb()
+{
+    gpg_keyring__import_trustdb__args="expected args: <path>"
+
+    if [ -z "$1" ] || [ ! -f "$1" ]; then
+        echo >&2 "missing args !"
+        echo >&2 "$gpg_keyring__import_trustdb__args"
+        return 2
+    fi
+
+    gpg_keyring__context || return 1
+
+    rm "$GPG_KEYRING_TRUSTDB"
+    gpg --import-ownertrust < "$1"
+}
+
+gpg_keyring__delete_public_key()
+{
+    gpg_keyring__delete_public_key__args="expected args: <id>"
+
+    if [ -z "$1" ]; then
+        echo >&2 "missing args !"
+        echo >&2 "$gpg_keyring__delete_public_key__args"
+        return 2
+    fi
+
+    gpg_keyring__context || return 1
+
+    gpg --delete-key "$1"
+}
+
+gpg_keyring__delete_secret_key()
+{
+    gpg_keyring__delete_secret_key__args="expected args: <id>"
+
+        if [ -z "$1" ]; then
+        echo >&2 "missing args !"
+        echo >&2 "$gpg_keyring__delete_secret_key__args"
+        return 2
+    fi
+
+    gpg_keyring__context || return 1
+
+    gpg --delete-secret-key "$1"
+}
+
+
+gpg_keyring__notes()
+{
+    cat <<EOF
+# principle
+- in KEYRING
+  - create master
+  - create subkey (addkey)
+  - export private subkey
+- in local
+  - import exported private subkey
+  - trust
+
+# labels
+- sec => 'SECret key'
+- ssb => 'Secret SuBkey'
+- pub => 'PUBlic key'
+- sub => 'public SUBkey'
+- sec# => 'missing SECret key'
+
+# key usage
+- cert | C     =>  key certification
+- sign | S     =>  key to sign
+- encrypt | E  =>  key to encrypt
+
+# edit-key
+- adduid  => to add identity on key
+- addkey  => to add sign key / crypt key / auth key
+- trust   => trust imported
+- revkey  => revoke subkey
+=> then save !
+
+# encrypt / decrypt (symmetric)
+- gpg [-o <output>] -c <file>
+- gpg [-o <output>] -d <file>.gpg
+
+# encrypt / decrypt (asymmetric)
+- gpg [-o <output>] -e -u "<sender_id>" -r "<receiver_id/encrypt_id>" <file>
+- gpg [-o <output>] -d <file>.gpg
+
+# sign / verify
+-
+- gpg -v <checksum_file>
+
+# sign new key with old key
+- gpg --default-key <old> --sign-key <new>
+
+EOF
+}
+
+gpg_keyring__usage()
+{
+    cat <<EOF
+$SCRIPT_NAME <options> <command> <parameters>
+
+with options in
+     h                 : help
+     d <keyring_path>  : change keyring path
+
+with command in
+     usage
+     notes
+     init
+
+     list-keys|lk
+     list-public-keys|lpk
+     list-secret-keys|lsk
+     list-signatures|ls
+     check-signatures|cs
+
+     generate-key|gk
+     generate-key-batch|gkb
+     generate-master-key|gmk
+
+     edit-key|ek
+     edit-adduid|eau
+     edit-addkey|eak
+
+     export-secret-key-full|eskf
+     export-secret-key-sub|esks
+     export-public-key|epk
+     import-key|ik
+     import-secret-key|isk
+     export_trustdb|et
+     import_trustdb|it
+
+     delete-public-key|dpk
+     delete-secret-key|dsk
+
+     publish|pu
+
+EOF
+}
+
+gpg_keyring()
+{
+    gpg_keyring__act=list_key
+
+    OPTIND=1
+    VERBOSE=0
+    while getopts :hvxd: opt; do
+        case $opt in
+            h) gpg_keyring__usage
+               return 0 ;;
+            v) VERBOSE=$(($VERBOSE + 1)) ;;
+            x) set -x ;;
+            d) GPG_KEYRING="$OPTARG" ;;
+        esac
+    done
+    shift $(($OPTIND - 1))
+
+    case $1 in
+        init|usage|notes)
+            gpg_keyring__act="$1"
+            shift
+            ;;
+        list-keys|lk)
+            gpg_keyring__act=list_keys
+            shift
+            ;;
+        list-public-keys|lpk)
+            gpg_keyring__act=list_public_keys
+            shift
+            ;;
+        list-secret-keys|lsk)
+            gpg_keyring__act=list_secret_keys
+            shift
+            ;;
+        generate-key|gk)
+            gpg_keyring__act=generate_key
+            shift
+            ;;
+        generate-key-batch|gkb)
+            gpg_keyring__act=generate_key_batch
+            shift
+            ;;
+        generate-master-key|gmk)
+            gpg_keyring__act=generate_master_key
+            shift
+            ;;
+        edit-key|ek)
+            gpg_keyring__act=edit_key
+            shift
+            ;;
+        edit-adduid|eau)
+            gpg_keyring__act=edit_adduid
+            shift
+            ;;
+        edit-addkey|eak)
+            gpg_keyring__act=edit_addkey
+            shift
+            ;;
+        list-signatures|ls)
+            gpg_keyring__act=list_signatures
+            shift
+            ;;
+        check-signatures|cs)
+            gpg_keyring__act=check_signatures
+            shift
+            ;;
+        export-secret-key-full|eskf)
+            gpg_keyring__act=export_secret_key_full
+            shift
+            ;;
+        export-secret-key-sub|esks)
+            gpg_keyring__act=export_secret_key_sub
+            shift
+            ;;
+        export-public-key|epk)
+            gpg_keyring__act=export_public_key
+            shift
+            ;;
+        import-key|ik)
+            gpg_keyring__act=import_key
+            shift
+            ;;
+        import-secret-key|isk)
+            gpg_keyring__act=import_secret_key
+            shift
+            ;;
+        export_trustdb|et)
+            gpg_keyring__act=export_trustdb
+            shift
+            ;;
+        import_trustdb|it)
+        gpg_keyring__act=import_trustdb
+            shift
+            ;;
+        delete-public-key|dpk)
+            gpg_keyring__act=delete_public_key
+            shift
+            ;;
+        delete-secret-key|dsk)
+            gpg_keyring__act=delete_secret_key
+            shift
+            ;;
+        publish|pu)
+            gpg_keyring__act=publish
+            shift
+            ;;
+        *)
+            echo >&2 "unsupported action \"$1\""
+            gpg_keyring__usage
+            return 1
+            ;;
+    esac
+
+    "gpg_keyring__${gpg_keyring__act}" "$@"
+
+    gpg_keyring__status=$?
+    gpg_keyring__clean_context
+    return $gpg_keyring__status
+}
+
+
+if ! is_sourced && [ "$SCRIPT_NAME" = 'gpg_keyring' ]; then
+    gpg_keyring "$@"
+fi

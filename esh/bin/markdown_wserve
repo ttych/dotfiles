@@ -1,0 +1,14 @@
+#!/bin/sh
+
+echo2()
+{
+    echo >&2 "$@"
+}
+
+
+if ! which octodown >/dev/null 2>&1; then
+    echo2 "install octodown with gem install octodown"
+    exit 1
+fi
+
+octodown --live-reload --style github "$@"

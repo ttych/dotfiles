@@ -1,0 +1,5 @@
+#!/bin/sh
+
+which exif >/dev/null 2>/dev/null || exit 1
+
+exif -t DateTimeOriginal "$@"

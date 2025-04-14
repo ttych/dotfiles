@@ -1,0 +1,3 @@
+#!/bin/sh
+
+ruby -rcsv -e 'rcsv = CSV.new(ARGF.read);'"$@"

@@ -1,0 +1,53 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+build_with()
+{
+    # set -x
+
+    build_with__include=
+    build_with__cppinclude=
+    build_with__lib=
+    build_with__ldlib=
+    build_with__pkgconfig=
+
+    for build_with__dist; do
+        build_with__dist="${build_with__dist%/}"
+
+        [ -z "$build_with__dist" ] && shift && break
+        [ ! -d "$build_with__dist" ] && break
+        shift
+
+        case "$build_with__dist" in
+            */lib)
+                build_with__base="$build_with__dist/.."
+                ;;
+            */lib/pkgconfig)
+                build_with__base="$build_with__dist/../.."
+                ;;
+            *)
+                build_with__base="$build_with__dist"
+                ;;
+        esac
+        if [ -d "$build_with__base/include" ]; then
+            build_with__include="${build_with__include:+$build_with__include:}$build_with__base/include"
+            build_with__cppinclude="${build_with__cppinclude:+$build_with__cppinclude }-I$build_with__base/include"
+        fi
+        if [ -d "$build_with__base/lib" ]; then
+            build_with__lib="${build_with__lib:+$build_with__lib:}$build_with__base/lib"
+            build_with__ldlib="${build_with__ldlib:+$build_with__ldlib }-Wl,-rpath=$build_with__base/lib"
+        fi
+        if [ -d "$build_with__base/lib/pkgconfig" ]; then
+            build_with__pkgconfig="${build_with__pkgconfig:+$build_with__pkgconfig:}$build_with__base/lib/pkgconfig"
+        fi
+    done
+
+    eval \
+        env \
+        ${build_with__pkgconfig:+PKG_CONFIG_PATH=\"${PKG_CONFIG_PATH}:$build_with__pkgconfig\"} \
+        ${build_with__cppinclude:+CPPFLAGS=\"${CPPFLAGS} $build_with__cppinclude\"} \
+        ${build_with__ldlib:+LDFLAGS=\"${LDFLAGS} $build_with__ldlib\"} \
+        "$@"
+}
+
+build_with "$@"

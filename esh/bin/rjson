@@ -1,0 +1,3 @@
+#!/bin/sh
+
+ruby -rjson -e 'rjson = JSON.parse(ARGF.read);'"$@"

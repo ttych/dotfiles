@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+
+["RUBY_VERSION", "RUBY_PATCHLEVEL", "RUBY_PLATFORM", "RUBY_RELEASE_DATE"].each do |const|
+  const_value = Object.const_get(const)
+  puts "#{const} #{const_value}"
+end
+
+puts
+
+require 'openssl'
+["VERSION", "OPENSSL_VERSION", "OPENSSL_LIBRARY_VERSION"].each do |const|
+  const_value = OpenSSL.const_get(const)
+  puts "OpenSSL::#{const} #{const_value}"
+end
