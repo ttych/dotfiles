@@ -1,0 +1,296 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+# set -x
+
+is_in_git()
+{
+    git rev-parse --git-dir >/dev/null 2>/dev/null || return 1
+}
+
+git_remote_url()
+{
+    git_remote_url=$(cd "${1:-.}" ; git remote get-url origin)
+}
+
+git_clone()
+{
+    mkdir -p "${2%/*}"
+    git clone -q "$1" "$2"
+}
+
+git_update()
+{
+    if [ -n "$GIT_UPDATE_FORCE" ]; then
+        git_update_force "$@"
+    else
+        git_update_simple "$@"
+    fi
+}
+
+git_update_simple()
+{
+    is_in_git || return 1
+
+    if git rev-parse @{u} >/dev/null 2>&1; then
+        git reset --quiet --hard HEAD &&
+            git pull --quiet --no-rebase --ff-only
+    fi
+    git submodule --quiet update --recursive
+}
+
+git_update_force()
+{
+    is_in_git || return 1
+
+    if git rev-parse @{u} >/dev/null 2>&1; then
+        git_branch_cur=`git rev-parse --abbrev-ref HEAD`
+        git_rem=`git branch --format '%(upstream:remotename)'`
+        git_branch_rem=`git branch --format '%(upstream)'`
+        git_branch_rem="${git_branch_rem#*/$git_rem/}"
+
+        git branch -d -r "$git_rem/$git_branch_rem"
+        git fetch "$git_rem" "$git_branch_rem"
+
+        git checkout -f "$git_rem/$git_branch_rem"
+        git branch -f "$git_branch_cur" "$git_rem/$git_branch_rem"
+        git checkout -f  "$git_branch_cur"
+    fi
+    git submodule --quiet update --recursive
+}
+
+RBENV_HOSTING="${RBENV_HOSTING:-https://github.com}"
+RBENV_ORGA="${RBENV_ORGA:-rbenv}"
+RBENV_REPO="${RBENV_REPO:-rbenv}"
+RBENV_PLUGINS="${RBENV_PLUGINS:-ruby-build rbenv-each rbenv-vars rbenv-default-gems}"
+RBENV_PLUGINS="${RBENV_PLUGINS} ${RBENV_PLUGINS_LOCAL}"
+RBENV_PLUGINS_ADDITIONAL="${RBENV_PLUGINS_ADDITIONAL:-rbenv-aliases rbenv-ctags rbenv-use rkh/rbenv-update}"
+
+rbenv_mgr_help()
+{
+    cat <<EOF
+Usage is :
+      $0 [-h] [-D] <action> <action_parameters>
+
+with action in :
+     help
+     info
+     install
+     update
+     fupdate
+     init
+EOF
+}
+
+rbenv_check()
+{
+    [ -z "$1" ] && return 1
+    [ -d "$1" ] || return 1
+    [ -x "$1/bin/rbenv" ] || return 1
+    RBENV_ROOT="$1" "$1/bin/rbenv" versions >/dev/null
+}
+
+rbenv_exec()
+{
+    rbenv_root "$1"
+    shift
+    RBENV_ROOT="$rbenv_root" "$rbenv_root/bin/rbenv" "$@"
+}
+
+rbenv_root()
+{
+    rbenv_root="${1:-$rbenv_root}"
+    rbenv_root="${rbenv_root:-$RBENV_ROOT}"
+
+    [ -n "$rbenv_root" ] && return 0
+
+    for rbenv_root in "${HOME_ALT:+$HOME_ALT/.rbenv}" \
+                          "$HOME/.rbenv" ;
+    do
+        rbenv_check "$rbenv_root" && break
+    done
+}
+
+rbenv_plugin()
+{
+    rbenv_plugin__name=
+    rbenv_plugin__url=
+    case "$1" in
+        "")
+            echo >&2 "plugin: empty input specified"
+            return 1
+            ;;
+        http*://*/*/*/*|*@*:*/*/*)
+            echo >&2 "plugin: wrong pattern \"$1\""
+            return 2
+            ;;
+        http*://*/*/*|*@*:*/*)
+            rbenv_plugin__url="$1"
+            ;;
+        */*)
+            rbenv_plugin__url="${RBENV_HOSTING}/$1"
+            ;;
+        *)
+            rbenv_plugin__url="${RBENV_HOSTING}/${RBENV_ORGA}/$1"
+            ;;
+    esac
+    rbenv_plugin__name="${1##*/}"
+    rbenv_plugin__name="${rbenv_plugin__name%.git}"
+}
+
+rbenv_mgr_info()
+{
+    rbenv_root "$1"
+    rbenv_check "$rbenv_root" || {
+        echo >&2 "no valid rbenv found at \"$rbenv_root\""
+        return 1
+    }
+
+    cat <<EOF
+$(rbenv_mgr_info_rbenv)
+
+$(rbenv_mgr_info_plugins)
+
+$(rbenv_mgr_info_ruby)
+EOF
+}
+
+rbenv_mgr_info_rbenv()
+{
+    echo '# rbenv distribution found:'
+    git_remote_url "$rbenv_root"
+    echo "$rbenv_root: $git_remote_url"
+}
+
+rbenv_mgr_info_ruby()
+{
+    echo '# installed ruby versions:'
+    RBENV_ROOT="$rbenv_root" rbenv versions
+}
+
+rbenv_mgr_info_plugins()
+(
+    echo '# install rbenv plugins:'
+    cd "$rbenv_root/plugins" || return 0
+    for d in */; do
+        git_remote_url "$d"
+        echo "${d%/}: $git_remote_url"
+    done
+)
+
+rbenv_mgr_install()
+{
+    rbenv_root "$1"
+    if rbenv_check "$rbenv_root"; then
+        echo >&2 "a distribution already exists in \"$rbenv_root\""
+        return 1
+    fi
+    [ -d "$1" ] && rm -Rf "$rbenv_root"
+    rbenv_mgr_install_base "$rbenv_root" &&
+        rbenv_mgr_install_plugins "$rbenv_root"
+}
+
+rbenv_mgr_install_base()
+{
+    echo "install rbenv from $RBENV_HOSTING/$RBENV_ORGA/$RBENV_REPO"
+    git_clone "$RBENV_HOSTING/$RBENV_ORGA/$RBENV_REPO" "$1"
+}
+
+rbenv_mgr_install_plugins()
+{
+    [ -d "$1/plugins" ] || mkdir -p "$1/plugins"
+    for plugin in $RBENV_PLUGINS; do
+        rbenv_plugin "$plugin" || continue
+        echo "install plugin $rbenv_plugin__name from $rbenv_plugin__url"
+        git_clone "$rbenv_plugin__url" "$1/plugins/$rbenv_plugin__name"
+    done
+}
+
+rbenv_mgr_update()
+{
+    rbenv_root "$1"
+    rbenv_mgr_update_base "$rbenv_root" &&
+        rbenv_mgr_update_plugins "$rbenv_root"
+}
+
+rbenv_mgr_update_base()
+(
+    echo "update rbenv"
+    if cd "$1" >/dev/null; then
+        git_update
+    else
+        rbenv_mgr_install_base
+    fi
+)
+
+rbenv_mgr_update_plugins()
+(
+    [ -d "$1/plugins" ] || mkdir -p "$1/plugins" || return 1
+    rbenv_mgr_update_plugins__processed=:
+    for plugin in $RBENV_PLUGINS; do
+        rbenv_plugin "$plugin" || continue
+        echo "update plugin $rbenv_plugin__name"
+        ( cd "$1/plugins/$rbenv_plugin__name" 2>/dev/null && git_update ) ||
+            git_clone "$rbenv_plugin__url" "$1/plugins/$rbenv_plugin__name"
+        rbenv_mgr_update_plugins__processed="${rbenv_mgr_update_plugins__processed}${rbenv_plugin__name}:"
+    done
+    for dir in "$1/plugins/"*/; do
+        dir="${dir%/}"
+        dir_name="${dir##*/}"
+        case "$rbenv_mgr_update_plugins__processed" in
+            *:"$dir_name":*)
+                continue
+                ;;
+        esac
+        echo "update plugin $dir_name"
+        cd "$dir" 2>/dev/null && git_update
+    done
+)
+
+rbenv_mgr_fupdate()
+{
+    GIT_UPDATE_FORCE=1
+
+    rbenv_mgr_update "$@"
+}
+
+rbenv_mgr_init()
+{
+    rbenv_root "$1"
+    echo "export RBENV_ROOT=\"$rbenv_root\""
+    rbenv_exec "$rbenv_root" init -
+}
+
+rbenv_mgr()
+{
+    rbenv_mgr=
+    rbenv_mgr__action=
+    while getopts :hD opt; do
+        case $opt in
+            h) rbenv_mgr_help
+               exit 0
+               ;;
+            D) set -x ;;
+        esac
+    done
+    shift $(($OPTIND - 1))
+
+    case $1 in
+        help|info|install|update|fupdate|init|"")
+            rbenv_mgr__action="rbenv_mgr_${1:-info}"
+            [ $# -gt 0 ] && shift
+            $rbenv_mgr__action "$@"
+            ;;
+        *)
+            echo >&2 "unknown action \"$1\""
+            rbenv_mgr_help
+            exit 1
+            ;;
+    esac
+}
+
+case "$0" in
+    */rbenv_mgr)
+        rbenv_mgr "$@"
+        ;;
+esac
