@@ -1,0 +1,14 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+# Usage :
+# mac2dos FILE [...]
+
+progname=${0##*/}
+tempfile=`mktemp $progname.XXXXXX` || exit 5
+for file
+do
+    { tr '\015' '\012' < "$file" || continue; } |
+        sed -e "s/$/$CR/" > "$tempfile" &&
+        mv "$tempfile" "$file"
+done

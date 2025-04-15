@@ -1,0 +1,15 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+# Usage :
+# unix2mac FILE [...]
+
+progname=${0##*/}
+tempfile=$(mktemp $progname.XXXXXX) || exit 5
+for file
+do
+    ## Old versions of tr do not understand \r and \n
+    ## the octal codes work on all versions
+    tr '\012' '\015' < "$file" > "$tempfile" &&
+        mv "$tempfile" "$file"
+done

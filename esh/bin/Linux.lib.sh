@@ -6,7 +6,6 @@ SCRIPT_RPATH="${0%$SCRIPT_NAME}"
 SCRIPT_PATH=`cd "${SCRIPT_RPATH:-.}" && pwd`
 
 
-
 ######################################### guard clause
 if [ "$(uname)" != "Linux" ]; then
   echo "This script is for Linux. Aborting."
@@ -73,15 +72,12 @@ pkg_latest_kernel_version()
 
 
 
-######################################### kernel
-KERNEL_VERSION=`uname -r`
-
-check_kernel_version()
+######################################### cpu
+cpu_count()
 {
-    [ "$(pkg_latest_kernel_version)" = "$KERNEL_VERSION" ] && return 0
-
-    echo2 "# running:$KERNEL_VERSION  installed:$(pkg_latest_kernel_version)"
-    return 1
+    # cpu_count=`grep -c '^processor' /proc/cpuinfo`
+    cpu_count=`nproc`
+    echo $cpu_count
 }
 
 
@@ -103,6 +99,19 @@ cat_entropy()
     if [ "$cat_entropy" -le "$LINUX_PROC_ENTROPY_BASE" ]; then
         echo >&2 "not enough, < $LINUX_PROC_ENTROPY_BASE"
     fi
+}
+
+
+
+######################################### kernel
+KERNEL_VERSION=`uname -r`
+
+check_kernel_version()
+{
+    [ "$(pkg_latest_kernel_version)" = "$KERNEL_VERSION" ] && return 0
+
+    echo2 "# running:$KERNEL_VERSION  installed:$(pkg_latest_kernel_version)"
+    return 1
 }
 
 

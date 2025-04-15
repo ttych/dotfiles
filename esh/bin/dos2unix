@@ -1,0 +1,14 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+# Usage :
+# dos2unix FILE [...]
+
+CR=$(printf "\r")
+progname=${0##*/}
+tempfile=$(mktemp $progname.XXXXXX) || exit 5
+for file
+do
+    sed "s/$CR$//" "$file" > "$tempfile" &&
+        mv "$tempfile" "$file"
+done

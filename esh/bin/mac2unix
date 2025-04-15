@@ -1,0 +1,13 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+# Usage :
+# mac2unix FILE [...]
+
+progname=${0##*/}
+tempfile=`mktemp $progname.XXXXXX` || exit 5
+for file
+do
+    tr '\015' '\012' < "$file" > "$tempfile" &&
+        mv "$tempfile" "$file"
+done

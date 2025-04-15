@@ -1,8 +1,43 @@
 #!/bin/sh
 # -*- mode: sh -*-
 
-### pkgconfig
 
+######################################### getent
+gh()
+{
+    getent hosts "$@"
+}
+
+gp()
+{
+    getent passwd "$@"
+}
+
+
+
+######################################### ps
+pstop()
+{
+    kill -STOP "$@"
+}
+
+prun()
+{
+    kill -CONT "$@"
+}
+
+ps_sessionid()
+{
+    ps -o sid= -p "$1"
+}
+
+ps_forest() {
+    ps --forest -o pid,tty,stat,time,cmd -T -g $(ps_sessionid "$1")
+}
+
+
+
+######################################### pkgconfig
 pkgconfig_path_pprint()
 {
     echo "$PKG_CONFIG_PATH" | tr ':' '\012'
