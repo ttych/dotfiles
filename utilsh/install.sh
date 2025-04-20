@@ -2,12 +2,15 @@
 
 DISTRIBUTIONS='
   https://github.com/ttych/pyv.git
-  https://github.com/ttych/wtmux.git
   https://github.com/ttych/wwine.git
-  https://github.com/ttych/installer.git
-  https://github.com/ttych/wec.git
   https://github.com/ttych/git-hooks.git
   https://github.com/ttych/publish.git
+'
+
+OLD_DISTRIBUTIONS='
+  https://github.com/ttych/installer.git
+  https://github.com/ttych/wec.git
+  https://github.com/ttych/wtmux.git
 '
 
 AUTOLOADS='
@@ -17,8 +20,12 @@ AUTOLOADS='
   pyv.sh
   git.lib.sh
   editors.lib.sh
+'
+
+OLD_AUTOLOADS='
   texlive.lib.sh
 '
+
 
 if [ -z "$UTILSH_DIR" ]; then
     UTILSH_DIR=`cd ${0%/*} ; echo $PWD`
