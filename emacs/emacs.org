@@ -1912,6 +1912,7 @@ org configuration:
 
     (defvar org-directories
       (list (concat org-directory "/tasks")
+            (concat org-directory "/learn")
             org-directory
             )
       "List of directories containing Org files.")
@@ -2993,14 +2994,46 @@ Corfu settings:
      (typescript-mode . eglot-ensure)
      (c-mode . eglot-ensure)
      (c++-mode . eglot-ensure))
+
     :custom
     (eglot-autoshutdown t)
     (eglot-extend-to-xref t)
     (eglot-send-changes-idle-time  0.5)
     ;; (eglot-events-buffer-size 2000000)
+
     :config
     (add-to-list 'eglot-server-programs
-             '(ruby-mode . ("ruby-lsp")))
+                 '(ruby-mode . ("ruby-lsp"))
+                 ;; '(ruby-mode . ("solargraph" "stdio"))
+                 )
+
+    ;; Custom initialization options for Ruby-LSP
+    (setq eglot-ruby-lsp-options
+          '(:enabledFeatures
+            (
+             :documentHighlights t
+             :documentSymbols t
+             :foldingRanges t
+             :selectionRanges t
+             :semanticHighlighting t
+             :formatting t
+             :onTypeFormatting t
+             :codeActions t
+             :completion t
+             :diagnostics t
+             :hover t))
+          )
+
+    ;; Apply Ruby-LSP configuration
+    (add-to-list 'eglot-workspace-configuration
+                 `((ruby-lsp . ,eglot-ruby-lsp-options))
+                 )
+
+    ;; Keybindings
+    ;; (define-key eglot-mode-map (kbd "C-c r") 'eglot-rename)
+    ;; (define-key eglot-mode-map (kbd "C-c f") 'eglot-format)
+    ;; (define-key eglot-mode-map (kbd "C-c h") 'eglot-help-at-point)
+    ;; (define-key eglot-mode-map (kbd "C-c a") 'eglot-code-actions)
     )
 #+end_src
 
@@ -3019,7 +3052,6 @@ Corfu settings:
 | START        | M-x eglot                               |
 | START (hook) | (add-hook 'foo-mode-hook 'eglot-ensure) |
 |--------------+-----------------------------------------|
-|              |                                         |
 
 ***** commands
 
@@ -3045,9 +3077,13 @@ Corfu settings:
 | eglot-signal-didChangeConfiguration |                                           |
 | eglot-clear-status                  |                                           |
 |-------------------------------------+-------------------------------------------|
+| eglot-rename                        |                                           |
+| eglot-format                        |                                           |
+| eglot-help-at-point                 |                                           |
+|-------------------------------------+-------------------------------------------|
 | eldoc                               |                                           |
 | eldoc-doc-buffer                    |                                           |
-| lymake-show-diagnostics
+| flymake-show-diagnostics            |                                           |
 | flymake-show-buffer-diagnostics     |                                           |
 | flymake-show-project-diagnostics    |                                           |
 | xref-find-definitions               |                                           |
