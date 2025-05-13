@@ -1,0 +1,200 @@
+#!/bin/sh
+
+rb()
+{
+    ruby "$@"
+}
+
+rcop()
+{
+    rubocop "$@"
+}
+
+bundle_exec()
+{
+    bundle exec "$@"
+}
+bexec()
+{
+    bundle_exec "$@"
+}
+Bexec()
+{
+    bundle_exec "$@"
+}
+
+brake()
+{
+    bundle_exec rake "$@"
+}
+Brake()
+{
+    bundle_exec rake "$@"
+}
+
+bruby()
+{
+    bundle_exec ruby "$@"
+}
+Bruby()
+{
+    bundle_exec ruby "$@"
+}
+brb()
+{
+    bundle_exec ruby "$@"
+}
+birb()
+{
+    bundle_exec irb "$@"
+}
+Birb()
+{
+    bundle_exec irb "$@"
+}
+
+brails()
+{
+    bundle_exec rails "$@"
+}
+Brails()
+{
+    bundle_exec rails "$@"
+}
+bconsole()
+{
+    bundle_exec console "$@"
+}
+Bconsole()
+{
+    bundle_exec console "$@"
+}
+
+brubocop()
+{
+    bundle_exec rubocop "$@"
+}
+Brubocop()
+{
+    bundle_exec rubocop "$@"
+}
+brcop()
+{
+    bundle_exec rubocop "$@"
+}
+Brcop()
+{
+    bundle_exec rubocop "$@"
+}
+
+brspec()
+{
+    bundle_exec rspec "$@"
+}
+Brspec()
+{
+    bundle_exec rspec "$@"
+}
+
+bguard()
+{
+    bundle_exec guard "$@"
+}
+Bguard()
+{
+    bundle_exec guard "$@"
+}
+
+rman()
+{
+    gem man -s "$@"
+}
+
+bcap()
+{
+    bundle_exec cap "$@"
+}
+Bcap()
+{
+    bundle_exec cap "$@"
+}
+
+bjekyll()
+{
+    bundle_exec jekyll "$@"
+}
+Bjekyll()
+{
+    bundle_exec jekyll "$@"
+}
+bjekylls()
+{
+    bjekyll serve --drafts --livereload --watch "$@"
+}
+Bjekylls()
+{
+    bundle_exec jekyll serve --drafts --livereload --watch "$@"
+}
+bjekylls2()
+{
+    bundle_exec jekyll serve --port 4001 --drafts --livereload --livereload-port 4011 --watch "$@"
+}
+Bjekylls2()
+{
+    bjekylls2 "$@"
+}
+
+bnanoc()
+{
+    bundle_exec nanoc "$@"
+}
+Bnanoc()
+{
+    bnanoc "$@"
+}
+bnanocs()
+{
+    bnanoc view --live-reload "$@"
+}
+Bnanocs()
+{
+    bnanocs "$@"
+}
+bnanocb()
+{
+    bnanoc compile --watch "$@"
+}
+Bnanocb()
+{
+    bnanocb "$@"
+}
+
+bmiddleman()
+{
+    bundle_exec middleman "$@"
+}
+Bmiddleman()
+{
+    bmiddleman "$@"
+}
+bmiddlemans()
+{
+    bmiddleman server --verbose "$@"
+}
+Bmiddlemans()
+{
+    bmiddlemans "$@"
+}
+
+yards()
+{
+    yard server --reload "$@"
+}
+byards()
+{
+    bundle exec yard server --reload "$@"
+}
+Byards()
+{
+    byards "$@"
+}

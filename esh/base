@@ -132,8 +132,8 @@ _path_add_var()
 
 _path_add()
 {
-    _path_add__loc1="$1" ; shift
-    _path_add__loc2="$1" ; shift
+    _path_add__loc1="${1:-front}" ; shift
+    _path_add__loc2="${1:-back}" ; shift
     [ $# -eq 0 ] && return
     case $_path_add__loc1 in
         pre|front) _path_add__loc1=FRONT ;;
@@ -219,77 +219,114 @@ path_purge()
 
 path_add()
 {
-    path_add_pre "$@"
-}
-
-path_add_pre_pre()
-{
-    _path_add pre pre "$@"
+    _path_add pre post "$@"
 }
 
 path_add_pre()
 {
     _path_add pre post "$@"
 }
-
-path_add_base_pre()
+path_add_pre_pre()
 {
-    _path_add base pre "$@"
+    _path_add pre pre "$@"
+}
+path_add_pre_post()
+{
+    _path_add pre post "$@"
 }
 
 path_add_base()
 {
     _path_add base post "$@"
 }
-
-path_add_post_pre()
+path_add_base_pre()
 {
-    _path_add post pre "$@"
+    _path_add base pre "$@"
+}
+path_add_base_post()
+{
+    _path_add base post "$@"
 }
 
 path_add_post()
 {
     _path_add post post "$@"
 }
+path_add_post_pre()
+{
+    _path_add post pre "$@"
+}
+path_add_post_post()
+{
+    _path_add post post "$@"
+}
 
 _path_addin()
 {
-    path_addin__loc="$1" ; shift
+    path_addin__loc1="${1:-front}" ; shift
+    path_addin__loc2="${1:-back}" ; shift
     for path_addin__p
     do
         [ -d "$path_addin__p" ] || continue
-        if [ -r "$path_addin__p/_path_load" ]; then
+        if [ -r "$path_addin__p/.load_path" ]; then
             while read path_addin__dist path_addin__mode; do
-                path_add_${path_addin__loc}_${path_addin__mode:+_$path_addin__mode} "${path_addin__p}/${path_addin__dist}"
-            done < "$path_addin__p/to_load"
+                path_addin__mode=${path_addin__mode:-$path_addin__loc2}
+                path_add_${path_addin__loc1}${path_addin__mode:+_$path_addin__mode} "${path_addin__p}/${path_addin__dist}"
+            done < "$path_addin__p/.load_path"
         elif (echo "$path_addin__p"/* >/dev/null) 2>/dev/null; then
             for path_addin__dist in "$path_addin__p"/*; do
                 case "${path_addin__dist##*/}" in
                     _*) continue ;;
                 esac
                 [ -d "$path_addin__dist" ] && \
-                    path_add_${path_addin__loc} "$path_addin__dist"
+                    path_add_${path_addin__loc1}_${path_addin__loc2} "$path_addin__dist"
             done
         fi
     done
 }
 
-path_addin_pre()
-{
-    _path_addin pre "$@"
-}
-path_addin_base()
-{
-    _path_addin base "$@"
-}
-path_addin_post()
-{
-    _path_addin post "$@"
-}
-
 path_addin()
 {
-    path_addin_pre "$@"
+    _path_addin pre post "$@"
+}
+
+path_addin_pre()
+{
+    _path_addin pre post "$@"
+}
+path_addin_pre_pre()
+{
+    _path_addin pre pre "$@"
+}
+path_addin_pre_post()
+{
+    _path_addin pre post "$@"
+}
+
+path_addin_base()
+{
+    _path_addin base post "$@"
+}
+path_addin_base_pre()
+{
+    _path_addin base pre "$@"
+}
+path_addin_base_post()
+{
+    _path_addin base post "$@"
+}
+
+path_addin_post()
+{
+    _path_addin post post "$@"
+}
+path_addin_post_pre()
+{
+    _path_addin post pre "$@"
+}
+path_addin_post_post()
+{
+    _path_addin post post "$@"
 }
 
 _path_activate()
@@ -301,7 +338,6 @@ _path_activate()
         return 0
     fi
 }
-
 _path_deactivate()
 {
     _path_activate=

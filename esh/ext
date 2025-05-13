@@ -466,6 +466,86 @@ esh_ext_local()
     }
 }
 
+######################################### EXT :: ruby_env
+esh_ext_ruby_env()
+{
+    rbenv_guess_path()
+    {
+        rbenv_guess_path="${1}"
+        rbenv_guess_path="${rbenv_guess_path:-$(rbenv root 2>/dev/null)}"
+        rbenv_guess_path="${rbenv_guess_path:-$RBENV_ROOT}"
+        rbenv_guess_path="${rbenv_guess_path:-$HOME/.rbenv}"
+    }
+
+    rbenv_load()
+    {
+        rbenv_guess_path "$1"
+        RBENV_ROOT="$rbenv_guess_path"
+        export RBENV_ROOT
+        PATH="$RBENV_ROOT/bin:$PATH"
+        export PATH
+        eval "$(rbenv init -)"
+        #[ -r "$RBENV_ROOT/completions/rbenv.${SHELL_SHORT}" ] &&
+        #    . "$RBENV_ROOT/completions/rbenv.${SHELL_SHORT}"
+    }
+
+    rvm_load()
+    {
+        source "${1:-$HOME/.rvm/scripts/rvm}"
+    }
+
+    ruby_env()
+    {
+        [ -n "$ruby_env" ] && return 0
+
+        for _RUBY_HOME in "${HOME_ALT}" "${HOME}"; do
+            _RUBY_RBENV_AVAILABLE=false
+            _RUBY_RBENV_ROOT="$_RUBY_HOME/.rbenv"
+            ( cd "$_RUBY_RBENV_ROOT" 2>/dev/null ) && [ -x "$_RUBY_RBENV_ROOT/bin/rbenv" ] && _RUBY_RBENV_AVAILABLE=true
+
+            _RUBY_RVM_AVAILABLE=false
+            _RUBY_RVM_ROOT="$_RUBY_HOME/.rvm"
+            ( cd "$_RUBY_RVM_ROOT" 2>/dev/null ) && [ -x "$_RUBY_RVM_ROOT/scripts/rvm" ] && _RUBY_RVM_AVAILABLE=true
+
+            if $_RUBY_RBENV_AVAILABLE; then
+                rbenv_load "$_RUBY_RBENV_ROOT"
+                ruby_env="rbenv"
+                break
+            elif $_RUBY_RVM_AVAILABLE; then
+                rvm_load "$_RUBY_RVM_ROOT"
+                ruby_env="rvm"
+                break
+            fi
+        done
+    }
+
+    ruby_env_find_dir()
+    {
+        eval ruby_env_find_dir="\$$1"
+        if [ -z "$ruby_env_find_dir" ]; then
+            ruby_env_find_dir_=
+            # existing ?
+            for ruby_env_find_dir__h in "${HOME_ALT}" "${HOME}"; do
+                [ -z "$ruby_env_find_dir__h" ] && continue
+                [ -z "$ruby_env_find_dir_" ] && ruby_env_find_dir_="${ruby_env_find_dir__h}/${2}"
+                if [ -d "${ruby_env_find_dir__h}/${2}" ]; then
+                    ruby_env_find_dir="${ruby_env_find_dir__h}/${2}"
+                    break
+                fi
+            done
+            # set default
+            [ -z "$ruby_env_find_dir" ] && ruby_env_find_dir="$ruby_env_find_dir_"
+
+            eval "$1"="$ruby_env_find_dir"
+            export "$1"
+        fi
+    }
+
+    ruby_env
+    ruby_env_find_dir RUBY_BUILD_ROOT local/ruby-build
+    ruby_env_find_dir RUBY_INSTALL_ROOT local/ruby-install
+}
+
 ######################################### EXT :: ruby
 esh_ext_ruby()
 {
@@ -478,7 +558,9 @@ esh_ext_ruby()
 }
 esh_ext_ruby_interactive()
 {
-    :
+    [ -r "${ESH_EXTD_DIR}/ruby/shortcuts" ] &&
+        . "${ESH_EXTD_DIR}/ruby/shortcuts"
+    return 0
 }
 
 ######################################### EXT :: terminal
@@ -492,6 +574,10 @@ esh_ext_terminal()
         reset
         # reset terminal attribute
         tput sgr0
+    }
+    reset_term()
+    {
+        _term_reset "$@"
     }
 }
 esh_ext_terminal_interactive()
@@ -754,110 +840,6 @@ esh_ext_shortcuts_interactive()
     #stty intr '^C'
 
 
-    ### ruby
-    rb()
-    {
-        ruby "$@"
-    }
-
-    rcop()
-    {
-        rubocop "$@"
-    }
-
-    bundle_exec()
-    {
-        bundle exec "$@"
-    }
-
-    bexec()
-    {
-        bundle_exec "$@"
-    }
-    brake()
-    {
-        bundle_exec rake "$@"
-    }
-    bruby()
-    {
-        bundle_exec ruby "$@"
-    }
-    brb()
-    {
-        bruby "$@"
-    }
-    birb()
-    {
-        bundle_exec irb "$@"
-    }
-    brails()
-    {
-        bundle_exec rails "$@"
-    }
-    bconsole()
-    {
-        bundle_exec console "$@"
-    }
-    brubocop()
-    {
-        bundle_exec rubocop "$@"
-    }
-    brcop()
-    {
-        bundle_exec rubocop "$@"
-    }
-    brspec()
-    {
-        bundle_exec rspec "$@"
-    }
-    bguard()
-    {
-        bundle_exec guard "$@"
-    }
-
-    Bexec()
-    {
-        bundle_exec "$@"
-    }
-    Brake()
-    {
-        bundle_exec rake "$@"
-    }
-    Bruby()
-    {
-        bundle_exec ruby "$@"
-    }
-    Brails()
-    {
-        bundle_exec rails "$@"
-    }
-    Bconsole()
-    {
-        bundle_exec console "$@"
-    }
-    Birb()
-    {
-        bundle_exec irb "$@"
-    }
-    Brubocop()
-    {
-        bundle_exec rubocop "$@"
-    }
-    Brspec()
-    {
-        bundle_exec rspec "$@"
-    }
-    Bguard()
-    {
-        bundle_exec guard "$@"
-    }
-
-    rman()
-    {
-        gem man -s "$@"
-    }
-
-
     ### copy / paste
 
     # alias pbcopy='xsel --clipboard --input'
@@ -951,7 +933,10 @@ esh_ext_load \
     terminal \
     lang \
     local \
-    tmux \
+    ruby_env \
+    tmux
+
+esh_ext_load \
     home \
     $ESH_SH_CUR_SHORT \
     utilsh \
