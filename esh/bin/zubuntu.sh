@@ -135,7 +135,7 @@ step_zpool()
           -O acltype=posixacl \
           -O xattr=sa \
           -O dnodesize=auto \
-          -O normalization=formD \
+          -O normalization=formC \
           -O atime=off \
           -O relatime=off \
           -m none \
