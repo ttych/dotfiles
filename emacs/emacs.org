@@ -1911,9 +1911,9 @@ org configuration:
     (setq org-directory "~/org")
 
     (defvar org-directories
-      (list (concat org-directory "/tasks")
+      (list org-directory
+            (concat org-directory "/tasks")
             (concat org-directory "/learn")
-            org-directory
             )
       "List of directories containing Org files.")
 
@@ -2887,10 +2887,11 @@ Order example:
           ;; company-dabbrev-downcase nil
           ;; company-dabbrev-ignore-case t
           )
-    :bind (("<TAB>" . company-indent-or-complete-common)
+    :bind (
+           ;; ("<TAB>" . company-indent-or-complete-common)
            ("M-'" . company-complete)
            :map company-active-map
-           ("<TAB>" . company-complete-common-or-cycle)
+           ("<tab>" . company-complete-common-or-cycle)
            ("<backtab>" . company-select-previous))
     )
 #+end_src
@@ -2999,15 +3000,17 @@ Corfu settings:
     (eglot-autoshutdown t)
     (eglot-extend-to-xref t)
     (eglot-send-changes-idle-time  0.5)
+    (eglot-connect-timeout 10)
+    (eglot-sync-connect 1)
     ;; (eglot-events-buffer-size 2000000)
 
     :config
     (add-to-list 'eglot-server-programs
                  '(ruby-mode . ("ruby-lsp"))
+                 ;; '(ruby-mode . ("ruby-lsp" "--verbose"))
                  ;; '(ruby-mode . ("solargraph" "stdio"))
                  )
 
-    ;; Custom initialization options for Ruby-LSP
     (setq eglot-ruby-lsp-options
           '(:enabledFeatures
             (
@@ -3021,19 +3024,22 @@ Corfu settings:
              :codeActions t
              :completion t
              :diagnostics t
-             :hover t))
+             :hover t
+             ))
           )
 
-    ;; Apply Ruby-LSP configuration
     (add-to-list 'eglot-workspace-configuration
                  `((ruby-lsp . ,eglot-ruby-lsp-options))
                  )
 
-    ;; Keybindings
+    ;; Keybindings (separate map)
     ;; (define-key eglot-mode-map (kbd "C-c r") 'eglot-rename)
     ;; (define-key eglot-mode-map (kbd "C-c f") 'eglot-format)
     ;; (define-key eglot-mode-map (kbd "C-c h") 'eglot-help-at-point)
     ;; (define-key eglot-mode-map (kbd "C-c a") 'eglot-code-actions)
+    ;; (define-key my/eglot-mode-map (kbd "C-c d") 'eglot-find-declaration)
+    ;; (define-key my/eglot-mode-map (kbd "C-c t") 'eglot-find-typeDefinition)
+
     )
 #+end_src
 
@@ -3044,14 +3050,6 @@ Corfu settings:
 
 ***** references
 - https://www.gnu.org/software/emacs/manual/html_node/eglot/index.html
-
-***** flow
-
-| step         | action                                  |
-|--------------+-----------------------------------------|
-| START        | M-x eglot                               |
-| START (hook) | (add-hook 'foo-mode-hook 'eglot-ensure) |
-|--------------+-----------------------------------------|
 
 ***** commands
 
@@ -3080,6 +3078,8 @@ Corfu settings:
 | eglot-rename                        |                                           |
 | eglot-format                        |                                           |
 | eglot-help-at-point                 |                                           |
+| eglot-find-declaration              |                                           |
+| eglot-find-typeDefinition           |                                           |
 |-------------------------------------+-------------------------------------------|
 | eldoc                               |                                           |
 | eldoc-doc-buffer                    |                                           |
