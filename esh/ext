@@ -300,16 +300,19 @@ esh_ext_keychain_interactive()
 }
 
 ######################################### EXT :: home
+esh_ext_home()
+{
+    HOME_ALT_REF="${HOME}/.local/home/${ESH_HOSTNAME}"
+    HOME_ALT=$(cd "$HOME_ALT_REF" 2>/dev/null && pwd -P)
+    export HOME_ALT
+}
+
 esh_ext_home_interactive()
 {
     home()
     {
         cd "$HOME"
     }
-
-    HOME_ALT_REF="${HOME}/.local/home/${ESH_HOSTNAME}"
-    HOME_ALT=$(cd "$HOME_ALT_REF" 2>/dev/null && pwd -P)
-    export HOME_ALT
 
     home_alt()
     {
@@ -933,11 +936,11 @@ esh_ext_load \
     terminal \
     lang \
     local \
+    home \
     ruby_env \
     tmux
 
 esh_ext_load \
-    home \
     $ESH_SH_CUR_SHORT \
     utilsh \
     ruby \
