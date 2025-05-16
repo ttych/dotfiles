@@ -935,8 +935,8 @@ esh_ext_direnv_interactive()
 esh_ext_load \
     terminal \
     lang \
-    local \
     home \
+    local \
     ruby_env \
     tmux
 
