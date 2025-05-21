@@ -582,6 +582,10 @@ esh_ext_terminal()
     {
         _term_reset "$@"
     }
+    treset()
+    {
+        _term_reset "$@"
+    }
 }
 esh_ext_terminal_interactive()
 {
