@@ -10,23 +10,63 @@ if [ -z "$Y_DL" ]; then
     cat <<EOF >&2
 no yt-dlp or youtube-dl exe,
 consider installing one or the other:
-- pip install -U yt-dlp
-- pip install -U youtube-dl
+- pip install -U yt-dlp (newer)
+- pip install -U youtube-dl (older)
 EOF
     exit 1
 fi
 
+
 DOWNLOAD_DIR="${DOWNLOAD_DIR:-$HOME/Downloads/}"
+HEIGHT=1080
+FORMAT=mkv
+CODEC=libx265
+CRF=24
+
+usage()
+{
+    cat <<EOF
+usage is:
+  $0 [options] URL
+
+with options:
+  -d download_dir (default: $DOWNLOAD_DIR)
+  -r height resolution (default: 1080)
+  -f format in mkv,mp4,... (default: mkv)
+  -v video codec (default: libx265)
+  -V video CRF (default: 24)
+
+using exe: $Y_DL
+EOF
+}
+
+OPTIND=1
+while getopts :hd:r:f:v:V: opt; do
+    case $opt in
+        h) usage
+           exit 0
+           ;;
+        d) DOWNLOAD_DIR="$OPTARG"
+           ;;
+        r) HEIGHT="$OPTARG"
+           ;;
+        f) FORMAT="$OPTARG"
+           ;;
+        v) CODEC="$OPTARG"
+           ;;
+        V) CRF="$OPTARG"
+           ;;
+    esac
+done
+shift $(($OPTIND - 1))
+
 
 for link; do
     $Y_DL \
         --all-subs \
         -o "$DOWNLOAD_DIR/%(upload_date)s_%(channel)s__%(title)s.%(ext)s" \
-        -f "bv*[height<=1080]+ba/b" \
+        -f "bestvideo[height<=${HEIGHT}]+bestaudio" \
+        --merge-output-format ${FORMAT} \
+        --postprocessor-args "ffmpeg:-c:v ${CODEC} -crf ${CRF} -preset slow" \
         "$link"
-
-    ## youtube-dl
-    # -f 'mp4[height=1080]+m4a/bestvideo[height<=1080]+bestaudio'
-    ## mp4 else best
-    # -f "bv*[height=1080][ext=mp4]+ba[ext=m4a]/b[ext=mp4] / bv*[height<=1080]+ba/b"
 done
