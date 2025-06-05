@@ -66,9 +66,9 @@ prompt_git()
 {
     prompt_git=
     prompt_git_alt=
-    if _git_prompt "$@"; then
-        prompt_git="$_git_prompt"
-        prompt_git_alt="$_git_prompt_alt"
+    if __git_prompt "$@"; then
+        prompt_git="$__git_prompt"
+        prompt_git_alt="$__git_prompt_alt"
     fi
 }
 
