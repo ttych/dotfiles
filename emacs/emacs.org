@@ -1317,7 +1317,6 @@ To defer package loading:
 ** utility
 
 *** dired
-
 **** settings
 
 basic dired settings :
@@ -1339,7 +1338,7 @@ basic dired settings :
 |                                         |                                                |
 
 #+begin_src emacs-lisp
-  (setq dired-listing-switches "-alh --group-directories-first"
+  (setq dired-listing-switches "-alhv --group-directories-first"
         dired-dwim-target t
         dired-recursive-copies 'always
         dired-recursive-deletes 'top
@@ -1347,6 +1346,8 @@ basic dired settings :
         dired-auto-revert-buffer 'dired-directory-changed-p
         dired-hide-details-hide-symlink-targets nil
         dired-ls-F-marks-symlinks nil
+        dired-clean-up-buffers-too t
+        dired-clean-confirm-killing-deleted-buffers t
         )
 #+end_src
 
@@ -1358,7 +1359,6 @@ basic dired settings :
 | dired-jump    | C-x C-j  | open dired, select the current file |
 | project-dired | C-x p D  |                                     |
 |---------------+----------+-------------------------------------|
-|               |          |                                     |
 
 **** operation
 
@@ -1390,7 +1390,6 @@ basic dired settings :
 |----------+---------------------------------------------------|
 | D        | delete marked file                                |
 | d        | mark file for deletion                            |
-|----------+---------------------------------------------------|
 | x        | execute deletion for marks                        |
 |----------+---------------------------------------------------|
 | Z        | compress or uncompress a file / folder (tar.gz)   |
@@ -1411,7 +1410,6 @@ basic dired settings :
 | C-x C-q  | (toggle) editable dired                           |
 | C-c C-c  | apply changes of dired buffer                     |
 |----------+---------------------------------------------------|
-|          |                                                   |
 
 **** dired-x
 
@@ -1434,24 +1432,41 @@ basic dired settings :
   (use-package dired-open
     :ensure t
     :after dired
+    :hook (dired-mode . dired-open-mode)
     :config
     ;; (add-to-list 'dired-open-functions #'dired-open-xdg t)
     ;; -- ^OR --
-    (setq dired-open-extensions '(("png" . "feh")
-                                  ("mkv" . "mpv")))
+    (setq dired-open-extensions '(
+                                  ;; ("png" . "feh")
+                                  ("mp3" . "mpv")
+                                  ("mp4" . "mpv")
+                                  ("webm" . "mpv")
+                                  ("mkv" . "mpv")
+                                  ("docx" . "libreoffice")
+                                  ("xlsx" . "libreoffice")
+                                  ("pptx" . "libreoffice")
+                                  ))
+    :bind (:map dired-mode-map
+                ("C-c o" . dired-open-file-other)  ; Open with other program
+                ("C-c c-o" . dired-open-external)  ; Open externally
+                )
     )
 #+end_src
 
 **** dired-hide-dotfiles
 
-#+begin_src emacs-lisp :tangle no
+#+begin_src emacs-lisp
   (use-package dired-hide-dotfiles
     :ensure t
     :defer t
     :hook (dired-mode . dired-hide-dotfiles-mode)
+    :bind (:map dired-mode-map
+                ("." . dired-hide-dotfiles-mode))
     :config
-    ;; (evil-collection-define-key 'normal 'dired-mode-map
-    ;;                            "H" 'dired-hide-dotfiles-mode))
+    (setq dired-hide-dotfiles-mode t
+          ;; dired-omit-files "^\\.[^.]"
+          )
+    )
 #+end_src
 
 *** lossage
@@ -1763,6 +1778,13 @@ highlights color strings.
 On first execution, run (M-x):
 #+begin_src emacs-lisp :tangle no
   all-the-icons-install-fonts
+#+end_src
+
+dired
+#+begin_src emacs-lisp :tangle no
+  (use-package all-the-icons-dired
+    :hook (dired-mode . all-the-icons-dired-mode)
+    )
 #+end_src
 
 *** htmlize
