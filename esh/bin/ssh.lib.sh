@@ -43,6 +43,7 @@ sshtun()
 {
     ssh \
         $SSH_DEFAULTS \
+        -n \
         -N \
         -f \
         -q \
