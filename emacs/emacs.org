@@ -1293,15 +1293,20 @@ To defer package loading:
 
 *** auto-package-update
 
-#+begin_src emacs-lisp :tangle no
+#+begin_src emacs-lisp
   (use-package auto-package-update
     :custom
     (auto-package-update-interval 7)
-    ;; (auto-package-update-prompt-before-update t)
+    (auto-package-update-prompt-before-update t)
     (auto-package-update-hide-results t)
     :config
     (auto-package-update-maybe)
-    (auto-package-update-at-time "09:00"))
+    (auto-package-update-at-time "13:00"))
+#+end_src
+
+to update NOW :
+#+begin_src emacs-lisp :tangle no
+  (auto-update-package-now)
 #+end_src
 
 *** try
@@ -1944,6 +1949,10 @@ org configuration:
           )
 
     (setq org-directory "~/org")
+
+    ;; (setq
+    ;;  org-use-property-inheritance t
+    ;;  )
 
     (defvar org-directories
       (list org-directory
