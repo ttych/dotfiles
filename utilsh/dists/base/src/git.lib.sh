@@ -14,106 +14,106 @@ __git_eread ()
     test -r "$1" && IFS=$'\r\n' read "$2" <"$1"
 }
 
-_git_info()
+__git_info()
 {
-    _git_info__head_sha=
-    _git_info__is_inside_work_tree=
-    _git_info__is_inside_git_dir=
-    _git_info__is_bare_repository=
-    _git_info__git_dir=
-    _git_info__git_name=
-    _git_info__ignored=false
-    _git_info__staged=false
-    _git_info__changed=false
-    _git_info__untracked=false
-    _git_info__detached=false
-    _git_info__branch=
-    _git_info__action=
-    _git_info__action_extended=
-    _git_info__step=
-    _git_info__total=
+    __git_info__head_sha=
+    __git_info__is_inside_work_tree=
+    __git_info__is_inside_git_dir=
+    __git_info__is_bare_repository=
+    __git_info__git_dir=
+    __git_info__git_name=
+    __git_info__ignored=false
+    __git_info__staged=false
+    __git_info__changed=false
+    __git_info__untracked=false
+    __git_info__detached=false
+    __git_info__branch=
+    __git_info__action=
+    __git_info__action_extended=
+    __git_info__step=
+    __git_info__total=
 
-    _git_info__rev_parse="$(git rev-parse --absolute-git-dir --is-bare-repository --is-inside-git-dir --is-inside-work-tree --short HEAD 2>/dev/null)"
-    _git_info__status=$?
-    [ -z "$_git_info__rev_parse" ] && return 1
+    __git_info__rev_parse="$(git rev-parse --absolute-git-dir --is-bare-repository --is-inside-git-dir --is-inside-work-tree --short HEAD 2>/dev/null)"
+    __git_info__status=$?
+    [ -z "$__git_info__rev_parse" ] && return 1
 
-    _git_info__tmp="${_git_info__rev_parse}"
-    _git_info__git_dir="${_git_info__tmp%%
+    __git_info__tmp="${__git_info__rev_parse}"
+    __git_info__git_dir="${__git_info__tmp%%
 *}"
-    _git_info__tmp="${_git_info__tmp#$_git_info__git_dir?}"
-    _git_info__is_bare_repository="${_git_info__tmp%%
+    __git_info__tmp="${__git_info__tmp#$__git_info__git_dir?}"
+    __git_info__is_bare_repository="${__git_info__tmp%%
 *}"
-    _git_info__tmp="${_git_info__tmp#$_git_info__is_bare_repository?}"
-    _git_info__is_inside_git_dir="${_git_info__tmp%%
+    __git_info__tmp="${__git_info__tmp#$__git_info__is_bare_repository?}"
+    __git_info__is_inside_git_dir="${__git_info__tmp%%
 *}"
-    _git_info__tmp="${_git_info__tmp#$_git_info__is_inside_git_dir?}"
-    _git_info__is_inside_work_tree="${_git_info__tmp%%
+    __git_info__tmp="${__git_info__tmp#$__git_info__is_inside_git_dir?}"
+    __git_info__is_inside_work_tree="${__git_info__tmp%%
 *}"
-    _git_info__tmp="${_git_info__tmp#$_git_info__is_inside_work_tree?}"
-    _git_info__head_sha="${_git_info__tmp}"
+    __git_info__tmp="${__git_info__tmp#$__git_info__is_inside_work_tree?}"
+    __git_info__head_sha="${__git_info__tmp}"
 
-    _git_info__git_name="${_git_info__git_dir}"
-    [ "$_git_info__is_bare_repository" = "false" ] && _git_info__git_name="${_git_info__git_name%/.git}"
-    _git_info__git_name="${_git_info__git_name##*/}"
+    __git_info__git_name="${__git_info__git_dir}"
+    [ "$__git_info__is_bare_repository" = "false" ] && __git_info__git_name="${__git_info__git_name%/.git}"
+    __git_info__git_name="${__git_info__git_name##*/}"
 
-    [ $_git_info__status -ne 0 ] && return 0
+    [ $__git_info__status -ne 0 ] && return 0
 
-    if [ "$_git_info__is_inside_work_tree" = "true" ]; then
-        $GIT check-ignore -q . && _git_info__ignored=true
-        git diff --no-ext-diff --cached --quiet >/dev/null 2>/dev/null || _git_info__diff_staged=true
-        git diff --no-ext-diff --quiet >/dev/null 2>/dev/null || _git_info__changed=true
-        git ls-files --others --exclude-standard --directory --no-empty-directory --error-unmatch -- ':/*' >/dev/null 2>/dev/null && _git_info__untracked=true
+    if [ "$__git_info__is_inside_work_tree" = "true" ]; then
+        $GIT check-ignore -q . && __git_info__ignored=true
+        git diff --no-ext-diff --cached --quiet >/dev/null 2>/dev/null || __git_info__diff_staged=true
+        git diff --no-ext-diff --quiet >/dev/null 2>/dev/null || __git_info__changed=true
+        git ls-files --others --exclude-standard --directory --no-empty-directory --error-unmatch -- ':/*' >/dev/null 2>/dev/null && __git_info__untracked=true
     fi
 
-    if [ -d "$_git_info__git_dir/rebase-merge" ]; then
-        _git_info__action=rebase
-        __git_eread "$_git_info__git_dir/rebase-merge/head-name" _git_info__branch
-        __git_eread "$_git_info__git_dir/rebase-merge/msgnum" _git_info__step
-        __git_eread "$_git_info__git_dir/rebase-merge/end" _git_info__total
+    if [ -d "$__git_info__git_dir/rebase-merge" ]; then
+        __git_info__action=rebase
+        __git_eread "$__git_info__git_dir/rebase-merge/head-name" __git_info__branch
+        __git_eread "$__git_info__git_dir/rebase-merge/msgnum" __git_info__step
+        __git_eread "$__git_info__git_dir/rebase-merge/end" __git_info__total
     else
-        if [ -d "$_git_info__git_dir/rebase-apply" ]; then
-            __git_eread "$_git_info__git_dir/rebase-apply/next" _git_info__step
-            __git_eread "$_git_info__git_dir/rebase-apply/last" _git_info__total
-            if [ -f "$_git_info__git_dir/rebase-apply/rebasing" ]; then
-                _git_info__action=rebase
-                __git_eread "$_git_info__git_dir/rebase-apply/head-name" _git_info__branch
-            elif [ -f "$_git_info__git_dir/rebase-apply/applying" ]; then
-                _git_info__action=am
+        if [ -d "$__git_info__git_dir/rebase-apply" ]; then
+            __git_eread "$__git_info__git_dir/rebase-apply/next" __git_info__step
+            __git_eread "$__git_info__git_dir/rebase-apply/last" __git_info__total
+            if [ -f "$__git_info__git_dir/rebase-apply/rebasing" ]; then
+                __git_info__action=rebase
+                __git_eread "$__git_info__git_dir/rebase-apply/head-name" __git_info__branch
+            elif [ -f "$__git_info__git_dir/rebase-apply/applying" ]; then
+                __git_info__action=am
             else
-                _git_info__action=am/rebase
+                __git_info__action=am/rebase
             fi
-        elif [ -f "$_git_info__git_dir/MERGE_HEAD" ]; then
-            _git_info__action=merging
-        elif test -f "$_git_info__git_dir/CHERRY_PICK_HEAD"; then
-            _git_info__action=cherry-picking
-        elif test -f "$_git_info__git_dir/REVERT_HEAD"; then
-            _git_info__action=reverting
-        elif __git_eread "$_git_info__git_dir/sequencer/todo" _git_info__todo; then
-            case "$_git_info__todo" in
+        elif [ -f "$__git_info__git_dir/MERGE_HEAD" ]; then
+            __git_info__action=merging
+        elif test -f "$__git_info__git_dir/CHERRY_PICK_HEAD"; then
+            __git_info__action=cherry-picking
+        elif test -f "$__git_info__git_dir/REVERT_HEAD"; then
+            __git_info__action=reverting
+        elif __git_eread "$__git_info__git_dir/sequencer/todo" __git_info__todo; then
+            case "$__git_info__todo" in
                 p[\ \	]|pick[\ \	]*)
-                    _git_info__action=cherry-picking ;;
+                    __git_info__action=cherry-picking ;;
                 revert[\ \	]*)
-                    _git_info__action=reverting ;;
+                    __git_info__action=reverting ;;
             esac
-        elif [ -f "$_git_info__git_dir/BISECT_LOG" ]; then
-            _git_info__action=bisecting
+        elif [ -f "$__git_info__git_dir/BISECT_LOG" ]; then
+            __git_info__action=bisecting
         fi
 
-        if [ -n "$_git_info__branch" ]; then
+        if [ -n "$__git_info__branch" ]; then
             :
-        elif [ -h "$_git_info__git_dir/HEAD" ]; then
+        elif [ -h "$__git_info__git_dir/HEAD" ]; then
             # symlink symbolic ref
-            _git_info__branch="$(git symbolic-ref HEAD 2>/dev/null)"
-            _git_info__branch="${_git_info__branch#ref: refs/heads/}"
+            __git_info__branch="$(git symbolic-ref HEAD 2>/dev/null)"
+            __git_info__branch="${__git_info__branch#ref: refs/heads/}"
         else
-            if ! __git_eread "$_git_info__git_dir/HEAD" _git_info__head; then
+            if ! __git_eread "$__git_info__git_dir/HEAD" __git_info__head; then
                 return 0
             fi
             # is it a symbolic ref?
-            _git_info__branch="${_git_info__head#ref: }"
-            if [ "$_git_info__head" = "$_git_info__branch" ]; then
-                _git_info__detached=true
-                _git_info__branch="$(
+            __git_info__branch="${__git_info__head#ref: }"
+            if [ "$__git_info__head" = "$__git_info__branch" ]; then
+                __git_info__detached=true
+                __git_info__branch="$(
 case "${_GIT_INFO_DESCRIBE_STYLE}" in
 contains)
 git describe --contains HEAD ;;
@@ -127,60 +127,60 @@ git describe HEAD ;;
 git describe --tags --exact-match HEAD ;;
 esac 2>/dev/null
 )" ||
-                    _git_info__branch="$_git_info__head_sha"
+                    __git_info__branch="$__git_info__head_sha"
             else
-                _git_info__branch="${_git_info__branch#refs/heads/}"
+                __git_info__branch="${__git_info__branch#refs/heads/}"
             fi
         fi
     fi
 
-    _git_info__action_ext="$_git_info__action"
-    if [ -n "$_git_info__step" ] && [ -n "$_git_info__total" ]; then
-        _git_info__action_ext="$_git_info__action_ext($_git_info__step/$_git_info__total)"
+    __git_info__action_ext="$__git_info__action"
+    if [ -n "$__git_info__step" ] && [ -n "$__git_info__total" ]; then
+        __git_info__action_ext="$__git_info__action_ext($__git_info__step/$__git_info__total)"
     fi
 }
 
-_git_prompt()
+__git_prompt()
 {
-    _git_prompt=
-    _git_prompt_alt=
+    __git_prompt=
+    __git_prompt_alt=
 
-    _git_prompt__cb="$1"
-    _git_prompt__cok="$2"
-    _git_prompt__cko="$3"
-    _git_prompt__cr="$4"
+    __git_prompt__cb="$1"
+    __git_prompt__cok="$2"
+    __git_prompt__cko="$3"
+    __git_prompt__cr="$4"
 
-    _git_info 2>/dev/null || return 1
+    __git_info 2>/dev/null || return 1
 
-    _git_prompt__git_name_prefix=
-    if [ "$_git_info__is_bare_repository" = "true" ]; then
-        _git_prompt__git_name_prefix=B/
+    __git_prompt__git_name_prefix=
+    if [ "$__git_info__is_bare_repository" = "true" ]; then
+        __git_prompt__git_name_prefix=B/
     fi
 
-    _git_prompt__status=
-    [ "$_git_info__staged" = true ] &&
-        _git_prompt__status="${_git_prompt__status}${_git_prompt__cok}+"
-    [ "$_git_info__changed" = true ] &&
-        _git_prompt__status="${_git_prompt__status}${_git_prompt__cko}*"
-    [ "$_git_info__untracked" = true ] &&
-        _git_prompt__status="${_git_prompt__status}${_git_prompt__cb}u"
+    __git_prompt__status=
+    [ "$__git_info__staged" = true ] &&
+        __git_prompt__status="${__git_prompt__status}${__git_prompt__cok}+"
+    [ "$__git_info__changed" = true ] &&
+        __git_prompt__status="${__git_prompt__status}${__git_prompt__cko}*"
+    [ "$__git_info__untracked" = true ] &&
+        __git_prompt__status="${__git_prompt__status}${__git_prompt__cb}u"
 
-    _git_prompt__branch="${_git_info__branch:-???}"
-    case "$_git_prompt__branch" in
-        master|"???") _git_prompt__branch="${_git_prompt__cko}${_git_prompt__branch}${_git_prompt__cb}" ;;
+    __git_prompt__branch="${__git_info__branch:-???}"
+    case "$__git_prompt__branch" in
+        master|"???") __git_prompt__branch="${__git_prompt__cko}${__git_prompt__branch}${__git_prompt__cb}" ;;
     esac
-    if [ "$_git_info__detached" = true ]; then
-        _git_prompt__branch="${_git_prompt__branch:-???}(d)"
+    if [ "$__git_info__detached" = true ]; then
+        __git_prompt__branch="${__git_prompt__branch:-???}(d)"
     fi
 
-    [ "$_git_info__ignored" = true ] && _git_info__ignored=ignored
+    [ "$__git_info__ignored" = true ] && __git_info__ignored=ignored
 
-    _git_prompt="${_git_prompt__cb}${_git_prompt__git_name_prefix}${_git_info__git_name}:${_git_prompt__branch}${_git_prompt__status:+:$_git_prompt__status}${_git_prompt__cr}"
+    __git_prompt="${__git_prompt__cb}${__git_prompt__git_name_prefix}${__git_info__git_name}:${__git_prompt__branch}${__git_prompt__status:+:$__git_prompt__status}${__git_prompt__cr}"
 
-    [ "$_git_info__ignored" = true ] &&
-        _git_prompt_alt="${_git_prompt_alt:+$_git_prompt_alt }ignored"
-    _git_prompt_alt="${_git_prompt_alt:+$_git_prompt_alt }${git_info__action_ext}"
-    _git_prompt_alt="${_git_prompt__cb}${_git_prompt_alt}${_git_prompt__cr}"
+    [ "$__git_info__ignored" = true ] &&
+        __git_prompt_alt="${__git_prompt_alt:+$__git_prompt_alt }ignored"
+    __git_prompt_alt="${__git_prompt_alt:+$__git_prompt_alt }${git_info__action_ext}"
+    __git_prompt_alt="${__git_prompt__cb}${__git_prompt_alt}${__git_prompt__cr}"
 }
 
 is_inside_git()
@@ -194,11 +194,11 @@ is_inside_git_work_tree()
     [ "$is_inside_git_work_tree" = 'true' ]
 }
 
-_git_current_branch()
+__git_current_branch()
 {
-    _git_current_branch=$(git symbolic-ref HEAD 2> /dev/null || \
+    __git_current_branch=$(git symbolic-ref HEAD 2> /dev/null || \
                                    git rev-parse --short HEAD 2> /dev/null)
-    _git_current_branch="${_git_current_branch#refs/heads/}"
+    __git_current_branch="${__git_current_branch#refs/heads/}"
 }
 
 git_add()
@@ -210,83 +210,83 @@ git_add()
     $GIT add "$1"
 }
 
-_git_branch_current_name()
+__git_branch_current_name()
 {
-    _git_branch_current_name=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+    __git_branch_current_name=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
 }
 
-_git_last_tag()
+__git_last_tag()
 {
-    _git_last_tag=$(git describe --abbrev=0 --tags 2>/dev/null)
+    __git_last_tag=$(git describe --abbrev=0 --tags 2>/dev/null)
 }
 
-_git_stable_state()
+__git_stable_state()
 {
     test -z "$(git status --porcelain)"
 }
 
-_git_clone()
+__git_clone()
 {
-    _git_clone__opts=
-    _git_clone__name_opts=
-    _git_clone__suffix=
+    __git_clone__opts=
+    __git_clone__name_opts=
+    __git_clone__suffix=
     OPTIND=1
-    while getopts :123bs: _git_clone__opt; do
-        case $_git_clone__opt in
-            1|2|3) _git_clone__name_opts="$_git_clone__name_opts -$_git_clone__opt" ;;
-            b) _git_clone__opts="$_git_clone__opts --bare"
-               _git_clone__name_opts="$_git_clone__name_opts -$_git_clone__opt" ;;
-            s) _git_clone__name_opts="$_git_clone__name_opts -$_git_clone__opt $OPTARG" ;;
+    while getopts :123bs: __git_clone__opt; do
+        case $__git_clone__opt in
+            1|2|3) __git_clone__name_opts="$__git_clone__name_opts -$__git_clone__opt" ;;
+            b) __git_clone__opts="$__git_clone__opts --bare"
+               __git_clone__name_opts="$__git_clone__name_opts -$__git_clone__opt" ;;
+            s) __git_clone__name_opts="$__git_clone__name_opts -$__git_clone__opt $OPTARG" ;;
         esac
     done
     shift $(($OPTIND - 1))
 
     [ -z "$1" ] && return 1
-    _git_clone__target="$2"
-    if [ -z "$_git_clone__target" ]; then
-        _git_url_to_name $_git_clone__name_opts "$1" || return 1
-        _git_clone__target="$_git_url_to_name"
-        [ -z "$_git_url_to_name" ] && return 1
-        mkdir -p "$_git_url_to_name" || return 1
+    __git_clone__target="$2"
+    if [ -z "$__git_clone__target" ]; then
+        __git_url_to_name $__git_clone__name_opts "$1" || return 1
+        __git_clone__target="$__git_url_to_name"
+        [ -z "$__git_url_to_name" ] && return 1
+        mkdir -p "$__git_url_to_name" || return 1
     fi
-    git clone $_git_clone__opts "$1" $_git_clone__target
+    git clone $__git_clone__opts "$1" $__git_clone__target
 }
 git_clone()
 {
-    _git_clone "$@"
+    __git_clone "$@"
 }
 
-_git_url_to_name()
+__git_url_to_name()
 {
-    _git_url_to_name=
+    __git_url_to_name=
 
-    _git_url_to_name__mode=1
-    _git_url_to_name__sep=/
-    _git_url_to_name__suffix=
+    __git_url_to_name__mode=1
+    __git_url_to_name__sep=/
+    __git_url_to_name__suffix=
     OPTIND=1
-    while getopts :123bs: _git_url_to_name__opt; do
-        case $_git_url_to_name__opt in
-            1|2|3) _git_url_to_name__mode=$_git_url_to_name__opt ;;
-            s) _git_url_to_name__sep="$OPTARG" ;;
-            b) _git_url_to_name__suffix=.git ;;
+    while getopts :123bs: __git_url_to_name__opt; do
+        case $__git_url_to_name__opt in
+            1|2|3) __git_url_to_name__mode=$__git_url_to_name__opt ;;
+            s) __git_url_to_name__sep="$OPTARG" ;;
+            b) __git_url_to_name__suffix=.git ;;
         esac
     done
     shift $(($OPTIND - 1))
 
     [ -z "$1" ] && return 1
 
-    _git_url_to_name__ifs="$IFS"
+    __git_url_to_name__ifs="$IFS"
     IFS='@:/'
     set -- $1
-    while [ $_git_url_to_name__mode -gt 0 ]; do
-        eval _git_url_to_name="${_git_url_to_name:+$_git_url_to_name$_git_url_to_name__sep}"\${$(($# + 1 - $_git_url_to_name__mode))}
-        _git_url_to_name__mode=$(($_git_url_to_name__mode - 1))
+    while [ $__git_url_to_name__mode -gt 0 ]; do
+        eval __git_url_to_name="${__git_url_to_name:+$__git_url_to_name$__git_url_to_name__sep}"\${$(($# + 1 - $__git_url_to_name__mode))}
+        __git_url_to_name__mode=$(($__git_url_to_name__mode - 1))
     done
-    IFS="$_git_url_to_name__ifs"
+    IFS="$__git_url_to_name__ifs"
 
-    _git_url_to_name="${_git_url_to_name%.git}${_git_url_to_name__suffix}"
+    __git_url_to_name="${__git_url_to_name%.git}${__git_url_to_name__suffix}"
 
-    _git_url_to_name="$(echo $_git_url_to_name | tr '[A-Z]' '[a-z]')"
+    __git_url_to_name="$(echo $__git_url_to_name | tr '[A-Z]' '[a-z]')"
 }
 
 ###
@@ -306,24 +306,24 @@ _semver_split()
 
 
 ########## clone
-_git_clone_or_update()
+__git_clone_or_update()
 (
-    _git_clone_or_update__source="$1"
-    _git_clone_or_update__target="$2"
+    __git_clone_or_update__source="$1"
+    __git_clone_or_update__target="$2"
 
-    [ -z "$_git_clone_or_update__source" ] && return 1
-    [ -z "$_git_clone_or_update__target" ] && return 1
+    [ -z "$__git_clone_or_update__source" ] && return 1
+    [ -z "$__git_clone_or_update__target" ] && return 1
 
-    cd "${_git_clone_or_update__target}" 2>/dev/null ||
-        mkdir -p "${_git_clone_or_update__target}" ||
+    cd "${__git_clone_or_update__target}" 2>/dev/null ||
+        mkdir -p "${__git_clone_or_update__target}" ||
         return 1
 
-    if [ -d "$_git_clone_or_update__target/.git" ]; then
-        cd "${_git_clone_or_update__target}" &&
+    if [ -d "$__git_clone_or_update__target/.git" ]; then
+        cd "${__git_clone_or_update__target}" &&
             git pull -q --no-rebase --ff-only
     else
-        git clone -q "${_git_clone_or_update__source%.git}.git" \
-                     "${_git_clone_or_update__target}"
+        git clone -q "${__git_clone_or_update__source%.git}.git" \
+                     "${__git_clone_or_update__target}"
     fi
 )
 
