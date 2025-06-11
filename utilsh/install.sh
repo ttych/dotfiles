@@ -4,10 +4,10 @@ DISTRIBUTIONS='
   https://github.com/ttych/pyv.git
   https://github.com/ttych/wwine.git
   https://github.com/ttych/git-hooks.git
-  https://github.com/ttych/publish.git
 '
 
 OLD_DISTRIBUTIONS='
+  https://github.com/ttych/publish.git
   https://github.com/ttych/installer.git
   https://github.com/ttych/wec.git
   https://github.com/ttych/wtmux.git
@@ -15,7 +15,6 @@ OLD_DISTRIBUTIONS='
 
 AUTOLOADS='
   std.shl
-  ruby_env.shl
   python_env.shl
   pyv.sh
   git.lib.sh
@@ -23,6 +22,7 @@ AUTOLOADS='
 '
 
 OLD_AUTOLOADS='
+  ruby_env.shl
   texlive.lib.sh
 '
 
