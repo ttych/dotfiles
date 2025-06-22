@@ -147,7 +147,7 @@ switch to plist
 
 debug mode inheritance
 #+begin_src emacs-lisp :tangle no
-  (defun em/derived-mode-parents (mode)
+  (defun emw/derived-mode-parents (mode)
     (and mode (cons mode (derived-mode-parents
                           (get mode 'derived-mode-parent)))))
 
@@ -161,12 +161,12 @@ debug mode inheritance
 *** startup time
 
 #+begin_src emacs-lisp
-  (defun em/display-startup-time ()
+  (defun emw/display-startup-time ()
     (message "> Emacs loaded in %s seconds with %d garbage collections."
              (emacs-init-time "%.2f")
              gcs-done))
 
-  (add-hook 'emacs-startup-hook #'em/display-startup-time)
+  (add-hook 'emacs-startup-hook #'emw/display-startup-time)
 #+end_src
 
 *** startup behavior
@@ -342,7 +342,7 @@ available.
 
 load all code from a directory:
 #+begin_src emacs-lisp
-  (defun em/load-directory (dir)
+  (defun emw/load-directory (dir)
     "Load all Emacs Lisp files in the specified directory DIR."
     (when (file-directory-p dir)  ;; Check if dir is a valid directory
       (dolist (file (directory-files dir t "\\.el$"))  ;; `t` makes the file names absolute
@@ -352,7 +352,7 @@ load all code from a directory:
 
 load a specific file from a directory:
 #+begin_src emacs-lisp
-  (defun em/load-file-from-directory (dir filename)
+  (defun emw/load-file-from-directory (dir filename)
     "Load the Emacs Lisp file FILENAME from directory DIR if it exists and is a valid .el file."
     (let ((filepath (expand-file-name filename dir)))
       (if (and (file-regular-p filepath) (string= (file-name-extension filepath) "el"))
@@ -432,7 +432,7 @@ display-line-numbers-type can be in:
 
 line number toggle:
 #+begin_src emacs-lisp :tangle no
-  (defun em/line-numbers-type-toggle ()
+  (defun emw/line-numbers-type-toggle ()
     "Toggle between different line number types."
     (interactive)
     (setq display-line-numbers-type
@@ -443,7 +443,7 @@ line number toggle:
     (global-display-line-numbers-mode -1)
     (global-display-line-numbers-mode 1))
 
-  ;; (global-set-key (kbd "C-c l") 'em/line-numbers-type-toggle)
+  ;; (global-set-key (kbd "C-c l") 'emw/line-numbers-type-toggle)
 #+end_src
 
 You can also restrict line number to prog-mode:
@@ -618,13 +618,13 @@ and prevent "write bookmark" messages :
 (defvar *protected-buffers* '("*scratch*" "*Messages*")
   "Buffers that cannot be killed.")
 
-(defun em/protect-protected-buffers ()
+(defun emw/protect-protected-buffers ()
   "Protects some buffers from being killed."
   (dolist (buffer *protected-buffers*)
     (with-current-buffer buffer
       (emacs-lock-mode 'kill))))
 
-(add-hook 'after-init-hook #'em/protect-protected-buffers)
+(add-hook 'after-init-hook #'emw/protect-protected-buffers)
 #+end_src
 
 *** auto-revert
@@ -772,8 +772,17 @@ manual cleanup
 
 *** scratch
 
+emy / scratch-goto
 #+begin_src emacs-lisp
-  (defun em/scratch-new (&optional mode)
+  (defun emw/scratch-goto ()
+    "Switch to the *scratch* buffer."
+    (interactive)
+    (switch-to-buffer "*scratch*"))
+#+end_src
+
+emy / scratch-new
+#+begin_src emacs-lisp
+  (defun emw/scratch-new (&optional mode)
     "Create a scratch buffer with the specified MODE (or initial-major-mode)."
     (interactive)
     (let ((bufname (generate-new-buffer-name "*scratch*"))
@@ -837,7 +846,6 @@ examples:
 
 #+begin_src emacs-lisp
   (global-set-key (kbd "C-x a \"") 'abbrev-prefix-mark)
-  (global-set-key (kbd "M-\"") 'abbrev-prefix-mark)
 #+end_src
 
 #+begin_src emacs-lisp
@@ -923,54 +931,54 @@ For whitespace-mode:
 #+end_src
 
 #+begin_src emacs-lisp
-  (defun em/delete-trailing-whitespace ()
+  (defun emw/delete-trailing-whitespace ()
     (when (derived-mode-p 'prog-mode)
       (delete-trailing-whitespace)))
 
-  (add-hook 'before-save-hook 'em/delete-trailing-whitespace)
+  (add-hook 'before-save-hook 'emw/delete-trailing-whitespace)
 #+end_src
 
 **** space vs. tab
 
 # FIXME
-=> (add-hook 'after-init-hook #'em/protect-protected-buffers)
+=> (add-hook 'after-init-hook #'emw/protect-protected-buffers)
 
 examples:
 | mode          | space mode           |
 |---------------+----------------------|
-| ruby-mode     | em/2-spaces-indented |
-| html-mode     | em/2-spaces-indented |
-| yaml-mode     | em/2-spaces-indented |
-| js-mode       | em/2-spaces-indented |
-| json-mode     | em/2-spaces-indented |
+| ruby-mode     | emw/2-spaces-indented |
+| html-mode     | emw/2-spaces-indented |
+| yaml-mode     | emw/2-spaces-indented |
+| js-mode       | emw/2-spaces-indented |
+| json-mode     | emw/2-spaces-indented |
 |---------------+----------------------|
-| python-mode   | em/4-spaces-indented |
-| groovy-mode   | em/4-spaces-indented |
-| markdown-mode | em/4-spaces-indented |
+| python-mode   | emw/4-spaces-indented |
+| groovy-mode   | emw/4-spaces-indented |
+| markdown-mode | emw/4-spaces-indented |
 |---------------+----------------------|
-| makefile-mode | em/tab-4-indented    |
+| makefile-mode | emw/tab-4-indented    |
 
 configure with:
 #+begin_example
-(add-hook 'ruby-mode-hook #'em/tab-4-indented)
+(add-hook 'ruby-mode-hook #'emw/tab-4-indented)
 #+end_example
 
 #+begin_src emacs-lisp
-    (defun em/2-spaces-indented ()
+    (defun emw/2-spaces-indented ()
       "settings for 2 spaces indentation"
       (setq-local indent-tabs-mode nil
                   tab-width 2
                   )
       )
 
-  (defun em/4-spaces-indented ()
+  (defun emw/4-spaces-indented ()
       "settings for 2 spaces indentation"
       (setq-local indent-tabs-mode nil
                   tab-width 4
                   )
       )
 
-  (defun em/tab-4-indented ()
+  (defun emw/tab-4-indented ()
     "settings for 2 spaces indentation"
     (setq-local indent-tabs-mode t
                 tab-width 4
@@ -1165,7 +1173,7 @@ to load:
 
 to save:
 #+begin_src emacs-lisp
-  (defun em/macro-save-to-file-helper (macro-name file-path)
+  (defun emw/macro-save-to-file-helper (macro-name file-path)
     "Save a named macro to the specified file.
 
   MACRO-NAME is the name of the macro to save.
@@ -1205,35 +1213,35 @@ to save:
         (write-region (point-min) (point-max) file-path t 'silent)
         (message "Macro %s saved to %s" macro-name file-path))))
 
-  (defun em/macro-save-to-file (macro-name)
+  (defun emw/macro-save-to-file (macro-name)
     "Save a named macro to the macros file specified by `emacs-macros-el`."
     (interactive "SName of the macro to save: ")
-    (em/macro-save-to-file-helper macro-name emacs-macros-el))
+    (emw/macro-save-to-file-helper macro-name emacs-macros-el))
 
-  (defun em/macro-save-to-local-file (macro-name)
+  (defun emw/macro-save-to-local-file (macro-name)
     "Save a named macro to the local macros file specified by `emacs-macros-local-el`."
     (interactive "SName of the macro to save: ")
-    (em/macro-save-to-file-helper macro-name emacs-macros-local-el))
+    (emw/macro-save-to-file-helper macro-name emacs-macros-local-el))
 
-  (defun em/macro-save-last-to-file (macro-name)
+  (defun emw/macro-save-last-to-file (macro-name)
     "Save the last recorded macro to the global macros file with the specified name."
     (interactive "SName for the last recorded macro: ")
     ;; (save-last-macro-helper macro-name)
     (kmacro-name-last-macro macro-name)
-    (em/macro-save-to-file macro-name))
+    (emw/macro-save-to-file macro-name))
 
-  (defun em/macro-save-last-to-local-file (macro-name)
+  (defun emw/macro-save-last-to-local-file (macro-name)
     "Save the last recorded macro to the local macros file with the specified name."
     (interactive "SName for the last recorded macro: ")
     ;; (save-last-macro-helper macro-name)
     (kmacro-name-last-macro macro-name)
-    (em/macro-save-to-local-file macro-name))
+    (emw/macro-save-to-local-file macro-name))
 #+end_src
 
 ** proxy
 
 #+begin_src emacs-lisp
-  (em/load-file-from-directory emacs-etc-dir "proxy.el")
+  (emw/load-file-from-directory emacs-etc-dir "proxy.el")
 #+end_src
 
 ** package
@@ -1895,6 +1903,29 @@ SRC: [[https://github.com/abo-abo/avy][https://github.com/abo-abo/avy]]
     )
 #+end_src
 
+*** ansi-color
+#+begin_src emacs-lisp
+  (require 'ansi-color)
+#+end_src
+
+*** compile
+#+begin_src emacs-lisp
+  (require 'compile)
+
+  (setq compilation-scroll-output t
+        )
+
+  (add-hook 'compilation-filter-hook 'ansi-color-compilation-filter)
+#+end_src
+
+Extra compile variables:
+| variable                | purpose                                       |
+|-------------------------+-----------------------------------------------|
+| compilation-environment | set specific env variable for compile command |
+|                         | (setq compilation-environment '("HOME=/tmp")) |
+|-------------------------+-----------------------------------------------|
+|                         |                                               |
+
 ** org
 
 define emacs-org-conf-dir:
@@ -1907,20 +1938,20 @@ define emacs-org-conf-dir:
 
 org-mode-setup on activation:
 #+begin_src emacs-lisp
-  (defun emy/org-mode-setup ()
+  (defun emw/org-mode-setup ()
     "Customizations for org-mode."
     (org-indent-mode 1)
     (auto-fill-mode 0)
     )
 
-  ;; (add-hook 'org-mode-hook 'em/org-mode-setup)
+  ;; (add-hook 'org-mode-hook 'emw/org-mode-setup)
 
   (delight 'org-indent-mode nil 'org-indent)
 #+end_src
 
 org-mode-visual-fill
 #+begin_src emacs-lisp
-  (defun emy/org-mode-visual-fill ()
+  (defun emw/org-mode-visual-fill ()
     (setq visual-fill-column-width 100
           visual-fill-column-center-text t)
     (visual-fill-column-mode 1)
@@ -1933,7 +1964,7 @@ org configuration:
     :ensure t
     ;; :pin org
     :commands (org-capture org-agenda)
-    :hook (org-mode . emy/org-mode-setup)
+    :hook (org-mode . emw/org-mode-setup)
     :config
     (setq org-hide-leading-stars t
           org-startup-indented t
@@ -2216,7 +2247,7 @@ examples
 
 or can use method to append to org-agenda-files:
 #+begin_src emacs-lisp
-  (defun em/org-agenda-add-to-files (file)
+  (defun emw/org-agenda-add-to-files (file)
     "Add a file to org-agenda-files if it exists."
     (interactive "fFile to add to org-agenda: ")
     (if (file-exists-p file)
@@ -2250,7 +2281,7 @@ or can use method to append to org-agenda-files:
            (file ,(expand-file-name "journal.orgcaptmpl" emacs-org-conf-dir)))
 
           ("n" "Note" entry
-           (file+function "notes.org" em/org-ask-headline-2-target)
+           (file+function "notes.org" emw/org-ask-headline-2-target)
            "* %?\n\nCREATED: %U\nSAMPLE: %i\nFROM: %a"
            :empty-lines 1)
 
@@ -2533,7 +2564,7 @@ Available shell:
 | vterm     |            | (to install)                 |
 
 #+begin_src emacs-lisp
-  (defun em/configure-terminal-common ()
+  (defun emw/configure-terminal-common ()
     "Customizations for terminal."
     (setq-local show-trailing-whitespace nil)
     (display-line-numbers-mode 0)
@@ -2589,7 +2620,7 @@ example of async-shell-command usage:
 
 example of async-shell
 #+begin_src emacs-lisp :tangle no
-  (defun em/shell-command-async-on-file (command)
+  (defun emw/shell-command-async-on-file (command)
     "Execute COMMAND asynchronously on the current file."
     (interactive (list (read-shell-command
                         (concat "Async shell command on " (buffer-name) ": "))))
@@ -2610,14 +2641,14 @@ example of async-shell
 
   (add-hook 'eshell-output-filter-functions 'eshell-truncate-buffer)
 
-  (add-hook 'eshell-mode-hook 'em/configure-terminal-common)
+  (add-hook 'eshell-mode-hook 'emw/configure-terminal-common)
 #+end_src
 
 *** shell
 
 configure
 #+begin_src emacs-lisp
-  (add-hook 'shell-mode-hook 'em/configure-terminal-common)
+  (add-hook 'shell-mode-hook 'emw/configure-terminal-common)
 #+end_src
 
 comint-based buffers configuration
@@ -2629,8 +2660,8 @@ comint-based buffers configuration
 *** term
 
 #+begin_src emacs-lisp
-  (setq explicit-shell-args '("--login"))
-  (defvar emacs-shell-program (getenv "ESHELL"))
+  (setq explicit-shell-args '("-l"))
+  (defvar emacs-shell-program (or (getenv "ESHELL") (getenv "SHELL")))
   (if (string-equal emacs-shell-program "")
       (setq emacs-shell-program "bash"
             explicit-shell-file-name "bash"
@@ -2643,7 +2674,7 @@ comint-based buffers configuration
 
 configure
 #+begin_src emacs-lisp
-  (add-hook 'term-mode-hook 'em/configure-terminal-common)
+  (add-hook 'term-mode-hook 'emw/configure-terminal-common)
 #+end_src
 
 **** named-term
@@ -2653,7 +2684,7 @@ configure
   "Create a terminal buffer with a login shell and optionally rename it to NAME."
   (interactive "sTerminal name (leave blank for default): ")
   (let* ((shell (or (getenv "ESHELL") (getenv "SHELL")))
-         (login-shell (concat shell " --login"))
+         (login-shell (concat shell " -l"))
          (term-buffer (term login-shell)))
     (with-current-buffer term-buffer
       (unless (string= name "")
@@ -2681,25 +2712,21 @@ replace *C-x* witch *C-c*
 | term-char-mode | C-c C-k  | every keystroke is sent directly to the underlying terminal |
 | term-line-mode | C-c C-j  | input is sent to the terminal only when you press RET       |
 
-** key-binding
-*** to add
+** emw
+*** elisp
+**** interactive
+#+begin_src emacs-lisp
+  (defun emw/eval-and-insert-at-eol ()
+    "Evaluate the preceding sexp and insert result at end of line."
+    (interactive)
+    (let ((result (eval-last-sexp nil)))
+      (save-excursion
+        (end-of-line)
+        (insert "  ; → " (format "%S" result)))))
 
-| tool            | binding |
-|-----------------+---------|
-| yasnippet       |         |
-| magit           |         |
-| git-timemachine |         |
-| hl-todo         |         |
-| org-agenda      |         |
-| org-capture     |         |
-| async command   |         |
-| company         |         |
-| hippie expand   |         |
-| eglot           |         |
-|-----------------+---------|
-| my menu         |         |
-|-----------------+---------|
-|                 |         |
+  (define-key org-mode-map (kbd "C-c C-e") 'emw/eval-and-insert-at-eol)
+#+end_src
+** key-binding
 
 *** edit
 
@@ -2721,7 +2748,7 @@ replace *C-x* witch *C-c*
   (global-set-key (kbd "C-x C-k i") 'insert-kbd-macro)
 #+end_src
 
-*** search
+*** search  -  M-s
 
 #+begin_src emacs-lisp
   (global-set-key (kbd "M-s r") 'query-replace-regexp)
@@ -2735,6 +2762,12 @@ replace *C-x* witch *C-c*
   (global-set-key (kbd "M-s f r") 'find-lisp-find-dired)
 #+end_src
 
+*** move  -  M-g
+
+#+begin_src emacs-lisp
+
+#+end_src
+
 *** <fn>
 
 | <fn>  | function                             | alt                    |
@@ -2743,7 +2776,7 @@ replace *C-x* witch *C-c*
 | <f2>  | *display menu*                         | < >                    |
 | <f3>  | *kmacro-start-macro-or-insert-counter* | < >                    |
 | <f4>  | *kmacro-end-or-call-macro*             | ---------------------- |
-| <f5>  | revert-buffer                        | em/scratch-new         |
+| <f5>  | revert-buffer                        | emw/scratch-new         |
 | <f6>  | magit-status                         | magit-file-dispatch    |
 | <f7>  | term                                 | ansi-term              |
 | <f8>  | org-agenda                           | org-capture            |
@@ -2753,143 +2786,140 @@ replace *C-x* witch *C-c*
 | <f12> | named-term                           | < >                    |
 
 #+begin_src emacs-lisp
-  (global-set-key (kbd "<f5>") 'revert-buffer)
-  (global-set-key (kbd "M-<f5>") 'em/scratch-new)
+  ;; (global-set-key (kbd "M-<f2>") 'xxx)
 
-  (global-set-key (kbd "<f6>") 'recentf-open-files)
+  ;; (global-set-key (kbd "M-<f3>") 'xxx)
+
+  (global-set-key (kbd "<f5>") 'revert-buffer)
+  (global-set-key (kbd "M-<f5>") 'recentf-open-files)
+
+  (global-set-key (kbd "<f6>") 'org-agenda)
+  (global-set-key (kbd "M-<f6>") 'org-capture)
 
   (global-set-key (kbd "<f7>") 'term)
+  ;; (global-set-key (kbd "<f7>") 'named-term)
   (global-set-key (kbd "M-<f7>") 'ansi-term)
 
-  (global-set-key (kbd "<f8>") 'org-agenda)
-  (global-set-key (kbd "M-<f8>") 'org-capture)
+  (global-set-key (kbd "<f8>") 'magit-status)
+  (global-set-key (kbd "M-<f8>") 'magit-file-dispatch)
 
-  (global-set-key (kbd "<f9>") 'magit-status)
-  (global-set-key (kbd "M-<f9>") 'magit-file-dispatch)
+  ;; (global-set-key (kbd "<f9>") 'xxx)
+  ;; (global-set-key (kbd "M-<f9>") 'xxx)
 
   (global-set-key (kbd "<f12>") 'named-term)
+  ;; (global-set-key (kbd "M-<f12>") 'xxx)
 #+end_src
 
-*** M-]  (my menu)
+*** M-]  (mega menu)
 
 #+begin_src emacs-lisp
-  (global-set-key (kbd "M-] b s") 'scratch)
-  (global-set-key (kbd "M-] b c") 'em/scratch-new)
-  (global-set-key (kbd "M-] b n") 'em/scratch-new)
+  (define-prefix-command 'emy-mega-map)
+  (keymap-global-set "M-]" 'emy-mega-map)
 
-  (global-set-key (kbd "M-] m l") 'display-line-numbers-mode)
-  (global-set-key (kbd "M-] m F") 'auto-fill-mode)
-  (global-set-key (kbd "M-] m W") 'whitespace-mode)
-  (global-set-key (kbd "M-] m S") 'auto-save-mode)
-  (global-set-key (kbd "M-] m T") 'toggle-truncate-lines)
+  (define-prefix-command 'emy-mega-buffer-map)
+  (keymap-set emy-mega-map "b" 'emy-mega-buffer-map)
+  (keymap-set emy-mega-buffer-map "s" 'emw/scratch-goto)
+  (keymap-set emy-mega-buffer-map "c" 'emw/scratch-new)
+  (keymap-set emy-mega-buffer-map "n" 'emw/scratch-new)
+  (keymap-set emy-mega-buffer-map "v" 'add-file-local-variable)
+  (keymap-set emy-mega-buffer-map "p" 'add-file-local-variable-prop-line)
 
-  (global-set-key (kbd "M-] o a") 'org-agenda)
-  (global-set-key (kbd "M-] o c") 'org-capture)
-  (global-set-key (kbd "M-] o d") 'org-deadline)
-  (global-set-key (kbd "M-] o E") 'org-set-effort)
-  (global-set-key (kbd "M-] o l") 'org-todo-list)
-  (global-set-key (kbd "M-] o P") 'org-set-property)
-  (global-set-key (kbd "M-] o s") 'org-schedule)
-  (global-set-key (kbd "M-] o t") 'org-set-tags-command)
-  (global-set-key (kbd "M-] o T") 'org-time-stamp)
+  ;; (global-set-key (kbd "M-] l R") 'eglot-reconnect)
+  ;; (global-set-key (kbd "M-] l S") 'eglot-shutdown)
+  ;; (global-set-key (kbd "M-] l a") 'eglot-code-actions)
+  ;; (global-set-key (kbd "M-] l f") 'eglot-format)
+  ;; (global-set-key (kbd "M-] l r") 'eglot-rename)
 
-  (global-set-key (kbd "M-] t t") 'treemacs)
-  (global-set-key (kbd "M-] t o") 'treemacs-select-window)
-  (global-set-key (kbd "M-] t 0") 'treemacs-select-window)
-  (global-set-key (kbd "M-] t B") 'treemacs-bookmark)
-  (global-set-key (kbd "M-] t C-f") 'treemacs-find-file)
-  (global-set-key (kbd "M-] t C-t") 'treemacs-find-tag)
+  ;; (global-set-key (kbd "M-] m l") 'display-line-numbers-mode)
+  ;; (global-set-key (kbd "M-] m F") 'auto-fill-mode)
+  ;; (global-set-key (kbd "M-] m W") 'whitespace-mode)
+  ;; (global-set-key (kbd "M-] m S") 'auto-save-mode)
+  ;; (global-set-key (kbd "M-] m T") 'toggle-truncate-lines)
 
-  (global-set-key (kbd "M-] <deletechar>")
-                  (lambda ()
-                    (interactive)
-                    (join-line -1)))
-  (global-set-key (kbd "M-] M-o") 'open-line-below)
-  (global-set-key (kbd "M-] M-O") 'open-line-above)
+  ;; (global-set-key (kbd "M-] o a") 'org-agenda)
+  ;; (global-set-key (kbd "M-] o c") 'org-capture)
+  ;; (global-set-key (kbd "M-] o d") 'org-deadline)
+  ;; (global-set-key (kbd "M-] o D") 'org-deadline)
+  ;; (global-set-key (kbd "M-] o E") 'org-set-effort)
+  ;; (global-set-key (kbd "M-] o l") 'org-todo-list)
+  ;; (global-set-key (kbd "M-] o P") 'org-set-property)
+  ;; (global-set-key (kbd "M-] o s") 'org-schedule)
+  ;; (global-set-key (kbd "M-] o S") 'org-schedule)
+  ;; (global-set-key (kbd "M-] o t") 'org-time-stamp)
+  ;; (global-set-key (kbd "M-] o T") 'org-set-tags-command)
+  ;; (global-set-key (kbd "M-] o y") 'org-timer-set-timer)
 
-  (global-set-key (kbd "M-] M-h") 'em/htmlize-buffer-to-file)
+  ;; (global-set-key (kbd "M-] t t") 'treemacs)
+  ;; (global-set-key (kbd "M-] t o") 'treemacs-select-window)
+  ;; (global-set-key (kbd "M-] t 0") 'treemacs-select-window)
+  ;; (global-set-key (kbd "M-] t B") 'treemacs-bookmark)
+  ;; (global-set-key (kbd "M-] t C-f") 'treemacs-find-file)
+  ;; (global-set-key (kbd "M-] t C-t") 'treemacs-find-tag)
+
+  ;; (global-set-key (kbd "M-] <deletechar>")
+  ;;                 (lambda ()
+  ;;                   (interactive)
+  ;;                   (join-line -1)))
+  ;; (global-set-key (kbd "M-] M-o") 'open-line-below)
+  ;; (global-set-key (kbd "M-] M-O") 'open-line-above)
+
+  ;; (global-set-key (kbd "M-] M-h") 'emw/htmlize-buffer-to-file)
 #+end_src
 
-*** M-*  (my menu)
+*** M-=  (my menu)
 
 #+begin_src emacs-lisp
-  (global-set-key (kbd "M-* b s") 'scratch)
-  (global-set-key (kbd "M-* b c") 'em/scratch-new)
-  (global-set-key (kbd "M-* b n") 'em/scratch-new)
+  (define-prefix-command 'emy-menu-map)
+  (keymap-global-set "M-=" 'emy-menu-map)
 
-  (global-set-key (kbd "M-* l R") 'eglot-reconnect)
-  (global-set-key (kbd "M-* l S") 'eglot-shutdown)
-  (global-set-key (kbd "M-* l a") 'eglot-code-actions)
-  (global-set-key (kbd "M-* l f") 'eglot-format)
-  (global-set-key (kbd "M-* l r") 'eglot-rename)
-
-  (global-set-key (kbd "M-* m l") 'display-line-numbers-mode)
-  (global-set-key (kbd "M-* m F") 'auto-fill-mode)
-  (global-set-key (kbd "M-* m W") 'whitespace-mode)
-  (global-set-key (kbd "M-* m S") 'auto-save-mode)
-  (global-set-key (kbd "M-* m T") 'toggle-truncate-lines)
-
-  (global-set-key (kbd "M-* o D") 'org-deadline)
-  (global-set-key (kbd "M-* o E") 'org-set-effort)
-  (global-set-key (kbd "M-* o P") 'org-set-property)
-  (global-set-key (kbd "M-* o S") 'org-schedule)
-  (global-set-key (kbd "M-* o T") 'org-set-tags-command)
-  (global-set-key (kbd "M-* o a") 'org-agenda)
-  (global-set-key (kbd "M-* o c") 'org-capture)
-  (global-set-key (kbd "M-* o l") 'org-todo-list)
-  (global-set-key (kbd "M-* o t") 'org-time-stamp)
-  (global-set-key (kbd "M-* o y") 'org-timer-set-timer)
-
-  (global-set-key (kbd "M-* t t") 'treemacs)
-  (global-set-key (kbd "M-* t o") 'treemacs-select-window)
-  (global-set-key (kbd "M-* t 0") 'treemacs-select-window)
-  (global-set-key (kbd "M-* t B") 'treemacs-bookmark)
-  (global-set-key (kbd "M-* t C-f") 'treemacs-find-file)
-  (global-set-key (kbd "M-* t C-t") 'treemacs-find-tag)
-
-  (global-set-key (kbd "M-* <deletechar>")
-                  (lambda ()
-                    (interactive)
-                    (join-line -1)))
-  (global-set-key (kbd "M-* M-o") 'open-line-below)
-  (global-set-key (kbd "M-* M-O") 'open-line-above)
-
-  (global-set-key (kbd "M-* M-h") 'em/htmlize-buffer-to-file)
+  (keymap-set emy-menu-map "m" 'compile)
 #+end_src
 
-*** to remap
+*** remap
 
 | function         | orig shortcut |
 |------------------+---------------|
-| count-lines-page |  C-x l        |
+| count-lines-page | C-x l         |
+| count-words      | M-=           |
+
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-x r =") 'count-words)
+#+end_src
 
 *** free key-binding
 
-| key-binding |   | usable  |
-|-------------+---+---------|
-| C-x j       |   |         |
-| C-x y       |   |         |
-| C-x !       |   |         |
-| C-x @       |   |         |
-| C-x %       |   |         |
-| C-x &       |   |         |
-| C-x :       |   |         |
-| C-x "       |   |         |
-| C-x         |   |         |
-| C-x ,       |   |         |
-| C-x /       |   |         |
-| C-x ?       |   |         |
-| C-x ~       |   |         |
-| C-x C-y     |   |         |
-|-------------+---+---------|
-| C-^         |   |         |
-|-------------+---+---------|
-| M-"         |   |         |
-| M-*         |   | my-menu |
-| M-]         |   | my-menu |
-|-------------+---+---------|
-| C-x C-h     |   | NO      |
-|             |   |         |
+#+begin_src emacs-lisp :tangle no
+  (use-package free-keys
+    :ensure t
+    :defer t
+    :commands (free-keys)
+    )
+#+end_src
+
+| key-binding |   | usable |
+|-------------+---+--------|
+| C-x j       |   |        |
+| C-x y       |   |        |
+| C-x !       |   |        |
+| C-x @       |   |        |
+| C-x %       |   |        |
+| C-x &       |   |        |
+| C-x :       |   |        |
+| C-x "       |   |        |
+| C-x ,       |   |        |
+| C-x /       |   |        |
+| C-x ?       |   |        |
+| C-x ~       |   |        |
+| C-x C-y     |   |        |
+|-------------+---+--------|
+| C-^         |   |        |
+|-------------+---+--------|
+| M-"         |   |        |
+| M-*         |   |        |
+| M-]         |   |        |
+|-------------+---+--------|
+| C-x C-h     |   | NO     |
+|-------------+---+--------|
 
 ** completion
 
@@ -3347,12 +3377,12 @@ extend *eglot-server-programs* with
 
 configure prog-mode when activated:
 #+begin_src emacs-lisp
-(defun em/configure-prog-mode ()
+(defun emw/configure-prog-mode ()
   "Customizations for eshell-mode."
   (whitespace-mode 1)
 )
 
-(add-hook 'prog-mode-hook 'em/configure-prog-mode)
+(add-hook 'prog-mode-hook 'emw/configure-prog-mode)
 #+end_src
 
 *** adoc
@@ -3474,7 +3504,7 @@ configure prog-mode when activated:
     :hook (markdown-mode . flyspell-mode)
     :bind (:map markdown-mode-map
                 ("C-c C-f" . markdown-format-buffer)
-                ("C-c C-v" . em/markdown-preview-with-pandoc))
+                ("C-c C-v" . emw/markdown-preview-with-pandoc))
     :config
     (setq markdown-command "pandoc"
           markdown-fontify-code-blocks-natively t)
@@ -3485,7 +3515,7 @@ configure prog-mode when activated:
 
 Preview current buffer with pandoc :
 #+begin_src emacs-lisp
-  (defun em/markdown-preview-with-pandoc ()
+  (defun emw/markdown-preview-with-pandoc ()
   "Preview the current markdown file with pandoc."
   (interactive)
   (let ((output-buffer (get-buffer-create "*pandoc-output*")))
@@ -3534,12 +3564,23 @@ Preview current buffer with pandoc :
 *** ruby
 
 #+begin_src emacs-lisp
+  (defun emw/ruby-customs ()
+    "Ruby custom settings"
+    (setq-local compile-command
+                (concat "ruby "
+                        (when buffer-file-name
+                          (shell-quote-argument buffer-file-name)))
+                )
+    )
+#+end_src
+
+#+begin_src emacs-lisp
   (use-package ruby-mode
     :ensure t
     :defer t
     :hook (
-           (ruby-mode . em/2-spaces-indented)
-           ;; (ruby-mode . lsp-deferred)
+           (ruby-mode . emw/2-spaces-indented)
+           (ruby-mode . emw/ruby-customs)
            )
     ;; :config
     ;; (setq lsp-solargraph-use-bundler nil)
@@ -3581,12 +3622,12 @@ add more extension :
 
 Customize text-mode when activated:
 #+begin_src emacs-lisp
-(defun em/configure-text-mode ()
+(defun emw/configure-text-mode ()
   "Customizations for text-mode."
   (whitespace-mode 1)
 )
 
-(add-hook 'text-mode-hook 'em/configure-text-mode)
+(add-hook 'text-mode-hook 'emw/configure-text-mode)
 #+end_src
 
 *** typescript
@@ -3667,14 +3708,14 @@ available themes
 | adwaita | deeper-blue | dichromacy | leuven-dark | leuven | light-blue | manoj-dark | misterioso | modus-operandi | modus-vivendi | tango-dark | tango | tsdh-dark | tsdh-light | wheatgrass | whiteboard | wombat |
 
 #+begin_src emacs-lisp
-  (defun em/disable-all-themes ()
+  (defun emw/disable-all-themes ()
     "Disable all active themes."
     (interactive)
     (mapc #'disable-theme custom-enabled-themes))
 #+end_src
 
 #+begin_src emacs-lisp :tangle no
-  (em/disable-all-themes)
+  (emw/disable-all-themes)
 #+end_src
 
 *** default
