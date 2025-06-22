@@ -1,0 +1,8 @@
+---
+
+enabled_features:
+  diagnostics: true
+  formatting: true
+  code_actions: true
+  completion: true
+  semantic_highlighting: true

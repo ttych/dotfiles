@@ -1,0 +1,17 @@
+---
+
+include:
+  - "**/*.rb"
+exclude:
+  - "spec/**/*"
+  - "test/**/*"
+  - "vendor/**/*"
+domains: []
+reporters:
+  - rubocop
+  - require_not_found
+require_paths: []
+plugins: []
+formatter:
+  rubocop:
+    cops: safe
