@@ -772,7 +772,7 @@ manual cleanup
 
 *** scratch
 
-emy / scratch-goto
+emw / scratch-goto
 #+begin_src emacs-lisp
   (defun emw/scratch-goto ()
     "Switch to the *scratch* buffer."
@@ -780,7 +780,7 @@ emy / scratch-goto
     (switch-to-buffer "*scratch*"))
 #+end_src
 
-emy / scratch-new
+emw / scratch-new
 #+begin_src emacs-lisp
   (defun emw/scratch-new (&optional mode)
     "Create a scratch buffer with the specified MODE (or initial-major-mode)."
@@ -1074,54 +1074,91 @@ as well as other text processing functions that deal with sentences.
 *** history
 
 #+begin_src emacs-lisp
-  (setq history-length 100
+  (setq history-length 50
         history-delete-duplicates t
         savehist-file (expand-file-name (format "%s/history" emacs-tmp-dir))
         savehist-save-minibuffer-history 1
         savehist-additional-variables '(kill-ring search-ring regexp-search-ring)
         savehist-autosave-interval (* 5 60)
         )
-  (savehist-mode t)
+  (savehist-mode 1)
   (add-to-list 'savehist-additional-variables 'global-mark-ring)
 #+end_src
 
 *** completion
 
-fido-mode:
-- fido-mode (which stands for "FInger DO")
-- is built on top of icomplete-mode
-- fido-mode automatically enables icomplete-mode
+| variable                              | default | value | description                              |
+|---------------------------------------+---------+-------+------------------------------------------|
+| icomplete-in-buffer                   | nil     | t     | enable completion in buffer              |
+| icomplete-show-matches-on-no-input    | nil     | t     | Show completions even without input      |
+| icomplete-hide-common-prefix          | t       | nil   | Do not hide common prefix                |
+| icomplete-compute-delay               | 0.15    | 0     | Remove delay in showing completions      |
+| icomplete-separator                   | <pipe>  | "\n"  | Separate candidates by newlines          |
+| icomplete-prospects-height            | 2       | 1     | Number of completion lines in minibuffer |
+| icomplete-delay-completions-threshold | 400     | 100   | Show completions immediately             |
+|---------------------------------------+---------+-------+------------------------------------------|
+| read-file-name-completion-ignore-case | nil     | t     |                                          |
+| read-buffer-completion-ignore-case    | nil     | t     |                                          |
+| completion-ignore-case                | nil     | t     |                                          |
+|                                       |         |       |                                          |
 
-  | setting             | default | value | usage                       |
-  |---------------------+---------+-------+-----------------------------|
-  | icomplete-in-buffer | nil     | t     | enable completion in buffer |
-  |                     |         |       |                             |
+Common:
 #+begin_src emacs-lisp
-  (fido-mode 1)
-  ;; (fido-vertical-mode 1)
-
-  (setq icomplete-in-buffer t
+  (setq completion-auto-wrap t
+        completion-styles '(flex basic partial-completion)
+        completion-show-help t
+        completion-auto-help t
+        completion-auto-select 'second-tab
+        completions-detailed t
+        completions-max-height 15
+        ;; completions-format 'vertical
+        ;; icomplete-in-buffer t
         icomplete-hide-common-prefix nil
+        ;; icomplete-show-matches-on-no-input t
+        max-mini-window-height 10
         )
-
-   (with-eval-after-load 'icomplete
-     (define-key icomplete-minibuffer-map (kbd "C-n") 'icomplete-forward-completions)
-     (define-key icomplete-minibuffer-map (kbd "C-p") 'icomplete-backward-completions))
 #+end_src
 
-Common icomplete settings:
-| variable                              | default | value | description                              |                                 |
-|---------------------------------------+---------+-------+------------------------------------------+---------------------------------|
-| icomplete-show-matches-on-no-input    | nil     | t     | Show completions even without input      |                                 |
-| icomplete-hide-common-prefix          | t       | nil   | Do not hide common prefix                |                                 |
-| icomplete-compute-delay               | 0.15    | 0     | Remove delay in showing completions      |                                 |
-| icomplete-separator                   | "       | "     | "\n"                                     | Separate candidates by newlines |
-| icomplete-prospects-height            | 2       | 1     | Number of completion lines in minibuffer |                                 |
-| icomplete-delay-completions-threshold | 400     | 100   | Show completions immediately             |                                 |
-| read-file-name-completion-ignore-case | nil     | t     |                                          |                                 |
-| read-buffer-completion-ignore-case    | nil     | t     |                                          |                                 |
-| completion-ignore-case                | nil     | t     |                                          |                                 |
-|                                       |         |       |                                          |                                 |
+icomplete:
+#+begin_src emacs-lisp
+  (defun icomplete-vertical-completion-activate ()
+    (setq completion-styles '(initials flex)
+          )
+
+     (icomplete-mode 1)
+     (icomplete-vertical-mode 1)
+     )
+#+end_src
+
+fido:
+#+begin_src emacs-lisp
+  (defun fido-completion-activate ()
+    (setq completion-auto-help nil
+          completion-show-help nil
+     )
+
+    (fido-mode 1)
+    (fido-vertical-mode 1)
+    )
+
+  (defun fido-completion-deactivate ()
+    (fido-mode 0)
+    (fido-vertical-mode 0)
+    )
+
+  ;; (fido-completion-activate)
+#+end_src
+
+keymap:
+#+begin_src emacs-lisp
+  (with-eval-after-load 'icomplete
+    ;; (keymap-set icomplete-minibuffer-map "TAB"       #'minibuffer-complete)
+    (keymap-set icomplete-minibuffer-map "TAB"       #'icomplete-forward-completions)
+    (keymap-set icomplete-minibuffer-map "<backtab>" #'icomplete-backward-completions)
+    ;; (keymap-set icomplete-minibuffer-map "C-n"       #'icomplete-forward-completions)
+    ;; (keymap-set icomplete-minibuffer-map "C-p"       #'icomplete-backward-completions)
+    )
+#+end_src
 
 *** repeat
 
@@ -1926,6 +1963,223 @@ Extra compile variables:
 |-------------------------+-----------------------------------------------|
 |                         |                                               |
 
+** emw
+*** elisp
+**** interactive
+#+begin_src emacs-lisp
+  (defun emw/eval-and-insert-at-eol ()
+    "Evaluate the preceding sexp and insert result at end of line."
+    (interactive)
+    (let ((result (eval-last-sexp nil)))
+      (save-excursion
+        (end-of-line)
+        (insert "  ; → " (format "%S" result)))))
+#+end_src
+
+#+begin_src emacs-lisp :tangle no
+  (define-key org-mode-map (kbd "C-c C-e") 'emw/eval-and-insert-at-eol)
+#+end_src
+** key-binding
+
+*** edit
+#+begin_src emacs-lisp
+  (global-set-key (kbd "M-<deletechar>") 'kill-word)
+
+  (global-set-key (kbd "M-#") 'comment-line)
+#+end_src
+
+*** package
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-x P") 'list-packages)
+#+end_src
+
+*** kmacro
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-x C-k i") 'insert-kbd-macro)
+#+end_src
+
+*** search  -  M-s
+#+begin_src emacs-lisp
+  (global-set-key (kbd "M-s r") 'query-replace-regexp)
+  (global-set-key (kbd "M-s M-%") 'query-replace-regexp)
+  ;; (global-set-key (kbd "M-s O") 'multi-occur)
+  (global-set-key (kbd "M-s O") 'multi-occur-in-matching-buffers)
+  (global-set-key (kbd "M-s g") 'rgrep)
+  (global-set-key (kbd "M-s l") 'lgrep)
+  (global-set-key (kbd "M-s f f") 'find-dired)
+  (global-set-key (kbd "M-s f n") 'find-name-dired)
+  (global-set-key (kbd "M-s f r") 'find-lisp-find-dired)
+#+end_src
+
+*** move  -  M-g
+#+begin_src emacs-lisp
+
+#+end_src
+
+*** completion
+#+begin_src emacs-lisp
+  (global-set-key (kbd "M-/") #'completion-at-point)
+#+end_src
+
+*** <fn>
+
+| <fn>  | function                             | alt                    |
+|-------+--------------------------------------+------------------------|
+| <f1>  | *help menu*                            | ---------------------- |
+| <f2>  | *display menu*                         | < >                    |
+| <f3>  | *kmacro-start-macro-or-insert-counter* | < >                    |
+| <f4>  | *kmacro-end-or-call-macro*             | ---------------------- |
+| <f5>  | revert-buffer                        | emw/scratch-new         |
+| <f6>  | magit-status                         | magit-file-dispatch    |
+| <f7>  | term                                 | ansi-term              |
+| <f8>  | org-agenda                           | org-capture            |
+| <f9>  | recentf-open-files                   | < >                    |
+| <f10> | *menu-bar-open*                        | *toggle-frame-maximized* |
+| <f11> | ------------------------------------ | ---------------------- |
+| <f12> | named-term                           | < >                    |
+
+#+begin_src emacs-lisp
+  ;; (global-set-key (kbd "M-<f2>") 'xxx)
+
+  ;; (global-set-key (kbd "M-<f3>") 'xxx)
+
+  (global-set-key (kbd "<f5>") 'revert-buffer)
+  (global-set-key (kbd "M-<f5>") 'recentf-open-files)
+
+  (global-set-key (kbd "<f6>") 'org-agenda)
+  (global-set-key (kbd "M-<f6>") 'org-capture)
+
+  (global-set-key (kbd "<f7>") 'term)
+  (global-set-key (kbd "M-<f7>") 'ansi-term)
+
+  ;; (global-set-key (kbd "<f8>") 'xxx)
+  ;; (global-set-key (kbd "M-<f8>") 'xxx)
+
+  (global-set-key (kbd "<f9>") 'magit-status)
+  (global-set-key (kbd "M-<f9>") 'magit-file-dispatch)
+
+  (global-set-key (kbd "<f12>") 'named-term)
+  ;; (global-set-key (kbd "M-<f12>") 'xxx)
+#+end_src
+
+*** M-]  (mega menu)
+
+#+begin_src emacs-lisp
+  (define-prefix-command 'emw-mega-map)
+  (keymap-global-set "M-]" 'emw-mega-map)
+
+  (define-prefix-command 'emw-mega-buffer-map)
+  (keymap-set emw-mega-map "b" 'emw-mega-buffer-map)
+  (keymap-set emw-mega-buffer-map "s" 'emw/scratch-goto)
+  (keymap-set emw-mega-buffer-map "c" 'emw/scratch-new)
+  (keymap-set emw-mega-buffer-map "n" 'emw/scratch-new)
+  (keymap-set emw-mega-buffer-map "v" 'add-file-local-variable)
+  (keymap-set emw-mega-buffer-map "p" 'add-file-local-variable-prop-line)
+
+  ;; (global-set-key (kbd "M-] l R") 'eglot-reconnect)
+  ;; (global-set-key (kbd "M-] l S") 'eglot-shutdown)
+  ;; (global-set-key (kbd "M-] l a") 'eglot-code-actions)
+  ;; (global-set-key (kbd "M-] l f") 'eglot-format)
+  ;; (global-set-key (kbd "M-] l r") 'eglot-rename)
+
+  ;; (global-set-key (kbd "M-] m l") 'display-line-numbers-mode)
+  ;; (global-set-key (kbd "M-] m F") 'auto-fill-mode)
+  ;; (global-set-key (kbd "M-] m W") 'whitespace-mode)
+  ;; (global-set-key (kbd "M-] m S") 'auto-save-mode)
+  ;; (global-set-key (kbd "M-] m T") 'toggle-truncate-lines)
+
+  ;; (global-set-key (kbd "M-] o a") 'org-agenda)
+  ;; (global-set-key (kbd "M-] o c") 'org-capture)
+  ;; (global-set-key (kbd "M-] o d") 'org-deadline)
+  ;; (global-set-key (kbd "M-] o D") 'org-deadline)
+  ;; (global-set-key (kbd "M-] o E") 'org-set-effort)
+  ;; (global-set-key (kbd "M-] o l") 'org-todo-list)
+  ;; (global-set-key (kbd "M-] o P") 'org-set-property)
+  ;; (global-set-key (kbd "M-] o s") 'org-schedule)
+  ;; (global-set-key (kbd "M-] o S") 'org-schedule)
+  ;; (global-set-key (kbd "M-] o t") 'org-time-stamp)
+  ;; (global-set-key (kbd "M-] o T") 'org-set-tags-command)
+  ;; (global-set-key (kbd "M-] o y") 'org-timer-set-timer)
+
+  ;; (global-set-key (kbd "M-] t t") 'treemacs)
+  ;; (global-set-key (kbd "M-] t o") 'treemacs-select-window)
+  ;; (global-set-key (kbd "M-] t 0") 'treemacs-select-window)
+  ;; (global-set-key (kbd "M-] t B") 'treemacs-bookmark)
+  ;; (global-set-key (kbd "M-] t C-f") 'treemacs-find-file)
+  ;; (global-set-key (kbd "M-] t C-t") 'treemacs-find-tag)
+
+  ;; (global-set-key (kbd "M-] <deletechar>")
+  ;;                 (lambda ()
+  ;;                   (interactive)
+  ;;                   (join-line -1)))
+  ;; (global-set-key (kbd "M-] M-o") 'open-line-below)
+  ;; (global-set-key (kbd "M-] M-O") 'open-line-above)
+
+  ;; (global-set-key (kbd "M-] M-h") 'emw/htmlize-buffer-to-file)
+#+end_src
+
+*** M-=  (my menu)
+
+#+begin_src emacs-lisp
+  (define-prefix-command 'emw-menu-map)
+  (keymap-global-set "M-=" 'emw-menu-map)
+
+  (keymap-set emw-menu-map "e" 'emw/eval-and-insert-at-eol)
+  (keymap-set emw-menu-map "m" 'compile)
+#+end_src
+
+*** M-"  (code menu)
+#+begin_src emacs-lisp
+  (define-prefix-command 'emw-code-map)
+  (keymap-global-set "M-\"" 'emw-menu-map)
+#+end_src
+
+*** remap
+
+| function         | orig shortcut |
+|------------------+---------------|
+| count-lines-page | C-x l         |
+| count-words      | M-=           |
+
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-x r =") 'count-words)
+#+end_src
+
+*** free key-binding
+
+#+begin_src emacs-lisp :tangle no
+  (use-package free-keys
+    :ensure t
+    :defer t
+    :commands (free-keys)
+    )
+#+end_src
+
+| key-binding |   | usable |
+|-------------+---+--------|
+| C-x j       |   |        |
+| C-x y       |   |        |
+| C-x !       |   |        |
+| C-x @       |   |        |
+| C-x %       |   |        |
+| C-x &       |   |        |
+| C-x :       |   |        |
+| C-x "       |   |        |
+| C-x ,       |   |        |
+| C-x /       |   |        |
+| C-x ?       |   |        |
+| C-x ~       |   |        |
+| C-x C-y     |   |        |
+|-------------+---+--------|
+| C-^         |   |        |
+|-------------+---+--------|
+| M-"         |   |        |
+| M-*         |   |        |
+| M-]         |   |        |
+|-------------+---+--------|
+| C-x C-h     |   | NO     |
+|-------------+---+--------|
+
 ** org
 
 define emacs-org-conf-dir:
@@ -1942,6 +2196,8 @@ org-mode-setup on activation:
     "Customizations for org-mode."
     (org-indent-mode 1)
     (auto-fill-mode 0)
+
+    ;; (keymap-set emw-menu-map "e" 'emw/eval-and-insert-at-eol)
     )
 
   ;; (add-hook 'org-mode-hook 'emw/org-mode-setup)
@@ -2564,6 +2820,20 @@ Available shell:
 | vterm     |            | (to install)                 |
 
 #+begin_src emacs-lisp
+  (setq shell-file-name (or (getenv "ESHELL") (getenv "SHELL")))
+  (when (string-equal shell-file-name "")
+    (setq shell-file-name "/bin/bash"))
+  (setq explicit-shell-file-name shell-file-name
+        explicit-shell-args '("-l")
+        explicit-bash-args '("-l")
+        explicit-zsh-args  '("-l")
+        explicit-sh-args '("-l")
+        )
+  (setq term-prompt-regexp "^[^#$%>\n]*[#$%>] *")
+  (setq term-ansi-program (concat shell-file-name " -l"))
+#+end_src
+
+#+begin_src emacs-lisp
   (defun emw/configure-terminal-common ()
     "Customizations for terminal."
     (setq-local show-trailing-whitespace nil)
@@ -2573,6 +2843,12 @@ Available shell:
     (hl-line-mode -1)
     (yas-minor-mode -1)
     )
+#+end_src
+
+#+begin_src emacs-lisp
+  (add-hook 'eshell-mode-hook 'emw/configure-terminal-common)
+  (add-hook 'shell-mode-hook 'emw/configure-terminal-common)
+  (add-hook 'term-mode-hook 'emw/configure-terminal-common)
 #+end_src
 
 *** command
@@ -2640,16 +2916,9 @@ example of async-shell
         )
 
   (add-hook 'eshell-output-filter-functions 'eshell-truncate-buffer)
-
-  (add-hook 'eshell-mode-hook 'emw/configure-terminal-common)
 #+end_src
 
 *** shell
-
-configure
-#+begin_src emacs-lisp
-  (add-hook 'shell-mode-hook 'emw/configure-terminal-common)
-#+end_src
 
 comint-based buffers configuration
 #+begin_src emacs-lisp
@@ -2658,25 +2927,6 @@ comint-based buffers configuration
 #+end_src
 
 *** term
-
-#+begin_src emacs-lisp
-  (setq explicit-shell-args '("-l"))
-  (defvar emacs-shell-program (or (getenv "ESHELL") (getenv "SHELL")))
-  (if (string-equal emacs-shell-program "")
-      (setq emacs-shell-program "bash"
-            explicit-shell-file-name "bash"
-            )
-    (setq explicit-shell-file-name emacs-shell-program
-          )
-    )
-  (setq term-prompt-regexp "^[^#$%>\n]*[#$%>] *")
-#+end_src
-
-configure
-#+begin_src emacs-lisp
-  (add-hook 'term-mode-hook 'emw/configure-terminal-common)
-#+end_src
-
 **** named-term
 
 #+begin_src emacs-lisp
@@ -2712,215 +2962,10 @@ replace *C-x* witch *C-c*
 | term-char-mode | C-c C-k  | every keystroke is sent directly to the underlying terminal |
 | term-line-mode | C-c C-j  | input is sent to the terminal only when you press RET       |
 
-** emw
-*** elisp
-**** interactive
-#+begin_src emacs-lisp
-  (defun emw/eval-and-insert-at-eol ()
-    "Evaluate the preceding sexp and insert result at end of line."
-    (interactive)
-    (let ((result (eval-last-sexp nil)))
-      (save-excursion
-        (end-of-line)
-        (insert "  ; → " (format "%S" result)))))
-
-  (define-key org-mode-map (kbd "C-c C-e") 'emw/eval-and-insert-at-eol)
-#+end_src
-** key-binding
-
-*** edit
-
-#+begin_src emacs-lisp
-  (global-set-key (kbd "M-<deletechar>") 'kill-word)
-
-  (global-set-key (kbd "M-#") 'comment-line)
-#+end_src
-
-*** package
-
-#+begin_src emacs-lisp
-  (global-set-key (kbd "C-x P") 'list-packages)
-#+end_src
-
-*** kmacro
-
-#+begin_src emacs-lisp
-  (global-set-key (kbd "C-x C-k i") 'insert-kbd-macro)
-#+end_src
-
-*** search  -  M-s
-
-#+begin_src emacs-lisp
-  (global-set-key (kbd "M-s r") 'query-replace-regexp)
-  (global-set-key (kbd "M-s M-%") 'query-replace-regexp)
-  ;; (global-set-key (kbd "M-s O") 'multi-occur)
-  (global-set-key (kbd "M-s O") 'multi-occur-in-matching-buffers)
-  (global-set-key (kbd "M-s g") 'rgrep)
-  (global-set-key (kbd "M-s l") 'lgrep)
-  (global-set-key (kbd "M-s f f") 'find-dired)
-  (global-set-key (kbd "M-s f n") 'find-name-dired)
-  (global-set-key (kbd "M-s f r") 'find-lisp-find-dired)
-#+end_src
-
-*** move  -  M-g
-
-#+begin_src emacs-lisp
-
-#+end_src
-
-*** <fn>
-
-| <fn>  | function                             | alt                    |
-|-------+--------------------------------------+------------------------|
-| <f1>  | *help menu*                            | ---------------------- |
-| <f2>  | *display menu*                         | < >                    |
-| <f3>  | *kmacro-start-macro-or-insert-counter* | < >                    |
-| <f4>  | *kmacro-end-or-call-macro*             | ---------------------- |
-| <f5>  | revert-buffer                        | emw/scratch-new         |
-| <f6>  | magit-status                         | magit-file-dispatch    |
-| <f7>  | term                                 | ansi-term              |
-| <f8>  | org-agenda                           | org-capture            |
-| <f9>  | recentf-open-files                   | < >                    |
-| <f10> | *menu-bar-open*                        | *toggle-frame-maximized* |
-| <f11> | ------------------------------------ | ---------------------- |
-| <f12> | named-term                           | < >                    |
-
-#+begin_src emacs-lisp
-  ;; (global-set-key (kbd "M-<f2>") 'xxx)
-
-  ;; (global-set-key (kbd "M-<f3>") 'xxx)
-
-  (global-set-key (kbd "<f5>") 'revert-buffer)
-  (global-set-key (kbd "M-<f5>") 'recentf-open-files)
-
-  (global-set-key (kbd "<f6>") 'org-agenda)
-  (global-set-key (kbd "M-<f6>") 'org-capture)
-
-  (global-set-key (kbd "<f7>") 'term)
-  ;; (global-set-key (kbd "<f7>") 'named-term)
-  (global-set-key (kbd "M-<f7>") 'ansi-term)
-
-  (global-set-key (kbd "<f8>") 'magit-status)
-  (global-set-key (kbd "M-<f8>") 'magit-file-dispatch)
-
-  ;; (global-set-key (kbd "<f9>") 'xxx)
-  ;; (global-set-key (kbd "M-<f9>") 'xxx)
-
-  (global-set-key (kbd "<f12>") 'named-term)
-  ;; (global-set-key (kbd "M-<f12>") 'xxx)
-#+end_src
-
-*** M-]  (mega menu)
-
-#+begin_src emacs-lisp
-  (define-prefix-command 'emy-mega-map)
-  (keymap-global-set "M-]" 'emy-mega-map)
-
-  (define-prefix-command 'emy-mega-buffer-map)
-  (keymap-set emy-mega-map "b" 'emy-mega-buffer-map)
-  (keymap-set emy-mega-buffer-map "s" 'emw/scratch-goto)
-  (keymap-set emy-mega-buffer-map "c" 'emw/scratch-new)
-  (keymap-set emy-mega-buffer-map "n" 'emw/scratch-new)
-  (keymap-set emy-mega-buffer-map "v" 'add-file-local-variable)
-  (keymap-set emy-mega-buffer-map "p" 'add-file-local-variable-prop-line)
-
-  ;; (global-set-key (kbd "M-] l R") 'eglot-reconnect)
-  ;; (global-set-key (kbd "M-] l S") 'eglot-shutdown)
-  ;; (global-set-key (kbd "M-] l a") 'eglot-code-actions)
-  ;; (global-set-key (kbd "M-] l f") 'eglot-format)
-  ;; (global-set-key (kbd "M-] l r") 'eglot-rename)
-
-  ;; (global-set-key (kbd "M-] m l") 'display-line-numbers-mode)
-  ;; (global-set-key (kbd "M-] m F") 'auto-fill-mode)
-  ;; (global-set-key (kbd "M-] m W") 'whitespace-mode)
-  ;; (global-set-key (kbd "M-] m S") 'auto-save-mode)
-  ;; (global-set-key (kbd "M-] m T") 'toggle-truncate-lines)
-
-  ;; (global-set-key (kbd "M-] o a") 'org-agenda)
-  ;; (global-set-key (kbd "M-] o c") 'org-capture)
-  ;; (global-set-key (kbd "M-] o d") 'org-deadline)
-  ;; (global-set-key (kbd "M-] o D") 'org-deadline)
-  ;; (global-set-key (kbd "M-] o E") 'org-set-effort)
-  ;; (global-set-key (kbd "M-] o l") 'org-todo-list)
-  ;; (global-set-key (kbd "M-] o P") 'org-set-property)
-  ;; (global-set-key (kbd "M-] o s") 'org-schedule)
-  ;; (global-set-key (kbd "M-] o S") 'org-schedule)
-  ;; (global-set-key (kbd "M-] o t") 'org-time-stamp)
-  ;; (global-set-key (kbd "M-] o T") 'org-set-tags-command)
-  ;; (global-set-key (kbd "M-] o y") 'org-timer-set-timer)
-
-  ;; (global-set-key (kbd "M-] t t") 'treemacs)
-  ;; (global-set-key (kbd "M-] t o") 'treemacs-select-window)
-  ;; (global-set-key (kbd "M-] t 0") 'treemacs-select-window)
-  ;; (global-set-key (kbd "M-] t B") 'treemacs-bookmark)
-  ;; (global-set-key (kbd "M-] t C-f") 'treemacs-find-file)
-  ;; (global-set-key (kbd "M-] t C-t") 'treemacs-find-tag)
-
-  ;; (global-set-key (kbd "M-] <deletechar>")
-  ;;                 (lambda ()
-  ;;                   (interactive)
-  ;;                   (join-line -1)))
-  ;; (global-set-key (kbd "M-] M-o") 'open-line-below)
-  ;; (global-set-key (kbd "M-] M-O") 'open-line-above)
-
-  ;; (global-set-key (kbd "M-] M-h") 'emw/htmlize-buffer-to-file)
-#+end_src
-
-*** M-=  (my menu)
-
-#+begin_src emacs-lisp
-  (define-prefix-command 'emy-menu-map)
-  (keymap-global-set "M-=" 'emy-menu-map)
-
-  (keymap-set emy-menu-map "m" 'compile)
-#+end_src
-
-*** remap
-
-| function         | orig shortcut |
-|------------------+---------------|
-| count-lines-page | C-x l         |
-| count-words      | M-=           |
-
-#+begin_src emacs-lisp
-  (global-set-key (kbd "C-x r =") 'count-words)
-#+end_src
-
-*** free key-binding
-
-#+begin_src emacs-lisp :tangle no
-  (use-package free-keys
-    :ensure t
-    :defer t
-    :commands (free-keys)
-    )
-#+end_src
-
-| key-binding |   | usable |
-|-------------+---+--------|
-| C-x j       |   |        |
-| C-x y       |   |        |
-| C-x !       |   |        |
-| C-x @       |   |        |
-| C-x %       |   |        |
-| C-x &       |   |        |
-| C-x :       |   |        |
-| C-x "       |   |        |
-| C-x ,       |   |        |
-| C-x /       |   |        |
-| C-x ?       |   |        |
-| C-x ~       |   |        |
-| C-x C-y     |   |        |
-|-------------+---+--------|
-| C-^         |   |        |
-|-------------+---+--------|
-| M-"         |   |        |
-| M-*         |   |        |
-| M-]         |   |        |
-|-------------+---+--------|
-| C-x C-h     |   | NO     |
-|-------------+---+--------|
-
+** navigation
+*** consult
+** actions
+*** embark
 ** completion
 
 *** hippie-expand
@@ -2935,17 +2980,16 @@ replace *C-x* witch *C-c*
     :config
     (setopt hippie-expand-try-functions-list
             '(yas-hippie-try-expand
-              try-expand-all-abbrevs
               try-expand-dabbrev
+              try-expand-all-abbrevs
               try-expand-dabbrev-all-buffers
               try-expand-dabbrev-from-kill
-              try-complete-file-name
-              try-complete-file-name-partially
-              try-complete-lisp-symbol
               try-complete-lisp-symbol-partially
+              try-complete-lisp-symbol
+              try-complete-file-name-partially
+              try-complete-file-name
               try-expand-list
               try-expand-line
-              try-expand-line-all-buffers
               ))
     )
 #+end_src
@@ -2965,52 +3009,98 @@ replace *C-x* witch *C-c*
 | try-complete-lisp-symbol           | Completes Lisp symbols.                                          |
 | try-complete-lisp-symbol-partially | Partially completes Lisp symbols.                                |
 
-Order example:
+*** orderless
 #+begin_src emacs-lisp :tangle no
-  '(yas-hippie-try-expand
-    try-expand-all-abbrevs
-    try-expand-dabbrev
-    try-expand-dabbrev-all-buffers
-    try-expand-dabbrev-from-kill
-    try-complete-lisp-symbol-partially
-    try-complete-lisp-symbol
-    try-complete-file-name-partially
-    try-complete-file-name)
+  (use-package orderless
+    :ensure t
+    :defer 0
+    :config
+    (setq completion-styles '(orderless flex basic)
+          completion-category-overrides '((file (styles basic partial-completion))))
+    )
 #+end_src
 
+*** marginalia
+#+begin_src emacs-lisp
+  (use-package marginalia
+    :ensure t
+    :defer 0
+    :init
+    (marginalia-mode)
+    )
+#+end_src
+
+*** vertico
+#+begin_src emacs-lisp
+  (use-package vertico
+    :ensure t
+    :defer 0
+    :init
+    (vertico-mode 1)
+    :custom
+    (vertico-count 10)
+    (vertico-cycle t)
+    (vertico-resize t)
+    :config
+    (require 'vertico-quick)
+    (keymap-set vertico-map "M-q" #'vertico-quick-insert)
+    (keymap-set vertico-map "C-q" #'vertico-quick-exit)
+
+    ;; (global-set-key "\M-R" #'vertico-repeat)
+    ;; (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)
+
+    ;; (keymap-set vertico-map "DEL" #'vertico-directory-delete-char)
+    ;; (keymap-set vertico-map "M-DEL" #'vertico-directory-delete-word)
+
+    ;; (vertico-indexed-mode 1)
+    (vertico-mouse-mode 1)
+    )
+#+end_src
+
+**** vertico-postframe
+#+begin_src emacs-lisp :tangle no
+  (use-package vertico-posframe
+    :after vertico
+    :config
+    (vertico-posframe-mode 1)
+    )
+#+end_src
 *** company
 
-| config                            | default                   | suggestion | purpose                                       |
-|-----------------------------------+---------------------------+------------+-----------------------------------------------|
-| company-idle-delay                | 0.2                       | 0.1        | delay before suggestions popup (in seconds)   |
-| company-minimum-prefix-length     | 3                         | 1          | min number of chars before completion starts  |
-| company-show-numbers              | nil                       | t          | show numbers for quick selection              |
-| company-tooltip-align-annotations | nil                       | t          | align annotations to the right tooltip border |
-| company-require-match             | company-explicit-action-p | nil        | don't require match, allow free text          |
-| company-dabbrev-downcase          | case-replace              | nil        | do not downcase suggestions                   |
-| company-dabbrev-ignore-case       | keep-prefix               | t          | ignore case in dabbrev                        |
+| variable                          | default | description                                                     |
+|-----------------------------------+---------+-----------------------------------------------------------------|
+| company-minimum-prefix-length     |       3 | The minimum prefix length for idle completion                   |
+| company-idle-delay                |     0.2 | The idle delay in seconds until completion starts automatically |
+| company-selection-wrap-around     |     nil | Sselecting item before first or after last wraps around         |
+| company-tooltip-limit             |      10 | The maximum number of candidates in the tooltip                 |
+| company-tooltip-align-annotations |         | Align annotations to the right tooltip border                   |
+| company-show-quick-access         |     nil | Show quick-access hints beside the candidates                   |
+|-----------------------------------+---------+-----------------------------------------------------------------|
+| company-backends                  |         | The list of active completion engines                           |
 
 #+begin_src emacs-lisp
   (use-package company
     :ensure t
+    :defer 0
     :init
     (global-company-mode t)
+    ;; :hook (prog-mode . company-mode)
+    :custom
+    (company-minimum-prefix-length 2)
+    (company-idle-delay 0.8)
+    (company-selection-wrap-around t)
+    (company-tooltip-limit 10)
+    (company-tooltip-align-annotations t)
+    (company-show-quick-access t)
     :config
-    (setq company-idle-delay 0.5
-          company-minimum-prefix-length 2
-          company-show-numbers t
-          company-tooltip-limit 10
-          company-tooltip-align-annotations t
-          ;; company-require-match nil
-          ;; company-dabbrev-downcase nil
-          ;; company-dabbrev-ignore-case t
-          )
     :bind (
-           ;; ("<TAB>" . company-indent-or-complete-common)
            ("M-'" . company-complete)
            :map company-active-map
-           ("<tab>" . company-complete-common-or-cycle)
-           ("<backtab>" . company-select-previous))
+           ("TAB" . company-complete-selection)
+           ;; ("TAB" . company-complete-common-or-cycle)
+           ("C-n" . company-select-next)
+           ("C-p" . company-select-previous)
+           )
     )
 #+end_src
 
@@ -3018,7 +3108,19 @@ Order example:
   (use-package company-box
     :ensure t
     :defer t
-    :hook (company-mode . company-box-mode))
+    :after company
+    :if (display-graphic-p)
+    :hook (company-mode . company-box-mode)
+    )
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package company-quickhelp
+    :ensure t
+    :defer t
+    :after company
+    :hook (company-mode . company-quickhelp-mode)
+    )
 #+end_src
 
 bindings in company-active-map
@@ -3035,70 +3137,102 @@ bindings in company-active-map
 |            |                                                           |                                                                |
 
 *** corfu
-:PROPERTIES:
-:header-args:emacs-lisp: :tangle no
-:END:
 
-#+begin_src emacs-lisp
+Corfu settings:
+| setting                | default   | purpose                                                   |
+|------------------------+-----------+-----------------------------------------------------------|
+| corfu-cycle            | nil       | Enable cycling for completions                            |
+| corfu-auto             | nil       | Enable auto completion                                    |
+| corfu-auto-delay       | 0.2       | Delay for auto completion                                 |
+| corfu-auto-prefix      | 3         | Minimum length of prefix for auto completion              |
+| corfu-auto-commands    |           | Commands which initiate auto completion                   |
+| corfu-count            | 10        | Maximal number of candidates to show                      |
+| corfu-quit-no-match    | separator | Automatically quit if no match is found                   |
+| corfu-quit-at-boundary | separator | Automatically quit at completion boundary                 |
+| corfu-preselect        | valid     | Configure if the prompt or first candidate is preselected |
+| corfu-preview-current  | insert    | Preview currently selected candidate                      |
+
+#+begin_src emacs-lisp :tangle no
   (use-package corfu
-    :disabled t
     :ensure t
-    ;; Optional customizations
-    :custom
-    (corfu-cycle t)                 ; Allows cycling through candidates
-    (corfu-auto t)                  ; Enable auto completion
-    (corfu-auto-prefix 2)
-    (corfu-auto-delay 0.8)
-    (corfu-popupinfo-delay '(0.5 . 0.2))
-    (corfu-preview-current 'insert) ; insert previewed candidate
-    (corfu-preselect 'prompt)
-    (corfu-on-exact-match nil)      ; Don't auto expand tempel snippets
-    ;; Optionally use TAB for cycling, default is `corfu-complete'.
-    :bind (:map corfu-map
-                ("M-SPC"      . corfu-insert-separator)
-                ("TAB"        . corfu-next)
-                ([tab]        . corfu-next)
-                ("S-TAB"      . corfu-previous)
-                ([backtab]    . corfu-previous)
-                ("S-<return>" . corfu-insert)
-                )
-
+    :defer 0
     :init
     (global-corfu-mode)
-    (unless (display-graphic-p)
-      (require 'corfu-terminal)
-      (corfu-terminal-mode +1))
     (corfu-history-mode)
-    (corfu-popupinfo-mode) ; Popup completion info
-    ;; :config
-    ;; (add-hook 'eshell-mode-hook
-    ;;           (lambda () (setq-local corfu-quit-at-boundary t
-    ;;                                  corfu-quit-no-match t
-    ;;                                  corfu-auto nil)
-    ;;             (corfu-mode))
-    ;;           nil
-    ;;           t))
+    (corfu-popupinfo-mode 1)
+    :custom
+    (corfu-cycle t)
+    (corfu-auto t)
+    (corfu-auto-delay 0.8)
+    (corfu-auto-prefix 2)
+    (corfu-count 8)
+    (corfu-quit-no-match 'separator)
+    (corfu-quit-at-boundary 'separator)
+    (corfu-preselect 'prompt)
+    (corfu-preview-current 'insert)
+    (corfu-min-width 80)
+    :config
+    ;; (when (not (display-graphic-p))
+      ;; (corfu-popupinfo-mode nil)
+      ;; )
+    ;; :hook
+    ;; ((prog-mode . eglot-ensure)
+    ;;  (text-mode . corfu-mode)
+    ;;  (org-mode . corfu-mode))
+    ;; :bind
+    ;; (:map corfu-map
+    ;;       ("M-\""    . corfu-insert-separator)
+    ;;       ("TAB"     . corfu-next)               ; Cycle forward
+    ;;       ([tab]     . corfu-next)               ; Support for terminal Emacs
+    ;;       ("S-TAB"   . corfu-previous)           ; Cycle backward
+    ;;       ([backtab] . corfu-previous)           ; Terminal compatibility
+    ;;       ("RET"     . corfu-insert)             ; Confirm selection
+    ;;       ("M-RET"   . corfu-insert-and-quit)    ; Confirm and close
+    ;;       ("C-g"     . corfu-quit)               ; Abort completion
+    ;;       ("M-n"     . corfu-scroll-down)        ; Scroll popup down
+    ;;       ("M-p"     . corfu-scroll-up)          ; Scroll popup up
+    ;;       ("M-d"     . corfu-show-documentation) ; Show docs (if available)
+    ;; )
     )
 #+end_src
 
-Corfu settings:
+*** cape
+#+begin_src emacs-lisp
+  (use-package cape
+    :ensure t
+    :defer 0
+    :config
+    ;; Add default completion sources (order matters!)
+    (add-to-list 'completion-at-point-functions #'cape-dabbrev)  ; Buffer words
+    (add-to-list 'completion-at-point-functions #'cape-file)    ; File paths
+    (add-to-list 'completion-at-point-functions #'cape-keyword) ; Keywords
+    (add-to-list 'completion-at-point-functions #'cape-symbol)  ; Elisp symbols
 
-| setting             | default   | value | purpose                                 |
-|---------------------+-----------+-------+-----------------------------------------|
-| corfu-cycle         | nil       | t     | enable cycling for completions          |
-| corfu-auto          | nil       | t     | enable auto completion                  |
-| corfu-quit-no-match | separator | t     | automatically quit if no match is found |
+    ;; (add-to-list 'completion-at-point-functions #'cape-eglot 100)
+    (with-eval-after-load 'eglot
+      (add-to-list 'completion-at-point-functions #'eglot-completion-at-point))
 
-** language server
+    ;; (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-silent)
+    ;; (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-purify))
+    )
+#+end_src
 
-| shortcut | command               |
-|----------+-----------------------|
-| M-,      | xref-go-back          |
-| M-.      | xref-find-definitions |
-| M-/      | hippie-expand         |
-| M-'      | company-complete      |
+** prog
+*** flymake
+#+begin_src emacs-lisp
+  (use-package flymake
+    :ensure nil
+    :hook (prog-mode . flymake-mode)
+    :bind (
+           :map flymake-mode-map
+                ("M-\" M-n" . flymake-goto-next-error)
+                ("M-\" M-p" . flymake-goto-prev-error)
+                ("M-\" M-e" . flymake-show-buffer-diagnostics)
+           )
+    )
+#+end_src
 
-*** TODO eglot
+*** eglot
 
 #+begin_src emacs-lisp
   (use-package eglot
@@ -3124,10 +3258,11 @@ Corfu settings:
 
     :config
     (add-to-list 'eglot-server-programs
-                 '(ruby-mode . ("ruby-lsp"))
-                 ;; '(ruby-mode . ("ruby-lsp" "--verbose"))
-                 ;; '(ruby-mode . ("solargraph" "stdio"))
-                 )
+                 '(ruby-mode . ("solargraph" "stdio")))
+                 ;; '((ruby-mode) . ("ruby-lsp")))
+    (add-to-list 'eglot-server-programs
+                 '(ruby-mode . ("solargraph" "stdio")))
+                 ;; '((ruby-ts-mode) . ("ruby-lsp")))
 
     (setq eglot-ruby-lsp-options
           '(:enabledFeatures
@@ -3150,6 +3285,13 @@ Corfu settings:
                  `((ruby-lsp . ,eglot-ruby-lsp-options))
                  )
 
+    :bind
+    (:map eglot-mode-map
+          ("M-." . xref-find-definitions)
+          ("M-?" . xref-find-references)
+          ("M-," . xref-go-back)
+          ("C-c r" . eglot-rename)
+          ("C-c a" . eglot-code-actions))
     ;; Keybindings (separate map)
     ;; (define-key eglot-mode-map (kbd "C-c r") 'eglot-rename)
     ;; (define-key eglot-mode-map (kbd "C-c f") 'eglot-format)
@@ -3157,7 +3299,6 @@ Corfu settings:
     ;; (define-key eglot-mode-map (kbd "C-c a") 'eglot-code-actions)
     ;; (define-key my/eglot-mode-map (kbd "C-c d") 'eglot-find-declaration)
     ;; (define-key my/eglot-mode-map (kbd "C-c t") 'eglot-find-typeDefinition)
-
     )
 #+end_src
 
@@ -3371,6 +3512,7 @@ extend *eglot-server-programs* with
   (dap-mode . dap-auto-configure-mode))
 #+end_src
 
+*** tempel
 ** language
 
 *** [prog]
@@ -3691,11 +3833,6 @@ or
 
 *** info
 
-current enabled themes
-#+begin_src emacs-lisp :tangle no
-   (message "%s" custom-enabled-themes)
-#+end_src
-
 #+RESULTS:
 : nil
 
@@ -3740,18 +3877,22 @@ available themes
 | whiteboard     | light |           |
 | wombat         | dark  |         3 |
 
-#+begin_src emacs-lisp :tangle no
-  (load-theme 'manoj-dark t)
+#+begin_src emacs-lisp
+  (load-theme 'modus-vivendi t)
 #+end_src
 
 *** railscasts-reloaded
-
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   (use-package railscasts-reloaded-theme
     :ensure t
     :init
     (load-theme 'railscasts-reloaded t)
     )
+#+end_src
+
+*** enabled themes
+#+begin_src emacs-lisp
+  (message "> Enabled themes: %S" custom-enabled-themes)
 #+end_src
 
 ** end
