@@ -3,7 +3,7 @@
 
 # `underscore` any file at any filepath
 
-_und()
+und_()
 {
     und__target="${1}"
     [ -z "$und__target" ] && return 1
@@ -21,6 +21,6 @@ _und()
 
 status=0
 for target; do
-    _und "$target" || status=1
+    und_ "$target" || status=1
 done
 exit $status
