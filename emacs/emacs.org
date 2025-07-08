@@ -3197,7 +3197,7 @@ Corfu settings:
 #+end_src
 
 *** cape
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   (use-package cape
     :ensure t
     :defer 0
@@ -3220,15 +3220,23 @@ Corfu settings:
 ** prog
 *** flymake
 #+begin_src emacs-lisp
+  (defun emw/flymake-setup ()
+    (defun flymake-display-warning (warning)
+      "Replace default behavior by a warning message"
+      (message "Flymake Warning: %s" warning))
+    )
+
   (use-package flymake
     :ensure nil
     :hook (prog-mode . flymake-mode)
     :bind (
            :map flymake-mode-map
-                ("M-\" M-n" . flymake-goto-next-error)
-                ("M-\" M-p" . flymake-goto-prev-error)
-                ("M-\" M-e" . flymake-show-buffer-diagnostics)
+           ("M-\" M-n" . flymake-goto-next-error)
+           ("M-\" M-p" . flymake-goto-prev-error)
+           ("M-\" M-e" . flymake-show-buffer-diagnostics)
            )
+    :config
+    (emw/flymake-setup)
     )
 #+end_src
 
