@@ -89,6 +89,42 @@ which git >/dev/null 2>&1 || {
 GIT_VERSION=`git --version`
 GIT_VERSION=${GIT_VERSION##* }
 
+__git_version_compare()
+{
+    __git_version_1="$1"
+    __git_version_2="$2"
+    __git_version_compare=0
+
+    if [ "$__git_version_1" = "$__git_version_2" ]; then
+        return $__git_version_compare
+    fi
+    while [ -n "$__git_version_1" ] && [ -n "$__git_version_2" ]; do
+        _git_version_1_part="${__git_version_1%%.*}"
+        __git_version_1="${__git_version_1#$_git_version_1_part}"
+        __git_version_1="${__git_version_1#.}"
+        _git_version_2_part="${__git_version_2%%.*}"
+        __git_version_2="${__git_version_2#$_git_version_2_part}"
+        __git_version_2="${__git_version_2#.}"
+
+        if [ "$_git_version_1_part" -gt "$_git_version_2_part" ]; then
+            __git_version_compare=1
+        elif [ "$_git_version_2_part" -gt "$_git_version_1_part" ]; then
+            __git_version_compare=2
+        fi
+
+        if [ $__git_version_compare -ne 0 ]; then
+            return $__git_version_compare
+        fi
+    done
+    if [ -n "$__git_version_1" ]; then
+        __git_version_compare=1
+    fi
+    if [ -n "$__git_version_2" ]; then
+        __git_version_compare=2
+    fi
+    return $__git_version_compare
+}
+
 
 ######################################### config
 
@@ -116,9 +152,11 @@ if [ -z "$git_current_user_mail" ]; then
 fi
 
 ### config :: edit
-git config --global alias.configedit 'config --global -e'
-git config --global alias.editconfig 'config --global -e'
-git config --global alias.confe      'config --global -e'
+git config --global alias.configedit 'config --global --edit'
+git config --global alias.editconfig 'config --global --edit'
+git config --global alias.confe      'config --global --edit'
+git config --global alias.confge     'config --global --edit'
+git config --global alias.cge        'config --global --edit'
 git config --global alias.configlist 'config --list --show-origin'
 git config --global alias.listconfig 'config --list --show-origin'
 git config --global alias.confl      'config --list --show-origin'
@@ -153,6 +191,7 @@ git config --global color.status auto
 for editor in e et emacs vim vi; do
     if command -v $editor >/dev/null 2>/dev/null; then
         git config --global core.editor $editor
+        # for vscode use: code --wait
         break
     fi
 done
@@ -201,9 +240,10 @@ git config --global init.defaultBranch master
 
 
 ######################################### add
-git config --global alias.a     "add"
-git config --global alias.addi  "add --interactive"
-git config --global alias.addp  "add --patch"
+git config --global alias.a     'add'
+git config --global alias.aa    'add -A'
+git config --global alias.addi  'add --interactive'
+git config --global alias.addp  'add --patch'
 
 
 ######################################### bisect
@@ -213,26 +253,26 @@ git config --global alias.addp  "add --patch"
 
 ######################################### blame
 # git blame -L14,25 <file>
-git config --global alias.blamew  "blame -w"
+git config --global alias.blamew  'blame -w'
 ## detect lines moved
 # -C : in the same commit
 # -C -C : in the same commit + commit that create file
 # -C -C -C : in any commit
-git config --global alias.blamec  "blame -w -C"
+git config --global alias.blamec  'blame -w -C'
 
 
 ######################################### branch
 # sort by: refname (def) | committerdate | creatordate | head | version:refname | ...
 git config --global branch.sort -committerdate
 
-git config --global alias.br branch
+git config --global alias.br          'branch'
 # git config --global alias.brv 'branch -v'
-git config --global alias.brv 'branch -vv'
-git config --global alias.bra 'branch --all'
+git config --global alias.brv         'branch -vv'
+git config --global alias.bra         'branch --all'
 # git config --global alias.brav 'branch --all -v'
-git config --global alias.brav 'branch --all -vv'
-git config --global alias.merged 'branch --merged'
-git config --global alias.unmerged 'branch --no-merged'
+git config --global alias.brav        'branch --all -vv'
+git config --global alias.merged      'branch --merged'
+git config --global alias.unmerged    'branch --no-merged'
 git config --global alias.cleanmerged '!f() { for br in $(git branch --merged "$@" | egrep -v " master\$| main\$|^\*"); do echo git branch -d "$br"; done; }; f'
 # git config --global alias.cleanmerged '!f() { git branch --merged ${1:-master} | grep -v " ${1:-master}$" | xargs git branch -d; }; f
 git config --global alias.bru 'branch -u'
@@ -242,7 +282,10 @@ git config --global alias.bru 'branch -u'
 
 
 ######################################### checkout
+git config --global alias.co        'checkout'
 git config --global alias.cob       'checkout -b'
+git config --global alias.coc       '!f() { git checkout -b "$1" --track "origin/$1"; }; f'
+git config --global alias.cod       'checkout .'
 git config --global alias.col       'checkout -'
 git config --global alias.com       'checkout master'
 git config --global alias.cop       'checkout --patch'
@@ -259,6 +302,9 @@ git config --global alias.append '!f() { git cherry-pick $(git merge-base HEAD $
 
 
 ######################################### clean
+git config --global alias.cl0      'clean -d --force --dry-run'
+git config --global alias.cl1      'clean -d --force'
+git config --global alias.cl2      'clean -dx --force'
 git config --global alias.pristine '!f() { git reset --hard ${1:-HEAD} && git clean -fdx; }; f'
 git config --global alias.cleantmp 'clean -dX'
 
@@ -277,15 +323,17 @@ git config --global alias.cleantmp 'clean -dX'
 if [ -r "$HOME/.gitmessage.txt" ]; then
     git config --global commit.template "$HOME/.gitmessage.txt"
 fi
-git config --global alias.ci commit
+git config --global alias.ci      'commit'
 git config --global alias.cim "commit -m"
 git config --global alias.cs "commit --signoff"
 git config --global alias.cam "commit --all -m"
-git config --global alias.amend 'commit --amend'
-git config --global alias.extend 'commit --amend --no-edit'
-git config --global alias.amendh 'commit --amend -C HEAD'
-git config --global alias.fixup 'commit --fixup'
-git config --global alias.squash 'commit --squash'
+git config --global alias.amend   'commit --amend'
+git config --global alias.extend  'commit --amend --no-edit'
+git config --global alias.extenda 'commit --all --amend --no-edit'
+git config --global alias.amenda  'commit --all --amend -C HEAD'
+git config --global alias.amendh  'commit --amend -C HEAD'
+git config --global alias.fixup   'commit --fixup'
+git config --global alias.squash  'commit --squash'
 
 
 ######################################### daemon
@@ -515,20 +563,22 @@ git config --global alias.gotype  'cat-file -t'
 
 ######################################### pull
 git config --global alias.ffpull "pull --no-rebase --ff-only"
+git config --global alias.pullf  "pull --no-rebase --ff-only"
 git config --global alias.repull "pull --rebase"
+git config --global alias.pullr  "pull --rebase"
 git config --global alias.up '!git pull --rebase $@ && git submodule update --init --recursive'
 
 # git pull --rebase
 WANT_REBASE=false
 if $WANT_REBASE; then
-    # git >= 1.8.5
-    version_tmp=$(printf "%s\n" $GIT_VERSION 1.8.5 | sort -r | head -1)
-    if [ "$version_tmp" = "$GIT_VERSION" ]; then
+    __git_version_compare "1.8.5" "$GIT_VERSION"
+    if [ $__git_version_compare -eq 0 ] || [ $__git_version_compare -eq 2 ]; then
+        # git >= 1.8.5
         git config --global pull.rebase preserve
     else
-        # git >= 1.7.9
-        version_tmp=$(printf "%s\n" $GIT_VERSION 1.7.9 | sort -r | head -1)
-        if [ "$version_tmp" = "$GIT_VERSION" ]; then
+        __git_version_compare "1.7.9" "$GIT_VERSION"
+        if [ $__git_version_compare -eq 0 ] || [ $__git_version_compare -eq 2 ]; then
+            # git >= 1.7.9
             git config --global pull.rebase true
         else
             # git < 1.7.9
@@ -541,11 +591,19 @@ fi
 ######################################### push
 # push : nothing | matching | simple | current
 git config --global push.default current
+git config --global push.autoSetupRemote true
 
 git config --global alias.push2all      '!f() { for remote in `git remote`; do git push $remote "$@"; done }; f'
 git config --global alias.pushf         'push --force-with-lease'
+git config --global alias.pushu         'push --set-upstream'
 git config --global alias.rm-remote-ref '!f() { [ $# -ge 2 ] && rem="$1" && shift ; git push "${rem:-origin}" --delete "$@"; }; f'
 # alternativ is: git push <origin> :refs/tags/<v1.4-lw>
+
+__git_version_compare "2.37.0" "$GIT_VERSION"
+if [ $__git_version_compare -eq 0 ] || [ $__git_version_compare -eq 2 ]; then
+    # git >= 2.37.0
+    git config --global push.autoSetupRemote true
+end
 
 
 ######################################### rebase
@@ -584,6 +642,7 @@ git config --global rerere.enabled true
 ## --mixed (default) / update : HEAD + index
 ## --soft / update : HEAD
 git config --global alias.unstage 'reset --mixed HEAD --'
+# git config --global alias.rh  'reset --mixed HEAD --'
 git config --global alias.resetto '!f() { branch=$(git rev-parse --abbrev-ref HEAD); git reset --hard "${1:-$branch}"; }; f'
 git config --global alias.resetfile '!f() { git reset @~ "$@" && git commit --amend --no-edit }; f'
 
@@ -665,7 +724,7 @@ git config --global alias.rtags  'show-ref --tags'
 git config --global submodule.recurse true
 git config --global diff.submodule log
 git config --global status.submodulesummary 1
-git config --global push.recurseSubmodules no
+git config --global push.recurseSubmodules on-demand
 
 git config --global alias.sinit 'submodule update --init --recursive'
 git config --global alias.sco 'checkout --recurse-submodules'
@@ -687,9 +746,10 @@ git config --global alias.stash2br 'stash branch'
 
 
 ######################################### status
-git config --global alias.st 'status'
-git config --global alias.stt 'status .'
-git config --global alias.s "status --short --branch"
+git config --global alias.st  'status'
+git config --global alias.std 'status .'
+git config --global alias.s   'status --short --branch'
+git config --global alias.sd  'status --short --branch .'
 # git config --global advice.statusuoption false
 
 
@@ -712,6 +772,9 @@ git config --global alias.ctag 'describe --exact-match --tags'
 ######################################### worktree
 # working on more than one branch at a time
 # provide a new working directory for each branch
+git config --global alias.wta "worktree add"
+git config --global alias.wtl "worktree list"
+git config --global alias.wtr "worktree remove"
 
 
 ######################################### large repository
