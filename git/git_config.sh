@@ -603,7 +603,7 @@ __git_version_compare "2.37.0" "$GIT_VERSION"
 if [ $__git_version_compare -eq 0 ] || [ $__git_version_compare -eq 2 ]; then
     # git >= 2.37.0
     git config --global push.autoSetupRemote true
-end
+fi
 
 
 ######################################### rebase
