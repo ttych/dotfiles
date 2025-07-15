@@ -17,9 +17,12 @@
 
 /init.el
 /early-init.el
+/etc/custom-vars.el
 
 /history
 /eshell/history
 /data/recentf
+/ielm-history.eld
+/tramp
 /snippets
 /tmp
