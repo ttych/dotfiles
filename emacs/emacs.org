@@ -3087,7 +3087,7 @@ replace *C-x* witch *C-c*
     ;; :hook (prog-mode . company-mode)
     :custom
     (company-minimum-prefix-length 2)
-    (company-idle-delay 0.8)
+    (company-idle-delay 1)
     (company-selection-wrap-around t)
     (company-tooltip-limit 10)
     (company-tooltip-align-annotations t)
@@ -3219,7 +3219,7 @@ Corfu settings:
 
 ** prog
 *** flymake
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   (defun emw/flymake-setup ()
     (defun flymake-display-warning (warning)
       "Replace default behavior by a warning message"
@@ -3805,6 +3805,25 @@ Customize text-mode when activated:
      :config
      (setq yaml-indent-offset 2)
      )
+#+end_src
+
+** IA
+*** gptel
+#+begin_src emacs-lisp :tangle no
+  (use-package gptel
+    :ensure t
+    :config
+     (setq gptel-backend
+          (gptel-make-openai "GPT-4 Turbo"
+           :key 'gptel-api-key
+           :models '("gpt-4.1" "gpt-4.1-mini"))
+          )
+    (setq gptel-api-key "a-key")
+    (setq gptel-use-curl t)
+    (setq gptel-stream t)
+
+    (setq gptel-model "gpt-4.1")
+    )
 #+end_src
 
 ** mail & news
