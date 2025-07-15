@@ -1333,7 +1333,10 @@ To defer package loading:
   (use-package auto-compile
     :ensure t
     :demand t
-    :config (auto-compile-on-load-mode))
+    :config
+    (auto-compile-on-load-mode 1)
+    (auto-compile-on-save-mode 1)
+    )
 #+end_src
 
 *** auto-package-update
@@ -3807,7 +3810,7 @@ Customize text-mode when activated:
      )
 #+end_src
 
-** IA
+** AI
 *** gptel
 #+begin_src emacs-lisp :tangle no
   (use-package gptel
@@ -3824,6 +3827,39 @@ Customize text-mode when activated:
 
     (setq gptel-model "gpt-4.1")
     )
+#+end_src
+
+*** copilot
+copilot
+#+begin_src emacs-lisp :tangle no
+  (use-package copilot
+    :ensure t
+    :hook ((prog-mode . copilot-mode))
+    :bind (("C-c C-c" . copilot-complete)
+           ("C-c C-a" . copilot-accept-completion)
+           ("C-c C-d" . copilot-diagnose)
+           :map copilot-completion-map
+           ("<tab>" . copilot-accept-completion)
+           ("TAB" . copilot-accept-completion)
+           ("C-g" . copilot-clear-overlay))
+    :custom
+    (copilot-idle-delay 0.5)
+    (copilot-indent-offset-warning-disable t)
+    (copilot-enable-predicates
+     '(copilot--buffer-changed
+       copilot--point-after-change
+       copilot--not-in-comment-or-string))
+    )
+#+end_src
+
+copilot-chat
+#+begin_src emacs-lisp :tangle no
+(use-package copilot-chat
+  :ensure t
+  :after copilot
+  :bind (("C-c C-q" . copilot-chat-ask-question)
+         ("C-c C-e" . copilot-chat-explain-code)
+         ("C-c C-f" . copilot-chat-fix-code)))
 #+end_src
 
 ** mail & news
