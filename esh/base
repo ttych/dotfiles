@@ -485,7 +485,7 @@ fi
 
 ######################################### History
 [ -d "$HOME/.log" ] || mkdir "$HOME/.log"
-HISTFILE="$HOME/.log/${ESH_HOSTNAME}_${ESH_SH_CUR_SHORT}"; export HISTFILE
+HISTFILE="$HOME/.log/${ESH_SH_CUR_SHORT}_${ESH_HOSTNAME}"; export HISTFILE
 # history file size
 [ "${HISTSIZE:-0}" -lt 4000 ] && HISTSIZE=4000; export HISTSIZE
 # bash history file size
