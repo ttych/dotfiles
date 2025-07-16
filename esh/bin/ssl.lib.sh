@@ -116,26 +116,50 @@ ssl_cert_enddate()
     fi
 }
 
-ssl_match_cert_key()
+ssl_cert_match_cert_key()
+{
+    [ $# -ne 2 ] &&
+        echo2 "# ssl_match_cert_key <cert> <key>" &&
+        return 1
+
+    cert_pubkey=`openssl x509 -pubkey -noout -in "$1" | openssl md5`
+    key_pubkey=`openssl pkey -pubout -in "$2" | openssl md5`
+
+    [ "$cert_pubkey" = "$key_pubkey" ]
+}
+
+ssl_cert_match_req_key()
+{
+    [ $# -ne 2 ] &&
+        echo2 "# ssl_match_req_key <req> <key>" &&
+        return 1
+
+    req_pubkey=`openssl req -pubkey -noout -in "$1" | openssl md5`
+    key_pubkey=`openssl pkey -pubout -in "$2" | openssl md5`
+
+    [ "$req_pubkey" = "$key_pubkey" ]
+}
+
+ssl_cert_match_mod_cert_key()
 {
     [ $# -ne 2 ] &&
         echo2 "# ssl_match_cert_key <cert> <key>" &&
         return 1
 
     modulus_a=`openssl x509 -noout -modulus -in "$1" | openssl md5`
-    modulus_b=`openssl pkey -noout -modulus -in "$2" | openssl md5`
+    modulus_b=`openssl rsa -noout -modulus -in "$2" | openssl md5`
 
     [ "$modulus_a" = "$modulus_b" ]
 }
 
-ssl_match_req_key()
+ssl_cert_match_mod_req_key()
 {
     [ $# -ne 2 ] &&
         echo2 "# ssl_match_req_key <req> <key>" &&
         return 1
 
     modulus_a=`openssl req -noout -modulus -in "$1" | openssl md5`
-    modulus_b=`openssl pkey -noout -modulus -in "$2" | openssl md5`
+    modulus_b=`openssl rsa -noout -modulus -in "$2" | openssl md5`
 
     [ "$modulus_a" = "$modulus_b" ]
 }
