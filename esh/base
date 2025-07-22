@@ -1,6 +1,7 @@
 #!/bin/sh
 # -*- mode: sh -*-
 
+ESH_DIR="${ESH_DIR%/}"
 ESH_DIR="${ESH_DIR:-$HOME/.esh}"
 export ESH_DIR
 
