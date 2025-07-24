@@ -24,6 +24,11 @@ echo2()
     echo >&2 "$@"
 }
 
+print_usage()
+{
+    printf >&2 "# %s\n" "$@"
+}
+
 has_openssl()
 {
     which openssl >/dev/null 2>/dev/null
@@ -327,6 +332,69 @@ ssl_client()
     # -cert / -key / -pass
     # -verify_hostname
     # -verify_return_error
+}
+
+ssl_client_get_cert()
+{
+    ssl_client_get_cert__usage="ssl_client_get_cert [-S] hostname port [servername]"
+
+    OPTIND=1
+    ssl_client_get_cert__starttls=
+    while getopts :hS opt; do
+        case $opt in
+            h) print_usage "$ssl_client_get_cert__usage"
+               return 0
+               ;;
+            S) ssl_client_get_cert__starttls="-starttls"
+               ;;
+        esac
+    done
+    shift $(($OPTIND - 1))
+
+    ssl_client_get_cert__hostname="${1}"
+    ssl_client_get_cert__port="${2:-443}"
+    ssl_client_get_cert__servername="${3}"
+
+    if [ -z "$ssl_client_get_cert__hostname" ]; then
+        print_usage "$ssl_client_get_cert__usage"
+        return 1
+    fi
+
+    openssl s_client -connect "${ssl_client_get_cert__hostname}:${ssl_client_get_cert__port}" \
+            ${ssl_client_get_cert__servername:+-servername $ssl_client_get_cert__servername} \
+            -showcerts $ssl_client_get_cert__starttls </dev/null 2>/dev/null |
+        openssl x509 -outform PEM
+}
+
+ssl_client_get_cert_chain()
+{
+    ssl_client_get_cert_chain__usage="ssl_client_get_cert_chain"
+
+    OPTIND=1
+    ssl_client_get_cert_chain__starttls=
+    while getopts :hS opt; do
+        case $opt in
+            h) echo "# $ssl_client_get_cert_chain__usage"
+               return 0
+               ;;
+            S) ssl_client_get_cert_chain__starttls="-starttls"
+               ;;
+        esac
+    done
+    shift $(($OPTIND - 1))
+
+    ssl_client_get_cert_chain__hostname="${1}"
+    ssl_client_get_cert_chain__port="${2:-443}"
+    ssl_client_get_cert_chain__servername="${3}"
+
+    if [ -z "$ssl_client_get_cert_chain__hostname" ]; then
+        print_usage "$ssl_client_get_cert_chain__usage"
+        return 1
+    fi
+
+    openssl s_client -connect "${ssl_client_get_cert_chain__hostname}:${ssl_client_get_cert_chain__port}" \
+            ${ssl_client_get_cert_chain__servername:+-servername $ssl_client_get_cert_chain__servername} \
+            -showcerts $ssl_client_get_cert_chain__starttls </dev/null
 }
 
 
