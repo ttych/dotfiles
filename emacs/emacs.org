@@ -1515,6 +1515,8 @@ basic dired settings :
     :hook (dired-mode . dired-hide-dotfiles-mode)
     :bind (:map dired-mode-map
                 ("." . dired-hide-dotfiles-mode))
+    :custom
+    (dired-hide-dotfiles-verbose nil)
     :config
     (setq dired-hide-dotfiles-mode t
           ;; dired-omit-files "^\\.[^.]"
