@@ -821,16 +821,33 @@ esh_ext_shortcuts_interactive()
     # -o CheckHostIP=no
     fssh()
     {
-        ssh -o StrictHostKeyChecking=no -o CheckHostIP=no -o ConnectTimeout=10 "$@"
+        ssh \
+            -o StrictHostKeyChecking=no -o CheckHostIP=no -o ConnectTimeout=10 -o UserKnownHostsFile=/dev/null \
+            "$@"
+    }
+    fsshp()
+    {
+        fssh -o PreferredAuthentications=password -o PubkeyAuthentication=no "$@"
     }
     s()
     {
-        ssh -o StrictHostKeyChecking=no -o CheckHostIP=no -o ConnectTimeout=10 "$@"
+        ssh \
+            -o StrictHostKeyChecking=no -o CheckHostIP=no -o ConnectTimeout=10 \
+            "$@"
     }
-
+    sp()
+    {
+        s -o PreferredAuthentications=password -o PubkeyAuthentication=no "$@"
+    }
     fscp()
     {
-        scp -o StrictHostKeyChecking=no -o CheckHostIP=no -o ConnectTimeout=10 "$@"
+        scp \
+            -o StrictHostKeyChecking=no -o CheckHostIP=no -o ConnectTimeout=10 -o UserKnownHostsFile=/dev/null \
+            "$@"
+    }
+    fscpp()
+    {
+        fscp -o PreferredAuthentications=password -o PubkeyAuthentication=no "$@"
     }
 
 
