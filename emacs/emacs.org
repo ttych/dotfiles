@@ -1954,7 +1954,9 @@ SRC: [[https://github.com/abo-abo/avy][https://github.com/abo-abo/avy]]
 #+begin_src emacs-lisp
   (require 'compile)
 
-  (setq compilation-scroll-output t
+  (setq compilation-scroll-output 'first-error
+        compilation-always-kill t
+        compilation-ask-about-save nil
         )
 
   (add-hook 'compilation-filter-hook 'ansi-color-compilation-filter)
