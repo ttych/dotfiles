@@ -79,7 +79,7 @@ conf_install()
                 esac
             done
 
-            rm -f "${DOTFILES_INSTALL_DIR}/$b" && \
+            rm -Rf "${DOTFILES_INSTALL_DIR}/$b" && \
                 ln -s "${a_rel}${DOTFILES_SOURCE_DIR}/${conf_install__app%/}/$a" "${DOTFILES_INSTALL_DIR}/$b"
         done  < "${conf_install__app}/install.list"
     fi
