@@ -15,7 +15,7 @@ gp()
 
 
 
-######################################### ps
+######################################### kill
 pstop()
 {
     kill -STOP "$@"
@@ -24,15 +24,6 @@ pstop()
 prun()
 {
     kill -CONT "$@"
-}
-
-ps_sessionid()
-{
-    ps -o sid= -p "$1"
-}
-
-ps_forest() {
-    ps --forest -o pid,tty,stat,time,cmd -T -g $(ps_sessionid "$1")
 }
 
 
@@ -60,3 +51,72 @@ pkgconfig_path_add()
         export PKG_CONFIG_PATH
     fi
 }
+
+
+
+######################################### ps
+
+psa()
+{
+    ps -ef "$@"
+}
+
+psac()
+{
+    ps -ef --sort=-%mem "$@"
+}
+
+psam()
+{
+    ps -ef --sort=-%cpu "$@"
+}
+
+psat()
+{
+    ps -ef --sort=-time "$@"
+}
+
+psj()
+{
+    ps -efj "$@"
+}
+
+ps_full()
+{
+    ps -eF "$@"
+}
+
+ps_cpu()
+{
+    ps -ef --sort=-%mem "$@"
+}
+
+ps_mem()
+{
+    ps -ef --sort=-%cpu "$@"
+}
+
+ps_time()
+{
+    ps -edf --sort=-time "$@"
+}
+
+ps_thread()
+{
+    ps -eLf "$@"
+}
+
+ps_forest()
+{
+    ps -efj --forest "$@"
+}
+
+ps_sessionid()
+{
+    ps -o sid= -p "${1:-$$}"
+}
+
+# ps_forest()
+# {
+#     ps --forest -o pid,tty,stat,time,cmd -T -g $(ps_sessionid "$1")
+# }
