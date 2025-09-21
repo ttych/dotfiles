@@ -5,12 +5,12 @@ SCRIPT_RPATH="${0%$SCRIPT_NAME}"
 SCRIPT_PATH=`cd "${SCRIPT_RPATH:-.}" && pwd`
 
 
-RG_SSL_URL='https://git.io/rg-ssl'
+KEYCHAIN_URL='https://raw.githubusercontent.com/funtoo/keychain/refs/heads/master/keychain'
 
 
 CURL()
 {
-    curl -s -S -L $CURL_NO_SSL ${2:+-o "$2"} "$1"
+    curl -fsSL $CURL_NO_SSL ${2:+-o "$2"} "$1"
 }
 WGET()
 {
@@ -28,5 +28,5 @@ download()
 }
 
 set -x
-download "$RG_SSL_URL" "$SCRIPT_PATH/rg-ssl"
+download "$KEYCHAIN_URL" "$SCRIPT_PATH/keychain"
 set +x
