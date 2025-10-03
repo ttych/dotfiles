@@ -431,7 +431,7 @@ ssl_cert_pem_to_jks()
     ssl_cert_pem_to_jks__password=
 
     OPTIND=1
-    while getopts :ha:c: opt; do
+    while getopts :ha:c:p: opt; do
         case $opt in
             h) ;;
             a) ssl_cert_pem_to_jks__alias="$OPTARG" ;;
