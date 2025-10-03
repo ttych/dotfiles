@@ -412,6 +412,77 @@ keytool_cert_text()
 }
 
 
+######################################### convert
+ssl_cert_pem_to_jks()
+{
+    ssl_cert_pem_to_jks__usage="ssl_cert_pem_to_jks [-h] [-a alias] [-c ca_file] <cert> <key> [jks]"
+
+    if ! has_openssl; then
+        echo2 "# openssl bin is missing"
+        return 1
+    fi
+    if ! has_keytool; then
+        echo2 "# keytool bin is missing"
+        return 1
+    fi
+
+    ssl_cert_pem_to_jks__alias=
+    ssl_cert_pem_to_jks__ca=
+    ssl_cert_pem_to_jks__password=
+
+    OPTIND=1
+    while getopts :ha:c: opt; do
+        case $opt in
+            h) ;;
+            a) ssl_cert_pem_to_jks__alias="$OPTARG" ;;
+            c) ssl_cert_pem_to_jks__ca="$OPTARG" ;;
+            p) ssl_cert_pem_to_jks__password="$OPTARG" ;;
+        esac
+    done
+    shift $(($OPTIND - 1))
+
+    ssl_cert_pem_to_jks__cert="$1"
+    ssl_cert_pem_to_jks__key="$2"
+    ssl_cert_pem_to_jks__jks="$3"
+
+    if [ -z "$ssl_cert_pem_to_jks__cert" ] || [ -z "$ssl_cert_pem_to_jks__key" ]; then
+        echo2 "# missing arguments : cert / key"
+        print_usage "$ssl_cert_pem_to_jks__usage"
+        return 1
+    fi
+    if [ ! -r "$ssl_cert_pem_to_jks__cert" ] || [ ! -r "$ssl_cert_pem_to_jks__key" ]; then
+        echo2 "# unreadable cert / key"
+        print_usage "$ssl_cert_pem_to_jks__usage"
+        return 1
+    fi
+    if [ -z "$ssl_cert_pem_to_jks__jks" ]; then
+        ssl_cert_pem_to_jks__jks="${ssl_cert_pem_to_jks__cert%.pem}.jks"
+    fi
+    if [ -z "$ssl_cert_pem_to_jks__alias" ]; then
+        ssl_cert_pem_to_jks__alias=$(openssl x509 -in "$ssl_cert_pem_to_jks__cert" -subject -noout | sed 's/.*CN=\([^/]*\).*/\1/')
+    fi
+
+    openssl pkcs12 -export \
+            -in "${ssl_cert_pem_to_jks__cert}" \
+            -inkey "${ssl_cert_pem_to_jks__key}" \
+            ${ssl_cert_pem_to_jks__ca:+-certfile "$ssl_cert_pem_to_jks__ca"} \
+            -out "${ssl_cert_pem_to_jks__cert}.p12" \
+            -name "$ssl_cert_pem_to_jks__alias" \
+            ${ssl_cert_pem_to_jks__password:+-passout "pass:$ssl_cert_pem_to_jks__password"} \
+        &&
+        keytool -importkeystore \
+                -srckeystore "${ssl_cert_pem_to_jks__cert}.p12" \
+                -srcstoretype PKCS12 \
+                ${ssl_cert_pem_to_jks__password:+-srcstorepass "$ssl_cert_pem_to_jks__password"} \
+                -destkeystore "$ssl_cert_pem_to_jks__jks" \
+                -deststoretype JKS \
+                ${ssl_cert_pem_to_jks__password:+-deststorepass "$ssl_cert_pem_to_jks__password"} ||
+            return 1
+
+    rm -f "${ssl_cert_pem_to_jks__cert}.p12"
+}
+
+
 
 ######################################### main
 case "$SCRIPT_NAME" in
