@@ -121,6 +121,21 @@ ssl_cert_enddate()
     fi
 }
 
+ssl_cert_subject_alt_name()
+{
+    ssl_cert_subject_alt_name__in="$1"
+    if [ -p /dev/stdin ]; then
+        ssl_cert_subject_alt_name__in=
+    fi
+    if [ -n "$ssl_cert_subject_alt_name__in" ] && [ ! -r "$ssl_cert_subject_alt_name__in" ]; then
+        echo >&2 "$ssl_cert_subject_alt_name__in is not accessible"
+        return 1
+    fi
+
+    openssl x509 ${ssl_cert_subject_alt_name__in:+-in "$ssl_cert_subject_alt_name__in"} -noout -ext subjectAltName |
+        sed -e '/^X509v3 Subject Alternative Name:/d; s/^[[:space:]]*//; s/,[[:space:]]*/\n/g'
+}
+
 ssl_cert_match_cert_key()
 {
     [ $# -ne 2 ] &&
@@ -169,63 +184,63 @@ ssl_cert_match_mod_req_key()
     [ "$modulus_a" = "$modulus_b" ]
 }
 
-ssl_verify()
+ssl_cert_verify()
 {
-    ssl_verify__usage="ssl_verify [-C CA_FILE] <cert>"
+    ssl_cert_verify__usage="ssl_cert_verify [-C CA_FILE] <cert>"
 
     OPTIND=1
     while getopts :hC: opt; do
         case $opt in
-            h) echo2 "# $ssl_verify__usage"
+            h) echo2 "# $ssl_cert_verify__usage"
                return 0
                ;;
-            C) ssl_verify__ca_file="$OPTARG"
+            C) ssl_cert_verify__ca_file="$OPTARG"
                ;;
         esac
     done
     shift $(($OPTIND - 1))
 
-    openssl verify ${ssl_verify__ca_file:+-CAfile "$ssl_verify__ca_file"} "$@"
+    openssl verify ${ssl_cert_verify__ca_file:+-CAfile "$ssl_cert_verify__ca_file"} "$@"
 }
 
-ssl_gen_self_signed()
+ssl_cert_gen_self_signed()
 {
-    ssl_gen_self_signed__usage="ssl_gen_self_signed <name>"
+    ssl_cert_gen_self_signed__usage="ssl_cert_gen_self_signed <name>"
 
-    ssl_gen_self_signed__nodes=
-    ssl_gen_self_signed__days=3655
+    ssl_cert_gen_self_signed__nodes=
+    ssl_cert_gen_self_signed__days=3655
     OPTIND=1
     while getopts :hd:P: opt; do
         case $opt in
-            h) echo "# $ssl_gen_self_signed__usage"
+            h) echo "# $ssl_cert_gen_self_signed__usage"
                return 0
                ;;
-            d) ssl_gen_self_signed__days="$OPTARG"
+            d) ssl_cert_gen_self_signed__days="$OPTARG"
                ;;
-            P) ssl_gen_self_signed__nodes=1
+            P) ssl_cert_gen_self_signed__nodes=1
                ;;
         esac
     done
     shift $(($OPTIND - 1))
 
-    ssl_gen_self_signed="$1"
-    if [ -z "$ssl_gen_self_signed" ]; then
+    ssl_cert_gen_self_signed="$1"
+    if [ -z "$ssl_cert_gen_self_signed" ]; then
         echo2 "# please provide a name"
         echo2
-        echo2 "# $ssl_gen_self_signed__usage"
+        echo2 "# $ssl_cert_gen_self_signed__usage"
         return 1
     fi
-    if [ -r "${ssl_gen_self_signed}.pem" ]; then
-        echo2 "# $ssl_gen_self_signed already exists"
+    if [ -r "${ssl_cert_gen_self_signed}.pem" ]; then
+        echo2 "# $ssl_cert_gen_self_signed already exists"
         return 1
     fi
 
     openssl req -x509 \
-            ${ssl_gen_self_signed__nodes:+-nodes} \
+            ${ssl_cert_gen_self_signed__nodes:+-nodes} \
             -newkey rsa:4096 \
-            -keyout "${ssl_gen_self_signed}.key" \
-            -out "${ssl_gen_self_signed}.pem" \
-            -days "${ssl_gen_self_signed__days}"
+            -keyout "${ssl_cert_gen_self_signed}.key" \
+            -out "${ssl_cert_gen_self_signed}.pem" \
+            -days "${ssl_cert_gen_self_signed__days}"
 }
 
 
