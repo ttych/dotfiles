@@ -380,6 +380,10 @@ whence()
 {
     command -v "$@"
 }
+# whence ()
+# {
+#     type -p "$@"
+# }
 
 _is_alias()
 {
@@ -488,11 +492,11 @@ fi
 [ -d "$HOME/.log" ] || mkdir "$HOME/.log"
 HISTFILE="$HOME/.log/${ESH_SH_CUR_SHORT}_${ESH_HOSTNAME}"; export HISTFILE
 # history file size
-[ "${HISTSIZE:-0}" -lt 4000 ] && HISTSIZE=4000; export HISTSIZE
+[ "${HISTSIZE:-0}" -lt 10000 ] && HISTSIZE=10000; export HISTSIZE
 # bash history file size
-[ "${HISTFILESIZE:-0}" -lt 4000 ] && HISTFILESIZE=4000; export HISTFILESIZE
+[ "${HISTFILESIZE:-0}" -lt 10000 ] && HISTFILESIZE=10000; export HISTFILESIZE
 # session history size
-[ "${SAVEHIST:-0}" -lt 4000 ] && SAVEHIST=4000; export SAVEHIST
+[ "${SAVEHIST:-0}" -lt 10000 ] && SAVEHIST=10000; export SAVEHIST
 
 
 ######################################### INTERACTIVE
