@@ -1,0 +1,35 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+
+iso2dev()
+{
+    if [ $# -ne 2 ]; then
+        printf >&2 "%s\n" \
+               "Usage: iso2dev <iso> <device>" \
+               "" \
+               "Example: iso2dev ~/../ubuntu.iso /dev/sda" \
+               "" \
+               "Available devices:" \
+               $(lsblk -d -o NAME | grep -e '^sd[a-z]' | awk '{print "/dev/"$1}')
+        return 1
+    fi
+
+    iso2dev__iso="$1"
+    iso2dev__device="$2"
+
+    lsblk "$iso2dev__device" > /dev/null || {
+        echo >&2 "#> verify device $iso2dev__device"
+        return 1
+    }
+
+    dd bs=4M status=progress oflag=sync if="$iso2dev__iso" of="$iso2dev__device" || {
+        echo >&2 "#> failed to write $iso2dev__iso on $iso2dev__device"
+        return 1
+    }
+
+    eject "$iso2dev__device"
+}
+
+
+iso2dev "$@"
