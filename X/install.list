@@ -1,3 +1,4 @@
-Xresources	.Xresources
-xpm		.xpm
-xsession        .xsession
+Xresources		.Xresources
+xpm				.xpm
+xsession		.xsession
+XCompose		.XCompose

@@ -1,0 +1,30 @@
+include "%L"
+# System: /usr/share/X11/locale/en_US.UTF-8/Compose
+
+# Emoji
+<Multi_key> <e> <s> : "😄" # smile
+<Multi_key> <e> <c> : "😂" # cry
+<Multi_key> <e> <l> : "😍" # love
+<Multi_key> <e> <v> : "✌️"  # victory
+<Multi_key> <e> <h> : "❤️"  # heart
+<Multi_key> <e> <y> : "👍" # yes
+<Multi_key> <e> <n> : "👎" # no
+<Multi_key> <e> <f> : "🖕" # fuck
+<Multi_key> <e> <w> : "🤞" # wish
+<Multi_key> <e> <r> : "🤘" # rock
+<Multi_key> <e> <k> : "😘" # kiss
+<Multi_key> <e> <e> : "🙄" # eyeroll
+<Multi_key> <e> <d> : "🤤" # droll
+<Multi_key> <e> <m> : "💰" # money
+<Multi_key> <e> <x> : "🎉" # xellebrate
+<Multi_key> <e> <1> : "💯" # 100%
+<Multi_key> <e> <t> : "🥂" # toast
+<Multi_key> <e> <p> : "🙏" # pray
+<Multi_key> <e> <i> : "😉" # wink
+<Multi_key> <e> <o> : "👌" # OK
+<Multi_key> <e> <g> : "👋" # greeting
+<Multi_key> <e> <a> : "💪" # arm
+<Multi_key> <e> <b> : "🤯" # blowing
+
+# Typography
+#<Multi_key> <space> <space> : "—"
