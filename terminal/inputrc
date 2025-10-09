@@ -11,7 +11,7 @@ set bell-style none
 set show-all-if-ambiguous on
 set show-all-if-unmodified on
 set completion-ignore-case on
-set completion-prefix-display-length 2
+# set completion-prefix-display-length 2
 
 # Arrow keys match what you've typed so far against your command history
 "\e[A": history-search-backward
