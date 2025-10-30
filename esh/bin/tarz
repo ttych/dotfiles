@@ -1,0 +1,10 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+DEFAULT_ZSTD=11
+
+case "$1" in
+    [0-9]|-[0-9]) ZSTD_LEVEL="${1#-}" ;;
+esac
+
+tar -I "zstd -${ZSTD_LEVEL:-$DEFAULT_ZSTD} -T0" "$@"
