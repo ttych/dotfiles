@@ -244,6 +244,24 @@ ssl_cert_gen_self_signed()
 }
 
 
+######################################### request
+ssl_req_text()
+{
+    if [ -p /dev/stdin ]; then
+        openssl req -noout -text
+    else
+        for req; do
+            if [ ! -f "$req" ] || [ ! -r "$req" ]; then
+                echo >&2 "$req is not accessible"
+                continue
+            fi
+
+            openssl req -in $req -noout -text
+        done
+    fi
+}
+
+
 ######################################### key
 ssl_is_key()
 {
