@@ -2249,10 +2249,13 @@ org configuration:
     ;;  )
 
     (defvar org-directories
-      (list org-directory
-            (concat org-directory "/tasks")
-            (concat org-directory "/learn")
-            )
+      (list
+       ;; org-directory
+       (concat org-directory "/tasks")
+       (concat org-directory "/learn")
+       (concat org-directory "/todo")
+       (concat org-directory "/work")
+       )
       "List of directories containing Org files.")
 
     ;; (setq org-agenda-files '("~/org/todo.org"
