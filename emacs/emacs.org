@@ -2240,21 +2240,26 @@ org configuration:
           org-src-fontify-natively t
           org-edit-src-content-indentation 2
           org-confirm-babel-evaluate nil
+          ;; org-use-property-inheritance t
           )
 
     (setq org-directory "~/org")
+    (setq org-directory-emacs-dir (concat org-directory "/emacs")
+          org-directory-tasks-dir (concat org-directory "/tasks")
+          org-directory-todo-dir  (concat org-directory "/todo")
+          org-directory-learn-dir (concat org-directory "/learn")
+          org-directory-work-dir  (concat org-directory "/work")
+          )
 
-    ;; (setq
-    ;;  org-use-property-inheritance t
-    ;;  )
 
     (defvar org-directories
       (list
        ;; org-directory
-       (concat org-directory "/tasks")
-       (concat org-directory "/learn")
-       (concat org-directory "/todo")
-       (concat org-directory "/work")
+       org-directory-emacs-dir
+       org-directory-tasks-dir
+       org-directory-todo-dir
+       org-directory-learn-dir
+       org-directory-work-dir
        )
       "List of directories containing Org files.")
 
@@ -2426,7 +2431,7 @@ Configure custom agenda views:
 
           ("I" "Inbox"
            ((todo ".*"
-                  ((org-agenda-files (list (expand-file-name "inbox.org" org-directory)))
+                  ((org-agenda-files (list (expand-file-name "inbox.org" org-directory-emacs-dir)))
                    (org-agenda-overriding-header "Unprocessed Inbox Items"))
                   ))
            )
@@ -2543,76 +2548,76 @@ or can use method to append to org-agenda-files:
         `(
           ("j" "Journal")
           ("jj" "Journal" entry
-           (file+datetree "journal.org" "Journal")
+           (file+datetree (expand-file-name "journal.org" org-directory-emacs-dir) "Journal")
            (file ,(expand-file-name "journal.orgcaptmpl" emacs-org-conf-dir)))
 
           ("n" "Note" entry
-           (file+function "notes.org" emw/org-ask-headline-2-target)
+           (file+function (expand-file-name "notes.org" org-directory-emacs-dir) emw/org-ask-headline-2-target)
            "* %?\n\nCREATED: %U\nSAMPLE: %i\nFROM: %a"
            :empty-lines 1)
 
           ("r" "Rendez-Vous")
           ("ra" "Administrative" entry
-           (file+headline "rdv.org" "Administrative")
+           (file+headline (expand-file-name "rdv.org" org-directory-emacs-dir) "Administrative")
            "* TODO %^{who} . %^{desk} . %^{contact}%? :rdv:admin:\nDEADLINE: %^t\nCREATED: %U\nLOCATION: %^{location}\nSAMPLE: %i\nFROM: %a"
            :empty-lines 1
            )
           ("rf" "Family" entry
-           (file+headline "rdv.org" "Family")
+           (file+headline (expand-file-name "rdv.org" org-directory-emacs-dir) "Family")
            "* TODO %^{who} for %^{activity} with %^{contact}%? :rdv:family:\nDEADLINE: %^t\nCREATED: %U\nLOCATION: %^{location}\nSAMPLE: %i\nFROM: %a"
            :empty-lines 1
            )
           ("rm" "Medical" entry
-           (file+headline "rdv.org" "Medical")
+           (file+headline (expand-file-name "rdv.org" org-directory-emacs-dir) "Medical")
            "* TODO %^{who} . %^{speciality} . %^{contact}%? :rdv:medic:\nDEADLINE: %^t\nCREATED: %U\nLOCATION: %^{location}\nSAMPLE: %i\nFROM: %a"
            :empty-lines 1
            )
           ("rO" "Off" entry
-           (file+headline "rdv.org" "Off")
+           (file+headline (expand-file-name "rdv.org" org-directory-emacs-dir) "Off")
            "* TODO %^{who} . OFF%? :off:\nDEADLINE: %^t\nCREATED: %U\nLOCATION: %^{location}"
            :empty-lines 1
            )
           ("rs" "Sport" entry
-           (file+headline "rdv.org" "Sport")
+           (file+headline (expand-file-name "rdv.org" org-directory-emacs-dir) "Sport")
            "* TODO %^{who} . %^{sport} . %^{contact}%? :rdv:sport:\nDEADLINE: %^t\nCREATED: %U\nLOCATION: %^{location}\nSAMPLE: %i\nFROM: %a"
            :empty-lines 1
            )
           ("ro" "Other" entry
-           (file+headline "rdv.org" "Other")
+           (file+headline (expand-file-name "rdv.org" org-directory-emacs-dir) "Other")
            "* TODO %^{who} . %^{what} . %^{contact}%? :rdv:\nDEADLINE: %^t\nCREATED: %U\nLOCATION: %^{location}\nSAMPLE: %i\nFROM: %a"
            :empty-lines 1
            )
           ("rw" "Work" entry
-           (file+headline "rdv.org" "Other")
+           (file+headline (expand-file-name "rdv.org" org-directory-emacs-dir) "Other")
            "* TODO %^{who} . %^{Company} . %^{contact}%? :rdv:work:\nDEADLINE: %^t\nCREATED: %U\nLOCATION: %^{location}\nSAMPLE: %i\nFROM: %a"
            :empty-lines 1
            )
 
           ("t" "ToDo")
           ("tt" "ToDo" entry
-           (file+headline "todo.org" "Main")
+           (file+headline (expand-file-name "todo.org" org-directory-emacs-dir) "Main")
            "* TODO [#C] %?\nDEADLINE: %^t\nCREATED: %U\nSAMPLE: %i\nFROM: %a"
            :empty-lines 1
            )
 
           ("w" "Work")
           ("wb" "Build Task" entry
-           (file+headline "work.org" "Build")
+           (file+headline (expand-file-name "work.org" org-directory-emacs-dir) "Build")
            "* TODO %? :build:\nCREATED: %U\nSAMPLE: %i\nFROM: %a"
            :empty-lines 1
            )
           ("wr" "Run Task" entry
-           (file+headline "work.org" "Run")
+           (file+headline (expand-file-name "work.org" org-directory-emacs-dir) "Run")
            "* TODO %? :run:\nCREATED: %U\nSAMPLE: %i\nFROM: %a"
            :empty-lines 1
            )
           ("wc" "Change" entry
-           (file+headline "work.org" "Change")
+           (file+headline (expand-file-name "work.org" org-directory-emacs-dir) "Change")
            "* TODO %? :change:\n SCHEDULED: %^T\nCREATED: %U\nFROM: %a"
            :empty-lines 1
            )
           ("wi" "Idea" entry
-           (file+headline "work.org" "Idea")
+           (file+headline (expand-file-name "work.org" org-directory-emacs-dir) "Idea")
            "* TODO %? :idea:\n %i\n %a"
            :empty-lines 1
            )
