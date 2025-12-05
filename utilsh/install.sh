@@ -1,13 +1,13 @@
 #!/bin/sh
 
 DISTRIBUTIONS='
+  https://github.com/ttych/publish.git
   https://github.com/ttych/pyv.git
   https://github.com/ttych/wwine.git
   https://github.com/ttych/git-hooks.git
 '
 
 OLD_DISTRIBUTIONS='
-  https://github.com/ttych/publish.git
   https://github.com/ttych/installer.git
   https://github.com/ttych/wec.git
   https://github.com/ttych/wtmux.git
