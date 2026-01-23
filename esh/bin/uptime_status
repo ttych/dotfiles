@@ -1,0 +1,108 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+set -e
+
+# UPTIME_STATUS_LOGO='🟢'
+# UPTIME_STATUS_LOGO='⏼'
+# UPTIME_STATUS_LOGO='⏻'
+UPTIME_STATUS_LOGO='✅'
+
+UPTIME_STATUS_COLOR='green'
+UPTIME_STATUS_COLOR_SH='\\033[38;2;0;255;0m'
+UPTIME_STATUS_COLOR_RESET='\033[0m'
+
+UPTIME_STATUS_FORMAT="{color_sh}{logo_c}{uptime_human}${UPTIME_STATUS_COLOR_RESET}\n"
+UPTIME_STATUS_TMUX_FORMAT=' #[fg={color}]{logo_c}{uptime_human}#[fg=default] '
+
+
+uptime_status_Linux()
+{
+    uptime_status_Linux__uptime=`cat /proc/uptime`
+    uptime_status_seconds="${uptime_status_Linux__uptime%% *}"
+    uptime_status_seconds="${uptime_status_seconds%%.*}"
+}
+
+uptime_status_set_color()
+{
+    # uptime_status_color="$UPTIME_STATUS_COLOR"
+    # uptime_status_color_sh="$UPTIME_STATUS_COLOR_SH"
+    :
+}
+
+uptime_status_humanize()
+{
+    uptime_status_human=
+
+    seconds="${1:-0}"
+    days=$((seconds / 86400))
+    seconds=$((seconds % 86400))
+    hours=$((seconds / 3600))
+    seconds=$((seconds % 3600))
+    minutes=$((seconds / 60))
+    seconds=$((seconds % 60))
+
+    if [ "$days" -gt 0 ]; then
+        uptime_status_human="${days}d"
+    fi
+    if [ "$hours" -gt 0 ]; then
+        uptime_status_human="${uptime_status_human}${hours}h"
+    fi
+    if [ "$minutes" -gt 0 ]; then
+        uptime_status_human="${uptime_status_human}${minutes}m"
+    fi
+    if [ "$seconds" -gt 0 ] || [ -z "$uptime_status_human" ]; then
+        uptime_status_human="${uptime_status_human}${seconds}s"
+    fi
+}
+
+uptime_status_display()
+{
+    uptime_status_display__format="$1"
+
+    uptime_status_display__format=$(echo "$uptime_status_display__format" | sed "s/{color}/${uptime_status_color}/g")
+    uptime_status_display__format=$(echo "$uptime_status_display__format" | sed "s/{color_sh}/${uptime_status_color_sh}/g")
+    uptime_status_display__format=$(echo "$uptime_status_display__format" | sed "s/{logo_c}/${uptime_status_logo_c}/g")
+    uptime_status_display__format=$(echo "$uptime_status_display__format" | sed "s/{uptime_seconds}/${uptime_status_seconds}/g")
+    uptime_status_display__format=$(echo "$uptime_status_display__format" | sed "s/{uptime_human}/${uptime_status_human}/g")
+
+    printf "%s" "$uptime_status_display__format"
+}
+
+uptime_status()
+{
+    uptime_status__usage="uptime_status [options]
+
+with options:
+  -h            help
+  -x            debug
+  -f FORMAT     output format
+  -t            tmux output format
+"
+    uptime_status__format="$UPTIME_STATUS_FORMAT"
+    uptime_status__os=`uname`
+
+    OPTIND=1
+    while getopts :hxf:t opt; do
+        case $opt in
+            h) printf "$uptime_status_status__usage" ; exit 0 ;;
+            x) set -x ;;
+            f) uptime_status__format="$OPTARG" ;;
+            t) uptime_status__format="$UPTIME_STATUS_TMUX_FORMAT" ;;
+        esac
+    done
+    shift $(($OPTIND - 1))
+
+    uptime_status_logo_c="$UPTIME_STATUS_LOGO"
+    uptime_status_seconds='???'
+    uptime_status_human='???sec'
+
+    uptime_status_${uptime_status__os}
+    uptime_status_set_color
+    uptime_status_humanize "$uptime_status_seconds"
+    uptime_status_display "$uptime_status__format"
+}
+
+
+########### main
+uptime_status "$@"

@@ -1,0 +1,163 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+set -e
+
+# BATTERY_LOGO='⚡'
+# BATTERY_STATUS_LOGO='🔋'
+BATTERY_STATUS_LOGO='🔌'
+BATTERY_STATUS_C_FULL='='
+BATTERY_STATUS_C_CHARGE='+'
+BATTERY_STATUS_C_DISCHARGE='-'
+
+BATTERY_STATUS_COLOR_OK='green'
+BATTERY_STATUS_COLOR_OK_SH='\\033[38;2;0;255;0m'
+BATTERY_STATUS_COLOR_WARN='yellow'
+BATTERY_STATUS_COLOR_WARN_SH='\\033[38;2;255;255;0m'
+BATTERY_STATUS_COLOR_ALERT='red'
+BATTERY_STATUS_COLOR_ALERT_SH='\\033[38;2;255;0;0m'
+BATTERY_STATUS_COLOR_RESET='\033[0m'
+
+BATTERY_STATUS_FORMAT="{color_sh}{logo_c}{state_c}{percent}${BATTERY_STATUS_COLOR_RESET}\n"
+BATTERY_STATUS_TMUX_FORMAT=' #[fg={color}]{logo_c}{state_c}{percent}#[fg=default] '
+
+
+########### Linux
+
+upower_cmd()
+{
+    upower_cmd__battery="$1"
+
+    if [ -z "$upower_cmd__battery" ]; then
+        upower_cmd__battery=$(upower -e | grep -i bat | head -1)
+    fi
+    if [ -z "upower_cmd__battery" ]; then
+        return 0
+    fi
+
+    upower -i "$upower_cmd__battery"
+}
+
+upower_status()
+{
+    upower_status=$(upower_cmd | awk '
+        $1 ~ /state:/ { print "upower_state=\""$2"\"" }
+        $1 ~ /percentage:/ { print "upower_percentage=\""$2"\"" }
+    ')
+    eval "$upower_status"
+}
+
+battery_status_Linux()
+{
+
+    battery_status_state=
+    battery_status_percentage=
+    battery_status_percentage_i=
+
+    upower_status || return 1
+
+    battery_status_state="$upower_state"
+    battery_status_percentage="$upower_percentage"
+    battery_status_percentage_i="${battery_status_percentage%%%}"
+}
+
+########### FreeBSD
+battery_status_FreeBSD()
+{
+    battery_status_FreeBSD=`sysctl -n hw.acpi.battery.state`
+    case "$battery_status_FreeBSD" in
+        1) battery_status_state=discharging ;;
+        2) battery_status_state=charging ;;
+        *) battery_status_state='?' ;;
+    esac
+    battery_status_percentage=`sysctl -n hw.acpi.battery.life`
+    battery_status_percentage_i="${battery_status_percentage%%%}"
+}
+
+########### color
+battery_status_set_ok_color()
+{
+    battery_status_color="$BATTERY_STATUS_COLOR_OK"
+    battery_status_color_sh="$BATTERY_STATUS_COLOR_OK_SH"
+}
+
+battery_status_set_warn_color()
+{
+    battery_status_color="$BATTERY_STATUS_COLOR_WARN"
+    battery_status_color_sh="$BATTERY_STATUS_COLOR_WARN_SH"
+}
+
+battery_status_set_alert_color()
+{
+    battery_status_color="$BATTERY_STATUS_COLOR_ALERT"
+    battery_status_color_sh="$BATTERY_STATUS_COLOR_ALERT_SH"
+}
+
+battery_status_display()
+{
+    battery_status_display__format="$1"
+
+    battery_status_display__format=$(echo "$battery_status_display__format" | sed "s/{color}/${battery_status_color}/g")
+    battery_status_display__format=$(echo "$battery_status_display__format" | sed "s/{color_sh}/${battery_status_color_sh}/g")
+    battery_status_display__format=$(echo "$battery_status_display__format" | sed "s/{logo_c}/${battery_status_logo_c}/g")
+    battery_status_display__format=$(echo "$battery_status_display__format" | sed "s/{percent_i}/${battery_status_percentage_i}/g")
+    battery_status_display__format=$(echo "$battery_status_display__format" | sed "s/{percent}/${battery_status_percentage}/g")
+    battery_status_display__format=$(echo "$battery_status_display__format" | sed "s/{state}/${battery_status_state}/g")
+    battery_status_display__format=$(echo "$battery_status_display__format" | sed "s/{state_c}/${battery_status_state_c}/g")
+
+    printf "%s" "$battery_status_display__format"
+}
+
+battery_status()
+{
+    battery_status__usage="battery_status [options]
+
+with options:
+  -h            help
+  -x            debug
+  -f FORMAT     output format
+  -t            tmux output format
+"
+    battery_status__format="$BATTERY_STATUS_FORMAT"
+    battery_status__os=`uname`
+
+    OPTIND=1
+    while getopts :hxf:t opt; do
+        case $opt in
+            h) printf "$battery_status_status__usage" ; exit 0 ;;
+            x) set -x ;;
+            f) battery_status__format="$OPTARG" ;;
+            t) battery_status__format="$BATTERY_STATUS_TMUX_FORMAT" ;;
+        esac
+    done
+    shift $(($OPTIND - 1))
+
+    battery_status_set_ok_color
+    battery_status_logo_c="$BATTERY_STATUS_LOGO"
+    battery_status_percent='???'
+    battery_status_state='?'
+    battery_status_state_c='?'
+
+    battery_status_${battery_status__os}
+
+    case "$battery_status_state" in
+        fully-charged)
+            battery_status_state_c="$BATTERY_STATUS_C_FULL" ;;
+        discharging)
+            battery_status_state_c="$BATTERY_STATUS_C_DISCHARGE" ;;
+        charging)
+            battery_status_state_c="$BATTERY_STATUS_C_CHARGE" ;;
+    esac
+    case "$battery_status_percentage_i" in
+        0*|1?|2*)
+            battery_status_color="$BATTERY_STATUS_COLOR_ALERT" ;;
+        3*|4*|5*)
+            battery_status_color="$BATTERY_STATUS_COLOR_WARN" ;;
+    esac
+
+    battery_status_display "$battery_status__format"
+}
+
+
+########### main
+battery_status "$@"
