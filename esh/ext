@@ -773,6 +773,7 @@ esh_extd_load()
 }
 
 for esh_module in \
+    mise \
     nop
 do
     esh_extd_load "$esh_module"

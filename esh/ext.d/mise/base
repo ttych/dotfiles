@@ -1,0 +1,15 @@
+#!/bin/sh
+
+has_mise()
+{
+    which mise >/dev/null 2>/dev/null
+}
+
+load_mise()
+{
+    if has_mise; then
+        eval "$(mise activate $SHELL_SHORT)"
+    fi
+}
+
+load_mise
