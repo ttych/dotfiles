@@ -8,7 +8,7 @@ RAW_URL='https://raw.githubusercontent.com/git/git/master/contrib/completion/'
 
 CURL()
 {
-    curl -s -S -L $CURL_NO_SSL ${2:+-o "$2"} "$1"
+    curl --silent --show-error --location $CURL_NO_SSL ${2:+-o "$2"} "$1"
 }
 WGET()
 {
