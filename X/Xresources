@@ -866,6 +866,11 @@ XTerm*vt100.geometry:           80x24
 ! XTerm.vt100.bellIsUrgent:       true
 XTerm*faceSize: 8
 XTerm*renderFont: true
+XTerm*utf8: 2
+XTerm*wideChars: true
+! XTerm*cjkWidth: true
+XTerm*faceName: Liberation Mono
+! XTerm*faceName: Noto Mono
 
 
 ! ---------- myTerm
