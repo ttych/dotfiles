@@ -3644,6 +3644,21 @@ configure prog-mode when activated:
     )
 #+end_src
 
+*** go
+#+begin_src emacs-lisp
+  (use-package go-mode
+    :ensure t
+    :defer t
+    :hook (
+           (go-mode . (lambda ()
+                        (setq tab-width 4)
+                        (setq indent-tabs-mode t)))  ; Go uses tabs
+           (before-save . gofmt-before-save)         ; Format on save
+           )
+    :config
+    ;; (setq gofmt-command "goimports")
+    )
+#+end_src
 *** ini
 
 #+begin_src emacs-lisp
