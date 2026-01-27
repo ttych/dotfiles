@@ -1,0 +1,34 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+if _process_ppid && _process_comm "$_process_ppid"; then
+    case "$_process_comm" in
+        *[Tt][Ee][Rr][Mm]*) export TMUX= ;;
+        *[Rr][Xx][Vv][Tt]*) export TMUX= ;;
+    esac
+fi
+
+ESH_ATMUX_CONF="$ESH_CONF_DIR/auto_tmux"
+_want_auto_tmux()
+{
+    [ -r "$ESH_ATMUX_CONF" ] || return 1
+    [ -s "$ESH_ATMUX_CONF" ] || return 0
+    if grep "^${HOSTNAME}$" "$ESH_ATMUX_CONF" >/dev/null 2>&1 ; then
+        return 0
+    fi
+    return 1
+}
+
+_ensure_tmux_is_running()
+{
+    atx _init_
+}
+
+if _want_auto_tmux; then
+    _ensure_tmux_is_running
+fi
+
+tmx()
+{
+    tmux "$@"
+}

@@ -1,0 +1,78 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+rbenv_guess_path()
+{
+    rbenv_guess_path="${1}"
+    rbenv_guess_path="${rbenv_guess_path:-$(rbenv root 2>/dev/null)}"
+    rbenv_guess_path="${rbenv_guess_path:-$RBENV_ROOT}"
+    rbenv_guess_path="${rbenv_guess_path:-$HOME/.rbenv}"
+}
+
+rbenv_load()
+{
+    rbenv_guess_path "$1"
+    RBENV_ROOT="$rbenv_guess_path"
+    export RBENV_ROOT
+    PATH="$RBENV_ROOT/bin:$PATH"
+    export PATH
+    eval "$(rbenv init -)"
+    #[ -r "$RBENV_ROOT/completions/rbenv.${SHELL_SHORT}" ] &&
+    #    . "$RBENV_ROOT/completions/rbenv.${SHELL_SHORT}"
+}
+
+rvm_load()
+{
+    source "${1:-$HOME/.rvm/scripts/rvm}"
+}
+
+ruby_env()
+{
+    [ -n "$ruby_env" ] && return 0
+
+    for _RUBY_HOME in "${HOME_ALT}" "${HOME}"; do
+        _RUBY_RBENV_AVAILABLE=false
+        _RUBY_RBENV_ROOT="$_RUBY_HOME/.rbenv"
+        ( cd "$_RUBY_RBENV_ROOT" 2>/dev/null ) && [ -x "$_RUBY_RBENV_ROOT/bin/rbenv" ] && _RUBY_RBENV_AVAILABLE=true
+
+        _RUBY_RVM_AVAILABLE=false
+        _RUBY_RVM_ROOT="$_RUBY_HOME/.rvm"
+        ( cd "$_RUBY_RVM_ROOT" 2>/dev/null ) && [ -x "$_RUBY_RVM_ROOT/scripts/rvm" ] && _RUBY_RVM_AVAILABLE=true
+
+        if $_RUBY_RBENV_AVAILABLE; then
+            rbenv_load "$_RUBY_RBENV_ROOT"
+            ruby_env="rbenv"
+            break
+        elif $_RUBY_RVM_AVAILABLE; then
+            rvm_load "$_RUBY_RVM_ROOT"
+            ruby_env="rvm"
+            break
+        fi
+    done
+}
+
+ruby_env_find_dir()
+{
+    eval ruby_env_find_dir="\$$1"
+    if [ -z "$ruby_env_find_dir" ]; then
+        ruby_env_find_dir_=
+        # existing ?
+        for ruby_env_find_dir__h in "${HOME_ALT}" "${HOME}"; do
+            [ -z "$ruby_env_find_dir__h" ] && continue
+            [ -z "$ruby_env_find_dir_" ] && ruby_env_find_dir_="${ruby_env_find_dir__h}/${2}"
+            if [ -d "${ruby_env_find_dir__h}/${2}" ]; then
+                ruby_env_find_dir="${ruby_env_find_dir__h}/${2}"
+                break
+            fi
+        done
+        # set default
+        [ -z "$ruby_env_find_dir" ] && ruby_env_find_dir="$ruby_env_find_dir_"
+
+        eval "$1"="$ruby_env_find_dir"
+        export "$1"
+    fi
+}
+
+ruby_env
+ruby_env_find_dir RUBY_BUILD_ROOT local/ruby-build
+ruby_env_find_dir RUBY_INSTALL_ROOT local/ruby-install
