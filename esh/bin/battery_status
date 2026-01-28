@@ -11,13 +11,12 @@ BATTERY_STATUS_C_CHARGE='+'
 BATTERY_STATUS_C_DISCHARGE='-'
 
 BATTERY_STATUS_COLOR_OK='green'
-BATTERY_STATUS_COLOR_OK_SH='\\033[38;2;0;255;0m'
+BATTERY_STATUS_COLOR_OK_SH="$(tput setaf 2)"
 BATTERY_STATUS_COLOR_WARN='yellow'
-BATTERY_STATUS_COLOR_WARN_SH='\\033[38;2;255;255;0m'
+BATTERY_STATUS_COLOR_WARN_SH="$(tput setaf 3)"
 BATTERY_STATUS_COLOR_ALERT='red'
-BATTERY_STATUS_COLOR_ALERT_SH='\\033[38;2;255;0;0m'
-BATTERY_STATUS_COLOR_RESET='\033[0m'
-# BATTERY_STATUS_COLOR_RESET=$(tput sgr0)
+BATTERY_STATUS_COLOR_ALERT_SH="$(tput setaf 1)"
+BATTERY_STATUS_COLOR_RESET="$(tput sgr0)"
 
 BATTERY_STATUS_FORMAT="{color_sh}{logo_c}{state_c}{percent}${BATTERY_STATUS_COLOR_RESET}\n"
 BATTERY_STATUS_TMUX_FORMAT=' #[fg={color}]{logo_c}{state_c}{percent}#[fg=default] '
@@ -33,7 +32,7 @@ upower_cmd()
         upower_cmd__battery=$(upower -e | grep -i bat | head -1)
     fi
     if [ -z "upower_cmd__battery" ]; then
-        return 0
+        return 1
     fi
 
     upower -i "$upower_cmd__battery"
@@ -46,6 +45,10 @@ upower_status()
         $1 ~ /percentage:/ { print "upower_percentage=\""$2"\"" }
     ')
     eval "$upower_status"
+
+    if [ -z "$upower_state" ] && [ -z "$upower_percentage" ]; then
+        return 1
+    fi
 }
 
 battery_status_Linux()
