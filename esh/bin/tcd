@@ -1,0 +1,122 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+
+set -e
+
+
+TCD_CUSTOM_CONF_DIR="${TCD_CUSTOM_CONF_DIR:-$HOME/.tmux/custom_conf}"
+TCD_LOCAL_CONF_NAME=".tmux.local.conf"
+
+
+echo2()
+{
+    echo >&2 "$@"
+}
+
+
+########### tmux
+
+_has_tmux()
+{
+    _has_tmux=$(which tmux 2>/dev/null)
+}
+
+_in_tmux()
+{
+    [ -n "$TMUX" ]
+}
+
+_tmux_has_session()
+{
+    [ -z "$1" ] && return 1
+    tmux has-session -t "$1" 2>/dev/null
+}
+
+
+########### tcd
+
+tcd_usage() {
+    echo2 "Usage: tcd [-b] [-c config_name] <directory>"
+    echo2 "  -b              Run in background (do not attach)"
+    echo2 "  -c config_name  Load config from $TCD_CUSTOM_CONF_DIR/<config_name>"
+
+    if [ -n "$1" ]; then
+        exit "$1"
+    fi
+}
+
+tcd()
+{
+    if ! _has_tmux; then
+        echo2 "tmux not found in PATH"
+        return 1
+    fi
+
+    tcd__detach=0
+    tcd__custom_conf=""
+
+    OPTIND=1
+    while getopts :hxbc: opt; do
+        case $opt in
+            h) tcd_usage 0; exit 0 ;;
+            x) set -x ;;
+            b) tcd__detach=1 ;;
+            c) tcd__custom_conf="$OPTARG" ;;
+            \?) tcd_usage 1 ;;
+        esac
+    done
+    shift $(($OPTIND - 1))
+
+    if [ -z "$1" ]; then
+        tcd_usage 1
+    fi
+
+    tcd__target_dir="$1"
+    if [ ! -d "$tcd__target_dir" ]; then
+        echo2 "Error: Directory '$tcd__target_dir' does not exist."
+        exit 1
+    fi
+
+    tcd__target_abs_dir=$(cd "$tcd__target_dir" && pwd)
+    tcd__session_name=$(basename "$tcd__target_abs_dir" | tr ':.' '_')
+
+    # session
+    if _tmux_has_session "$tcd__session_name" 2>/dev/null; then
+        if [ "tcd__detach" -eq 1 ]; then
+            exit 0
+        fi
+    else
+        tmux new-session -d -s "$tcd__session_name" -c "$tcd__target_abs_dir"
+
+        if [ -n "$tcd__custom_conf" ]; then
+            tcd__custom_conf_path="$TCD_CUSTOM_CONF_DIR/$tcd__custom_conf"
+            if [ -f "$tcd__custom_conf_path" ]; then
+                tmux source-file -t "$tcd__session_name" "$tcd__custom_conf_path"
+            else
+                echo2 "Warning: Custom config '$tcd__custom_conf_path' not found."
+            fi
+        else
+            if [ -f "$tcd__target_abs_dir/$TCD_LOCAL_CONF_NAME" ]; then
+                tmux source-file -t "$tcd__session_name" "$tcd__target_abs_dir/$TCD_LOCAL_CONF_NAME"
+            fi
+        fi
+    fi
+
+    # attach
+    if [ "$tcd__detach" -eq 1 ]; then
+        echo2 "Session '$tcd__session_name' created/running in background."
+        exit 0
+    fi
+
+    if [ -n "$TMUX" ]; then
+        tmux switch-client -t "$tcd__session_name"
+    else
+        tmux attach-session -t "$tcd__session_name"
+    fi
+}
+
+
+########### main
+
+tcd "$@"

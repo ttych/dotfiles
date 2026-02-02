@@ -576,19 +576,6 @@ esh_ext_utilsh()
     fi
 }
 
-######################################### EXT :: shortcuts
-esh_ext_shortcuts()
-{
-    :
-}
-
-esh_ext_shortcuts_interactive()
-{
-    [ -r "${ESH_EXTD_DIR}/toolsh/ishortcuts" ] &&
-        . "${ESH_EXTD_DIR}/toolsh/ishortcuts"
-    return 0
-}
-
 ######################################### EXT :: direnv
 esh_ext_direnv_interactive()
 {
@@ -653,5 +640,10 @@ esh_ext_load \
     keychain \
     git \
     gpg \
-    shortcuts \
     direnv
+
+for esh_module in \
+    toolsh
+do
+    esh_extd_load "$esh_module"
+done
