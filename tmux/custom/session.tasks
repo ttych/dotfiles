@@ -1,0 +1,1 @@
+split-window -t "$TARGET_SESSION" -h -c ~/ 'egenda'
