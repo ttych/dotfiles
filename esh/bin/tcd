@@ -5,7 +5,7 @@
 set -e
 
 
-TCD_CUSTOM_CONF_DIR="${TCD_CUSTOM_CONF_DIR:-$HOME/.tmux/custom_conf}"
+TCD_CUSTOM_CONF_DIR="${TCD_CUSTOM_CONF_DIR:-$HOME/.tmux/custom}"
 TCD_LOCAL_CONF_NAME=".tmux.local.conf"
 
 
@@ -58,7 +58,7 @@ tcd_cd()
     tcd__target_abs_dir=$(cd "$tcd__target_dir" && pwd)
     tcd__session_name=$(basename "$tcd__target_abs_dir" | tr ':.' '_')
 
-    if _tmux_has_session "$tcd__session_name" 2>/dev/null; then
+    if _tmux_has_session "=$tcd__session_name" 2>/dev/null; then
         if [ "tcd__detach" -eq 1 ]; then
             return 0
         fi
@@ -135,7 +135,7 @@ tcd()
         if [ -n "$1" ]; then
             if [ -d "$1" ]; then
                 tcd__action="cd"
-            elif _tmux_has_session "$1"; then
+            elif _tmux_has_session "=$1"; then
                 tcd__action="attach"
             else
                 echo2 "Error: \"$1\" is not a Directory and not a session"
