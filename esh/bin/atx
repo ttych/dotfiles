@@ -166,7 +166,7 @@ _atx_attach()
 _atx_session_and_switch()
 {
     if _tmux_has_session "=$1"; then
-        [ "atx__detach" -eq 1 ] && return 0
+        [ "$atx__detach" -eq 1 ] && return 0
     else
         _atx_session "$@" || return 1
     fi
