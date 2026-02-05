@@ -4,9 +4,14 @@
 
 load_flatpak_path()
 {
-    if [ -d "/var/lib/flatpak" ]; then
-        path_add_pre_post "/var/lib/flatpak/exports/bin"
-    fi
+    for d in "$HOME_ALT/.local/share/flatpak" \
+             "$HOME/.local/share/flatpak" \
+             "/var/lib/flatpak"
+    do
+        if [ -d "$d" ]; then
+            path_add_pre_post "${d}/exports/bin"
+        fi
+    done
 }
 
 load_flatpak_path
