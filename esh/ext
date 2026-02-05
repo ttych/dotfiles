@@ -625,6 +625,7 @@ esh_ext_load \
     local
 
 for esh_module in \
+    path_discovery \
     ruby_env \
         mise \
         tmux

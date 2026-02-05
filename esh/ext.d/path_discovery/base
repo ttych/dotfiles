@@ -1,0 +1,12 @@
+#!/bin/sh
+# -*- mode: sh -*-
+
+
+load_flatpak_path()
+{
+    if [ -d "/var/lib/flatpak" ]; then
+        path_add_pre_post "/var/lib/flatpak/exports/bin"
+    fi
+}
+
+load_flatpak_path
