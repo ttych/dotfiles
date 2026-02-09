@@ -3838,22 +3838,191 @@ Customize text-mode when activated:
 #+end_src
 
 ** AI
+*** ollama
+#+begin_src emacs-lisp
+    (defvar emw/ollama-available-models nil
+      "Cached list of available Ollama models.")
+
+    (setq-default gptel-model nil)
+
+(defun emw/ollama-refresh-models ()
+  "Refresh cached list of installed Ollama models.
+Initialize `gptel-model` if unset."
+  (setq emw/ollama-available-models
+        (ignore-errors (emw/get-ollama-models)))
+
+  ;; Set a safe global default model once
+  (when (and emw/ollama-available-models
+             (not (bound-and-true-p gptel-model)))
+    (setq-default gptel-model
+                  (intern (car emw/ollama-available-models)))))
+
+    (defun emw/get-ollama-models ()
+      "Fetch the list of installed Ollama models."
+      (let* ((output (shell-command-to-string "ollama list"))
+             (lines (split-string output "\n" t))
+             models)
+        (dolist (line (cdr lines))  ; Skip the first line
+          (when (string-match "^\\([^[:space:]]+\\)" line)
+            (push (match-string 1 line) models)))
+        (nreverse models)))
+
+    (defvar emw/ollama-mode-model-preferences
+      '(
+        (org  . ("codellama:7b" "codellama:13b" "llama3" "mistral"))
+        (prog . ("codellama:7b" "qwen2.5" "mistral"))
+        (text . ("llama3" "mistral"))
+        ;;
+        (emacs-lisp . ("codellama:13b" "codellama:7b" "llama3" "qwen2.5" "mistral"))
+        (python     . ("codellama:7b" "codellama:13b" "mistral" "qwen2.5" "llama3"))
+        (sh         . ("codellama:7b" "codellama:13b" "qwen2.5" "llama3"))
+        )
+      "Preferred Ollama models per mode, in priority order.")
+
+    (defun emw/ollama-default-model ()
+      "Return the first available Ollama model as a symbol, or nil."
+      (when emw/ollama-available-models
+        (intern (car emw/ollama-available-models))))
+#+end_src
+
 *** gptel
-#+begin_src emacs-lisp :tangle no
+#+begin_src emacs-lisp
+  (defun emw/gptel-debug-buffer ()
+    (interactive)
+    (message "gptel-model=%s, gptel-directive=%s"
+             gptel-model gptel-directive))
+
+  (defun emw/gptel--base-from-mode ()
+    "Return base symbol derived from `major-mode`."
+    (let ((name (symbol-name major-mode)))
+      (when (string-suffix-p "-mode" name)
+        (intern (string-remove-suffix "-mode" name)))))
+
+  (defun emw/gptel--mode-category ()
+    "Return a category symbol for the current major mode."
+    (cond
+     ((derived-mode-p 'org-mode)  'org)
+     ((derived-mode-p 'prog-mode) 'prog)
+     ((derived-mode-p 'text-mode) 'text)
+     (t nil)))
+
+  (defun emw/gptel--mode-keywords ()
+    "Return (BASE CATEGORY) for current buffer."
+    (list
+     (emw/gptel--base-from-mode)
+     (emw/gptel--mode-category)))
+
+  (defun emw/gptel--models-for (key)
+    "Return preferred Ollama models list for KEY, or nil."
+    (cdr (assoc key emw/ollama-mode-model-preferences)))
+
+  (defun emw/gptel--select-model-for-mode ()
+  "Return the first available Ollama model (as a symbol) for this buffer."
+  (let* ((base (emw/gptel--base-from-mode))
+         (category (emw/gptel--mode-category))
+         (available emw/ollama-available-models))
+    (when available
+      (let ((model
+             (or
+              ;; 1. Exact mode match
+              (seq-find (lambda (m) (member m available))
+                        (cdr (assoc base emw/ollama-mode-model-preferences)))
+              ;; 2. Category fallback
+              (seq-find (lambda (m) (member m available))
+                        (cdr (assoc category emw/ollama-mode-model-preferences))))))
+        (when model
+          (intern model))))))
+
+  (defun emw/gptel--directive-from-mode ()
+    "Resolve gptel directive with mode → category → default fallback."
+    (cl-destructuring-bind (base category)
+        (emw/gptel--mode-keywords)
+      (cond
+       ((assoc base gptel-directives)     base)
+       ((assoc category gptel-directives) category)
+       (t 'default))))
+
+  (defun emw/gptel-select-directive ()
+    "Interactively select a gptel directive for the current buffer."
+    (interactive)
+    (setq-local
+     gptel-directive
+     (intern
+      (completing-read
+       "GPTel directive: "
+       (mapcar #'symbol-name (mapcar #'car gptel-directives))))))
+
+  (defun emw/gptel-setup-buffer ()
+    "Set gptel directive and model buffer-locally based on major mode."
+    (setq-local gptel-directive (emw/gptel--directive-from-mode))
+    (setq-local gptel-model
+                (or (emw/gptel--select-model-for-mode)
+                    gptel-model)))
+
   (use-package gptel
     :ensure t
-    :config
-     (setq gptel-backend
-          (gptel-make-openai "GPT-4 Turbo"
-           :key 'gptel-api-key
-           :models '("gpt-4.1" "gpt-4.1-mini"))
-          )
-    (setq gptel-api-key "a-key")
-    (setq gptel-use-curl t)
-    (setq gptel-stream t)
+    :defer t
+    :commands (gptel gptel-send gptel-request emw/gptel-explain emw/gptel-review)
+    :init
+    (setq gptel-directives
+          '((default . "You are a helpful assistant.")
+            (prog    . "You are a programming assistant. Focus on code correctness, clarity, and tradeoffs.")
+            (text    . "You are a writing assistant. Improve clarity, structure, and tone.")
+            (emacs-lisp . "You are an Emacs Lisp expert. Prefer idiomatic Emacs Lisp and explain tradeoffs.")
+            (org . "You are assisting with a literate Org document. Do not overwrite content unless asked.")
+            (python . "You are a Python expert. Write clear, idiomatic Python and explain decisions.")
+            (review . "You are a code reviewer. Be critical, precise, and concise.")
+            (explainer . "Explain concepts step by step using simple language.")
+            (work . "You are conservative, precise, and avoid speculation.")
+            ))
+    (setq-default gptel-directive 'default)
 
-    (setq gptel-model "gpt-4.1")
+    :hook
+    ((prog-mode . emw/gptel-setup-buffer)
+     (text-mode . emw/gptel-setup-buffer)
+     (org-mode  . emw/gptel-setup-buffer))
+    :config
+    (emw/ollama-refresh-models)
+
+    (setq gptel-backend
+          (gptel-make-ollama "Ollama"
+            :host "localhost:11434"
+            :stream t
+            :models emw/ollama-available-models)
+          )
+
+    (setq gptel-use-curl t
+          gptel-stream t
+          gptel-default-mode 'org-mode)
+
+    (define-prefix-command 'emw-gptel-map)
+    (keymap-global-set "C-x G" 'emw-gptel-map)
+
+    (keymap-set emw-gptel-map "g" #'gptel)                      ;; open chat buffer
+    (keymap-set emw-gptel-map "s" #'gptel-send)                 ;; send region/prompt
+    (keymap-set emw-gptel-map "x" #'emw/gptel-explain)          ;; explain region
+    (keymap-set emw-gptel-map "r" #'gptel-rewrite)              ;; rewrite region
+    (keymap-set emw-gptel-map "d" #'emw/gptel-select-directive) ;; choose directive
+    (keymap-set emw-gptel-map "a" #'gptel-abort)                ;; abort request
+    (keymap-set emw-gptel-map "c" #'gptel-clear-buffer)         ;; clear buffer
+    (keymap-set emw-gptel-map "i" #'emw/gptel-debug-buffer)     ;; show model/directive
     )
+
+  (defun emw/gptel-explain ()
+    "Explain the active region using gptel."
+    (interactive)
+    (unless (use-region-p)
+      (user-error "No active region"))
+    (let ((gptel-directive 'explainer))
+      (gptel-send)))
+
+  (defun emw/gptel-review ()
+    "Review the active region as code."
+    (interactive)
+    (unless (use-region-p)
+      (user-error "No active region"))
+    (let ((gptel-directive 'review))
+      (gptel-send)))
 #+end_src
 
 *** copilot
