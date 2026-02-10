@@ -1,4 +1,12 @@
 {
+    "editor.fontFamily": "CaskaydiaMono Nerd Font",
+    "editor.fontSize": 12,
+    "editor.tabSize": 2,
+    "editor.minimap.enabled": false,
+    "editor.tabCompletion": "on",
+    "security.workspace.trust.untrustedFiles": "open",
+    "window.menuBarVisibility": "compact",
+    "extensions.ignoreRecommendations": true,
     "github.copilot.nextEditSuggestions.enabled": true,
     "python.defaultInterpreterPath": "/bin/python3",
     "workbench.colorTheme": "Spinel",
@@ -11,5 +19,7 @@
         "editor.semanticHighlighting.enabled": true,
         "editor.formatOnType": true,
         "editor.wordSeparators": "`~@#$%^&*()-=+[{]}\\|;:'\",.<>/"
-    }
+    },
+    "editor.codeActionsOnSave": {
+    },
 }
