@@ -1,15 +1,25 @@
 {
     "editor.fontFamily": "CaskaydiaMono Nerd Font",
     "editor.fontSize": 12,
-    "editor.tabSize": 2,
+    "editor.formatOnPaste": false,
+    "editor.formatOnSave": false,
+    "editor.insertSpaces": false,
     "editor.minimap.enabled": false,
+    "editor.renderWhitespace": "trailing",
+    "editor.rulers": [80],
     "editor.tabCompletion": "on",
-    "security.workspace.trust.untrustedFiles": "open",
-    "window.menuBarVisibility": "compact",
+    "editor.tabSize": 2,
     "extensions.ignoreRecommendations": true,
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 60000,
     "github.copilot.nextEditSuggestions.enabled": true,
     "python.defaultInterpreterPath": "/bin/python3",
-    "workbench.colorTheme": "Spinel",
+    "security.workspace.trust.untrustedFiles": "open",
+    "telemetry.telemetryLevel": "crash",
+    "terminal.integrated.copyOnSelection": true,
+    "terminal.integrated.cursorBlinking": true,
+    "terminal.integrated.middleClickBehavior": "paste",
+    "window.menuBarVisibility": "compact",
     "[ruby]": {
         "editor.defaultColorDecorators": "never",
         "editor.defaultFormatter": "Shopify.ruby-lsp",
@@ -20,6 +30,38 @@
         "editor.formatOnType": true,
         "editor.wordSeparators": "`~@#$%^&*()-=+[{]}\\|;:'\",.<>/"
     },
-    "editor.codeActionsOnSave": {
+    "editor.codeActionsOnSave": {},
+    "notebook.codeActionsOnSave": {},
+    "terminal.integrated.fontSize": 12,
+    "terminal.integrated.profiles.linux": {
+        "bash": {
+            "path": "bash",
+            "args": ["--login"],
+            "icon": "terminal-bash"
+        },
+        "zsh": {
+            "path": "zsh",
+            "args": ["--login"],
+        },
+        "fish": {
+            "path": "fish"
+        },
+        "tmux": {
+            "path": "tmux",
+            "icon": "terminal-tmux"
+        },
+        "pwsh": {
+            "path": "pwsh",
+            "icon": "terminal-powershell"
+        },
+        "atx": {
+            "path": "atx",
+            "icon": "terminal-tmux"
+        },
+    },
+    "terminal.integrated.defaultProfile.linux": "atx",
+    "terminal.integrated.env.linux": {
+        "TMUX": null,
+        "TMUX_PANE": null,
     },
 }

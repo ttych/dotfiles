@@ -13,3 +13,5 @@ ms-azuretools.vscode-containers
 golang.go
 #
 enkia.tokyo-night
+#
+hiro-sun.vscode-emacs
