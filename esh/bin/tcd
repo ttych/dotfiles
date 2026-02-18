@@ -79,7 +79,7 @@ tcd_cd()
         fi
     fi
 
-    tcd_attach "tcd__session_name"
+    tcd_attach "$tcd__session_name"
 }
 
 tcd_attach()
