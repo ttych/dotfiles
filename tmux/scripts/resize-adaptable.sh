@@ -56,22 +56,26 @@ if [ ! -z "$pflag" ]; then
     fi
 fi
 if [ ! -z "$lflag" ]; then
-    if [ $layout_name != 'main-horizontal' ] && [ $layout_name != 'main-vertical' ] ; then
-        printf "layout name must be main-horizontal or main-vertical" >&2
-        exit 1
-    fi
+    case "$layout_name" in
+        "main-horizontal"|"main-horizontal-mirrored") ;;
+        "main-vertical"|"main-vertical-mirrored") ;;
+        *)
+            printf "layout name must be main-horizontal or main-vertical" >&2
+            exit 1
+            ;;
+    esac
 fi
 
-if [ "$layout_name" = "main-vertical" ]; then
-    MAIN_PANE_SIZE=$(expr $(tmux display -p '#{window_width}') \* $percentage \/ 100)
-    MAIN_SIZE_OPTION='main-pane-width'
-
-fi
-
-if [ "$layout_name" = "main-horizontal" ]; then
-    MAIN_PANE_SIZE=$(expr $(tmux display -p '#{window_height}') \* $percentage \/ 100)
-    MAIN_SIZE_OPTION='main-pane-height'
-fi
+case "$layout_name" in
+    "main-vertical"|"main-vertical-mirrored")
+        MAIN_PANE_SIZE=$(expr $(tmux display -p '#{window_width}') \* $percentage \/ 100)
+        MAIN_SIZE_OPTION='main-pane-width'
+        ;;
+    "main-horizontal"|"main-horizontal-mirrored")
+        MAIN_PANE_SIZE=$(expr $(tmux display -p '#{window_height}') \* $percentage \/ 100)
+        MAIN_SIZE_OPTION='main-pane-height'
+        ;;
+esac
 
 if [ ! -z "$target" ]; then
     tmux setw -t $target $MAIN_SIZE_OPTION $MAIN_PANE_SIZE; tmux select-layout -t $target $layout_name
