@@ -644,7 +644,7 @@ esh_ext_load \
     direnv
 
 for esh_module in \
-    toolsh
+    tools
 do
     esh_extd_load "$esh_module"
 done
