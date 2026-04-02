@@ -102,7 +102,7 @@ GEM_PACK_WWW="puma webrick $GEM_PACK_MIDDLEMAN $GEM_PACK_JEKYLL $GEM_PACK_NANOC 
 # rails
 GEM_PACK_RAILS="rails rails-erb-lint rspec-rails"
 # puppet
-GEM_PACK_PUPPET="metadata-json-lint pdk puppet-lint"
+GEM_PACK_PUPPET="metadata-json-lint pdk puppet-lint puppet-languageserver"
 # test
 GEM_PACK_MINITEST="minitest"
 GEM_PACK_RSPEC="rspec"
