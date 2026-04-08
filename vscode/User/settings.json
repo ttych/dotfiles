@@ -1,4 +1,13 @@
 {
+    "chat.useAgentsMdFile": true,
+    "chat.useNestedAgentsMdFiles": true,
+    "chat.useClaudeMdFile": true,
+    "chat.viewSessions.orientation": "stacked",
+    "chat.tools.urls.autoApprove": {
+        "https://code.visualstudio.com": true,
+        "https://github.com/microsoft/vscode/wiki/*": true,
+        "https://nifi.apache.org": true
+    },
     "editor.fontFamily": "CaskaydiaMono Nerd Font",
     "editor.fontSize": 12,
     "editor.formatOnPaste": false,
@@ -42,6 +51,7 @@
         "zsh": {
             "path": "zsh",
             "args": ["--login"],
+            "icon": "terminal-zsh"
         },
         "fish": {
             "path": "fish"
@@ -56,12 +66,15 @@
         },
         "atx": {
             "path": "atx",
+            "args": [],
             "icon": "terminal-tmux"
         },
     },
-    "terminal.integrated.defaultProfile.linux": "atx",
+    "terminal.integrated.defaultProfile.linux": "bash",
     "terminal.integrated.env.linux": {
         "TMUX": null,
         "TMUX_PANE": null,
     },
+    "rubyLsp.rubyExecutablePath": "/home/thomas/.rbenv/shims/ruby",
+    "explorer.confirmDelete": false,
 }
