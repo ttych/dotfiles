@@ -53,7 +53,21 @@ gcd()
 }
 
 
-### ls
+########### kubectl
+k()
+{
+    kubectl "$@"
+}
+
+
+########### lazygit
+lg()
+{
+    lazygit "$@"
+}
+
+
+########### ls
 #alias l='ls'
 alias ll='ls -l --group-directories-first'
 alias lh='ls -lh --group-directories-first'
