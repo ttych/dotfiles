@@ -690,6 +690,14 @@ To save macro:
 | C-c C-c  | apply changes of dired buffer                     |
 |----------+---------------------------------------------------|
 
+*** executable
+#+begin_src emacs-lisp
+  (use-package executable
+    :straight nil
+    :hook (after-save . executable-make-buffer-file-executable-if-script-p)
+    )
+#+end_src
+
 *** history
 #+begin_src emacs-lisp
   (use-package savehist
@@ -864,6 +872,21 @@ Function method to stop properly emacs background instance.
 #+end_src
 
 ** utilities
+
+*** auto-package-update
+#+begin_src emacs-lisp :tangle no
+  (use-package auto-package-update
+    :straight t
+    :custom
+    (auto-package-update-interval 7)
+    (auto-package-update-prompt-before-update t)
+    (auto-package-update-hide-results t)
+    (auto-package-update-delete-old-versions t)
+    :config
+    (auto-package-update-maybe)
+    (auto-package-update-at-time "13:00")
+    )
+#+end_src
 
 *** expand-region
 #+begin_src emacs-lisp
@@ -1287,6 +1310,12 @@ Enable Magit-todos for showing TODOs in magit-status
     (setq org-babel-default-header-args:emacs-lisp
           '((:results . "value")
             (:lexical . "yes")))
+
+    (add-hook 'org-mode-hook
+          (lambda ()
+            (set-face-attribute 'org-block nil :background nil)
+            (set-face-attribute 'org-block-begin-line nil :background nil)
+            (set-face-attribute 'org-block-end-line nil :background nil)))
     )
 #+end_src
 
@@ -2035,6 +2064,20 @@ bundler:
     )
 #+end_src
 
+*** sh
+#+begin_src emacs-lisp
+  (use-package sh-script
+    :straight nil
+    :mode (("\\.shl\\'" . shell-script-mode)
+           ("\\.cmd\\'" . shell-script-mode)
+           ("\\.bashrc\\'" . shell-script-mode)
+           ("\\.zshrc\\'" . shell-script-mode))
+    :custom
+    (sh-basic-offset 2)
+    (sh-indentation 2)
+    )
+#+end_src
+
 *** terraform
 #+begin_src emacs-lisp
   (use-package terraform-mode
@@ -2202,13 +2245,13 @@ available themes
   (custom-available-themes)
 #+end_src
 
-*** modus vivendi
+*** modus
 #+begin_src emacs-lisp
-  (setq modus-themes-italic-constructs t
-        modus-themes-bold-constructs t
-        modus-themes-mixed-fonts t)
-
-  (load-theme 'modus-vivendi t)
+  (use-package modus-themes
+    :straight t
+    :config
+    (load-theme 'modus-vivendi t)
+    )
 #+end_src
 
 *** railscasts-reloaded
