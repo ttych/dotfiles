@@ -233,8 +233,8 @@ git config --global alias.gc-now 'gc --prune=now --aggressive'
 
 ######################################### init
 ### init :: branch
-git config --global init.defaultBranch master
-# git config --global init.defaultBranch main
+# git config --global init.defaultBranch master
+git config --global init.defaultBranch main
 ### init :: alias
 # git config --global alias.i init
 
