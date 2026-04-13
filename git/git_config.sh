@@ -344,6 +344,8 @@ git config --global alias.squash  'commit --squash'
 ######################################### diff
 ### diff :: algorithm : myers | minimal | patience | histogram
 git config --global diff.algorithm patience
+### dif :: wsErrorHighlight : new |+ old |+ context |+ all |+ none
+git config --global diff.wsErrorHighlight all
 
 ### diff strategy
 # echo '*.png diff=exif' >> .gitattributes
