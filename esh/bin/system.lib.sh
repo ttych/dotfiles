@@ -3,15 +3,15 @@
 
 
 ######################################### getent
-gh()
-{
-    getent hosts "$@"
-}
+# gh()
+# {
+#     getent hosts "$@"
+# }
 
-gp()
-{
-    getent passwd "$@"
-}
+# gp()
+# {
+#     getent passwd "$@"
+# }
 
 
 
