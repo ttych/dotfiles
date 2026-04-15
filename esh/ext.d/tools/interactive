@@ -7,6 +7,10 @@ dk()
 {
     docker "$@"
 }
+docker_prune_all()
+{
+    docker system prune --all --volumes "$@"
+}
 
 
 ########### editor
