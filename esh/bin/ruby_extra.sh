@@ -165,9 +165,12 @@ gem_pack()
 
 ######################################### main
 case "$SCRIPT_NAME" in
-    uuid*|now*)
-        "$SCRIPT_NAME" "$@"
-        ;;
+    uuid*)
+      "$SCRIPT_NAME" "$@" ;;
+    now*)
+      "$SCRIPT_NAME" "$@" ;;
+    file_*)
+      "$SCRIPT_NAME" "$@" ;;
     json_*|yaml_*|xml_*)
         "$SCRIPT_NAME" "$@" ;;
     rcat)
