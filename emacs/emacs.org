@@ -229,11 +229,40 @@ Install use-package via straight
 #+begin_src emacs-lisp
   (unless (require 'use-package nil t)
     (straight-use-package 'use-package))
+  (setq straight-use-package-by-default t)
 #+end_src
 
-Make straight the default for use-package
+Configure straight
 #+begin_src emacs-lisp
-  (setq straight-use-package-by-default t)
+  (use-package straight
+    :custom
+    (straight-use-package-by-default t)
+    (straight-check-for-modifications '(check-on-save))
+    (straight-vc-git-default-protocol 'https)
+    :bind ("C-x P u" . temc/straight-update-all)
+    :config
+    (defun temc/straight-update-all ()
+      "Update Packages managed by straight.el"
+      (interactive)
+      (message "Upgrading all packages...")
+      (straight-pull-recipe-repositories)
+      (straight-pull-all)
+      (straight-rebuild-all)
+      (message "All packages upgraded!")
+      )
+    )
+#+end_src
+
+Freeze-force version
+#+begin_src emacs-lisp :tangle no
+  (straight-freeze-versions)
+  (straight-thaw-versions)
+#+end_src
+
+Clean deprecated/unused
+#+begin_src emacs-lisp :tangle no
+  (straight-prune-build)
+  (straight-prune-elpa)
 #+end_src
 
 *** epkg
@@ -246,7 +275,7 @@ alternative to package-menu
                epkg-describe-package
                epkg-update)
     :hook (epkg-list-mode . (lambda() (setq truncate-lines t)))
-    :bind (("C-x P" . epkg-list-packages)
+    :bind (("C-x P l" . epkg-list-packages)
            )
     :config
     (setq epkg-repository (expand-file-name "epkgs/" user-emacs-directory))
