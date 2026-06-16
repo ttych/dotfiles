@@ -391,6 +391,16 @@ esh_ext_lang()
     }
 }
 
+######################################### EXT :: dot_local
+esh_ext_dot_local()
+{
+  path_add_pre "$HOME/.local"
+
+  if [ -n "$HOME_ALT" ]; then
+    path_add_pre "$HOME_ALT/.local"
+  fi
+}
+
 ######################################### EXT :: local
 esh_ext_local()
 {
@@ -634,6 +644,7 @@ do
 done
 
 esh_ext_load \
+    dot_local \
     $ESH_SH_CUR_SHORT \
     utilsh \
     ruby \
