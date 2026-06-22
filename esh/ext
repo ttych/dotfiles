@@ -420,10 +420,10 @@ esh_ext_local()
     local_path_load()
     {
         path_addin_pre "$LOCAL_OS_ARCH_DIR"
-        path_addin_pre "$LOCAL_OS_DIR"
-        path_addin_pre "$LOCAL_DIR"
         path_addin_pre "$LOCAL_ALT_OS_ARCH_DIR"
+        path_addin_pre "$LOCAL_OS_DIR"
         path_addin_pre "$LOCAL_ALT_OS_DIR"
+        path_addin_pre "$LOCAL_DIR"
         path_addin_pre "$LOCAL_ALT_DIR"
     }
     local_path_load
@@ -632,8 +632,9 @@ esh_ext_load \
     terminal \
     lang \
     home \
-    dot_local \
-    local
+    local \
+    utilsh \
+    dot_local
 
 for esh_module in \
     path_discovery \
@@ -646,7 +647,6 @@ done
 
 esh_ext_load \
     $ESH_SH_CUR_SHORT \
-    utilsh \
     ruby \
     tmuxinator \
     keychain \

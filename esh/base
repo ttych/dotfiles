@@ -360,7 +360,7 @@ case "$ESH_OS" in
     Linux) path_add_base /snap /usr/games /usr/X11R6 ;;
 esac
 
-path_addin /opt
+path_addin_post /opt
 
 path_pprint()
 {
