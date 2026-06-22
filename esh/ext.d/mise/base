@@ -8,7 +8,8 @@ has_mise()
 load_mise()
 {
     if has_mise; then
-        eval "$(mise activate $SHELL_SHORT)"
+        # eval "$(mise activate $SHELL_SHORT)"
+        eval "$(mise activate --shims)"
     fi
 }
 

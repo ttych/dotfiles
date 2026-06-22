@@ -394,11 +394,9 @@ esh_ext_lang()
 ######################################### EXT :: dot_local
 esh_ext_dot_local()
 {
-  path_purge "$HOME/.local"
   path_add_pre "$HOME/.local"
 
   if [ -n "$HOME_ALT" ]; then
-    path_purge "$HOME_ALT/.local"
     path_add_pre "$HOME_ALT/.local"
   fi
 }
@@ -634,8 +632,8 @@ esh_ext_load \
     terminal \
     lang \
     home \
-    local \
-    dot_local
+    dot_local \
+    local
 
 for esh_module in \
     path_discovery \
@@ -647,7 +645,6 @@ do
 done
 
 esh_ext_load \
-    dot_local \
     $ESH_SH_CUR_SHORT \
     utilsh \
     ruby \
