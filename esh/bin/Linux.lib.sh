@@ -70,6 +70,28 @@ pkg_latest_kernel_version()
     "${pkg_select}_latest_kernel_version"
 }
 
+deb_extract()
+{
+  if [ $# -ne 2 ]; then
+    echo >&2 "Usage is:  deb_extract <package.deb> <extract_dir>"
+    return 1
+  fi
+
+  mkdir -p "$2" &&
+    dpkg-deb -x "$1" "$2/"
+}
+
+rpm_extract()
+{
+  if [ $# -ne 2 ]; then
+    echo >&2 "Usage is:  rpm_extract <package.rpm> <extract_dir>"
+    return 1
+  fi
+
+  mkdir -p "$2" &&
+    rpm2cpio "$1" | cpio -idm --no-absolute-filenames -D "$2"
+}
+
 
 
 ######################################### cpu
@@ -123,6 +145,12 @@ case "$SCRIPT_NAME" in
         "$SCRIPT_NAME" "$@"
         ;;
     check_*)
+        "$SCRIPT_NAME" "$@"
+        ;;
+    deb_*)
+        "$SCRIPT_NAME" "$@"
+        ;;
+    rpm_*)
         "$SCRIPT_NAME" "$@"
         ;;
 esac
