@@ -9,10 +9,13 @@ SCRIPT_NAME="${0##*/}"
 
 curl_json()
 {
-    curl -H 'Cache-Control: no-cache' \
-         -H 'Content-Type: application/json' \
-         -H 'Accept: application/json' \
-         "$@"
+  curl \
+    --fail --show-error \
+    --location \
+    -H 'Cache-Control: no-cache' \
+    -H 'Content-Type: application/json' \
+    -H 'Accept: application/json' \
+    "$@"
 }
 
 
