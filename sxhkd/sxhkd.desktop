@@ -1,0 +1,5 @@
+[Desktop Entry]
+Type=Application
+Name=sxhkd
+Exec=sxhkd -c %h/.config/sxhkd/sxhkdrc
+OnlyShowIn=LXQt;

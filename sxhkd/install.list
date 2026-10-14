@@ -1,1 +1,2 @@
-.       .config/sxhkd
+.               .config/sxhkd
+sxhkd.desktop   .config/autostart/sxhkd.desktop

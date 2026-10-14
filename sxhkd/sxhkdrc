@@ -1,0 +1,5 @@
+super + Return
+    xterm
+
+XF86AudioRaiseVolume
+    amixer set Master 5%+
