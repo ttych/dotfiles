@@ -1,0 +1,4 @@
+[terminal]
+[terminal.shell]
+program = "exec_default_shell.sh"
+# args = ["-l"]
