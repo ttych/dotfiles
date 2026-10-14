@@ -1,5 +1,35 @@
-super + Return
-    xterm
+super + k
+    xkill
 
-XF86AudioRaiseVolume
-    amixer set Master 5%+
+super + f
+    firefox   
+
+super + shift + f
+    chromium
+
+super + s
+    xterm -name default_dark
+
+super + t
+    xterm -name default_dark
+
+super + shift + t
+    xterm -name 3024_dark
+
+super + x
+    xterm -name default_dark
+    
+super + shift + x
+    xterm -name 3024_dark
+
+super + shift + l
+    setxkbmap -layout fr
+
+super + shift + u
+    setxkbmap -layout us -option compose:ralt
+
+super + shift + s
+    steam
+
+# XF86AudioRaiseVolume
+#     amixer set Master 5%+
