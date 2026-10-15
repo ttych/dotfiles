@@ -31,5 +31,12 @@ super + shift + u
 super + shift + s
     steam
 
+
+XF86MonBrightnessUp
+    sudo brightnessctl set +10%
+
+XF86MonBrightnessDown
+    sudo brightnessctl set 10%-
+
 # XF86AudioRaiseVolume
 #     amixer set Master 5%+
