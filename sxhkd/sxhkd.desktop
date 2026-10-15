@@ -1,5 +1,8 @@
 [Desktop Entry]
-Type=Application
+# Exec=sxhkd -c %h/.config/sxhkd/sxhkdrc
+Exec=sxhkd
 Name=sxhkd
-Exec=sxhkd -c %h/.config/sxhkd/sxhkdrc
 OnlyShowIn=LXQt;
+Type=Application
+Terminal=false
+X-LXQt-X11-Only=true
