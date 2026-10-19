@@ -43,14 +43,20 @@ emacs_org_available()
         return 0
     fi
 
+    for emacs_org_note in "$emacs_org_base/${1}" "$emacs_org_base/${1}.org"; do
+      if [ -f "$emacs_org_note" ] && [ -r "$emacs_org_note" ]; then
+        emacs_org_available="${emacs_org_note}"
+        return 0
+      fi
+    done
+
     for emacs_org_note in "$emacs_org_base"/*"${1}"*.org; do
         [ -f "$emacs_org_note" ] && [ -r "$emacs_org_note" ] || continue
 
         emacs_org_available="${emacs_org_available}${emacs_org_note}${_ORG_RS}"
     done
+    return 0
 }
-
-
 
 emacs_org_prints()
 (
