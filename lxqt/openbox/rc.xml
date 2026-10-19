@@ -129,8 +129,8 @@
     <number>2</number>
     <firstdesk>1</firstdesk>
     <names>
-      <name>A</name>
-      <name>B</name>
+      <name>1</name>
+      <name>2</name>
     </names>
     <popupTime>0</popupTime>
     <!-- The number of milliseconds to show the popup for when switching
