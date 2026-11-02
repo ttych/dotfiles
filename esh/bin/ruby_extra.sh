@@ -83,43 +83,30 @@ rcat()
 
 
 ######################################### gem::pack
-# text
 GEM_PACK_ASCIIDOC="asciidoctor asciidoctor-pdf asciidoctor-revealjs rouge"
-GEM_PACK_DOC="gem-man ronn"
-GEM_PACK_TEXT="hexapdf octodown $GEM_PACK_ASCIIDOC $GEM_PACK_DOC"
-# deployment
-GEM_PACK_CAPISTRANO="capistrano"
-GEM_PACK_MINA="mina"
-# fluentd
-GEM_PACK_FLUENTD="fluentd fluent-plugin-kafka fluent-plugin-elasticsearch fluent-plugin-rewrite-tag-filter fluent-plugin-rename-key fluent-plugin-record-modifier fluent-plugin-flowcounter-simple fluent-plugin-http-healthcheck"
-# www
-GEM_PACK_JEKYLL="jekyll"
-GEM_PACK_MIDDLEMAN="middleman middleman-livereload middleman-autoprefixer middleman-blog"
-GEM_PACK_NANOC="nanoc"
-GEM_PACK_SINATRA="sinatra"
-GEM_PACK_RACK="rack shotgun"
-GEM_PACK_WWW="puma webrick $GEM_PACK_MIDDLEMAN $GEM_PACK_JEKYLL $GEM_PACK_NANOC $GEM_PACK_SINATRA"
-# rails
-GEM_PACK_RAILS="rails rails-erb-lint rspec-rails"
-# puppet
-GEM_PACK_PUPPET="metadata-json-lint pdk puppet-lint puppet-languageserver"
-# test
-GEM_PACK_MINITEST="minitest"
-GEM_PACK_RSPEC="rspec"
-GEM_PACK_TEST="$GEM_PACK_MINITEST $GEM_PACK_RSPEC $GEM_PACK_QUALITY aruba cucumber"
-# tools / utils
-GEM_PACK_TOOLS="quick_and_ruby tmuxinator"
-GEM_PACK_UTILS="$GEM_PACK_TOOLS"
-# dev / code
-GEM_PACK_RUBY="prism pry rbs geminabox"
-GEM_PACK_QUALITY="rubocop reek flay flog erb_lint"
 GEM_PACK_CLI="gli main"
-GEM_PACK_LSP="solargraph ruby-lsp"
-GEM_PACK_CODE="bump rdoc semver yard $GEM_PACK_CLI $GEM_PACK_TEST $GEM_PACK_QUALITY $GEM_PACK_RUBY $GEM_PACK_LSP"
-GEM_PACK_DEV="$GEM_PACK_CODE"
-# default
-GEM_PACK_DEFAULT="$GEM_PACK_RUBY $GEM_PACK_UTILS $GEM_PACK_DEV $GEM_PACK_MIDDLEMAN hexapdf"
-
+GEM_PACK_DEPLOYMENT="capistrano mina"
+GEM_PACK_FLUENTD="fluentd fluent-plugin-kafka fluent-plugin-elasticsearch fluent-plugin-rewrite-tag-filter fluent-plugin-rename-key fluent-plugin-record-modifier fluent-plugin-flowcounter-simple fluent-plugin-http-healthcheck"
+GEM_PACK_GEM="geminabox"
+GEM_PACK_JEKYLL="jekyll"
+GEM_PACK_MARKDOWN="octodown"
+GEM_PACK_MIDDLEMAN="middleman middleman-livereload middleman-autoprefixer middleman-blog"
+GEM_PACK_MINITEST="minitest"
+GEM_PACK_NANOC="nanoc"
+GEM_PACK_PDF="hexapdf"
+GEM_PACK_PUPPET="metadata-json-lint pdk puppet-lint puppet-languageserver"
+GEM_PACK_QUALITY="rubocop reek flay flog erb_lint"
+GEM_PACK_RAILS="rails rails-erb-lint rspec-rails"
+GEM_PACK_RSPEC="rspec"
+GEM_PACK_RUBY="irb pry byebug rdoc gem-man"   # ronn
+GEM_PACK_SINATRA="sinatra"
+GEM_PACK_TOOLS="quick_and_ruby tmuxinator"
+GEM_PACK_WEB="rack shotgun puma webrick"
+#
+GEM_PACK_TEST="$GEM_PACK_MINITEST $GEM_PACK_RSPEC $GEM_PACK_QUALITY aruba cucumber"
+GEM_PACK_DEV="irb pry byebug rdoc bump semver rbs solargraph ruby-lsp yard $GEM_PACK_DEPLOYMENT $GEM_PACK_TEST $GEM_PACK_TOOLS"
+#
+GEM_PACK_DEFAULT="$GEM_PACK_RUBY $GEM_PACK_TOOLS $GEM_PACK_MARKDOWN"
 
 _gem_pack_1()
 {
