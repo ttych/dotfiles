@@ -1,11 +1,13 @@
+
+Include config.d/*.conf
+
+Include config.local
+
 Host *
     ConnectTimeout 30
     ForwardAgent no
     ForwardX11   no
-    ForwardX11Trusted yes
-    Port 22
-    Protocol 2
+    ForwardX11Trusted no
     ServerAliveInterval 60
     ServerAliveCountMax 5
-
-Include config.local
+    # VisualHostKey yes

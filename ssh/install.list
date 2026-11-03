@@ -1,1 +1,2 @@
 config      .ssh/config
+config.d    .ssh/config.d
